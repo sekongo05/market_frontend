@@ -1,0 +1,81 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <h1 class="text-4xl font-bold text-gray-900 mb-8">Produits</h1>
+
+  <!-- Search bar -->
+  <div class="mb-8 flex gap-2">
+    <input
+      [(ngModel)]="searchQuery"
+      type="text"
+      placeholder="Rechercher des produits..."
+      class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+    />
+    <button
+      (click)="search()"
+      class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+    >
+      Rechercher
+    </button>
+  </div>
+
+  <div *ngIf="error" class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+    {{ error }}
+  </div>
+
+  <!-- Products grid -->
+  <div *ngIf="!loading && products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div *ngFor="let product of products" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+      <img
+        [src]="product.imageUrl"
+        [alt]="product.name"
+        class="w-full h-48 object-cover"
+      />
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-900">{{ product.name }}</h3>
+        <p class="text-sm text-gray-600 line-clamp-2">{{ product.description }}</p>
+        <div class="mt-4 flex justify-between items-center">
+          <span class="text-2xl font-bold text-blue-600">
+            {{ (product.price / 1000) | number: '0.0' }}K XOF
+          </span>
+          <button
+            (click)="false"
+            class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700"
+          >
+            Ajouter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="flex justify-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="totalPages > 1" class="flex justify-center gap-2 mt-8">
+    <button
+      (click)="previousPage()"
+      [disabled]="currentPage === 0"
+      class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+    >
+      Précédent
+    </button>
+    <button
+      *ngFor="let page of pages"
+      [class.bg-blue-600]="page === currentPage"
+      [class.text-white]="page === currentPage"
+      (click)="loadProducts(page)"
+      class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+    >
+      {{ page + 1 }}
+    </button>
+    <button
+      (click)="nextPage()"
+      [disabled]="currentPage >= totalPages - 1"
+      class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+    >
+      Suivant
+    </button>
+  </div>
+</div>

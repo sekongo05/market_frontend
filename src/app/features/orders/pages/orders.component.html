@@ -1,0 +1,59 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <h1 class="text-4xl font-bold text-gray-900 mb-8">Mes Commandes</h1>
+
+  <div *ngIf="error" class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 mb-6">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && orders.length === 0" class="text-center py-12">
+    <p class="text-gray-600 text-lg">Vous n'avez pas de commandes</p>
+  </div>
+
+  <div *ngIf="!loading && orders.length > 0" class="space-y-4">
+    <div *ngFor="let order of orders" class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">{{ order.orderNumber }}</h3>
+          <p class="text-sm text-gray-600">{{ order.createdAt | date: 'short' }}</p>
+        </div>
+        <span [ngClass]="getStatusColor(order.orderStatus)" class="px-3 py-1 rounded-full text-sm font-semibold">
+          {{ order.orderStatus }}
+        </span>
+      </div>
+
+      <div class="mb-4">
+        <p class="text-gray-600 text-sm">
+          <strong>Adresse de livraison:</strong> {{ order.deliveryAddress }}
+        </p>
+      </div>
+
+      <div class="mb-4">
+        <p class="text-sm font-semibold text-gray-700 mb-2">Articles:</p>
+        <ul class="space-y-1 text-sm text-gray-600">
+          <li *ngFor="let item of order.items">
+            {{ item.productName }} x {{ item.quantity }} - {{ (item.subtotal / 1000) | number: '0.0' }}K XOF
+          </li>
+        </ul>
+      </div>
+
+      <div class="border-t pt-4 flex justify-between items-center">
+        <div>
+          <p class="text-sm text-gray-600 mb-1">Montant total</p>
+          <p class="text-2xl font-bold text-blue-600">
+            {{ (order.totalAmount / 1000) | number: '0.0' }}K XOF
+          </p>
+        </div>
+        <button
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+        >
+          Voir détails
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="flex justify-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+</div>

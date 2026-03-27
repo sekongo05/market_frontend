@@ -1,0 +1,107 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      Créer un compte
+    </h2>
+
+    <div *ngIf="error" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <p class="text-red-800 text-sm">{{ error }}</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="nom" class="block text-sm font-medium text-gray-700">
+            Nom
+          </label>
+          <input
+            id="nom"
+            type="text"
+            formControlName="nom"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            [ngClass]="{ 'border-red-500': submitted && f['nom'].errors }"
+          />
+        </div>
+        <div>
+          <label for="prenom" class="block text-sm font-medium text-gray-700">
+            Prénom
+          </label>
+          <input
+            id="prenom"
+            type="text"
+            formControlName="prenom"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            [ngClass]="{ 'border-red-500': submitted && f['prenom'].errors }"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          [ngClass]="{ 'border-red-500': submitted && f['email'].errors }"
+        />
+      </div>
+
+      <div>
+        <label for="phone" class="block text-sm font-medium text-gray-700">
+          Téléphone
+        </label>
+        <input
+          id="phone"
+          type="tel"
+          formControlName="phone"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          [ngClass]="{ 'border-red-500': submitted && f['phone'].errors }"
+        />
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">
+          Mot de passe
+        </label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          [ngClass]="{ 'border-red-500': submitted && f['password'].errors }"
+        />
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
+          Confirmer le mot de passe
+        </label>
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          [ngClass]="{ 'border-red-500': submitted && f['confirmPassword'].errors }"
+        />
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+      >
+        {{ loading ? 'Inscription en cours...' : 'S\'inscrire' }}
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Vous avez déjà un compte?
+      <a routerLink="/auth/login" class="text-blue-600 hover:text-blue-500">
+        Se connecter
+      </a>
+    </p>
+  </div>
+</div>

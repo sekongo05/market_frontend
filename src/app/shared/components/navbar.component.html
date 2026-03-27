@@ -1,0 +1,57 @@
+<div class="bg-white shadow">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between">
+      <div class="flex items-center">
+        <a routerLink="/" class="text-2xl font-bold text-blue-600">Market</a>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <a routerLink="/products" class="text-gray-700 hover:text-blue-600">
+          Produits
+        </a>
+
+        <a *ngIf="currentUser?.role === 'ADMIN' || currentUser?.role === 'MANAGER'"
+          routerLink="/admin" 
+          class="text-gray-700 hover:text-blue-600">
+          Admin
+        </a>
+
+        <div class="relative">
+          <button *ngIf="currentUser"
+            (click)="toggleUserMenu()"
+            class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm">
+              {{ initials }}
+            </div>
+            <span>{{ fullName }}</span>
+          </button>
+
+          <div *ngIf="showUserMenu && currentUser" 
+            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
+            <div class="p-4 border-b">
+              <p class="text-sm text-gray-600">{{ currentUser.email }}</p>
+            </div>
+            <a routerLink="/profile" 
+              class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+              Mon Profil
+            </a>
+            <a routerLink="/orders" 
+              class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+              Mes Commandes
+            </a>
+            <button (click)="logout()" 
+              class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 border-t">
+              Déconnexion
+            </button>
+          </div>
+        </div>
+
+        <a *ngIf="!currentUser"
+          routerLink="/auth/login" 
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          Connexion
+        </a>
+      </div>
+    </div>
+  </nav>
+</div>

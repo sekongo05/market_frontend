@@ -1,0 +1,76 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      Connexion
+    </h2>
+
+    <div *ngIf="error" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <p class="text-red-800 text-sm">{{ error }}</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          [ngClass]="{ 'border-red-500': submitted && f['email'].errors }"
+        />
+        <div *ngIf="submitted && f['email'].errors" class="mt-1 text-sm text-red-600">
+          <span *ngIf="f['email'].errors['required']">Email est requis</span>
+          <span *ngIf="f['email'].errors['email']">Email invalide</span>
+        </div>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">
+          Mot de passe
+        </label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          [ngClass]="{ 'border-red-500': submitted && f['password'].errors }"
+        />
+        <div
+          *ngIf="submitted && f['password'].errors"
+          class="mt-1 text-sm text-red-600"
+        >
+          <span *ngIf="f['password'].errors['required']">
+            Mot de passe est requis
+          </span>
+          <span *ngIf="f['password'].errors['minlength']">
+            Minimum 6 caractères
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+      >
+        {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Pas encore de compte?
+      <a routerLink="/auth/register" class="text-blue-600 hover:text-blue-500">
+        S'inscrire
+      </a>
+    </p>
+
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Mot de passe oublié?
+      <a routerLink="/auth/forgot-password" class="text-blue-600 hover:text-blue-500">
+        Réinitialiser
+      </a>
+    </p>
+  </div>
+</div>

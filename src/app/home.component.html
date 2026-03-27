@@ -1,0 +1,70 @@
+<div>
+  <!-- Hero Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <h1 class="text-5xl font-bold mb-4">Bienvenue sur Market</h1>
+      <p class="text-xl mb-8">Découvrez nos produits et effectuez vos achats en ligne</p>
+      <div class="flex gap-4">
+        <a
+          routerLink="/products"
+          class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100"
+        >
+          Voir les produits
+        </a>
+        <a
+          *ngIf="!(currentUser$ | async)"
+          routerLink="/auth/login"
+          class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700"
+        >
+          Se connecter
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="bg-gray-50 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-bold text-center text-gray-900 mb-12">
+        Pourquoi choisir Market?
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+          <div class="text-4xl mb-4">🚀</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Livraison rapide</h3>
+          <p class="text-gray-600">
+            Nous livrons rapidement vos commandes à travers le pays
+          </p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+          <div class="text-4xl mb-4">💳</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Paiement sécurisé</h3>
+          <p class="text-gray-600">
+            Payez en toute sécurité avec Wave CI
+          </p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+          <div class="text-4xl mb-4">🛒</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Large sélection</h3>
+          <p class="text-gray-600">
+            Des milliers de produits disponibles
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="bg-blue-600 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-4xl font-bold mb-4">Prêt à faire vos achats?</h2>
+      <p class="text-xl mb-8">Explorez notre large sélection de produits dès aujourd'hui</p>
+      <a
+        routerLink="/products"
+        class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 inline-block"
+      >
+        Commencer les achats
+      </a>
+    </div>
+  </div>
+</div>
