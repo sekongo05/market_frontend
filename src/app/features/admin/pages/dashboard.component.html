@@ -1,72 +1,188 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-  <h1 class="text-4xl font-bold text-gray-900 mb-8">Dashboard Admin</h1>
+<div class="min-h-screen bg-gray-50">
 
-  <div *ngIf="error" class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 mb-6">
-    {{ error }}
-  </div>
-
-  <div *ngIf="!loading && stats" class="space-y-8">
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <p class="text-gray-600 text-sm">Commandes totales</p>
-        <p class="text-4xl font-bold text-blue-600">{{ stats.totalOrders }}</p>
-      </div>
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <p class="text-gray-600 text-sm">Utilisateurs</p>
-        <p class="text-4xl font-bold text-green-600">{{ stats.totalUsers }}</p>
-      </div>
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <p class="text-gray-600 text-sm">Produits actifs</p>
-        <p class="text-4xl font-bold text-purple-600">{{ stats.totalActiveProducts }}</p>
-      </div>
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <p class="text-gray-600 text-sm">Commandes en attente</p>
-        <p class="text-4xl font-bold text-yellow-600">{{ stats.pendingOrders }}</p>
-      </div>
-    </div>
-
-    <!-- Revenue -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-bold text-gray-900 mb-4">Revenus</h2>
-      <p class="text-3xl font-bold text-blue-600">
-        {{ (stats.totalRevenue / 1000000) | number: '0.2' }}M XOF
-      </p>
-    </div>
-
-    <!-- Order Status Summary -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-bold text-gray-900 mb-4">Statut des commandes</h2>
-      <div class="space-y-2">
-        <div *ngFor="let item of stats.ordersByStatus" class="flex justify-between items-center">
-          <span class="text-gray-700">{{ item.status }}</span>
-          <span class="font-bold">{{ item.count }}</span>
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in-down">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-indigo-600 font-semibold text-sm uppercase tracking-widest mb-1">Administration</p>
+          <h1 class="text-3xl font-black text-gray-900">Tableau de bord</h1>
         </div>
-      </div>
-    </div>
-
-    <!-- Recent Orders -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-bold text-gray-900 mb-4">Commandes récentes</h2>
-      <div class="space-y-3">
-        <div *ngFor="let order of stats.recentOrders" class="flex justify-between items-center border-b pb-3">
-          <div>
-            <p class="font-semibold">{{ order.orderNumber }}</p>
-            <p class="text-sm text-gray-600">{{ order.customerName }}</p>
-          </div>
-          <div class="text-right">
-            <p class="font-bold">{{ (order.totalAmount / 1000) | number: '0.0' }}K XOF</p>
-            <span [ngClass]="getStatusColor(order.orderStatus)" class="text-xs px-2 py-1 rounded">
-              {{ order.orderStatus }}
-            </span>
-          </div>
-        </div>
+        <button (click)="loadStats()" class="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 text-indigo-600 font-semibold text-sm rounded-xl hover:bg-indigo-100 transition-colors duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Actualiser
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Loading state -->
-  <div *ngIf="loading" class="flex justify-center py-12">
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Error -->
+    @if (error) {
+      <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 mb-6 animate-fade-in">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        {{ error }}
+      </div>
+    }
+
+    <!-- Loading skeleton -->
+    @if (loading) {
+      <div class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+              <div class="skeleton h-4 w-24 mb-3"></div>
+              <div class="skeleton h-10 w-20"></div>
+            </div>
+          }
+        </div>
+        <div class="grid lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm border border-gray-100"><div class="skeleton h-48 w-full"></div></div>
+          <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100"><div class="skeleton h-48 w-full"></div></div>
+        </div>
+      </div>
+    }
+
+    @if (!loading && stats) {
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-200 card-hover animate-fade-in-up delay-100">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            </div>
+            <span class="text-white/70 text-xs font-medium">+12% ce mois</span>
+          </div>
+          <p class="text-4xl font-black">{{ stats.totalOrders }}</p>
+          <p class="text-white/70 text-sm mt-1">Commandes totales</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-green-500 to-teal-500 rounded-3xl p-6 text-white shadow-xl shadow-green-200 card-hover animate-fade-in-up delay-200">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <span class="text-white/70 text-xs font-medium">+8% ce mois</span>
+          </div>
+          <p class="text-4xl font-black">{{ stats.totalUsers }}</p>
+          <p class="text-white/70 text-sm mt-1">Utilisateurs</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-6 text-white shadow-xl shadow-purple-200 card-hover animate-fade-in-up delay-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            </div>
+            <span class="text-white/70 text-xs font-medium">En ligne</span>
+          </div>
+          <p class="text-4xl font-black">{{ stats.totalActiveProducts }}</p>
+          <p class="text-white/70 text-sm mt-1">Produits actifs</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-orange-400 to-red-500 rounded-3xl p-6 text-white shadow-xl shadow-orange-200 card-hover animate-fade-in-up delay-400">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-white/70 text-xs font-medium">À traiter</span>
+          </div>
+          <p class="text-4xl font-black">{{ stats.pendingOrders }}</p>
+          <p class="text-white/70 text-sm mt-1">En attente</p>
+        </div>
+      </div>
+
+      <!-- Revenue + Status row -->
+      <div class="grid lg:grid-cols-3 gap-6 mb-6">
+
+        <!-- Revenue card -->
+        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 card-hover animate-fade-in-up delay-200">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Revenus totaux</h2>
+              <p class="text-xs text-gray-400 mt-0.5">Montant total des ventes</p>
+            </div>
+            <span class="px-3 py-1.5 bg-green-50 text-green-600 text-xs font-bold rounded-xl">+18% ce mois</span>
+          </div>
+          <p class="text-5xl font-black text-gray-900 mb-2">
+            {{ (stats.totalRevenue / 1000000) | number:'1.0-2' }}<span class="text-2xl text-gray-400 font-semibold ml-1">M XOF</span>
+          </p>
+          <div class="mt-6 h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style="width: 73%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-gray-400 mt-2">
+            <span>Objectif mensuel</span>
+            <span class="font-bold text-indigo-600">73%</span>
+          </div>
+        </div>
+
+        <!-- Orders by status -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 card-hover animate-fade-in-up delay-300">
+          <h2 class="text-lg font-bold text-gray-900 mb-5">Statut des commandes</h2>
+          @if (stats.ordersByStatus) {
+            <div class="space-y-3">
+              @for (item of stats.ordersByStatus; track item.status) {
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold" [ngClass]="getStatusColor(item.status)">{{ item.status }}</span>
+                  </div>
+                  <span class="text-lg font-black text-gray-800">{{ item.count }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Recent orders table -->
+      @if (stats.recentOrders) {
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden animate-fade-in-up delay-400">
+          <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Commandes récentes</h2>
+              <p class="text-xs text-gray-400 mt-0.5">Les dernières commandes passées</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Commande</th>
+                  <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Client</th>
+                  <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Montant</th>
+                  <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Statut</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                @for (order of stats.recentOrders; track order.orderNumber) {
+                  <tr class="hover:bg-gray-50 transition-colors duration-150">
+                    <td class="px-6 py-4">
+                      <span class="font-semibold text-sm text-gray-800">{{ order.orderNumber }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                          {{ order.customerName?.[0] }}
+                        </div>
+                        <span class="text-sm text-gray-700 font-medium">{{ order.customerName }}</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="font-bold text-gray-900">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K XOF</span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="inline-flex px-3 py-1.5 rounded-xl text-xs font-bold" [ngClass]="getStatusColor(order.orderStatus)">
+                        {{ order.orderStatus }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    }
   </div>
 </div>

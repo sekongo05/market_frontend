@@ -1,3 +1,162 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+/* ===== CUSTOM ANIMATIONS ===== */
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -800px 0; }
+  100% { background-position: 800px 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5); }
+  70%  { transform: scale(1);    box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+@keyframes goldShine {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ===== ANIMATION UTILITY CLASSES ===== */
+
+.animate-fade-in-up   { animation: fadeInUp 0.6s ease-out both; }
+.animate-fade-in-down { animation: fadeInDown 0.5s ease-out both; }
+.animate-fade-in      { animation: fadeIn 0.5s ease-out both; }
+.animate-slide-left   { animation: slideInLeft 0.6s ease-out both; }
+.animate-slide-right  { animation: slideInRight 0.6s ease-out both; }
+.animate-scale-in     { animation: scaleIn 0.5s ease-out both; }
+.animate-float        { animation: float 3s ease-in-out infinite; }
+.animate-pulse-ring   { animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite; }
+
+/* Stagger delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+
+/* ===== SKELETON LOADER ===== */
+
+.skeleton {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+.skeleton-light {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+/* ===== GOLD TEXT SHINE ===== */
+
+.gold-text {
+  background: linear-gradient(
+    90deg,
+    #b8860b 0%,
+    #d4af37 25%,
+    #f5e06e 50%,
+    #d4af37 75%,
+    #b8860b 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShine 4s linear infinite;
+}
+
+/* ===== GOLD GRADIENT ===== */
+
+.bg-gold {
+  background: linear-gradient(135deg, #b8860b 0%, #d4af37 50%, #f5e06e 100%);
+}
+
+.bg-gold-dark {
+  background: linear-gradient(135deg, #7a5c00 0%, #b8860b 50%, #d4af37 100%);
+}
+
+.border-gold {
+  border-color: #d4af37;
+}
+
+.text-gold {
+  color: #d4af37;
+}
+
+/* ===== CARD HOVER ===== */
+
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+/* ===== LUXURY CARD ===== */
+
+.luxury-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.luxury-card:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  box-shadow: 0 20px 40px rgba(212, 175, 55, 0.1);
+  transform: translateY(-4px);
+}
+
+/* ===== SMOOTH SCROLL ===== */
+* { scroll-behavior: smooth; }
+
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0d0d0d; }
+::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #f5e06e; }
