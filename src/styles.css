@@ -1,109 +1,150 @@
 @import 'tailwindcss';
+@config '../tailwind.config.js';
 
-/* ===== CUSTOM ANIMATIONS ===== */
+/* ─── Light variant (class-based, mirrors dark) ──────────────────────────── */
+@custom-variant light (&:where(.light, .light *));
 
+/* ─── Theme transition ────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}
+.no-transition, .no-transition * { transition: none !important; }
+
+/* ─── Scroll-reveal ───────────────────────────────────────────────────────── */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1) !important;
+}
+.scroll-reveal.from-left  { transform: translateX(-40px); }
+.scroll-reveal.from-right { transform: translateX( 40px); }
+.scroll-reveal.scale-up   { transform: scale(0.90); }
+.scroll-reveal.in-view    { opacity: 1; transform: translate(0) scale(1); }
+
+.stagger-1 { transition-delay: 0.05s !important; }
+.stagger-2 { transition-delay: 0.12s !important; }
+.stagger-3 { transition-delay: 0.19s !important; }
+.stagger-4 { transition-delay: 0.26s !important; }
+.stagger-5 { transition-delay: 0.33s !important; }
+.stagger-6 { transition-delay: 0.40s !important; }
+
+/* ─── Keyframes ───────────────────────────────────────────────────────────── */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(32px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeInDown {
   from { opacity: 0; transform: translateY(-20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
 @keyframes slideInLeft {
   from { opacity: 0; transform: translateX(-40px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(40px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.92); }
   to   { opacity: 1; transform: scale(1); }
 }
-
 @keyframes shimmer {
   0%   { background-position: -800px 0; }
-  100% { background-position: 800px 0; }
+  100% { background-position:  800px 0; }
 }
-
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-10px); }
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
 }
-
+@keyframes floatReverse {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY( 12px); }
+}
 @keyframes pulse-ring {
-  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5); }
-  70%  { transform: scale(1);    box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212,175,55,.5); }
+  70%  { transform: scale(1);    box-shadow: 0 0 0 14px rgba(212,175,55,0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212,175,55,0); }
 }
-
-@keyframes gradient-x {
-  0%, 100% { background-position: 0% 50%; }
-  50%       { background-position: 100% 50%; }
-}
-
 @keyframes goldShine {
   0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes drawerIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes orb-drift {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%      { transform: translate(40px,-30px) scale(1.1); }
+  66%      { transform: translate(-20px, 20px) scale(0.95); }
 }
 
-/* ===== ANIMATION UTILITY CLASSES ===== */
-
-.animate-fade-in-up   { animation: fadeInUp 0.6s ease-out both; }
+/* ─── Utility animation classes ──────────────────────────────────────────── */
+.animate-fade-in-up   { animation: fadeInUp   0.6s ease-out both; }
 .animate-fade-in-down { animation: fadeInDown 0.5s ease-out both; }
-.animate-fade-in      { animation: fadeIn 0.5s ease-out both; }
-.animate-slide-left   { animation: slideInLeft 0.6s ease-out both; }
+.animate-fade-in      { animation: fadeIn     0.5s ease-out both; }
+.animate-slide-left   { animation: slideInLeft  0.6s ease-out both; }
 .animate-slide-right  { animation: slideInRight 0.6s ease-out both; }
-.animate-scale-in     { animation: scaleIn 0.5s ease-out both; }
-.animate-float        { animation: float 3s ease-in-out infinite; }
-.animate-pulse-ring   { animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite; }
+.animate-scale-in     { animation: scaleIn    0.5s ease-out both; }
+.animate-float        { animation: float      3.5s ease-in-out infinite; }
+.animate-float-rev    { animation: floatReverse 4s ease-in-out infinite; }
+.animate-pulse-ring   { animation: pulse-ring 2s cubic-bezier(.455,.03,.515,.955) infinite; }
+.animate-spin-slow    { animation: spin-slow  20s linear infinite; }
+.animate-drawer-in    { animation: drawerIn   0.38s cubic-bezier(.32,0,.15,1) both; }
+.animate-backdrop-in  { animation: backdropIn 0.25s ease both; }
 
-/* Stagger delays */
+/* Stagger delays (initial animations) */
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }
 .delay-400 { animation-delay: 0.4s; }
 .delay-500 { animation-delay: 0.5s; }
 .delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-800 { animation-delay: 0.8s; }
 
-/* ===== SKELETON LOADER ===== */
+/* ─── Marquee strip ──────────────────────────────────────────────────────── */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
 
+/* ─── Skeleton ───────────────────────────────────────────────────────────── */
 .skeleton {
-  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background: linear-gradient(90deg, #1f1f1f 25%, #2d2d2d 50%, #1f1f1f 75%);
   background-size: 800px 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 6px;
 }
-
-.skeleton-light {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+.light .skeleton {
+  background: linear-gradient(90deg, #ede9e3 25%, #e0dbd2 50%, #ede9e3 75%);
   background-size: 800px 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: 6px;
 }
 
-/* ===== GOLD TEXT SHINE ===== */
-
+/* ─── Gold text shine ────────────────────────────────────────────────────── */
 .gold-text {
-  background: linear-gradient(
-    90deg,
-    #b8860b 0%,
-    #d4af37 25%,
-    #f5e06e 50%,
-    #d4af37 75%,
-    #b8860b 100%
-  );
+  background: linear-gradient(90deg,#b8860b 0%,#d4af37 25%,#f5e06e 50%,#d4af37 75%,#b8860b 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -111,52 +152,220 @@
   animation: goldShine 4s linear infinite;
 }
 
-/* ===== GOLD GRADIENT ===== */
+/* ─── Gold utilities ─────────────────────────────────────────────────────── */
+.bg-gold      { background: linear-gradient(135deg,#b8860b 0%,#d4af37 50%,#f0c93a 100%); }
+.bg-gold-dark { background: linear-gradient(135deg,#7a5c00 0%,#b8860b 50%,#d4af37 100%); }
+.border-gold  { border-color: #d4af37; }
+.text-gold    { color: #d4af37; }
+.light .text-gold { color: #a0720a; }   /* darker gold on white = better contrast */
 
-.bg-gold {
-  background: linear-gradient(135deg, #b8860b 0%, #d4af37 50%, #f5e06e 100%);
-}
-
-.bg-gold-dark {
-  background: linear-gradient(135deg, #7a5c00 0%, #b8860b 50%, #d4af37 100%);
-}
-
-.border-gold {
-  border-color: #d4af37;
-}
-
-.text-gold {
-  color: #d4af37;
-}
-
-/* ===== CARD HOVER ===== */
-
-.card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.card-hover:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-}
-
-/* ===== LUXURY CARD ===== */
-
+/* ─── Luxury card ─────────────────────────────────────────────────────────── */
 .luxury-card {
-  background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  background: linear-gradient(135deg,#191919 0%,#0f0f0f 100%);
+  border: 1px solid rgba(212,175,55,.18);
+  transition: border-color .3s, box-shadow .3s, transform .3s !important;
 }
 .luxury-card:hover {
-  border-color: rgba(212, 175, 55, 0.6);
-  box-shadow: 0 20px 40px rgba(212, 175, 55, 0.1);
+  border-color: rgba(212,175,55,.55);
+  box-shadow: 0 20px 48px rgba(212,175,55,.1);
   transform: translateY(-4px);
 }
 
-/* ===== SMOOTH SCROLL ===== */
-* { scroll-behavior: smooth; }
+/* Light variant — warm ivory card */
+.light .luxury-card {
+  background: #ffffff;
+  border: 1px solid rgba(168,128,30,.14);
+  box-shadow: 0 2px 20px rgba(0,0,0,.06);
+}
+.light .luxury-card:hover {
+  border-color: rgba(184,134,11,.35);
+  box-shadow: 0 16px 40px rgba(168,128,30,.12);
+}
 
-/* ===== CUSTOM SCROLLBAR ===== */
-::-webkit-scrollbar { width: 6px; }
+/* ─── Card hover ─────────────────────────────────────────────────────────── */
+.card-hover { transition: transform .3s, box-shadow .3s !important; }
+.card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,.18); }
+.light .card-hover:hover { box-shadow: 0 20px 40px rgba(0,0,0,.10); }
+
+/* ─── Theme backgrounds ──────────────────────────────────────────────────── */
+/* Dark defaults */
+.theme-bg      { background: #0a0a0a; }
+.theme-surface { background: #131313; }
+.theme-surface-2 { background: #1c1c1c; }
+.theme-border  { border-color: rgba(255,255,255,.07); }
+.theme-text    { color: #f1f1f1; }
+.theme-muted   { color: #9ca3af; }
+
+/* Light overrides — warm paper palette */
+.light .theme-bg       { background: #faf8f4; }
+.light .theme-surface  { background: #ffffff; }
+.light .theme-surface-2{ background: #f3f0eb; }
+.light .theme-border   { border-color: rgba(0,0,0,.08); }
+.light .theme-text     { color: #111111; }
+.light .theme-muted    { color: #6b7280; }
+
+/* ─── Theme input ────────────────────────────────────────────────────────── */
+.theme-input {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  color: #f1f1f1;
+}
+.theme-input::placeholder { color: #6b7280; }
+.theme-input:focus {
+  border-color: rgba(212,175,55,.50);
+  box-shadow: 0 0 0 3px rgba(212,175,55,.12);
+  outline: none;
+}
+.light .theme-input {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,.10);
+  color: #111111;
+}
+.light .theme-input::placeholder { color: #9ca3af; }
+.light .theme-input:focus {
+  border-color: rgba(168,128,30,.50);
+  box-shadow: 0 0 0 3px rgba(168,128,30,.10);
+}
+
+/* ─── Dot grid ───────────────────────────────────────────────────────────── */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(255,255,255,.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.light .dot-grid {
+  background-image: radial-gradient(circle, rgba(0,0,0,.06) 1px, transparent 1px);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: #0d0d0d; }
 ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #f5e06e; }
+.light ::-webkit-scrollbar-track { background: #ede9e3; }
+.light ::-webkit-scrollbar-thumb { background: #b8860b; }
+
+/* ─── Smooth scroll ──────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+
+/* ─── Body / html backgrounds ───────────────────────────────────────────── */
+body          { background: #0a0a0a; color: #f1f1f1; }
+html.dark     { background: #0a0a0a; }
+html.light    { background: #faf8f4; }
+html.light body { background: #faf8f4; color: #111111; }
+
+/* ─── Navbar items (desktop) ─────────────────────────────────────────────── */
+.nav-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.625rem;
+  color: #9ca3af;
+  transition: color .2s, background-color .2s;
+  text-decoration: none;
+}
+.nav-item:hover { color: #d4af37; background: rgba(255,255,255,.05); }
+.light .nav-item { color: #374151; }
+.light .nav-item:hover { color: #a0720a; background: rgba(0,0,0,.04); }
+
+/* Active state (routerLinkActive) */
+.nav-active {
+  color: #d4af37 !important;
+  background: rgba(212,175,55,.10) !important;
+}
+.light .nav-active {
+  color: #a0720a !important;
+  background: rgba(160,114,10,.09) !important;
+}
+
+/* ─── Navbar icon buttons ────────────────────────────────────────────────── */
+.nav-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  color: #9ca3af;
+  transition: color .2s, background-color .2s;
+  flex-shrink: 0;
+}
+.nav-icon-btn:hover { color: #d4af37; background: rgba(255,255,255,.07); }
+.light .nav-icon-btn { color: #6b7280; }
+.light .nav-icon-btn:hover { color: #a0720a; background: rgba(0,0,0,.06); }
+
+.active-icon { color: #d4af37; background: rgba(212,175,55,.12); }
+.light .active-icon { color: #a0720a; background: rgba(160,114,10,.10); }
+
+/* ─── Nav link (legacy) ──────────────────────────────────────────────────── */
+.nav-link {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: color .2s, background-color .2s;
+  color: #9ca3af;
+}
+.nav-link:hover { color: #d4af37; background: rgba(255,255,255,.05); }
+.light .nav-link { color: #374151; }
+.light .nav-link:hover { color: #a0720a; background: rgba(0,0,0,.04); }
+
+/* ─── Mobile nav items ───────────────────────────────────────────────────── */
+.mobile-nav-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  color: #9ca3af;
+  transition: color .2s, background-color .2s;
+  text-decoration: none;
+}
+.mobile-nav-item:hover { color: #d4af37; background: rgba(255,255,255,.05); }
+.light .mobile-nav-item { color: #374151; }
+.light .mobile-nav-item:hover { color: #a0720a; background: rgba(0,0,0,.04); }
+
+.mobile-nav-active { color: #d4af37 !important; background: rgba(212,175,55,.10) !important; }
+.light .mobile-nav-active { color: #a0720a !important; background: rgba(160,114,10,.09) !important; }
+
+/* ─── Dropdown items ─────────────────────────────────────────────────────── */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.625rem;
+  color: #9ca3af;
+  transition: color .2s, background-color .2s;
+  text-decoration: none;
+}
+.dropdown-item:hover { color: #e5e7eb; background: rgba(255,255,255,.06); }
+.light .dropdown-item { color: #374151; }
+.light .dropdown-item:hover { color: #111111; background: rgba(0,0,0,.04); }
+
+.dropdown-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: rgba(255,255,255,.06);
+  flex-shrink: 0;
+  color: #9ca3af;
+}
+.light .dropdown-icon { background: rgba(0,0,0,.05); color: #6b7280; }
+.dropdown-item:hover .dropdown-icon { color: #d4af37; background: rgba(212,175,55,.12); }
+.light .dropdown-item:hover .dropdown-icon { color: #a0720a; background: rgba(160,114,10,.10); }
+
+/* ─── Footer / layout overrides ─────────────────────────────────────────── */
+.light footer {
+  background: #f0ece4;
+  border-color: rgba(0,0,0,.07);
+  color: #6b7280;
+}

@@ -1,0 +1,415 @@
+<div class="min-h-screen theme-bg">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="theme-surface border-b theme-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-full bg-gold/15 text-gold border border-gold/25">
+              {{ currentUser?.role }}
+            </span>
+          </div>
+          <h1 class="text-2xl font-black theme-text">Espace Gestion</h1>
+          <p class="text-sm theme-muted mt-0.5">Gérez votre catalogue ChronoLux</p>
+        </div>
+        <button (click)="openCreateModal()"
+          class="flex items-center gap-2 px-5 py-3 bg-gold text-black rounded-xl font-bold text-sm
+                 hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          </svg>
+          Ajouter un produit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- ── Stats KPI ──────────────────────────────────────────────────────── -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
+        <div class="w-12 h-12 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-2xl font-black theme-text">{{ totalProducts }}</p>
+          <p class="text-xs theme-muted font-semibold">Produits</p>
+        </div>
+      </div>
+
+      <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
+        <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-2xl font-black text-green-400">{{ totalProducts - outOfStockCount - lowStockCount }}</p>
+          <p class="text-xs theme-muted font-semibold">En stock</p>
+        </div>
+      </div>
+
+      <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
+        <div class="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-2xl font-black text-orange-400">{{ lowStockCount }}</p>
+          <p class="text-xs theme-muted font-semibold">Stock faible</p>
+        </div>
+      </div>
+
+      <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
+        <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-2xl font-black text-red-400">{{ outOfStockCount }}</p>
+          <p class="text-xs theme-muted font-semibold">Rupture</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Search bar ─────────────────────────────────────────────────────── -->
+    <div class="flex gap-3">
+      <div class="relative flex-1 max-w-md">
+        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+        </svg>
+        <input [(ngModel)]="searchQuery" (keyup.enter)="search()" type="text"
+               placeholder="Rechercher un produit…"
+               class="theme-input w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-all"/>
+      </div>
+      <button (click)="search()"
+        class="px-5 py-2.5 bg-gold text-black rounded-xl text-sm font-bold hover:shadow-lg transition-all">
+        Chercher
+      </button>
+    </div>
+
+    <!-- ── Products table ─────────────────────────────────────────────────── -->
+    <div class="luxury-card rounded-2xl overflow-hidden">
+
+      <!-- Table header -->
+      <div class="px-6 py-4 border-b theme-border flex items-center justify-between">
+        <h2 class="font-bold theme-text">Catalogue produits</h2>
+        <span class="text-xs theme-muted">{{ totalProducts }} article{{ totalProducts > 1 ? 's' : '' }}</span>
+      </div>
+
+      <!-- Loading -->
+      @if (loading) {
+        <div class="p-8 flex justify-center">
+          <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </div>
+      }
+
+      <!-- Table -->
+      @if (!loading && products.length > 0) {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b theme-border">
+                <th class="text-left px-6 py-3 text-xs font-bold theme-muted uppercase tracking-wider">Produit</th>
+                <th class="text-left px-4 py-3 text-xs font-bold theme-muted uppercase tracking-wider hidden md:table-cell">Catégorie</th>
+                <th class="text-right px-4 py-3 text-xs font-bold theme-muted uppercase tracking-wider">Prix</th>
+                <th class="text-center px-4 py-3 text-xs font-bold theme-muted uppercase tracking-wider">Stock</th>
+                <th class="text-right px-6 py-3 text-xs font-bold theme-muted uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of products; track product.id; let i = $index) {
+                <tr class="border-b theme-border last:border-0 hover:bg-white/3 transition-colors group">
+
+                  <!-- Product -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <img [src]="product.imageUrl" [alt]="product.name"
+                           class="w-10 h-10 rounded-xl object-cover flex-shrink-0"
+                           (error)="$any($event.target).src='https://placehold.co/80x80/1a1a1a/d4af37?text=CL'"/>
+                      <div class="min-w-0">
+                        <p class="font-semibold theme-text truncate max-w-[180px]">{{ product.name }}</p>
+                        <p class="text-xs theme-muted truncate max-w-[180px]">{{ product.description | slice:0:60 }}…</p>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Category -->
+                  <td class="px-4 py-4 hidden md:table-cell">
+                    <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-gold/10 text-gold">
+                      {{ product.category.name }}
+                    </span>
+                  </td>
+
+                  <!-- Price -->
+                  <td class="px-4 py-4 text-right">
+                    <span class="font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+                    <span class="text-xs theme-muted ml-1">XOF</span>
+                  </td>
+
+                  <!-- Stock -->
+                  <td class="px-4 py-4 text-center">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold"
+                          [class]="stockClass(product.stock)">
+                      {{ stockLabel(product.stock) }}
+                    </span>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                      <a [routerLink]="['/products', product.id]"
+                         class="w-8 h-8 rounded-lg luxury-card theme-muted flex items-center justify-center
+                                hover:text-gold transition-colors" title="Voir">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                      </a>
+                      <button (click)="openEditModal(product)"
+                        class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-600/30 text-yellow-400
+                               flex items-center justify-center hover:bg-yellow-600/20 transition-colors" title="Modifier">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                      </button>
+                      <button (click)="deleteProduct(product)"
+                        class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400
+                               flex items-center justify-center hover:bg-red-500/20 transition-colors" title="Supprimer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (totalPages > 1) {
+          <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
+            <span class="text-xs theme-muted">Page {{ currentPage + 1 }} / {{ totalPages }}</span>
+            <div class="flex gap-2">
+              <button (click)="previousPage()" [disabled]="currentPage === 0"
+                class="px-3 py-1.5 rounded-lg luxury-card text-xs font-semibold theme-muted
+                       hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                ← Préc.
+              </button>
+              @for (page of pages; track page) {
+                <button (click)="loadProducts(page)"
+                  class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                  [class]="page === currentPage ? 'bg-gold text-black' : 'luxury-card theme-muted hover:text-gold'">
+                  {{ page + 1 }}
+                </button>
+              }
+              <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1"
+                class="px-3 py-1.5 rounded-lg luxury-card text-xs font-semibold theme-muted
+                       hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                Suiv. →
+              </button>
+            </div>
+          </div>
+        }
+      }
+
+      <!-- Empty -->
+      @if (!loading && products.length === 0) {
+        <div class="py-16 text-center">
+          <div class="w-16 h-16 luxury-card rounded-2xl mx-auto flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+          </div>
+          <p class="theme-text font-bold mb-1">Aucun produit</p>
+          <p class="theme-muted text-sm mb-4">Commencez par ajouter votre premier article</p>
+          <button (click)="openCreateModal()" class="px-5 py-2.5 bg-gold text-black rounded-xl text-sm font-bold transition-all hover:shadow-lg">
+            + Ajouter un produit
+          </button>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL AJOUT / MODIFICATION
+════════════════════════════════════════════════════════ -->
+@if (showModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeModal()"></div>
+
+    <div class="relative w-full max-w-lg theme-surface border theme-border rounded-3xl shadow-2xl animate-scale-in
+                max-h-[90vh] overflow-y-auto">
+
+      <!-- Header -->
+      <div class="sticky top-0 theme-surface flex items-center justify-between px-6 py-5 border-b theme-border z-10">
+        <div>
+          <h2 class="text-lg font-black theme-text">
+            {{ editingProduct ? 'Modifier le produit' : 'Nouveau produit' }}
+          </h2>
+          <p class="text-xs theme-muted mt-0.5">
+            {{ editingProduct ? editingProduct.name : 'Remplissez les informations' }}
+          </p>
+        </div>
+        <button (click)="closeModal()"
+          class="w-9 h-9 rounded-xl luxury-card theme-muted flex items-center justify-center hover:text-gold transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="productForm" (ngSubmit)="saveProduct()" class="p-6 space-y-4">
+
+        @if (modalSuccess) {
+          <div class="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/25 rounded-xl text-green-500 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            {{ modalSuccess }}
+          </div>
+        }
+        @if (modalError) {
+          <div class="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {{ modalError }}
+          </div>
+        }
+
+        <!-- Image upload -->
+        <div>
+          <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-2">Image</label>
+
+          @if (imagePreview) {
+            <div class="relative rounded-2xl overflow-hidden mb-3 aspect-video">
+              <img [src]="imagePreview" alt="Aperçu" class="w-full h-full object-cover"/>
+              <div class="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                <label class="flex items-center gap-1.5 px-3 py-2 bg-gold text-black text-xs font-bold rounded-xl cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  Changer
+                  <input type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)"/>
+                </label>
+                <button type="button" (click)="clearImage()"
+                  class="flex items-center gap-1.5 px-3 py-2 bg-red-500/80 text-white text-xs font-bold rounded-xl">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  Supprimer
+                </button>
+              </div>
+              @if (uploadingImage) {
+                <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
+                  <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                  <span class="text-white text-xs font-semibold">Envoi…</span>
+                </div>
+              }
+            </div>
+          }
+
+          @if (!imagePreview) {
+            <label class="flex flex-col items-center justify-center gap-3 w-full py-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200"
+              [class.border-yellow-500]="dragOver" [class.bg-yellow-500\/5]="dragOver"
+              [class.border-white\/15]="!dragOver"
+              (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onFileDrop($event)">
+              @if (uploadingImage) {
+                <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                <span class="text-sm theme-muted">Envoi en cours…</span>
+              } @else {
+                <div class="w-12 h-12 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div class="text-center">
+                  <p class="text-sm font-semibold theme-text">Glissez une image</p>
+                  <p class="text-xs theme-muted mt-0.5">ou <span class="text-gold underline">parcourez</span></p>
+                  <p class="text-[10px] theme-muted mt-1">JPG, PNG, WEBP · max 10 Mo</p>
+                </div>
+              }
+              <input type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)"/>
+            </label>
+          }
+
+          @if (uploadError) {
+            <p class="text-xs text-orange-400 mt-1.5 flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              {{ uploadError }}
+            </p>
+          }
+          <input formControlName="imageUrl" type="hidden"/>
+        </div>
+
+        <!-- Name -->
+        <div>
+          <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Nom</label>
+          <input formControlName="name" type="text" placeholder="Ex: Royal Oak Chronographe"
+            class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Description</label>
+          <textarea formControlName="description" rows="3" placeholder="Description du produit…"
+            class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all resize-none"></textarea>
+        </div>
+
+        <!-- Price + Stock -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Prix (XOF)</label>
+            <input formControlName="price" type="number" min="0" placeholder="8500000"
+              class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Stock</label>
+            <input formControlName="stock" type="number" min="0" placeholder="10"
+              class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div>
+          <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Catégorie</label>
+          <select formControlName="categoryId" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
+            <option value="" class="bg-neutral-900">Sélectionner…</option>
+            @for (cat of categories; track cat.id) {
+              <option [value]="cat.id" class="bg-neutral-900">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3 pt-2">
+          <button type="button" (click)="closeModal()"
+            class="flex-1 py-3 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
+            Annuler
+          </button>
+          <button type="submit" [disabled]="productForm.invalid || modalLoading"
+            class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-bold
+                   disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-yellow-600/20 transition-all">
+            @if (modalLoading) {
+              <span class="flex items-center justify-center gap-2">
+                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                Sauvegarde…
+              </span>
+            } @else {
+              {{ editingProduct ? 'Mettre à jour' : 'Ajouter' }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

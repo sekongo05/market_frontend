@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { OrderResponse } from '../../../core/models/order.models';
 import { PageResponse } from '../../../core/models/common.models';
@@ -7,7 +8,7 @@ import { PageResponse } from '../../../core/models/common.models';
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css'],
 })
@@ -19,7 +20,7 @@ export class OrdersComponent implements OnInit {
   pageSize = 10;
   totalPages = 0;
 
-  constructor(private orderService: OrderService) {}
+  constructor(private orderService: OrderService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadOrders();
@@ -38,11 +39,13 @@ export class OrdersComponent implements OnInit {
           this.totalPages = pageResponse.totalPages;
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: (error) => {
+      error: (err) => {
         this.error = 'Erreur lors du chargement des commandes';
         this.loading = false;
-        console.error(error);
+        this.cdr.detectChanges();
+        console.error(err);
       },
     });
   }

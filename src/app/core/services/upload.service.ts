@@ -23,6 +23,9 @@ export class UploadService {
         `${this.apiService.getBaseUrl()}/upload/product-image`,
         formData
       )
-      .pipe(map((response) => response.data));
+      .pipe(map((response) => {
+        const serverRoot = this.apiService.getBaseUrl().replace('/api', '');
+        return `${serverRoot}/${response.data}`;
+      }));
   }
 }

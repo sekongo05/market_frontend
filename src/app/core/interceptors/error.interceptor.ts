@@ -34,7 +34,6 @@ export class ErrorInterceptor implements HttpInterceptor {
         if (error.status === 403) {
           // Forbidden - user doesn't have permission
           console.error('Forbidden - access denied');
-          this.router.navigate(['/error/403']);
         }
 
         return throwError(() => error);

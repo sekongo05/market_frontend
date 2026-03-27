@@ -1,81 +1,636 @@
-<nav class="sticky top-0 z-50 bg-black/95 backdrop-blur-md border-b border-white/10 animate-fade-in-down">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
+<!-- ══════════════════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════════════════ -->
+<header class="sticky top-0 z-50 transition-all duration-300"
+        [class.scrolled-nav]="scrolled">
 
-      <!-- Logo -->
-      <a routerLink="/" class="flex items-center gap-2.5 group">
-        <div class="w-9 h-9 bg-gold rounded-xl flex items-center justify-center shadow-lg shadow-yellow-600/30 group-hover:shadow-yellow-600/50 group-hover:scale-110 transition-all duration-200">
-          <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <span class="text-xl font-black text-white group-hover:text-gold transition-colors duration-200">Market</span>
-      </a>
+  <!-- Top accent line -->
+  <div class="h-[2px] bg-gradient-to-r from-transparent via-yellow-500/60 to-transparent"></div>
 
-      <!-- Nav Links -->
-      <div class="hidden md:flex items-center gap-1">
-        <a routerLink="/" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-gold hover:bg-white/5 rounded-lg transition-all duration-200">Accueil</a>
-        <a routerLink="/products" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-gold hover:bg-white/5 rounded-lg transition-all duration-200">Collection</a>
-        @if (currentUser?.role === 'ADMIN' || currentUser?.role === 'MANAGER') {
-          <a routerLink="/admin" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-gold hover:bg-white/5 rounded-lg transition-all duration-200">Administration</a>
-        }
-      </div>
+  <nav [class]="scrolled
+    ? (themeService.isDark
+        ? 'bg-black/96 border-b border-white/8 shadow-[0_8px_32px_rgba(0,0,0,0.6)]'
+        : 'bg-white/96 border-b border-black/8 shadow-[0_8px_32px_rgba(0,0,0,0.08)]')
+    : (themeService.isDark
+        ? 'bg-black/80 border-b border-white/5'
+        : 'bg-white/80 border-b border-black/5')"
+       class="backdrop-blur-xl transition-all duration-300">
 
-      <!-- Right side -->
-      <div class="flex items-center gap-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-[68px] gap-8">
 
-        @if (!currentUser) {
-          <a routerLink="/auth/login" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-gold transition-colors duration-200">Connexion</a>
-          <a routerLink="/auth/register" class="px-4 py-2 text-sm font-bold text-black bg-gold rounded-xl hover:shadow-lg hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all duration-200">S'inscrire</a>
-        }
+        <!-- ── LOGO ── -->
+        <a routerLink="/" (click)="closeAll()"
+           class="flex items-center gap-3 flex-shrink-0 group">
+          <!-- Emblem: diamond + crown composite -->
+          <div class="relative w-10 h-10 flex-shrink-0">
+            <!-- Glow halo -->
+            <div class="absolute inset-0 bg-gold rounded-xl rotate-3 opacity-70
+                        group-hover:rotate-6 group-hover:scale-110 transition-all duration-300
+                        shadow-lg shadow-yellow-600/40"></div>
+            <!-- Face -->
+            <div class="relative w-full h-full bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl
+                        flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <!-- CL monogram -->
+              <span class="text-black font-black text-[11px] tracking-tighter select-none leading-none">CL</span>
+              <!-- small diamond accent top-right -->
+              <span class="absolute -top-1 -right-1 text-[8px] select-none">◆</span>
+            </div>
+          </div>
+          <!-- Wordmark -->
+          <div class="leading-none">
+            <div class="flex items-baseline gap-0">
+              <span class="text-[15px] font-black tracking-tight transition-colors duration-200
+                           text-white light:text-neutral-900
+                           group-hover:text-gold light:group-hover:text-yellow-700">Chrono</span>
+              <span class="text-[15px] font-black tracking-tight transition-colors duration-200 text-gold">Lux</span>
+            </div>
+            <span class="block text-[9px] font-semibold tracking-[0.22em] uppercase mt-0.5"
+                  style="color:#6b7280">Montres & Bijoux</span>
+          </div>
+        </a>
 
-        @if (currentUser) {
-          <!-- Notifications -->
-          <button class="relative p-2 text-gray-500 hover:text-gold hover:bg-white/5 rounded-lg transition-all duration-200">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
-            @if (unreadNotifications > 0) {
-              <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-gold text-black text-xs rounded-full flex items-center justify-center font-bold">{{ unreadNotifications }}</span>
+        <!-- ── NAV LINKS (desktop) ── -->
+        <nav class="hidden lg:flex items-center gap-1 flex-1 justify-center">
+
+          <a routerLink="/" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact:true}"
+             (click)="closeAll()" class="nav-item">
+            <span>Accueil</span>
+          </a>
+
+          <a routerLink="/products" routerLinkActive="nav-active"
+             (click)="closeAll()" class="nav-item">
+            <span>Collection</span>
+          </a>
+
+          @if (currentUser?.role === 'ADMIN') {
+            <a routerLink="/admin" routerLinkActive="nav-active"
+               (click)="closeAll()" class="nav-item">
+              <span>Administration</span>
+            </a>
+          }
+
+          @if (currentUser?.role === 'MANAGER') {
+            <a routerLink="/manager" routerLinkActive="nav-active"
+               (click)="closeAll()"
+               class="nav-item flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              <span>Gestion</span>
+            </a>
+          }
+        </nav>
+
+        <!-- ── ACTIONS (desktop) ── -->
+        <div class="hidden lg:flex items-center gap-1.5">
+
+          <!-- Theme toggle -->
+          <button (click)="toggleTheme()" title="Changer le thème" class="nav-icon-btn">
+            @if (themeService.isDark) {
+              <svg class="w-[18px] h-[18px] no-transition animate-fade-in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+              </svg>
+            } @else {
+              <svg class="w-[18px] h-[18px] no-transition animate-fade-in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+              </svg>
             }
           </button>
 
-          <!-- User menu -->
-          <div class="relative">
-            <button (click)="toggleUserMenu()" class="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-200">
-              <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-black text-sm font-black shadow">{{ initials }}</div>
-              <span class="hidden md:block text-sm font-medium text-gray-300 max-w-28 truncate">{{ fullName }}</span>
-              <svg class="w-4 h-4 text-gray-600 transition-transform duration-200" [class.rotate-180]="showUserMenu" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          <!-- Cart (customers only) -->
+          @if (!isManager) {
+            <button (click)="toggleCart()" class="nav-icon-btn relative" [class.active-icon]="showCart">
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
               </svg>
+              @if (cartCount > 0) {
+                <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
+                             bg-gold text-black text-[10px] font-black rounded-full
+                             flex items-center justify-center leading-none animate-scale-in">
+                  {{ cartCount > 9 ? '9+' : cartCount }}
+                </span>
+              }
+            </button>
+          }
+
+          <!-- Divider -->
+          <div class="w-px h-5 mx-1"
+               [style.background]="themeService.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'"></div>
+
+          <!-- Guest -->
+          @if (!currentUser) {
+            <a routerLink="/auth/login"
+               class="px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200
+                      text-gray-400 hover:text-white light:text-gray-600 light:hover:text-black">
+              Connexion
+            </a>
+            <a routerLink="/auth/register"
+               class="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-black bg-gold rounded-xl
+                      hover:shadow-lg hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all duration-200">
+              S'inscrire
+            </a>
+          }
+
+          <!-- Logged-in user -->
+          @if (currentUser) {
+            <!-- Notifications -->
+            <button class="nav-icon-btn relative">
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+              @if (unreadNotifications > 0) {
+                <span class="absolute -top-1 -right-1 w-[18px] h-[18px] bg-red-500 text-white
+                             text-[10px] font-black rounded-full flex items-center justify-center">
+                  {{ unreadNotifications }}
+                </span>
+              }
             </button>
 
-            @if (showUserMenu) {
-              <div class="absolute right-0 mt-2 w-56 bg-gray-900 rounded-2xl shadow-2xl border border-white/10 overflow-hidden animate-scale-in">
-                <div class="px-4 py-3 border-b border-white/5 bg-white/5">
-                  <p class="text-sm font-bold text-white">{{ fullName }}</p>
-                  <p class="text-xs text-gold mt-0.5 font-medium">{{ currentUser.role }}</p>
+            <!-- Avatar dropdown -->
+            <div class="relative">
+              <button (click)="toggleUserMenu()"
+                class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl border transition-all duration-200
+                       border-transparent hover:border-white/12 hover:bg-white/5
+                       light:hover:border-black/10 light:hover:bg-black/4"
+                [class.border-white/12]="showUserMenu"
+                [class.bg-white/5]="showUserMenu">
+                <!-- Avatar ring -->
+                <div class="relative">
+                  <div class="w-8 h-8 bg-gold rounded-xl flex items-center justify-center
+                              text-black text-xs font-black shadow-md shadow-yellow-600/20">
+                    {{ initials }}
+                  </div>
+                  <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full
+                               border-2 border-black light:border-white"></span>
                 </div>
-                <div class="py-1">
-                  <a routerLink="/profile" (click)="showUserMenu = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 hover:bg-white/5 hover:text-gold transition-colors duration-150">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    Mon profil
-                  </a>
-                  <a routerLink="/orders" (click)="showUserMenu = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 hover:bg-white/5 hover:text-gold transition-colors duration-150">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    Mes commandes
-                  </a>
-                  <div class="border-t border-white/5 my-1"></div>
-                  <button (click)="logout()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-white/5 transition-colors duration-150">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Déconnexion
-                  </button>
+                <div class="hidden xl:block text-left">
+                  <p class="text-xs font-bold leading-none mb-0.5
+                             text-white light:text-black">{{ fullName }}</p>
+                  <p class="text-[10px] leading-none" style="color:#d4af37">{{ currentUser.role }}</p>
                 </div>
-              </div>
-            }
-          </div>
-        }
+                <svg class="w-3.5 h-3.5 transition-transform duration-200 text-gray-600"
+                     [class.rotate-180]="showUserMenu"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+
+              <!-- Dropdown -->
+              @if (showUserMenu) {
+                <div class="absolute right-0 mt-3 w-60 rounded-2xl overflow-hidden shadow-2xl animate-scale-in
+                            border z-50"
+                     [style.background]="themeService.isDark ? '#111111' : '#ffffff'"
+                     [style.border-color]="themeService.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'">
+
+                  <!-- Profile card header -->
+                  <div class="px-4 py-4 flex items-center gap-3"
+                       [style.background]="themeService.isDark ? 'rgba(212,175,55,0.05)' : 'rgba(212,175,55,0.06)'"
+                       [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)'">
+                    <div class="w-10 h-10 bg-gold rounded-xl flex items-center justify-center
+                                text-black font-black text-sm shadow-md shadow-yellow-600/20 flex-shrink-0">
+                      {{ initials }}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm truncate"
+                         [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ fullName }}</p>
+                      <p class="text-[11px] font-semibold mt-0.5" style="color:#d4af37">{{ currentUser.role }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Menu items -->
+                  <div class="p-2 space-y-0.5">
+                    <a routerLink="/profile" (click)="closeAll()" class="dropdown-item">
+                      <div class="dropdown-icon">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-semibold"
+                           [style.color]="themeService.isDark ? '#e5e7eb' : '#111111'">Mon profil</p>
+                        <p class="text-[11px]" style="color:#6b7280">Modifier mes informations</p>
+                      </div>
+                    </a>
+
+                    @if (currentUser?.role !== 'MANAGER' && currentUser?.role !== 'ADMIN') {
+                      <a routerLink="/orders" (click)="closeAll()" class="dropdown-item">
+                        <div class="dropdown-icon">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <p class="text-sm font-semibold"
+                             [style.color]="themeService.isDark ? '#e5e7eb' : '#111111'">Mes commandes</p>
+                          <p class="text-[11px]" style="color:#6b7280">Historique & suivi</p>
+                        </div>
+                      </a>
+                    }
+
+                    @if (currentUser?.role === 'MANAGER' || currentUser?.role === 'ADMIN') {
+                      <a routerLink="/manager" (click)="closeAll()" class="dropdown-item">
+                        <div class="dropdown-icon">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <p class="text-sm font-semibold"
+                             [style.color]="themeService.isDark ? '#e5e7eb' : '#111111'">Espace Gestion</p>
+                          <p class="text-[11px]" style="color:#6b7280">Catalogue & stocks</p>
+                        </div>
+                      </a>
+                    }
+
+                    <div class="h-px my-1 mx-2"
+                         [style.background]="themeService.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'"></div>
+
+                    <button (click)="logout()"
+                      class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm
+                             transition-colors duration-150 text-red-400/80
+                             hover:bg-red-500/8 hover:text-red-400">
+                      <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-red-500/8">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                      </div>
+                      <span class="font-semibold">Déconnexion</span>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- ── MOBILE ACTIONS ── -->
+        <div class="flex lg:hidden items-center gap-1.5">
+          <!-- Cart (customers only) -->
+          @if (!isManager) {
+            <button (click)="toggleCart()" class="nav-icon-btn relative">
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+              @if (cartCount > 0) {
+                <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
+                             bg-gold text-black text-[10px] font-black rounded-full
+                             flex items-center justify-center leading-none">
+                  {{ cartCount }}
+                </span>
+              }
+            </button>
+          }
+
+          <!-- Hamburger -->
+          <button (click)="toggleMobile()"
+            class="w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
+                   text-gray-400 hover:text-white hover:bg-white/5
+                   light:text-gray-600 light:hover:text-black light:hover:bg-black/5">
+            <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
+                  [style.background]="themeService.isDark ? '#9ca3af' : '#6b7280'"
+                  [class.rotate-45]="mobileOpen"
+                  [class.translate-y-[6.5px]]="mobileOpen"></span>
+            <span class="block h-[1.5px] rounded-full transition-all duration-300"
+                  [style.background]="themeService.isDark ? '#9ca3af' : '#6b7280'"
+                  [style.width]="mobileOpen ? '0' : '14px'"
+                  [style.opacity]="mobileOpen ? '0' : '1'"></span>
+            <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
+                  [style.background]="themeService.isDark ? '#9ca3af' : '#6b7280'"
+                  [class.-rotate-45]="mobileOpen"
+                  [class.-translate-y-[6.5px]]="mobileOpen"></span>
+          </button>
+        </div>
+
       </div>
     </div>
-  </div>
-</nav>
+
+    <!-- ── MOBILE MENU ── -->
+    @if (mobileOpen) {
+      <div class="lg:hidden border-t animate-fade-in-down"
+           [style.border-color]="themeService.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'"
+           [style.background]="themeService.isDark ? '#0a0a0a' : '#faf8f3'">
+        <div class="px-4 py-5 space-y-1">
+
+          <a routerLink="/" routerLinkActive="mobile-nav-active" [routerLinkActiveOptions]="{exact:true}"
+             (click)="closeAll()" class="mobile-nav-item">
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            Accueil
+          </a>
+
+          <a routerLink="/products" routerLinkActive="mobile-nav-active"
+             (click)="closeAll()" class="mobile-nav-item">
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5 3h14a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zm0 10h14a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 012-2z"/>
+            </svg>
+            Collection
+          </a>
+
+          @if (currentUser?.role === 'ADMIN') {
+            <a routerLink="/admin" routerLinkActive="mobile-nav-active"
+               (click)="closeAll()" class="mobile-nav-item">
+              <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              </svg>
+              Administration
+            </a>
+          }
+
+          <!-- Divider -->
+          <div class="h-px my-3"
+               [style.background]="themeService.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'"></div>
+
+          <!-- Theme toggle -->
+          <button (click)="toggleTheme()" class="mobile-nav-item w-full text-left">
+            @if (themeService.isDark) {
+              <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+              </svg>
+              Thème clair
+            } @else {
+              <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+              </svg>
+              Thème sombre
+            }
+          </button>
+
+          @if (!currentUser) {
+            <div class="pt-2 flex flex-col gap-2">
+              <a routerLink="/auth/login" (click)="closeAll()"
+                 class="flex items-center justify-center py-3 rounded-2xl text-sm font-semibold border transition-colors
+                        border-white/10 text-gray-300 hover:bg-white/5
+                        light:border-black/10 light:text-gray-700 light:hover:bg-black/5">
+                Connexion
+              </a>
+              <a routerLink="/auth/register" (click)="closeAll()"
+                 class="flex items-center justify-center py-3 rounded-2xl text-sm font-bold
+                        text-black bg-gold hover:shadow-lg hover:shadow-yellow-600/20 transition-all">
+                Créer un compte
+              </a>
+            </div>
+          }
+
+          @if (currentUser) {
+            <div class="pt-2 space-y-1">
+              <a routerLink="/profile" (click)="closeAll()" class="mobile-nav-item">
+                <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                Mon profil
+              </a>
+              @if (currentUser?.role !== 'MANAGER' && currentUser?.role !== 'ADMIN') {
+                <a routerLink="/orders" (click)="closeAll()" class="mobile-nav-item">
+                  <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                  </svg>
+                  Mes commandes
+                </a>
+              }
+              @if (currentUser?.role === 'MANAGER' || currentUser?.role === 'ADMIN') {
+                <a routerLink="/manager" routerLinkActive="mobile-nav-active"
+                   (click)="closeAll()" class="mobile-nav-item">
+                  <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                  </svg>
+                  Espace Gestion
+                </a>
+              }
+              <button (click)="logout()"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold
+                       text-red-400 hover:bg-red-500/8 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                Déconnexion
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </nav>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════════
+     PANIER — DRAWER
+══════════════════════════════════════════════════════ -->
+@if (showCart) {
+  <div class="fixed inset-0 z-40 animate-backdrop-in"
+       style="background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);"
+       (click)="showCart = false"></div>
+
+  <aside class="fixed top-0 right-0 z-50 h-full w-full max-w-[420px] flex flex-col animate-drawer-in"
+         [style.background]="themeService.isDark ? '#0f0f0f' : '#faf8f3'"
+         [style.border-left]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.07)'"
+         style="box-shadow:-20px 0 80px rgba(0,0,0,0.5)">
+
+    <!-- Header -->
+    <div class="flex-shrink-0 px-6 pt-6 pb-5"
+         [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
+      <div class="flex items-start justify-between">
+        <div>
+          <h2 class="text-xl font-black tracking-tight"
+              [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Mon panier</h2>
+          @if (cartCount > 0) {
+            <p class="text-xs mt-0.5 font-medium" style="color:#d4af37">
+              {{ cartCount }} article{{ cartCount > 1 ? 's' : '' }}
+            </p>
+          } @else {
+            <p class="text-xs mt-0.5" style="color:#6b7280">Votre sélection est vide</p>
+          }
+        </div>
+        <button (click)="showCart = false"
+          class="w-9 h-9 rounded-2xl flex items-center justify-center transition-all duration-150
+                 text-gray-500 hover:text-white hover:bg-white/8
+                 light:hover:text-black light:hover:bg-black/8">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="mt-4 h-px w-10"
+           style="background:linear-gradient(90deg,#d4af37,#f5e06e,transparent)"></div>
+    </div>
+
+    <!-- Items -->
+    <div class="flex-1 overflow-y-auto px-6 py-4 space-y-2">
+      @if (cartItems.length === 0) {
+        <div class="flex flex-col items-center justify-center h-full py-12 text-center animate-fade-in">
+          <div class="w-20 h-20 rounded-3xl flex items-center justify-center mb-5"
+               [style.background]="themeService.isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.10)'"
+               style="border:1px solid rgba(212,175,55,0.15)">
+            <svg class="w-9 h-9 animate-float" style="color:rgba(212,175,55,0.5)"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+          </div>
+          <p class="font-bold text-base mb-1.5"
+             [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Panier vide</p>
+          <p class="text-sm leading-relaxed max-w-[200px] mb-6" style="color:#6b7280">
+            Découvrez notre collection de montres et bijoux d'exception
+          </p>
+          <button (click)="showCart = false" routerLink="/products"
+            class="px-6 py-2.5 text-sm font-bold text-black bg-gold rounded-2xl
+                   hover:shadow-lg hover:shadow-yellow-600/20 hover:-translate-y-0.5 transition-all duration-200">
+            Explorer la boutique
+          </button>
+        </div>
+      }
+
+      @for (item of cartItems; track item.productId; let i = $index) {
+        <div class="group relative rounded-3xl p-4 transition-all duration-200 animate-fade-in"
+             [style.background]="themeService.isDark ? 'rgba(255,255,255,0.03)' : '#ffffff'"
+             [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)'"
+             [style.animation-delay]="(i * 0.05) + 's'">
+          <div class="flex gap-4">
+            <div class="flex-shrink-0 relative">
+              <div class="w-20 h-20 rounded-2xl overflow-hidden"
+                   style="box-shadow:0 4px 20px rgba(0,0,0,0.25)">
+                <img [src]="item.imageUrl || 'https://placehold.co/80x80/1a1a1a/d4af37?text=M'"
+                     [alt]="item.productName"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                     (error)="$any($event.target).src='https://placehold.co/80x80/1a1a1a/d4af37?text=M'"/>
+              </div>
+              <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gold
+                          flex items-center justify-center"
+                   style="box-shadow:0 2px 8px rgba(212,175,55,0.4)">
+                <svg class="w-2 h-2 text-black" fill="currentColor" viewBox="0 0 8 8">
+                  <circle cx="4" cy="4" r="3"/>
+                </svg>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-sm leading-snug mb-0.5 pr-6"
+                 [style.color]="themeService.isDark ? '#f0f0f0' : '#111111'">{{ item.productName }}</p>
+              <p class="text-xs font-semibold mb-3" style="color:#d4af37">
+                {{ (item.price / 1000) | number:'1.0-0' }}&thinsp;000 XOF / unité
+              </p>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center rounded-2xl overflow-hidden"
+                     [style.background]="themeService.isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'">
+                  <button (click)="cartService.updateQuantity(item.productId, item.quantity - 1)"
+                    class="w-8 h-8 flex items-center justify-center text-lg font-light transition-colors
+                           hover:bg-white/8 light:hover:bg-black/8"
+                    [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">−</button>
+                  <span class="w-8 text-center text-sm font-black"
+                        [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ item.quantity }}</span>
+                  <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1)"
+                    class="w-8 h-8 flex items-center justify-center text-lg font-light transition-colors
+                           hover:bg-white/8 light:hover:bg-black/8"
+                    [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">+</button>
+                </div>
+                <p class="text-sm font-black" style="color:#d4af37">
+                  {{ ((item.price * item.quantity) / 1000) | number:'1.0-0' }}&thinsp;K
+                </p>
+              </div>
+            </div>
+          </div>
+          <button (click)="cartService.removeFromCart(item.productId)"
+            class="absolute top-3 right-3 w-7 h-7 rounded-xl flex items-center justify-center
+                   opacity-0 group-hover:opacity-100 transition-all duration-150
+                   text-gray-600 hover:text-red-400 hover:bg-red-500/10">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    @if (cartItems.length > 0) {
+      <div class="flex-shrink-0 px-6 pt-5 pb-6 space-y-4"
+           [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between text-sm">
+            <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
+            <span class="font-semibold"
+                  [style.color]="themeService.isDark ? '#d1d5db' : '#374151'">
+              {{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K XOF
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span style="color:#6b7280">Livraison</span>
+            <span class="font-semibold text-green-400">Gratuite</span>
+          </div>
+        </div>
+        <div class="h-px" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.3),transparent)"></div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold"
+                [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Total</span>
+          <div>
+            <span class="text-2xl font-black gold-text">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K</span>
+            <span class="text-xs ml-1" style="color:#6b7280">XOF</span>
+          </div>
+        </div>
+        <button class="w-full py-4 bg-gold text-black font-black rounded-2xl text-sm
+                       flex items-center justify-center gap-2
+                       hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all duration-200">
+          Commander maintenant
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </button>
+        <div class="flex items-center justify-between">
+          <button (click)="showCart = false" routerLink="/products"
+            class="text-xs font-semibold transition-colors text-gray-500 hover:text-gold">
+            ← Continuer mes achats
+          </button>
+          <button (click)="cartService.clearCart()"
+            class="text-xs font-semibold transition-colors text-gray-600 hover:text-red-400">
+            Vider le panier
+          </button>
+        </div>
+        <div class="flex items-center justify-center gap-4 pt-1">
+          <div class="flex items-center gap-1.5 text-[11px]" style="color:#4b5563">
+            <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            Authentique
+          </div>
+          <div class="w-px h-3"
+               [style.background]="themeService.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'"></div>
+          <div class="flex items-center gap-1.5 text-[11px]" style="color:#4b5563">
+            <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            Sécurisé
+          </div>
+          <div class="w-px h-3"
+               [style.background]="themeService.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'"></div>
+          <div class="flex items-center gap-1.5 text-[11px]" style="color:#4b5563">
+            <svg class="w-3.5 h-3.5" style="color:#d4af37" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+            Livraison 48h
+          </div>
+        </div>
+      </div>
+    }
+  </aside>
+}

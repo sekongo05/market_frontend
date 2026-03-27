@@ -1,25 +1,40 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../../../core/services/product.service';
+import { CategoryService } from '../../../core/services/category.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CartService } from '../../../core/services/cart.service';
+import { UploadService } from '../../../core/services/upload.service';
 import { ProductResponse, GetProductsParams } from '../../../core/models/product.models';
+import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })
 export class ProductsComponent implements OnInit {
   products: ProductResponse[] = [];
+  categories: CategoryResponse[] = [];
   loading = false;
   error: string | null = null;
   currentPage = 0;
   pageSize = 12;
   totalPages = 0;
   searchQuery = '';
+
+  // Modal state
+  showModal = false;
+  editingProduct: ProductResponse | null = null;
+  modalLoading = false;
+  modalError: string | null = null;
+  modalSuccess: string | null = null;
+  productForm!: FormGroup;
 
   private readonly CAT_MONTRES  = { id: 1, name: 'Montres',           slug: 'montres',  description: '', imageUrl: '', active: true, createdAt: '' };
   private readonly CAT_BAGUES   = { id: 2, name: 'Bagues',            slug: 'bagues',   description: '', imageUrl: '', active: true, createdAt: '' };
@@ -42,24 +57,233 @@ export class ProductsComponent implements OnInit {
     { id: 12, name: 'Bague Rubis & Diamants',    slug: 'bague-rubis-diamants',    description: "Bague cocktail en or rose 18 carats, rubis de Birmanie 3 ct entouré de diamants pavés. Certificat d'origine.",                  price: 8900000,  stock: 2, imageUrl: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=600&q=80',  category: this.CAT_BAGUES,   active: true, createdAt: '', updatedAt: '' },
   ];
 
-  constructor(private productService: ProductService) {}
+  // Tracks product ids that were just added (for button feedback)
+  addedIds = new Set<number>();
+
+  // Image upload state
+  imagePreview: string | null = null;
+  uploadingImage = false;
+  uploadError: string | null = null;
+  dragOver = false;
+
+  constructor(
+    private productService: ProductService,
+    private categoryService: CategoryService,
+    private authService: AuthService,
+    private cartService: CartService,
+    private uploadService: UploadService,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  addToCart(product: ProductResponse): void {
+    this.cartService.addToCart({
+      productId: product.id,
+      productName: product.name,
+      price: product.price,
+      quantity: 1,
+      imageUrl: product.imageUrl,
+    });
+    // Brief green feedback on the button
+    this.addedIds.add(product.id);
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      this.addedIds.delete(product.id);
+      this.cdr.detectChanges();
+    }, 1500);
+  }
 
   ngOnInit(): void {
+    this.initForm();
     this.loadProducts();
+    this.loadCategories();
   }
+
+  get isManager(): boolean {
+    const user = this.authService.getCurrentUser();
+    return user?.role === 'ADMIN' || user?.role === 'MANAGER';
+  }
+
+  // ─── Product form ───────────────────────────────────────────────────────────
+
+  private initForm(product?: ProductResponse): void {
+    this.productForm = this.fb.group({
+      name:        [product?.name        ?? '', Validators.required],
+      description: [product?.description ?? '', Validators.required],
+      price:       [product?.price       ?? null, [Validators.required, Validators.min(1)]],
+      stock:       [product?.stock       ?? null, [Validators.required, Validators.min(0)]],
+      imageUrl:    [product?.imageUrl    ?? '', Validators.required],
+      categoryId:  [product?.category?.id ?? null, Validators.required],
+    });
+  }
+
+  openCreateModal(): void {
+    this.editingProduct = null;
+    this.modalError = null;
+    this.modalSuccess = null;
+    this.imagePreview = null;
+    this.uploadError = null;
+    this.initForm();
+    this.showModal = true;
+    this.cdr.detectChanges();
+  }
+
+  openEditModal(product: ProductResponse): void {
+    this.editingProduct = product;
+    this.modalError = null;
+    this.modalSuccess = null;
+    this.imagePreview = product.imageUrl || null;
+    this.uploadError = null;
+    this.initForm(product);
+    this.showModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.editingProduct = null;
+    this.modalError = null;
+    this.modalSuccess = null;
+    this.imagePreview = null;
+    this.uploadError = null;
+    this.uploadingImage = false;
+    this.cdr.detectChanges();
+  }
+
+  // ─── Image upload ────────────────────────────────────────────────────────────
+
+  onFileDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver = false;
+    const file = event.dataTransfer?.files?.[0];
+    if (file) this._uploadFile(file);
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver = true;
+    this.cdr.detectChanges();
+  }
+
+  onDragLeave(): void {
+    this.dragOver = false;
+    this.cdr.detectChanges();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) this._uploadFile(file);
+    input.value = '';
+  }
+
+  private _uploadFile(file: File): void {
+    if (!file.type.startsWith('image/')) {
+      this.uploadError = 'Seules les images sont acceptées (JPG, PNG, WEBP…)';
+      this.cdr.detectChanges();
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      this.uploadError = 'Fichier trop lourd — maximum 10 Mo';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Immediate local preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.imagePreview = e.target?.result as string;
+      this.cdr.detectChanges();
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to server
+    this.uploadingImage = true;
+    this.uploadError = null;
+    this.cdr.detectChanges();
+
+    this.uploadService.uploadProductImage(file).subscribe({
+      next: (url) => {
+        this.productForm.patchValue({ imageUrl: url });
+        this.imagePreview = url;
+        this.uploadingImage = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        // Keep local preview; warn but allow saving with preview URL
+        this.uploadError = 'Serveur indisponible — l\'image sera utilisée localement';
+        this.uploadingImage = false;
+        // Still set the local data-url so the form is valid
+        if (this.imagePreview) {
+          this.productForm.patchValue({ imageUrl: this.imagePreview });
+        }
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  clearImage(): void {
+    this.imagePreview = null;
+    this.productForm.patchValue({ imageUrl: '' });
+    this.uploadError = null;
+    this.cdr.detectChanges();
+  }
+
+  saveProduct(): void {
+    if (this.productForm.invalid) return;
+    this.modalLoading = true;
+    this.modalError = null;
+
+    const data = this.productForm.value;
+
+    const request$ = this.editingProduct
+      ? this.productService.updateProduct(this.editingProduct.id, data)
+      : this.productService.createProduct(data);
+
+    request$.subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.modalSuccess = this.editingProduct
+            ? 'Article mis à jour avec succès'
+            : 'Article ajouté avec succès';
+          this.loadProducts(this.currentPage);
+          setTimeout(() => this.closeModal(), 1200);
+        } else {
+          this.modalError = 'Une erreur est survenue';
+        }
+        this.modalLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.modalError = 'Erreur lors de la sauvegarde';
+        this.modalLoading = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  deleteProduct(product: ProductResponse): void {
+    if (!confirm(`Supprimer "${product.name}" ?`)) return;
+
+    this.productService.deleteProduct(product.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.loadProducts(this.currentPage);
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => this.cdr.detectChanges(),
+    });
+  }
+
+  // ─── Catalogue ──────────────────────────────────────────────────────────────
 
   loadProducts(page: number = 0): void {
     this.loading = true;
     this.error = null;
 
-    const params: GetProductsParams = {
-      page,
-      size: this.pageSize,
-    };
-
-    if (this.searchQuery) {
-      params.search = this.searchQuery;
-    }
+    const params: GetProductsParams = { page, size: this.pageSize };
+    if (this.searchQuery) params.search = this.searchQuery;
 
     this.productService.getProducts(params).subscribe({
       next: (response) => {
@@ -75,12 +299,37 @@ export class ProductsComponent implements OnInit {
           this.currentPage = page;
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.products = this.getFilteredMocks();
         this.totalPages = 1;
         this.currentPage = 0;
         this.loading = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (response) => {
+        if (response.success && Array.isArray(response.data)) {
+          this.categories = response.data;
+        } else {
+          this.categories = [
+            this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS,
+            this.CAT_BRACE, this.CAT_BOUCLES,
+          ];
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.categories = [
+          this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS,
+          this.CAT_BRACE, this.CAT_BOUCLES,
+        ];
+        this.cdr.detectChanges();
       },
     });
   }
@@ -88,32 +337,22 @@ export class ProductsComponent implements OnInit {
   private getFilteredMocks(): ProductResponse[] {
     if (!this.searchQuery) return this.mockProducts;
     const q = this.searchQuery.toLowerCase();
-    return this.mockProducts.filter((p: ProductResponse) =>
+    return this.mockProducts.filter((p) =>
       p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
     );
   }
 
-  search(): void {
-    this.loadProducts(0);
-  }
+  search(): void { this.loadProducts(0); }
 
   previousPage(): void {
-    if (this.currentPage > 0) {
-      this.loadProducts(this.currentPage - 1);
-    }
+    if (this.currentPage > 0) this.loadProducts(this.currentPage - 1);
   }
 
   nextPage(): void {
-    if (this.currentPage < this.totalPages - 1) {
-      this.loadProducts(this.currentPage + 1);
-    }
+    if (this.currentPage < this.totalPages - 1) this.loadProducts(this.currentPage + 1);
   }
 
   get pages(): number[] {
-    const pages: number[] = [];
-    for (let i = 0; i < this.totalPages; i++) {
-      pages.push(i);
-    }
-    return pages;
+    return Array.from({ length: this.totalPages }, (_, i) => i);
   }
 }

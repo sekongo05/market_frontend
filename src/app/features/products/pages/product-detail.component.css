@@ -1,0 +1,18 @@
+/* ── Main image zoom ──────────────────────────────────────────────────── */
+.gallery-img {
+  transition: transform 0.5s cubic-bezier(.22,1,.36,1);
+  cursor: zoom-in;
+}
+.gallery-img.zoomed {
+  transform: scale(1.35);
+  cursor: zoom-out;
+}
+
+/* ── Thumbnail active ring ───────────────────────────────────────────── */
+.thumb-btn.active {
+  ring: 2px solid #d4af37;
+  box-shadow: 0 0 0 2px #d4af37;
+}
+
+/* ── Quantity stepper ───────────────────────────────────────────────── */
+.qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }

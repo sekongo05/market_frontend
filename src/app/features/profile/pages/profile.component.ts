@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../../core/services/user.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { UserResponse } from '../../../core/models/user.models';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
@@ -16,103 +18,125 @@ export class ProfileComponent implements OnInit {
   passwordForm!: FormGroup;
   user: UserResponse | null = null;
   loading = false;
+  saving = false;
+  changingPassword = false;
   successMessage = '';
   errorMessage = '';
 
+  showOldPwd = false;
+  showNewPwd = false;
+  showConfirmPwd = false;
+
   constructor(
-    private formBuilder: FormBuilder,
-    private userService: UserService
+    private fb: FormBuilder,
+    private userService: UserService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.loadUserProfile();
-    this.initializeForms();
-  }
-
-  initializeForms(): void {
-    this.profileForm = this.formBuilder.group({
-      nom: ['', Validators.required],
+    this.profileForm = this.fb.group({
+      nom:    ['', Validators.required],
       prenom: ['', Validators.required],
-      phone: ['', Validators.required],
+      phone:  ['', Validators.required],
     });
-
-    this.passwordForm = this.formBuilder.group({
-      oldPassword: ['', [Validators.required, Validators.minLength(6)]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+    this.passwordForm = this.fb.group({
+      oldPassword:     ['', [Validators.required, Validators.minLength(6)]],
+      newPassword:     ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
     });
+    this.loadUserProfile();
+  }
+
+  get isManager(): boolean {
+    const role = this.authService.getCurrentUser()?.role;
+    return role === 'MANAGER' || role === 'ADMIN';
+  }
+
+  get initials(): string {
+    if (!this.user) return '?';
+    return `${this.user.prenom[0]}${this.user.nom[0]}`.toUpperCase();
+  }
+
+  get memberSince(): string {
+    if (!this.user?.createdAt) return '';
+    return new Date(this.user.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  }
+
+  get roleLabel(): string {
+    const map: Record<string, string> = { CUSTOMER: 'Client', MANAGER: 'Manager', ADMIN: 'Administrateur' };
+    return map[this.user?.role ?? ''] ?? this.user?.role ?? '';
+  }
+
+  get roleColor(): string {
+    switch (this.user?.role) {
+      case 'ADMIN':    return 'bg-red-500/15 text-red-400 border-red-500/25';
+      case 'MANAGER':  return 'bg-gold/15 text-gold border-gold/25';
+      default:         return 'bg-blue-500/15 text-blue-400 border-blue-500/25';
+    }
   }
 
   loadUserProfile(): void {
     this.loading = true;
     this.userService.getProfile().subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.user = response.data;
-          this.profileForm.patchValue({
-            nom: this.user.nom,
-            prenom: this.user.prenom,
-            phone: this.user.phone,
-          });
+      next: (r) => {
+        if (r.success && r.data) {
+          this.user = r.data;
+          this.profileForm.patchValue({ nom: r.data.nom, prenom: r.data.prenom, phone: r.data.phone });
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: (error) => {
-        this.errorMessage = 'Erreur lors du chargement du profil';
-        this.loading = false;
-      },
+      error: () => { this.loading = false; this.cdr.detectChanges(); },
     });
   }
 
   updateProfile(): void {
-    if (this.profileForm.invalid) {
-      return;
-    }
-
-    this.loading = true;
+    if (this.profileForm.invalid) return;
+    this.saving = true;
+    this.clearMessages();
     this.userService.updateProfile(this.profileForm.value).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.successMessage = 'Profil mis à jour avec succès';
-          this.user = response.data;
+      next: (r) => {
+        if (r.success) {
+          this.user = r.data;
+          this._showSuccess('Profil mis à jour avec succès');
+        } else {
+          this._showError('Une erreur est survenue');
         }
-        this.loading = false;
+        this.saving = false;
+        this.cdr.detectChanges();
       },
-      error: (error) => {
-        this.errorMessage = 'Erreur lors de la mise à jour';
-        this.loading = false;
-      },
+      error: () => { this._showError('Erreur lors de la mise à jour'); this.saving = false; this.cdr.detectChanges(); },
     });
   }
 
   changePassword(): void {
-    if (this.passwordForm.invalid) {
-      return;
-    }
-
-    if (
-      this.passwordForm.value.newPassword !==
-      this.passwordForm.value.confirmPassword
-    ) {
-      this.errorMessage = 'Les nouveaux mots de passe ne correspondent pas';
-      return;
-    }
-
-    this.loading = true;
-    const { confirmPassword, ...data } = this.passwordForm.value;
-
-    this.userService.changePassword(data).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.successMessage = 'Mot de passe changé avec succès';
-          this.passwordForm.reset();
-        }
-        this.loading = false;
+    if (this.passwordForm.invalid) return;
+    const { newPassword, confirmPassword, oldPassword } = this.passwordForm.value;
+    if (newPassword !== confirmPassword) { this._showError('Les mots de passe ne correspondent pas'); return; }
+    this.changingPassword = true;
+    this.clearMessages();
+    this.userService.changePassword({ oldPassword, newPassword }).subscribe({
+      next: (r) => {
+        if (r.success) { this._showSuccess('Mot de passe modifié avec succès'); this.passwordForm.reset(); }
+        else { this._showError('Ancien mot de passe incorrect'); }
+        this.changingPassword = false;
+        this.cdr.detectChanges();
       },
-      error: (error) => {
-        this.errorMessage = 'Erreur lors du changement de mot de passe';
-        this.loading = false;
-      },
+      error: () => { this._showError('Erreur lors du changement de mot de passe'); this.changingPassword = false; this.cdr.detectChanges(); },
     });
+  }
+
+  clearMessages(): void { this.successMessage = ''; this.errorMessage = ''; }
+
+  private _showSuccess(msg: string): void {
+    this.successMessage = msg;
+    this.errorMessage = '';
+    setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 4000);
+  }
+
+  private _showError(msg: string): void {
+    this.errorMessage = msg;
+    this.successMessage = '';
   }
 }

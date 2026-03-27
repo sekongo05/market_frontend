@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../../core/services/dashboard.service';
 
@@ -14,7 +14,7 @@ export class AdminDashboardComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadStats();
@@ -30,11 +30,13 @@ export class AdminDashboardComponent implements OnInit {
           this.stats = response.data;
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: (error) => {
+      error: (err) => {
         this.error = 'Erreur lors du chargement des statistiques';
         this.loading = false;
-        console.error(error);
+        this.cdr.detectChanges();
+        console.error(err);
       },
     });
   }

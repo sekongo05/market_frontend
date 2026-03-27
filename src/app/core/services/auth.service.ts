@@ -57,6 +57,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
+    localStorage.removeItem('current_user');
     this.currentUserSubject.next(null);
   }
 
@@ -109,6 +110,7 @@ export class AuthService {
   }
 
   private setCurrentUser(user: AuthResponse): void {
+    localStorage.setItem('current_user', JSON.stringify(user));
     this.currentUserSubject.next(user as CurrentUser);
   }
 
