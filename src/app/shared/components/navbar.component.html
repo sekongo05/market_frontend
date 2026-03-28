@@ -218,7 +218,7 @@
                       </div>
                     </a>
 
-                    @if (currentUser?.role !== 'MANAGER' && currentUser?.role !== 'ADMIN') {
+                    @if (currentUser.role !== 'MANAGER' && currentUser.role !== 'ADMIN') {
                       <a routerLink="/orders" (click)="closeAll()" class="dropdown-item">
                         <div class="dropdown-icon">
                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,7 +234,7 @@
                       </a>
                     }
 
-                    @if (currentUser?.role === 'MANAGER' || currentUser?.role === 'ADMIN') {
+                    @if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
                       <a routerLink="/manager" (click)="closeAll()" class="dropdown-item">
                         <div class="dropdown-icon">
                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -395,7 +395,7 @@
                 </svg>
                 Mon profil
               </a>
-              @if (currentUser?.role !== 'MANAGER' && currentUser?.role !== 'ADMIN') {
+              @if (currentUser.role !== 'MANAGER' && currentUser.role !== 'ADMIN') {
                 <a routerLink="/orders" (click)="closeAll()" class="mobile-nav-item">
                   <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -404,7 +404,7 @@
                   Mes commandes
                 </a>
               }
-              @if (currentUser?.role === 'MANAGER' || currentUser?.role === 'ADMIN') {
+              @if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
                 <a routerLink="/manager" routerLinkActive="mobile-nav-active"
                    (click)="closeAll()" class="mobile-nav-item">
                   <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -585,14 +585,71 @@
             <span class="text-xs ml-1" style="color:#6b7280">XOF</span>
           </div>
         </div>
-        <button class="w-full py-4 bg-gold text-black font-black rounded-2xl text-sm
-                       flex items-center justify-center gap-2
-                       hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all duration-200">
-          Commander maintenant
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
-        </button>
+        @if (!showCheckout) {
+          <!-- Step 1 — bouton Commander -->
+          <button (click)="openCheckout()"
+                  class="w-full py-4 bg-gold text-black font-black rounded-2xl text-sm
+                         flex items-center justify-center gap-2
+                         hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all duration-200">
+            Commander maintenant
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </button>
+        } @else {
+          <!-- Step 2 — saisie adresse + confirmation -->
+          <div class="space-y-3">
+            @if (checkoutSuccess) {
+              <div class="flex flex-col items-center gap-2 py-4 text-center">
+                <div class="w-12 h-12 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <p class="text-sm font-bold text-green-400">Commande passée avec succès !</p>
+                <p class="text-xs" style="color:#6b7280">Redirection vers vos commandes…</p>
+              </div>
+            } @else {
+              <p class="text-xs font-bold theme-muted uppercase tracking-wider">Adresse de livraison</p>
+              <textarea
+                [(ngModel)]="deliveryAddress"
+                rows="2"
+                placeholder="Ex: Cocody, Abidjan, Côte d'Ivoire"
+                class="theme-input w-full px-3 py-2.5 rounded-xl text-sm resize-none transition-all">
+              </textarea>
+              @if (checkoutError) {
+                <p class="text-xs text-red-400 flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  {{ checkoutError }}
+                </p>
+              }
+              <div class="flex gap-2">
+                <button (click)="cancelCheckout()"
+                        class="flex-1 py-2.5 rounded-xl text-xs font-semibold theme-muted luxury-card transition-all hover:text-gold">
+                  Annuler
+                </button>
+                <button (click)="placeOrder()"
+                        [disabled]="checkoutLoading || !deliveryAddress.trim()"
+                        class="flex-1 py-2.5 bg-gold text-black rounded-xl text-xs font-black
+                               flex items-center justify-center gap-1.5
+                               disabled:opacity-50 disabled:cursor-not-allowed
+                               hover:shadow-lg hover:shadow-yellow-600/25 transition-all">
+                  @if (checkoutLoading) {
+                    <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    Envoi…
+                  } @else {
+                    Confirmer la commande
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        }
         <div class="flex items-center justify-between">
           <button (click)="showCart = false" routerLink="/products"
             class="text-xs font-semibold transition-colors text-gray-500 hover:text-gold">

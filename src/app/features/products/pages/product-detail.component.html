@@ -65,18 +65,19 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
       <div class="grid lg:grid-cols-2 gap-12 xl:gap-20">
 
-        <!-- ════ LEFT: Image Gallery ════ -->
+        <!-- ════ LEFT: Media Gallery ════ -->
         <div class="scroll-reveal from-left">
 
-          <!-- Main image -->
+          <!-- Main viewer -->
           <div class="relative overflow-hidden rounded-3xl luxury-card mb-4 aspect-square">
+
             <!-- Navigation arrows -->
             <button (click)="prevImage()"
               class="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full
                      bg-black/50 backdrop-blur-sm border border-white/15 text-white
-                     flex items-center justify-center hover:bg-black/70 transition-all duration-200
-                     opacity-0 group-hover:opacity-100"
-              [class.opacity-100]="galleryImages.length > 1">
+                     flex items-center justify-center hover:bg-black/70 transition-all duration-200"
+              [class.opacity-100]="galleryItems.length > 1"
+              [class.opacity-0]="galleryItems.length <= 1">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
               </svg>
@@ -85,29 +86,32 @@
               class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full
                      bg-black/50 backdrop-blur-sm border border-white/15 text-white
                      flex items-center justify-center hover:bg-black/70 transition-all duration-200"
-              [class.opacity-100]="galleryImages.length > 1">
+              [class.opacity-100]="galleryItems.length > 1"
+              [class.opacity-0]="galleryItems.length <= 1">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
               </svg>
             </button>
 
-            <!-- Zoom button -->
-            <button (click)="toggleZoom()"
-              class="absolute top-4 right-4 z-10 w-9 h-9 rounded-xl
-                     bg-black/50 backdrop-blur-sm border border-white/15 text-white
-                     flex items-center justify-center hover:bg-black/70 transition-all duration-200">
-              @if (!zoomed) {
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
-                </svg>
-              } @else {
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/>
-                </svg>
-              }
-            </button>
+            <!-- Zoom (images only) -->
+            @if (activeItem.type === 'IMAGE') {
+              <button (click)="toggleZoom()"
+                class="absolute top-4 right-4 z-10 w-9 h-9 rounded-xl
+                       bg-black/50 backdrop-blur-sm border border-white/15 text-white
+                       flex items-center justify-center hover:bg-black/70 transition-all duration-200">
+                @if (!zoomed) {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                  </svg>
+                } @else {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/>
+                  </svg>
+                }
+              </button>
+            }
 
             <!-- Stock badge -->
             <div class="absolute top-4 left-4 z-10">
@@ -122,35 +126,70 @@
               }
             </div>
 
-            <!-- Image counter -->
+            <!-- Counter -->
             <div class="absolute bottom-4 right-4 z-10 px-2.5 py-1 bg-black/60 backdrop-blur-sm
                         rounded-lg text-white text-xs font-semibold">
-              {{ activeIndex + 1 }} / {{ galleryImages.length }}
+              {{ activeIndex + 1 }} / {{ galleryItems.length }}
             </div>
 
-            <!-- The image -->
-            <div class="w-full h-full overflow-hidden">
-              <img [src]="galleryImages[activeIndex]"
-                   [alt]="product.name"
-                   class="gallery-img w-full h-full object-cover transition-all duration-500"
-                   [class.zoomed]="zoomed"
-                   (click)="toggleZoom()"
-                   (error)="$any($event.target).src='https://placehold.co/800x800/1a1a1a/d4af37?text=Luxe'"/>
-            </div>
+            <!-- Image -->
+            @if (activeItem.type === 'IMAGE') {
+              <div class="w-full h-full overflow-hidden">
+                <img [src]="activeItem.url"
+                     [alt]="product.name"
+                     class="gallery-img w-full h-full object-cover transition-all duration-500"
+                     [class.zoomed]="zoomed"
+                     (click)="toggleZoom()"
+                     (error)="$any($event.target).src='https://placehold.co/800x800/1a1a1a/d4af37?text=No+image'"/>
+              </div>
+            }
+
+            <!-- Video -->
+            @if (activeItem.type === 'VIDEO') {
+              <div class="w-full h-full flex items-center justify-center bg-black">
+                <video [src]="activeItem.url"
+                       controls
+                       playsinline
+                       preload="metadata"
+                       class="w-full h-full object-contain max-h-full"
+                       style="max-height: 100%;">
+                  Votre navigateur ne supporte pas la lecture vidéo.
+                </video>
+              </div>
+            }
           </div>
 
           <!-- Thumbnails -->
-          @if (galleryImages.length > 1) {
+          @if (galleryItems.length > 1) {
             <div class="grid grid-cols-4 gap-3">
-              @for (img of galleryImages; track img; let i = $index) {
+              @for (item of galleryItems; track item.url; let i = $index) {
                 <button (click)="setActive(i)"
-                  class="thumb-btn aspect-square rounded-2xl overflow-hidden border-2 transition-all duration-200
-                         hover:scale-105"
-                  [class.active]="activeIndex === i"
+                  class="thumb-btn relative aspect-square rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105"
                   [style.border-color]="activeIndex === i ? '#d4af37' : 'transparent'">
-                  <img [src]="img" [alt]="'Photo ' + (i+1)"
-                       class="w-full h-full object-cover"
-                       (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=Luxe'"/>
+
+                  <!-- Image thumbnail -->
+                  @if (item.type === 'IMAGE') {
+                    <img [src]="item.url" [alt]="'Photo ' + (i+1)"
+                         class="w-full h-full object-cover"
+                         (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
+                  }
+
+                  <!-- Video thumbnail : icône play sur fond sombre -->
+                  @if (item.type === 'VIDEO') {
+                    <div class="w-full h-full flex items-center justify-center bg-zinc-900">
+                      <div class="flex flex-col items-center gap-1">
+                        <svg class="w-8 h-8 text-gold" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <span class="text-[9px] text-zinc-400 font-semibold uppercase tracking-wider">Vidéo</span>
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Active ring -->
+                  @if (activeIndex === i) {
+                    <div class="absolute inset-0 ring-2 ring-gold rounded-2xl pointer-events-none"></div>
+                  }
                 </button>
               }
             </div>
@@ -338,24 +377,36 @@
       <!-- ════════════════════════════════════════════
            SECTION: Galerie complète
       ════════════════════════════════════════════ -->
-      @if (galleryImages.length > 1) {
+      @if (galleryItems.length > 1) {
         <div class="mt-20 scroll-reveal">
           <div class="mb-8">
             <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-2">Galerie</p>
-            <h2 class="text-2xl font-black theme-text">Toutes les photos</h2>
+            <h2 class="text-2xl font-black theme-text">Toutes les photos & vidéos</h2>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            @for (img of galleryImages; track img; let i = $index) {
+            @for (item of galleryItems; track item.url; let i = $index) {
               <button (click)="setActive(i); $any($event.target).closest('.scroll-reveal')?.scrollIntoView({behavior:'smooth', block:'start'})"
                 class="group relative aspect-square overflow-hidden rounded-2xl luxury-card transition-all duration-300 hover:scale-[1.03]"
-                [class.ring-2]="activeIndex === i"
                 [style.box-shadow]="activeIndex === i ? '0 0 0 2px #d4af37' : ''">
-                <img [src]="img" [alt]="product.name + ' - photo ' + (i+1)"
-                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                     (error)="$any($event.target).src='https://placehold.co/400x400/1a1a1a/d4af37?text=Luxe'"/>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                  <span class="text-white text-xs font-semibold">Photo {{ i + 1 }}</span>
-                </div>
+
+                @if (item.type === 'IMAGE') {
+                  <img [src]="item.url" [alt]="product.name + ' - photo ' + (i+1)"
+                       class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                       (error)="$any($event.target).src='https://placehold.co/400x400/1a1a1a/d4af37?text=?'"/>
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                    <span class="text-white text-xs font-semibold">Photo {{ i + 1 }}</span>
+                  </div>
+                }
+
+                @if (item.type === 'VIDEO') {
+                  <div class="w-full h-full flex flex-col items-center justify-center bg-zinc-900 gap-2">
+                    <svg class="w-10 h-10 text-gold" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <span class="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">Vidéo</span>
+                  </div>
+                }
+
                 @if (activeIndex === i) {
                   <div class="absolute top-2 right-2 w-6 h-6 bg-gold rounded-full flex items-center justify-center">
                     <svg class="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">

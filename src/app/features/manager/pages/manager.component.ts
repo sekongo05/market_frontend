@@ -48,21 +48,21 @@ export class ManagerComponent implements OnInit {
   uploadError: string | null = null;
   dragOver = false;
 
-  private readonly CAT_MONTRES  = { id: 1, name: 'Montres',           slug: 'montres',  description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_BAGUES   = { id: 2, name: 'Bagues',            slug: 'bagues',   description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_COLLIERS = { id: 3, name: 'Colliers',          slug: 'colliers', description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_BRACE    = { id: 4, name: 'Bracelets',         slug: 'bracelets',description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_BOUCLES  = { id: 5, name: "Boucles d'oreilles",slug: 'boucles',  description: '', imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_ELEC   = { id: 1, name: 'Électronique',    slug: 'electronique',   description: 'Smartphones, ordinateurs, accessoires tech', imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_MODE   = { id: 2, name: 'Mode & Vêtements', slug: 'mode-vetements', description: 'Vêtements, chaussures, accessoires de mode',  imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_MAISON = { id: 3, name: 'Maison & Cuisine',  slug: 'maison-cuisine', description: 'Électroménager, décoration, ustensiles',       imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_BEAUTE = { id: 4, name: 'Beauté & Santé',    slug: 'beaute-sante',   description: 'Cosmétiques, soins, produits de santé',        imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_SPORT  = { id: 5, name: 'Sports & Loisirs',  slug: 'sports-loisirs', description: 'Équipements sportifs, jeux, loisirs',          imageUrl: '', active: true, createdAt: '' };
 
   private readonly mockProducts: ProductResponse[] = [
-    { id: 1,  name: 'Royal Oak Chronographe',   slug: 'royal-oak-chrono',        description: "Montre iconique en acier inoxydable, cadran bleu, mouvement automatique Swiss Made.", price: 8500000,  stock: 3, imageUrl: 'https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=400&q=80', category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 2,  name: 'Submariner Date',           slug: 'submariner-date',         description: "Montre de plongée légendaire, boîtier Oystersteel, lunette céramique noire.",        price: 12000000, stock: 2, imageUrl: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400&q=80', category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 3,  name: 'Bague Solitaire Diamant',   slug: 'bague-solitaire',         description: "Bague en or blanc 18 carats sertie d'un diamant brillant de 1.5 ct.",                price: 5500000,  stock: 5, imageUrl: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80', category: this.CAT_BAGUES,   active: true, createdAt: '', updatedAt: '' },
-    { id: 4,  name: "Collier Perles d'Akoya",    slug: 'collier-perles-akoya',    description: "Collier de perles d'Akoya du Japon, fermoir en or jaune 18 carats.",                price: 3200000,  stock: 0, imageUrl: 'https://images.unsplash.com/photo-1599459183200-59c7687a0c70?w=400&q=80', category: this.CAT_COLLIERS, active: true, createdAt: '', updatedAt: '' },
-    { id: 5,  name: 'Santos de Cartier',         slug: 'santos-cartier',          description: 'Montre emblématique aux lignes carrées et vis apparentes.',                          price: 9800000,  stock: 2, imageUrl: 'https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400&q=80', category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 6,  name: 'Bracelet Jonc Or 18K',      slug: 'bracelet-jonc-or',        description: 'Bracelet jonc rigide en or jaune 18 carats. Finition polie.',                        price: 2800000,  stock: 6, imageUrl: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80', category: this.CAT_BRACE,    active: true, createdAt: '', updatedAt: '' },
-    { id: 7,  name: 'Speedmaster Moonwatch',     slug: 'speedmaster-moonwatch',   description: 'La montre des astronautes. Chronographe légendaire.',                               price: 7200000,  stock: 3, imageUrl: 'https://images.unsplash.com/photo-1612817159949-195b6eb9e31a?w=400&q=80', category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 8,  name: 'Boucles Émeraude & Or',     slug: 'boucles-emeraude-or',     description: "Boucles d'oreilles en or blanc 18 carats serties d'émeraudes colombiennes.",        price: 4100000,  stock: 1, imageUrl: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=400&q=80', category: this.CAT_BOUCLES,  active: true, createdAt: '', updatedAt: '' },
+    { id: 1,  name: 'iPhone 15 Pro',           slug: 'iphone-15-pro',      description: 'Smartphone Apple iPhone 15 Pro 256Go, puce A17 Pro, appareil photo 48MP.',        price: 650000,  stock: 15, imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 2,  name: 'Samsung Galaxy S24',      slug: 'samsung-galaxy-s24', description: 'Smartphone Samsung Galaxy S24 128Go, écran Dynamic AMOLED 6.2 pouces.',          price: 450000,  stock: 20, imageUrl: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 3,  name: 'MacBook Air M2',          slug: 'macbook-air-m2',     description: 'Ordinateur portable Apple MacBook Air 13 pouces, puce M2, 8Go RAM, 256Go SSD.',  price: 1200000, stock: 8,  imageUrl: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 4,  name: 'Sac à main Cuir',         slug: 'sac-main-cuir',      description: 'Sac à main en cuir véritable, design élégant, compartiments multiples.',          price: 55000,   stock: 18, imageUrl: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
+    { id: 5,  name: 'Robe Wax Traditionnelle', slug: 'robe-wax',           description: 'Robe en tissu wax 100% coton, motifs traditionnels africains, taille ajustable.', price: 25000,   stock: 30, imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
+    { id: 6,  name: 'Climatiseur Hisense',     slug: 'clim-hisense',       description: 'Climatiseur split Hisense 1.5 CV, fonction froid/chaud, économique en énergie.', price: 280000,  stock: 10, imageUrl: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&q=80', category: this.CAT_MAISON, active: true, createdAt: '', updatedAt: '' },
+    { id: 7,  name: 'Crème Hydratante Nivea',  slug: 'creme-nivea',        description: 'Crème hydratante corps Nivea 400ml, formule enrichie en aloe vera.',              price: 3500,    stock: 50, imageUrl: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&q=80', category: this.CAT_BEAUTE, active: true, createdAt: '', updatedAt: '' },
+    { id: 8,  name: 'Vélo de Sport',           slug: 'velo-sport',         description: 'Vélo de sport tout terrain 21 vitesses, cadre aluminium, freins à disque.',      price: 120000,  stock: 7,  imageUrl: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=400&q=80', category: this.CAT_SPORT,  active: true, createdAt: '', updatedAt: '' },
   ];
 
   constructor(
@@ -116,7 +116,7 @@ export class ManagerComponent implements OnInit {
       description: [product?.description ?? '', Validators.required],
       price:       [product?.price       ?? null, [Validators.required, Validators.min(1)]],
       stock:       [product?.stock       ?? null, [Validators.required, Validators.min(0)]],
-      imageUrl:    [product?.imageUrl    ?? '', Validators.required],
+      imageUrl:    [product?.imageUrl    ?? ''],
       categoryId:  [product?.category?.id ?? null, Validators.required],
     });
   }
@@ -152,7 +152,10 @@ export class ManagerComponent implements OnInit {
     if (this.productForm.invalid) return;
     this.modalLoading = true;
     this.modalError = null;
-    const data = this.productForm.value;
+    const data = { ...this.productForm.value };
+    if (!data.imageUrl) {
+      data.imageUrl = 'https://placehold.co/600x400/1a1400/d4af37?text=' + encodeURIComponent(data.name || 'Produit');
+    }
     const req$ = this.editingProduct
       ? this.productService.updateProduct(this.editingProduct.id, data)
       : this.productService.createProduct(data);
@@ -248,8 +251,15 @@ export class ManagerComponent implements OnInit {
     input.value = '';
   }
 
+  private _isImageFile(file: File): boolean {
+    if (file.type.startsWith('image/')) return true;
+    // HEIC/HEIF may arrive as application/octet-stream — fallback to extension check
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    return ['heic', 'heif'].includes(ext);
+  }
+
   private _uploadFile(file: File): void {
-    if (!file.type.startsWith('image/')) { this.uploadError = 'Seules les images sont acceptées'; this.cdr.detectChanges(); return; }
+    if (!this._isImageFile(file)) { this.uploadError = 'Format non supporté — JPEG, PNG, WEBP, GIF, BMP, TIFF, SVG, AVIF, HEIC'; this.cdr.detectChanges(); return; }
     if (file.size > 10 * 1024 * 1024) { this.uploadError = 'Fichier trop lourd — max 10 Mo'; this.cdr.detectChanges(); return; }
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -278,6 +288,14 @@ export class ManagerComponent implements OnInit {
   }
 
   clearImage(): void { this.imagePreview = null; this.productForm.patchValue({ imageUrl: '' }); this.uploadError = null; this.cdr.detectChanges(); }
+
+  onImageUrlInput(event: Event): void {
+    const url = (event.target as HTMLInputElement).value.trim();
+    if (url) {
+      this.imagePreview = url;
+      this.cdr.detectChanges();
+    }
+  }
 
   // ── Catalogue load ────────────────────────────────────────────────────────
 
@@ -309,10 +327,10 @@ export class ManagerComponent implements OnInit {
     this.categoryService.getCategories().subscribe({
       next: (r) => {
         this.categories = (r.success && Array.isArray(r.data)) ? r.data
-          : [this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS, this.CAT_BRACE, this.CAT_BOUCLES];
+          : [this.CAT_ELEC, this.CAT_MODE, this.CAT_MAISON, this.CAT_BEAUTE, this.CAT_SPORT];
         this.cdr.detectChanges();
       },
-      error: () => { this.categories = [this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS, this.CAT_BRACE, this.CAT_BOUCLES]; this.cdr.detectChanges(); },
+      error: () => { this.categories = [this.CAT_ELEC, this.CAT_MODE, this.CAT_MAISON, this.CAT_BEAUTE, this.CAT_SPORT]; this.cdr.detectChanges(); },
     });
   }
 

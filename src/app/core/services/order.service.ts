@@ -31,7 +31,7 @@ export class OrderService {
   }
 
   updateOrderStatus(id: number, status: string): Observable<ApiResponse<OrderResponse>> {
-    return this.apiService.patch(`/orders/${id}/status`, { status });
+    return this.apiService.patch(`/orders/${id}/status?status=${status}`);
   }
 
   cancelOrder(id: number): Observable<ApiResponse<OrderResponse>> {

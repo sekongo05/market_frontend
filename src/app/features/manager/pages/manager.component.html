@@ -130,7 +130,7 @@
             </thead>
             <tbody>
               @for (product of products; track product.id; let i = $index) {
-                <tr class="border-b theme-border last:border-0 hover:bg-white/3 transition-colors group">
+                <tr class="border-b theme-border last:border-0 hover:bg-white/5 light:hover:bg-black/5 transition-colors group">
 
                   <!-- Product -->
                   <td class="px-6 py-4">
@@ -303,7 +303,7 @@
                 <label class="flex items-center gap-1.5 px-3 py-2 bg-gold text-black text-xs font-bold rounded-xl cursor-pointer">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                   Changer
-                  <input type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)"/>
+                  <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="onFileSelected($event)"/>
                 </label>
                 <button type="button" (click)="clearImage()"
                   class="flex items-center gap-1.5 px-3 py-2 bg-red-500/80 text-white text-xs font-bold rounded-xl">
@@ -323,7 +323,7 @@
           @if (!imagePreview) {
             <label class="flex flex-col items-center justify-center gap-3 w-full py-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200"
               [class.border-yellow-500]="dragOver" [class.bg-yellow-500\/5]="dragOver"
-              [class.border-white\/15]="!dragOver"
+              [class.theme-drop-border]="!dragOver"
               (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onFileDrop($event)">
               @if (uploadingImage) {
                 <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
@@ -335,10 +335,10 @@
                 <div class="text-center">
                   <p class="text-sm font-semibold theme-text">Glissez une image</p>
                   <p class="text-xs theme-muted mt-0.5">ou <span class="text-gold underline">parcourez</span></p>
-                  <p class="text-[10px] theme-muted mt-1">JPG, PNG, WEBP · max 10 Mo</p>
+                  <p class="text-[10px] theme-muted mt-1">JPEG · PNG · WEBP · GIF · BMP · TIFF · SVG · AVIF · HEIC · max 10 Mo</p>
                 </div>
               }
-              <input type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)"/>
+              <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="onFileSelected($event)"/>
             </label>
           }
 
@@ -348,7 +348,15 @@
               {{ uploadError }}
             </p>
           }
-          <input formControlName="imageUrl" type="hidden"/>
+
+          <!-- URL directe -->
+          <div class="mt-2">
+            <p class="text-[10px] theme-muted mb-1.5 uppercase tracking-wider font-semibold">— ou coller une URL d'image</p>
+            <input formControlName="imageUrl" type="url"
+                   placeholder="https://exemple.com/image.jpg"
+                   (input)="onImageUrlInput($event)"
+                   class="theme-input w-full px-4 py-2.5 rounded-xl text-sm transition-all"/>
+          </div>
         </div>
 
         <!-- Name -->
@@ -383,9 +391,9 @@
         <div>
           <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Catégorie</label>
           <select formControlName="categoryId" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
-            <option value="" class="bg-neutral-900">Sélectionner…</option>
+            <option value="" class="theme-option">Sélectionner…</option>
             @for (cat of categories; track cat.id) {
-              <option [value]="cat.id" class="bg-neutral-900">{{ cat.name }}</option>
+              <option [value]="cat.id" class="theme-option">{{ cat.name }}</option>
             }
           </select>
         </div>

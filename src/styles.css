@@ -136,7 +136,7 @@
   animation: shimmer 1.5s infinite;
   border-radius: 6px;
 }
-.light .skeleton {
+html.light .skeleton {
   background: linear-gradient(90deg, #ede9e3 25%, #e0dbd2 50%, #ede9e3 75%);
   background-size: 800px 100%;
   animation: shimmer 1.5s infinite;
@@ -156,14 +156,17 @@
 .bg-gold      { background: linear-gradient(135deg,#b8860b 0%,#d4af37 50%,#f0c93a 100%); }
 .bg-gold-dark { background: linear-gradient(135deg,#7a5c00 0%,#b8860b 50%,#d4af37 100%); }
 .border-gold  { border-color: #d4af37; }
-.text-gold    { color: #d4af37; }
-.light .text-gold { color: #a0720a; }   /* darker gold on white = better contrast */
+.text-gold               { color: #d4af37; }
+html.light .text-gold   { color: #a0720a; }
 
 /* ─── Luxury card ─────────────────────────────────────────────────────────── */
 .luxury-card {
-  background: linear-gradient(135deg,#191919 0%,#0f0f0f 100%);
   border: 1px solid rgba(212,175,55,.18);
   transition: border-color .3s, box-shadow .3s, transform .3s !important;
+}
+/* Dark explicit */
+html:not(.light) .luxury-card {
+  background: linear-gradient(135deg,#191919 0%,#0f0f0f 100%);
 }
 .luxury-card:hover {
   border-color: rgba(212,175,55,.55);
@@ -171,77 +174,89 @@
   transform: translateY(-4px);
 }
 
-/* Light variant — warm ivory card */
-.light .luxury-card {
+/* Light explicit */
+html.light .luxury-card {
   background: #ffffff;
   border: 1px solid rgba(168,128,30,.14);
   box-shadow: 0 2px 20px rgba(0,0,0,.06);
 }
-.light .luxury-card:hover {
+html.light .luxury-card:hover {
   border-color: rgba(184,134,11,.35);
   box-shadow: 0 16px 40px rgba(168,128,30,.12);
+  transform: translateY(-4px);
 }
 
 /* ─── Card hover ─────────────────────────────────────────────────────────── */
 .card-hover { transition: transform .3s, box-shadow .3s !important; }
 .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,.18); }
-.light .card-hover:hover { box-shadow: 0 20px 40px rgba(0,0,0,.10); }
+html.light .card-hover:hover { box-shadow: 0 20px 40px rgba(0,0,0,.10); }
 
 /* ─── Theme backgrounds ──────────────────────────────────────────────────── */
-/* Dark defaults */
-.theme-bg      { background: #0a0a0a; }
-.theme-surface { background: #131313; }
-.theme-surface-2 { background: #1c1c1c; }
-.theme-border  { border-color: rgba(255,255,255,.07); }
-.theme-text    { color: #f1f1f1; }
-.theme-muted   { color: #9ca3af; }
+html:not(.light) .theme-bg       { background: #0a0a0a; }
+html:not(.light) .theme-surface  { background: #131313; }
+html:not(.light) .theme-surface-2{ background: #1c1c1c; }
+html:not(.light) .theme-border   { border-color: rgba(255,255,255,.07); }
+html:not(.light) .theme-text     { color: #f1f1f1; }
+html:not(.light) .theme-muted    { color: #9ca3af; }
 
-/* Light overrides — warm paper palette */
-.light .theme-bg       { background: #faf8f4; }
-.light .theme-surface  { background: #ffffff; }
-.light .theme-surface-2{ background: #f3f0eb; }
-.light .theme-border   { border-color: rgba(0,0,0,.08); }
-.light .theme-text     { color: #111111; }
-.light .theme-muted    { color: #6b7280; }
+html.light .theme-bg       { background: #faf8f4; }
+html.light .theme-surface  { background: #ffffff; }
+html.light .theme-surface-2{ background: #f3f0eb; }
+html.light .theme-border   { border-color: rgba(0,0,0,.08); }
+html.light .theme-text     { color: #111111; }
+html.light .theme-muted    { color: #6b7280; }
+
+/* ─── Body base ──────────────────────────────────────────────────────────── */
+html:not(.light) body { background: #0a0a0a; color: #f1f1f1; }
+html.light       body { background: #faf8f4; color: #111111; }
 
 /* ─── Theme input ────────────────────────────────────────────────────────── */
-.theme-input {
+html:not(.light) .theme-input {
   background: rgba(255,255,255,.06);
   border: 1px solid rgba(255,255,255,.10);
   color: #f1f1f1;
 }
-.theme-input::placeholder { color: #6b7280; }
-.theme-input:focus {
+html:not(.light) .theme-input::placeholder { color: #6b7280; }
+html:not(.light) .theme-input:focus {
   border-color: rgba(212,175,55,.50);
   box-shadow: 0 0 0 3px rgba(212,175,55,.12);
   outline: none;
 }
-.light .theme-input {
+html.light .theme-input {
   background: #ffffff;
   border: 1px solid rgba(0,0,0,.10);
   color: #111111;
 }
-.light .theme-input::placeholder { color: #9ca3af; }
-.light .theme-input:focus {
+html.light .theme-input::placeholder { color: #9ca3af; }
+html.light .theme-input:focus {
   border-color: rgba(168,128,30,.50);
   box-shadow: 0 0 0 3px rgba(168,128,30,.10);
+  outline: none;
 }
+
+/* ─── Drop zone dashed border ────────────────────────────────────────────── */
+html:not(.light) .theme-drop-border { border-color: rgba(255,255,255,.15); }
+html.light       .theme-drop-border { border-color: rgba(0,0,0,.15); }
+
+/* ─── Select option background ───────────────────────────────────────────── */
+.theme-option { background: #1a1a1a; color: #f1f1f1; }
+.light .theme-option { background: #ffffff; color: #111111; }
 
 /* ─── Dot grid ───────────────────────────────────────────────────────────── */
 .dot-grid {
   background-image: radial-gradient(circle, rgba(255,255,255,.07) 1px, transparent 1px);
   background-size: 28px 28px;
 }
-.light .dot-grid {
+html.light .dot-grid {
   background-image: radial-gradient(circle, rgba(0,0,0,.06) 1px, transparent 1px);
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #0d0d0d; }
-::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
-.light ::-webkit-scrollbar-track { background: #ede9e3; }
-.light ::-webkit-scrollbar-thumb { background: #b8860b; }
+html:not(.light) ::-webkit-scrollbar-track { background: #0d0d0d; }
+html:not(.light) ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
+html.light ::-webkit-scrollbar-track { background: #ede9e3; }
+html.light ::-webkit-scrollbar-thumb { background: #b8860b; border-radius: 3px; }
 
 /* ─── Smooth scroll ──────────────────────────────────────────────────────── */
 html { scroll-behavior: smooth; }

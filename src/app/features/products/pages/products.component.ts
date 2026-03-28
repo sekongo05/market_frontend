@@ -24,7 +24,7 @@ export class ProductsComponent implements OnInit {
   loading = false;
   error: string | null = null;
   currentPage = 0;
-  pageSize = 12;
+  pageSize = 48;
   totalPages = 0;
   searchQuery = '';
 
@@ -36,26 +36,29 @@ export class ProductsComponent implements OnInit {
   modalSuccess: string | null = null;
   productForm!: FormGroup;
 
-  private readonly CAT_MONTRES  = { id: 1, name: 'Montres',           slug: 'montres',  description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_BAGUES   = { id: 2, name: 'Bagues',            slug: 'bagues',   description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_COLLIERS = { id: 3, name: 'Colliers',          slug: 'colliers', description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_BRACE    = { id: 4, name: 'Bracelets',         slug: 'bracelets',description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_BOUCLES  = { id: 5, name: "Boucles d'oreilles",slug: 'boucles',  description: '', imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_ELEC   = { id: 1, name: 'Électronique',    slug: 'electronique',     description: 'Smartphones, ordinateurs, accessoires tech', imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_MODE   = { id: 2, name: 'Mode & Vêtements', slug: 'mode-vetements',   description: 'Vêtements, chaussures, accessoires de mode',  imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_MAISON = { id: 3, name: 'Maison & Cuisine',  slug: 'maison-cuisine',   description: 'Électroménager, décoration, ustensiles',       imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_BEAUTE = { id: 4, name: 'Beauté & Santé',    slug: 'beaute-sante',     description: 'Cosmétiques, soins, produits de santé',        imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_SPORT  = { id: 5, name: 'Sports & Loisirs',  slug: 'sports-loisirs',   description: 'Équipements sportifs, jeux, loisirs',          imageUrl: '', active: true, createdAt: '' };
 
   private readonly mockProducts: ProductResponse[] = [
-    { id: 1,  name: 'Royal Oak Chronographe',   slug: 'royal-oak-chrono',        description: "Montre iconique en acier inoxydable, cadran bleu, mouvement automatique Swiss Made. Un chef-d'œuvre de l'horlogerie moderne.", price: 8500000,  stock: 3, imageUrl: 'https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=600&q=80',  category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 2,  name: 'Submariner Date',           slug: 'submariner-date',         description: "Montre de plongée légendaire, boîtier Oystersteel, lunette céramique noire. Étanche jusqu'à 300 mètres.",                        price: 12000000, stock: 2, imageUrl: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&q=80',  category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 3,  name: 'Bague Solitaire Diamant',   slug: 'bague-solitaire',         description: "Bague en or blanc 18 carats sertie d'un diamant brillant de 1.5 ct. Certificat GIA inclus.",                                    price: 5500000,  stock: 5, imageUrl: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80',  category: this.CAT_BAGUES,   active: true, createdAt: '', updatedAt: '' },
-    { id: 4,  name: "Collier Perles d'Akoya",    slug: 'collier-perles-akoya',    description: "Collier de perles d'Akoya du Japon, fermoir en or jaune 18 carats. Éclat nacré exceptionnel.",                                  price: 3200000,  stock: 4, imageUrl: 'https://images.unsplash.com/photo-1599459183200-59c7687a0c70?w=600&q=80',  category: this.CAT_COLLIERS, active: true, createdAt: '', updatedAt: '' },
-    { id: 5,  name: 'Santos de Cartier',         slug: 'santos-cartier',          description: 'Montre emblématique aux lignes carrées et vis apparentes. Bracelet intégré en acier et or rose.',                                 price: 9800000,  stock: 2, imageUrl: 'https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=600&q=80',  category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 6,  name: 'Bracelet Jonc Or 18K',      slug: 'bracelet-jonc-or',        description: 'Bracelet jonc rigide en or jaune 18 carats. Finition polie, design intemporel et élégant.',                                      price: 2800000,  stock: 6, imageUrl: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80',  category: this.CAT_BRACE,    active: true, createdAt: '', updatedAt: '' },
-    { id: 7,  name: 'Speedmaster Moonwatch',     slug: 'speedmaster-moonwatch',   description: 'La montre des astronautes. Chronographe légendaire, verre saphir, mouvement manuel certifié COSC.',                             price: 7200000,  stock: 3, imageUrl: 'https://images.unsplash.com/photo-1612817159949-195b6eb9e31a?w=600&q=80',  category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 8,  name: 'Boucles Émeraude & Or',     slug: 'boucles-emeraude-or',     description: "Boucles d'oreilles en or blanc 18 carats serties d'émeraudes colombiennes et diamants pavés.",                                  price: 4100000,  stock: 4, imageUrl: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=600&q=80',  category: this.CAT_BOUCLES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 9,  name: 'Lange & Söhne Datograph',   slug: 'lange-datograph',         description: "Chronographe allemand d'exception, manufacture A. Lange & Söhne. Mouvement Flyback, boîtier platine.",                          price: 45000000, stock: 1, imageUrl: 'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=600&q=80',  category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 10, name: 'Collier Diamants Rivière',  slug: 'collier-diamants-riviere',description: "Rivière de diamants en or blanc 18 carats, 35 brillants d'un total de 5 carats. Pièce de haute joaillerie.",                   price: 18500000, stock: 1, imageUrl: 'https://images.unsplash.com/photo-1601121141461-9d6647bef0a1?w=600&q=80',  category: this.CAT_COLLIERS, active: true, createdAt: '', updatedAt: '' },
-    { id: 11, name: 'Breitling Navitimer',        slug: 'breitling-navitimer',     description: 'Chronographe de pilote iconique, règle à calcul intégrée, mouvement automatique COSC. Cadran anthracite.',                      price: 6800000,  stock: 3, imageUrl: 'https://images.unsplash.com/photo-1526045431048-f857369baa09?w=600&q=80',  category: this.CAT_MONTRES,  active: true, createdAt: '', updatedAt: '' },
-    { id: 12, name: 'Bague Rubis & Diamants',    slug: 'bague-rubis-diamants',    description: "Bague cocktail en or rose 18 carats, rubis de Birmanie 3 ct entouré de diamants pavés. Certificat d'origine.",                  price: 8900000,  stock: 2, imageUrl: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=600&q=80',  category: this.CAT_BAGUES,   active: true, createdAt: '', updatedAt: '' },
+    { id: 1,  name: 'iPhone 15 Pro',          slug: 'iphone-15-pro',         description: 'Smartphone Apple iPhone 15 Pro 256Go, puce A17 Pro, appareil photo 48MP.',         price: 650000,  stock: 15, imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 2,  name: 'Samsung Galaxy S24',     slug: 'samsung-galaxy-s24',    description: 'Smartphone Samsung Galaxy S24 128Go, écran Dynamic AMOLED 6.2 pouces.',           price: 450000,  stock: 20, imageUrl: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 3,  name: 'MacBook Air M2',         slug: 'macbook-air-m2',        description: 'Ordinateur portable Apple MacBook Air 13 pouces, puce M2, 8Go RAM, 256Go SSD.',   price: 1200000, stock: 8,  imageUrl: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 4,  name: 'Sac à main Cuir',        slug: 'sac-main-cuir',         description: 'Sac à main en cuir véritable, design élégant, compartiments multiples.',           price: 55000,   stock: 18, imageUrl: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
+    { id: 5,  name: 'Robe Wax Traditionnelle',slug: 'robe-wax',              description: 'Robe en tissu wax 100% coton, motifs traditionnels africains, taille ajustable.',  price: 25000,   stock: 30, imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
+    { id: 6,  name: 'Climatiseur Hisense',    slug: 'clim-hisense',          description: 'Climatiseur split Hisense 1.5 CV, fonction froid/chaud, économique en énergie.',  price: 280000,  stock: 10, imageUrl: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&q=80', category: this.CAT_MAISON, active: true, createdAt: '', updatedAt: '' },
+    { id: 7,  name: 'Fer à repasser Philips', slug: 'fer-philips',           description: 'Fer à repasser vapeur Philips 2400W, semelle en céramique, bac 350ml.',           price: 22000,   stock: 35, imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', category: this.CAT_MAISON, active: true, createdAt: '', updatedAt: '' },
+    { id: 8,  name: 'Crème Hydratante Nivea', slug: 'creme-nivea',           description: 'Crème hydratante corps Nivea 400ml, formule enrichie en aloe vera.',               price: 3500,    stock: 50, imageUrl: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80', category: this.CAT_BEAUTE, active: true, createdAt: '', updatedAt: '' },
+    { id: 9,  name: 'Parfum Dior Sauvage',    slug: 'parfum-dior',           description: 'Eau de toilette Dior Sauvage 100ml, fragrance boisée et fraîche pour homme.',    price: 85000,   stock: 12, imageUrl: 'https://images.unsplash.com/photo-1541643600914-78b084683702?w=600&q=80', category: this.CAT_BEAUTE, active: true, createdAt: '', updatedAt: '' },
+    { id: 10, name: 'Vélo de Sport',          slug: 'velo-sport',            description: 'Vélo de sport tout terrain 21 vitesses, cadre aluminium, freins à disque.',       price: 120000,  stock: 7,  imageUrl: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=600&q=80', category: this.CAT_SPORT,  active: true, createdAt: '', updatedAt: '' },
+    { id: 11, name: 'Ballon de Football Nike',slug: 'ballon-nike',           description: 'Ballon de football officiel Nike Strike, taille 5, certifié FIFA.',              price: 18000,   stock: 25, imageUrl: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&q=80', category: this.CAT_SPORT,  active: true, createdAt: '', updatedAt: '' },
+    { id: 12, name: 'Tablette iPad 10',       slug: 'ipad-10',               description: 'Tablette Apple iPad 10e génération 64Go WiFi, écran 10.9 pouces Liquid Retina.', price: 380000,  stock: 12, imageUrl: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
   ];
+
+  // Category filter
+  selectedCategoryId: number | null = null;
 
   // Tracks product ids that were just added (for button feedback)
   addedIds = new Set<number>();
@@ -177,9 +180,15 @@ export class ProductsComponent implements OnInit {
     input.value = '';
   }
 
+  private _isImageFile(file: File): boolean {
+    if (file.type.startsWith('image/')) return true;
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    return ['heic', 'heif'].includes(ext);
+  }
+
   private _uploadFile(file: File): void {
-    if (!file.type.startsWith('image/')) {
-      this.uploadError = 'Seules les images sont acceptées (JPG, PNG, WEBP…)';
+    if (!this._isImageFile(file)) {
+      this.uploadError = 'Format non supporté — JPEG, PNG, WEBP, GIF, BMP, TIFF, SVG, AVIF, HEIC';
       this.cdr.detectChanges();
       return;
     }
@@ -284,6 +293,7 @@ export class ProductsComponent implements OnInit {
 
     const params: GetProductsParams = { page, size: this.pageSize };
     if (this.searchQuery) params.search = this.searchQuery;
+    if (this.selectedCategoryId) params.categoryId = this.selectedCategoryId;
 
     this.productService.getProducts(params).subscribe({
       next: (response) => {
@@ -318,16 +328,16 @@ export class ProductsComponent implements OnInit {
           this.categories = response.data;
         } else {
           this.categories = [
-            this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS,
-            this.CAT_BRACE, this.CAT_BOUCLES,
+            this.CAT_ELEC, this.CAT_MODE, this.CAT_MAISON,
+            this.CAT_BEAUTE, this.CAT_SPORT,
           ];
         }
         this.cdr.detectChanges();
       },
       error: () => {
         this.categories = [
-          this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS,
-          this.CAT_BRACE, this.CAT_BOUCLES,
+          this.CAT_ELEC, this.CAT_MODE, this.CAT_MAISON,
+          this.CAT_BEAUTE, this.CAT_SPORT,
         ];
         this.cdr.detectChanges();
       },
@@ -335,11 +345,26 @@ export class ProductsComponent implements OnInit {
   }
 
   private getFilteredMocks(): ProductResponse[] {
-    if (!this.searchQuery) return this.mockProducts;
+    let mocks = this.mockProducts;
+    if (this.selectedCategoryId) mocks = mocks.filter(p => p.category.id === this.selectedCategoryId);
+    if (!this.searchQuery) return mocks;
     const q = this.searchQuery.toLowerCase();
-    return this.mockProducts.filter((p) =>
-      p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
-    );
+    return mocks.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
+  }
+
+  selectCategory(id: number | null): void {
+    this.selectedCategoryId = id;
+    this.searchQuery = '';
+    this.loadProducts(0);
+  }
+
+  get productsByCategory(): { category: CategoryResponse; items: ProductResponse[] }[] {
+    const map = new Map<number, { category: CategoryResponse; items: ProductResponse[] }>();
+    for (const p of this.products) {
+      if (!map.has(p.category.id)) map.set(p.category.id, { category: p.category, items: [] });
+      map.get(p.category.id)!.items.push(p);
+    }
+    return Array.from(map.values());
   }
 
   search(): void { this.loadProducts(0); }
