@@ -21,6 +21,8 @@ export class RegisterComponent implements OnInit {
   loading = false;
   submitted = false;
   error: string | null = null;
+  showPwd = false;
+  showConfirmPwd = false;
 
   constructor(
     private formBuilder: FormBuilder,

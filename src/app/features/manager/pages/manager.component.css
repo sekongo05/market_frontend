@@ -1,1 +1,17 @@
-/* empty — all styles via Tailwind + global theme classes */
+/* ── Drawer slide-in depuis la droite ─────────────────── */
+@keyframes drawer-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+.drawer-panel {
+  animation: drawer-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Toast slide-up ───────────────────────────────────── */
+@keyframes toast-in {
+  from { transform: translateY(12px) scale(0.96); opacity: 0; }
+  to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+.toast-enter {
+  animation: toast-in 0.2s ease-out;
+}
