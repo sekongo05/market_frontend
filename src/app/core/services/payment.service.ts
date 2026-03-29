@@ -38,16 +38,16 @@ export class PaymentService {
 
   // ---- Paiement manuel QR code ----
 
-  notifyPayment(orderId: number, waveReference?: string): Observable<ApiResponse<null>> {
-    return this.apiService.post(`/payments/manual/notify/${orderId}`, { waveReference: waveReference ?? null });
+  notifyPayment(orderId: number, waveReference: string): Observable<ApiResponse<null>> {
+    return this.apiService.post(`/payments/manual/notify/${orderId}`, { waveReference });
   }
 
   validatePayment(orderId: number): Observable<ApiResponse<OrderResponse>> {
     return this.apiService.patch(`/payments/manual/validate/${orderId}`);
   }
 
-  rejectPayment(orderId: number): Observable<ApiResponse<OrderResponse>> {
-    return this.apiService.patch(`/payments/manual/reject/${orderId}`);
+  rejectPayment(orderId: number, reason: string): Observable<ApiResponse<OrderResponse>> {
+    return this.apiService.patch(`/payments/manual/reject/${orderId}`, { reason });
   }
 
   getPendingValidationOrders(page = 0, size = 20): Observable<ApiResponse<PageResponse<OrderResponse>>> {

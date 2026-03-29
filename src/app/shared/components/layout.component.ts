@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './navbar.component';
+import { SupportWidgetComponent } from './support-widget.component';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterModule, NavbarComponent],
+  imports: [RouterModule, NavbarComponent, SupportWidgetComponent],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
 })

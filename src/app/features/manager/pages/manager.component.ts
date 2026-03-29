@@ -11,10 +11,13 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ProductMediaService } from '../../../core/services/product-media.service';
 import { OrderService } from '../../../core/services/order.service';
 import { PaymentService } from '../../../core/services/payment.service';
+import { DeliveryService } from '../../../core/services/delivery.service';
+import { DashboardService } from '../../../core/services/dashboard.service';
 import { ProductResponse, GetProductsParams, ProductMediaItem, Gender } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { OrderResponse } from '../../../core/models/order.models';
-import { PageResponse, OrderStatus } from '../../../core/models/common.models';
+import { DeliveryResponse, AddDeliveryEventRequest, UpdateDeliveryRequest } from '../../../core/models/delivery.models';
+import { PageResponse, OrderStatus, DeliveryStatus } from '../../../core/models/common.models';
 
 interface Toast { id: number; msg: string; type: 'success' | 'error'; }
 
@@ -28,7 +31,7 @@ interface Toast { id: number; msg: string; type: 'success' | 'error'; }
 export class ManagerComponent implements OnInit, OnDestroy {
 
   // ── Page tab ──────────────────────────────────────────────────────────────
-  pageTab: 'products' | 'orders' | 'payments' = 'products';
+  pageTab: 'products' | 'orders' | 'payments' | 'delivery' | 'dashboard' = 'products';
 
   // ── Data ──────────────────────────────────────────────────────────────────
   products: ProductResponse[] = [];
@@ -87,6 +90,34 @@ export class ManagerComponent implements OnInit, OnDestroy {
   paymentsTotalPages = 0;
   paymentActionId: number | null = null;
 
+  // ── Rejection modal ───────────────────────────────────────────────────────
+  rejectModalOpen = false;
+  rejectingOrder: OrderResponse | null = null;
+  rejectReason = '';
+
+  // ── Delivery tab ──────────────────────────────────────────────────────────
+  deliveryOrders: OrderResponse[] = [];
+  deliveryOrdersLoading = false;
+  deliveryOrdersPage = 0;
+  deliveryOrdersTotalPages = 0;
+  expandedDeliveryOrderId: number | null = null;
+  selectedDelivery: DeliveryResponse | null = null;
+  deliveryDetailLoading = false;
+  deliveryEventStatus: DeliveryStatus = DeliveryStatus.SHIPPED;
+  deliveryEventDesc = '';
+  deliveryEventLocation = '';
+  deliveryEventSaving = false;
+  deliveryUpdateAgent = '';
+  deliveryUpdateDate = '';
+  deliveryUpdateNotes = '';
+  deliveryUpdateSaving = false;
+  deliverySubTab: 'events' | 'update' = 'events';
+  readonly deliveryStatuses = Object.values(DeliveryStatus);
+
+  // ── Manager dashboard stats ───────────────────────────────────────────────
+  managerStats: any = null;
+  managerStatsLoading = false;
+
   // ── Inline stock edit ─────────────────────────────────────────────────────
   editingStockId: number | null = null;
   editingStockValue = 0;
@@ -133,6 +164,8 @@ export class ManagerComponent implements OnInit, OnDestroy {
     private productMediaService: ProductMediaService,
     private orderService: OrderService,
     private paymentService: PaymentService,
+    private deliveryService: DeliveryService,
+    private dashboardService: DashboardService,
     private fb: FormBuilder,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -466,10 +499,12 @@ export class ManagerComponent implements OnInit, OnDestroy {
   nextPage(): void { if (this.currentPage < this.totalPages - 1) this.loadProducts(this.currentPage + 1); }
   get pages(): number[] { return Array.from({ length: this.totalPages }, (_, i) => i); }
 
-  setPageTab(tab: 'products' | 'orders' | 'payments'): void {
+  setPageTab(tab: 'products' | 'orders' | 'payments' | 'delivery' | 'dashboard'): void {
     this.pageTab = tab;
     if (tab === 'orders' && this.allOrders.length === 0) this.loadAllOrders();
     if (tab === 'payments' && this.pendingPayments.length === 0) this.loadPendingPayments();
+    if (tab === 'delivery' && this.deliveryOrders.length === 0) this.loadDeliveryOrders();
+    if (tab === 'dashboard') this.loadManagerStats();
     if (this.drawerOpen) this.closeDrawer();
     this.cdr.detectChanges();
   }
@@ -567,9 +602,30 @@ export class ManagerComponent implements OnInit, OnDestroy {
     });
   }
 
-  rejectPayment(order: OrderResponse): void {
+  openRejectModal(order: OrderResponse): void {
+    this.rejectingOrder = order;
+    this.rejectReason = '';
+    this.rejectModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeRejectModal(): void {
+    this.rejectModalOpen = false;
+    this.rejectingOrder = null;
+    this.rejectReason = '';
+    this.cdr.detectChanges();
+  }
+
+  confirmRejectPayment(): void {
+    if (!this.rejectingOrder || !this.rejectReason.trim()) return;
+    const order = this.rejectingOrder;
+    const reason = this.rejectReason.trim();
     this.paymentActionId = order.id;
-    this.paymentService.rejectPayment(order.id).subscribe({
+    this.rejectModalOpen = false;
+    this.rejectingOrder = null;
+    this.rejectReason = '';
+    this.cdr.detectChanges();
+    this.paymentService.rejectPayment(order.id, reason).subscribe({
       next: (r) => {
         if (r.success) {
           this.pendingPayments = this.pendingPayments.filter(o => o.id !== order.id);
@@ -584,6 +640,149 @@ export class ManagerComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  // ── Delivery management ───────────────────────────────────────────────────
+
+  loadDeliveryOrders(page = 0): void {
+    this.deliveryOrdersLoading = true;
+    this.orderService.getAllOrders({ page, size: 20 }).subscribe({
+      next: (r) => {
+        if (r.success) {
+          const pg = r.data as PageResponse<OrderResponse>;
+          this.deliveryOrders = pg.content.filter(o =>
+            ['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'].includes(o.orderStatus));
+          this.deliveryOrdersTotalPages = pg.totalPages;
+          this.deliveryOrdersPage = page;
+        }
+        this.deliveryOrdersLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.deliveryOrdersLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  toggleDeliveryOrder(orderId: number): void {
+    if (this.expandedDeliveryOrderId === orderId) {
+      this.expandedDeliveryOrderId = null;
+      this.selectedDelivery = null;
+      this.cdr.detectChanges();
+      return;
+    }
+    this.expandedDeliveryOrderId = orderId;
+    this.selectedDelivery = null;
+    this.deliveryDetailLoading = true;
+    this.deliverySubTab = 'events';
+    this.cdr.detectChanges();
+    this.deliveryService.getDeliveryByOrder(orderId).subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.selectedDelivery = r.data;
+          this.deliveryUpdateAgent = r.data.deliveryAgent || '';
+          this.deliveryUpdateDate = r.data.estimatedDate ? r.data.estimatedDate.split('T')[0] : '';
+          this.deliveryUpdateNotes = r.data.notes || '';
+        }
+        this.deliveryDetailLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.deliveryDetailLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  submitDeliveryEvent(): void {
+    if (!this.selectedDelivery || !this.deliveryEventDesc.trim()) return;
+    this.deliveryEventSaving = true;
+    const data: AddDeliveryEventRequest = {
+      status: this.deliveryEventStatus,
+      description: this.deliveryEventDesc.trim(),
+      location: this.deliveryEventLocation.trim() || undefined,
+    };
+    this.deliveryService.addDeliveryEvent(this.selectedDelivery.id, data).subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.selectedDelivery = r.data;
+          this.deliveryEventDesc = '';
+          this.deliveryEventLocation = '';
+          this.toast('Événement de livraison ajouté ✓');
+        }
+        this.deliveryEventSaving = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.deliveryEventSaving = false;
+        this.toast(err?.error?.message || 'Erreur', 'error');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  submitDeliveryUpdate(): void {
+    if (!this.selectedDelivery) return;
+    this.deliveryUpdateSaving = true;
+    const data: UpdateDeliveryRequest = {
+      deliveryAgent: this.deliveryUpdateAgent.trim() || undefined,
+      estimatedDate: this.deliveryUpdateDate || undefined,
+      notes: this.deliveryUpdateNotes.trim() || undefined,
+    };
+    this.deliveryService.updateDelivery(this.selectedDelivery.id, data).subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.selectedDelivery = r.data;
+          this.toast('Informations de livraison mises à jour ✓');
+        }
+        this.deliveryUpdateSaving = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.deliveryUpdateSaving = false;
+        this.toast(err?.error?.message || 'Erreur', 'error');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  deliveryStatusLabel(s: string): string {
+    const m: Record<string, string> = {
+      PREPARING:        'Préparation',
+      SHIPPED:          'Expédié',
+      OUT_FOR_DELIVERY: 'En livraison',
+      DELIVERED:        'Livré',
+      FAILED:           'Échec',
+    };
+    return m[s] ?? s;
+  }
+
+  deliveryStatusClass(s: string): string {
+    const m: Record<string, string> = {
+      PREPARING:        'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
+      SHIPPED:          'bg-blue-500/15   text-blue-400   border border-blue-500/25',
+      OUT_FOR_DELIVERY: 'bg-purple-500/15 text-purple-400 border border-purple-500/25',
+      DELIVERED:        'bg-green-500/15  text-green-400  border border-green-500/25',
+      FAILED:           'bg-red-500/15    text-red-400    border border-red-500/25',
+    };
+    return m[s] ?? 'bg-white/10 theme-muted border border-white/10';
+  }
+
+  get deliveryOrderPages(): number[] { return Array.from({ length: this.deliveryOrdersTotalPages }, (_, i) => i); }
+
+  // ── Manager stats ──────────────────────────────────────────────────────────
+
+  loadManagerStats(): void {
+    this.managerStatsLoading = true;
+    this.dashboardService.getManagerStats().subscribe({
+      next: (r) => {
+        if (r.success) this.managerStats = r.data;
+        this.managerStatsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.managerStatsLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  formatCurrency(amount: number): string {
+    if (amount >= 1_000_000) return (amount / 1_000_000).toFixed(1) + 'M';
+    if (amount >= 1_000) return Math.round(amount / 1_000) + 'K';
+    return amount.toString();
   }
 
   get paymentPages(): number[] { return Array.from({ length: this.paymentsTotalPages }, (_, i) => i); }

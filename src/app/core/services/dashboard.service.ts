@@ -57,4 +57,8 @@ export class DashboardService {
   getTopProducts(limit: number = 5): Observable<ApiResponse<TopProductItem[]>> {
     return this.apiService.get('/dashboard/top-products', { limit });
   }
+
+  getManagerStats(): Observable<ApiResponse<any>> {
+    return this.apiService.get('/dashboard/manager-stats');
+  }
 }

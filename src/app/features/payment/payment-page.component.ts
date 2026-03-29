@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PaymentService } from '../../core/services/payment.service';
 import { OrderService } from '../../core/services/order.service';
 import { OrderResponse } from '../../core/models/order.models';
+import { PaymentStatus } from '../../core/models/common.models';
 
 @Component({
   selector: 'app-payment-page',
@@ -19,6 +20,7 @@ export class PaymentPageComponent implements OnInit {
   submitting = false;
   success = false;
   error: string | null = null;
+  referenceError: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -36,8 +38,8 @@ export class PaymentPageComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.order = res.data;
-          // If already paid or submitted, redirect to orders
-          if (this.order.paymentStatus === 'COMPLETED' || this.order.paymentStatus === 'SUBMITTED') {
+          // Rediriger seulement si déjà payé ou commande annulée/terminée
+          if (this.order.paymentStatus === 'COMPLETED') {
             this.router.navigate(['/orders']);
           }
         } else {
@@ -54,16 +56,45 @@ export class PaymentPageComponent implements OnInit {
     });
   }
 
+  /** Retourne true si le formulaire de paiement doit être affiché */
+  get canPay(): boolean {
+    return this.order?.paymentStatus === 'PENDING' || this.order?.paymentStatus === 'FAILED';
+  }
+
+  /** Retourne true si en attente de validation manager */
+  get isPendingValidation(): boolean {
+    return this.order?.paymentStatus === 'SUBMITTED';
+  }
+
   notifyPayment(): void {
     if (!this.order || this.submitting) return;
+
+    // Validation de la référence côté client
+    const ref = this.waveReference.trim();
+    if (!ref) {
+      this.referenceError = 'La référence Wave est obligatoire';
+      this.cdr.detectChanges();
+      return;
+    }
+    if (ref.length < 3) {
+      this.referenceError = 'La référence est trop courte (minimum 3 caractères)';
+      this.cdr.detectChanges();
+      return;
+    }
+    this.referenceError = null;
+
     this.submitting = true;
     this.error = null;
-    this.paymentService.notifyPayment(this.order.id, this.waveReference.trim() || undefined).subscribe({
+    this.paymentService.notifyPayment(this.order.id, ref).subscribe({
       next: (res) => {
         if (res.success) {
           this.success = true;
+          // Mettre à jour l'ordre local pour afficher l'état SUBMITTED
+          if (this.order) {
+            this.order = { ...this.order, paymentStatus: PaymentStatus.SUBMITTED, paymentReference: ref };
+          }
           this.cdr.detectChanges();
-          setTimeout(() => this.router.navigate(['/orders']), 2500);
+          setTimeout(() => this.router.navigate(['/orders']), 3000);
         } else {
           this.error = res.message || 'Erreur lors de la déclaration de paiement';
           this.submitting = false;
@@ -71,7 +102,8 @@ export class PaymentPageComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.error = err?.error?.message || 'Erreur lors de la déclaration de paiement';
+        const msg = err?.error?.message || err?.error?.errors?.waveReference;
+        this.error = msg || 'Erreur lors de la déclaration de paiement';
         this.submitting = false;
         this.cdr.detectChanges();
       },

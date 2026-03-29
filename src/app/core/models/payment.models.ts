@@ -13,6 +13,9 @@ export interface PaymentTransactionResponse {
   amount: number;
   currency: string;
   status: string;
+  paymentMethod: 'WAVE_CHECKOUT' | 'WAVE_MANUAL';
+  processedBy: string | null;
+  managerNote: string | null;
   errorMessage: string | null;
   createdAt: string;
 }
