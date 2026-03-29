@@ -1,0 +1,130 @@
+<div class="min-h-screen theme-bg flex items-center justify-center p-4">
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex flex-col items-center gap-4">
+      <svg class="w-10 h-10 animate-spin text-gold" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+      <p class="theme-muted text-sm">Chargement…</p>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (!loading && error && !order) {
+    <div class="text-center">
+      <p class="text-red-400 mb-4">{{ error }}</p>
+      <button (click)="goToOrders()" class="px-5 py-2.5 luxury-card rounded-xl text-sm font-semibold theme-text hover:text-gold transition-colors">
+        Retour aux commandes
+      </button>
+    </div>
+  }
+
+  <!-- Success -->
+  @if (success) {
+    <div class="text-center max-w-md">
+      <div class="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-5">
+        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h2 class="text-xl font-bold theme-text mb-2">Paiement déclaré !</h2>
+      <p class="theme-muted text-sm">Notre équipe va vérifier votre paiement et confirmer votre commande dans les plus brefs délais.</p>
+      <p class="theme-muted text-xs mt-3">Redirection en cours…</p>
+    </div>
+  }
+
+  <!-- Main payment page -->
+  @if (!loading && order && !success) {
+    <div class="w-full max-w-md">
+
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-bold theme-text mb-1">Paiement Wave</h1>
+        <p class="theme-muted text-sm">Commande <span class="font-semibold text-gold">{{ order.orderNumber }}</span></p>
+      </div>
+
+      <div class="luxury-card rounded-2xl p-6 space-y-6">
+
+        <!-- Amount -->
+        <div class="text-center py-3 rounded-xl" style="background:rgba(255,255,255,0.04)">
+          <p class="text-[11px] font-bold theme-muted uppercase tracking-wider mb-1">Montant à payer</p>
+          <p class="text-3xl font-bold text-gold">{{ order.totalAmount | number:'1.0-0' }} <span class="text-lg">XOF</span></p>
+        </div>
+
+        <!-- QR Code -->
+        <div class="flex flex-col items-center gap-3">
+          <p class="text-sm font-semibold theme-text">Scannez le QR code avec votre application Wave</p>
+          <div class="p-3 bg-white rounded-2xl shadow-lg">
+            <img src="wave-qr.png" alt="QR code Wave" class="w-52 h-52 object-contain rounded-xl"
+                 onerror="this.parentElement.innerHTML='<div class=\'w-52 h-52 flex flex-col items-center justify-center gap-2 rounded-xl bg-gray-100\'><svg class=\'w-12 h-12 text-gray-400\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0zM6 7.5a.5.5 0 11-1 0 .5.5 0 011 0zm.5 8.5a.5.5 0 110-1 .5.5 0 010 1zm11-8a.5.5 0 110-1 .5.5 0 010 1z\'/></svg><p class=\'text-xs text-gray-500 font-medium text-center px-2\'>QR code bientôt disponible</p></div>'"/>
+          </div>
+          <div class="flex items-start gap-2 p-3 rounded-xl w-full" style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)">
+            <svg class="w-4 h-4 text-blue-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-xs text-blue-300">
+              Ouvrez votre application <strong>Wave</strong>, appuyez sur <strong>Scanner</strong> et scannez ce code pour envoyer exactement <strong>{{ order.totalAmount | number:'1.0-0' }} XOF</strong>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Reference input -->
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">
+            Référence de transaction Wave <span class="normal-case font-normal">(optionnelle)</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="waveReference"
+            placeholder="Ex : TXN-XXXXXXXX"
+            class="w-full px-4 py-3 rounded-xl luxury-card theme-text text-sm placeholder:theme-muted focus:outline-none focus:ring-2 focus:ring-gold/40 transition-all"
+          />
+          <p class="text-[11px] theme-muted mt-1.5">Vous pouvez retrouver cette référence dans l'historique Wave après le paiement.</p>
+        </div>
+
+        <!-- Error -->
+        @if (error) {
+          <div class="p-3 rounded-xl" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">
+            <p class="text-sm text-red-400">{{ error }}</p>
+          </div>
+        }
+
+        <!-- CTA -->
+        <button
+          (click)="notifyPayment()"
+          [disabled]="submitting"
+          class="w-full py-3.5 rounded-xl font-bold text-sm transition-all
+                 bg-gold text-black hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed
+                 flex items-center justify-center gap-2">
+          @if (submitting) {
+            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            Envoi en cours…
+          } @else {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            J'ai effectué le paiement
+          }
+        </button>
+
+        <button (click)="goToOrders()"
+          class="w-full py-2.5 rounded-xl text-sm font-semibold theme-muted hover:theme-text transition-colors">
+          Payer plus tard
+        </button>
+
+      </div>
+
+      <!-- Warning -->
+      <p class="text-center text-[11px] theme-muted mt-4 px-4">
+        N'appuyez sur "J'ai effectué le paiement" qu'après avoir envoyé le montant exact via Wave. Votre commande sera confirmée après vérification par notre équipe.
+      </p>
+
+    </div>
+  }
+
+</div>

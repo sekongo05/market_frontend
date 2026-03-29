@@ -31,4 +31,12 @@ export class NotificationService {
   markAllAsRead(): Observable<ApiResponse<null>> {
     return this.apiService.patch('/notifications/read-all', {});
   }
+
+  deleteNotification(id: number): Observable<ApiResponse<null>> {
+    return this.apiService.delete(`/notifications/${id}`);
+  }
+
+  deleteAllNotifications(): Observable<ApiResponse<null>> {
+    return this.apiService.delete('/notifications');
+  }
 }

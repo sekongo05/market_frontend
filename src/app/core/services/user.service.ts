@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiResponse, PageResponse } from '../models/common.models';
+import { ApiResponse, PageResponse, UserRole } from '../models/common.models';
 import { UserResponse, UpdateProfileRequest, ChangePasswordRequest } from '../models/user.models';
 import { ApiService } from './api.service';
 
@@ -32,5 +32,9 @@ export class UserService {
 
   toggleUser(id: number): Observable<ApiResponse<null>> {
     return this.apiService.patch(`/users/${id}/toggle`, {});
+  }
+
+  changeRole(id: number, role: UserRole): Observable<ApiResponse<UserResponse>> {
+    return this.apiService.patch(`/users/${id}/role`, { role });
   }
 }

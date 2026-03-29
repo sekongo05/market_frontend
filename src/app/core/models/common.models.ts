@@ -34,6 +34,7 @@ export enum OrderStatus {
 
 export enum PaymentStatus {
   PENDING = 'PENDING',
+  SUBMITTED = 'SUBMITTED',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
   EXPIRED = 'EXPIRED',

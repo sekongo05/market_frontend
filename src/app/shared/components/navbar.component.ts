@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterModule, RouterLinkActive, Router } from '@angular/router';
 import { AuthService, CurrentUser } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { NotificationResponse } from '../../core/models/notification.models';
 import { ThemeService } from '../../core/services/theme.service';
 import { CartService, CartItem } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
@@ -20,11 +21,15 @@ import { takeUntil } from 'rxjs/operators';
 export class NavbarComponent implements OnInit, OnDestroy {
   currentUser: CurrentUser | null = null;
   unreadNotifications = 0;
-  showUserMenu  = false;
-  showCart      = false;
-  mobileOpen    = false;
-  scrolled      = false;
+  showUserMenu       = false;
+  showCart           = false;
+  showNotifications  = false;
+  mobileOpen         = false;
+  scrolled           = false;
   cartItems: CartItem[] = [];
+  notifications: NotificationResponse[] = [];
+  notificationsLoading = false;
+  selectedNotification: NotificationResponse | null = null;
 
   // Checkout flow
   showCheckout    = false;
@@ -51,6 +56,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (this.showNotifications && !target.closest('[data-notif-panel]')) {
+      this.showNotifications = false;
+      this.cdr.detectChanges();
+    }
+  }
+
   ngOnInit(): void {
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
@@ -69,10 +83,116 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   toggleTheme():   void { this.themeService.toggle(); this.cdr.detectChanges(); }
-  toggleCart():    void { this.showCart = !this.showCart; this.showUserMenu = false; this.mobileOpen = false; }
-  toggleUserMenu():void { this.showUserMenu = !this.showUserMenu; this.showCart = false; }
-  toggleMobile():  void { this.mobileOpen = !this.mobileOpen; this.showCart = false; this.showUserMenu = false; }
-  closeAll():      void { this.showCart = false; this.showUserMenu = false; this.mobileOpen = false; this._resetCheckout(); }
+  toggleCart():    void { this.showCart = !this.showCart; this.showUserMenu = false; this.showNotifications = false; this.mobileOpen = false; }
+  toggleUserMenu():void { this.showUserMenu = !this.showUserMenu; this.showCart = false; this.showNotifications = false; }
+  toggleMobile():  void { this.mobileOpen = !this.mobileOpen; this.showCart = false; this.showUserMenu = false; this.showNotifications = false; }
+  closeAll():      void { this.showCart = false; this.showUserMenu = false; this.showNotifications = false; this.mobileOpen = false; this._resetCheckout(); }
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications;
+    this.showCart = false;
+    this.showUserMenu = false;
+    if (!this.showNotifications) this.selectedNotification = null;
+    if (this.showNotifications && this.notifications.length === 0) {
+      this.loadNotifications();
+    }
+    this.cdr.detectChanges();
+  }
+
+  loadNotifications(): void {
+    this.notificationsLoading = true;
+    this.notificationService.getNotifications({ page: 0, size: 20 })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (r) => {
+          if (r.success) this.notifications = r.data.content;
+          this.notificationsLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: () => { this.notificationsLoading = false; this.cdr.detectChanges(); },
+      });
+  }
+
+  openNotification(notif: NotificationResponse): void {
+    this.selectedNotification = notif;
+    if (!notif.read) {
+      this.notificationService.markAsRead(notif.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            const idx = this.notifications.findIndex(n => n.id === notif.id);
+            if (idx !== -1) {
+              this.notifications = [...this.notifications];
+              this.notifications[idx] = { ...this.notifications[idx], read: true };
+              this.selectedNotification = this.notifications[idx];
+            }
+            if (this.unreadNotifications > 0) this.unreadNotifications--;
+            this.cdr.detectChanges();
+          },
+        });
+    }
+  }
+
+  closeNotificationDetail(): void {
+    this.selectedNotification = null;
+    this.cdr.detectChanges();
+  }
+
+  markAsRead(notif: NotificationResponse): void {
+    if (notif.read) return;
+    this.notificationService.markAsRead(notif.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          const idx = this.notifications.findIndex(n => n.id === notif.id);
+          if (idx !== -1) {
+            this.notifications = [...this.notifications];
+            this.notifications[idx] = { ...this.notifications[idx], read: true };
+          }
+          if (this.unreadNotifications > 0) this.unreadNotifications--;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  markAllAsRead(): void {
+    this.notificationService.markAllAsRead()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.notifications = this.notifications.map(n => ({ ...n, read: true }));
+          this.unreadNotifications = 0;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  deleteNotification(notif: NotificationResponse, event: Event): void {
+    event.stopPropagation();
+    this.notificationService.deleteNotification(notif.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          if (!notif.read && this.unreadNotifications > 0) this.unreadNotifications--;
+          this.notifications = this.notifications.filter(n => n.id !== notif.id);
+          if (this.selectedNotification?.id === notif.id) this.selectedNotification = null;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  deleteAllNotifications(): void {
+    this.notificationService.deleteAllNotifications()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.notifications = [];
+          this.unreadNotifications = 0;
+          this.selectedNotification = null;
+          this.cdr.detectChanges();
+        },
+      });
+  }
 
   logout(): void {
     this.authService.logout();
@@ -123,8 +243,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           setTimeout(() => {
             this.closeAll();
-            this.router.navigate(['/orders']);
-          }, 1800);
+            this.router.navigate(['/payment', res.data.id]);
+          }, 1200);
         } else {
           this.checkoutError = 'Erreur lors de la commande, veuillez réessayer';
         }

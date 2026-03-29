@@ -2,8 +2,8 @@
 
   <!-- ── Header ─────────────────────────────────────────────────────────── -->
   <div class="theme-surface border-b theme-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
         <div>
           <div class="flex items-center gap-2 mb-1">
             <span class="px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-full bg-gold/15 text-gold border border-gold/25">
@@ -11,21 +11,76 @@
             </span>
           </div>
           <h1 class="text-2xl font-black theme-text">Espace Gestion</h1>
-          <p class="text-sm theme-muted mt-0.5">Gérez votre catalogue produits</p>
+          <p class="text-sm theme-muted mt-0.5">
+            {{ pageTab === 'products' ? 'Gérez votre catalogue produits' : pageTab === 'orders' ? 'Suivez et validez les commandes clients' : 'Validez les paiements Wave déclarés' }}
+          </p>
         </div>
-        <button (click)="openCreateDrawer()"
-          class="flex items-center gap-2 px-5 py-3 bg-gold text-black rounded-xl font-bold text-sm
-                 hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all duration-200">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-          </svg>
-          Ajouter un produit
+        @if (pageTab === 'products') {
+          <button (click)="openCreateDrawer()"
+            class="flex items-center gap-2 px-5 py-3 bg-gold text-black rounded-xl font-bold text-sm
+                   hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+            </svg>
+            Ajouter un produit
+          </button>
+        }
+        @if (pageTab === 'orders') {
+          <button (click)="loadAllOrders(0)"
+            class="flex items-center gap-2 px-5 py-3 luxury-card theme-muted rounded-xl font-bold text-sm hover:text-gold transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Actualiser
+          </button>
+        }
+        @if (pageTab === 'payments') {
+          <button (click)="loadPendingPayments(0)"
+            class="flex items-center gap-2 px-5 py-3 luxury-card theme-muted rounded-xl font-bold text-sm hover:text-gold transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Actualiser
+          </button>
+        }
+      </div>
+      <!-- Page tabs -->
+      <div class="flex gap-1">
+        <button type="button" (click)="setPageTab('products')"
+          class="px-5 py-3 text-sm font-bold border-b-2 transition-colors"
+          [class.border-gold]="pageTab === 'products'"
+          [class.text-gold]="pageTab === 'products'"
+          [class.border-transparent]="pageTab !== 'products'"
+          [class.theme-muted]="pageTab !== 'products'">
+          Catalogue
+        </button>
+        <button type="button" (click)="setPageTab('orders')"
+          class="px-5 py-3 text-sm font-bold border-b-2 transition-colors"
+          [class.border-gold]="pageTab === 'orders'"
+          [class.text-gold]="pageTab === 'orders'"
+          [class.border-transparent]="pageTab !== 'orders'"
+          [class.theme-muted]="pageTab !== 'orders'">
+          Commandes
+        </button>
+        <button type="button" (click)="setPageTab('payments')"
+          class="px-5 py-3 text-sm font-bold border-b-2 transition-colors relative"
+          [class.border-gold]="pageTab === 'payments'"
+          [class.text-gold]="pageTab === 'payments'"
+          [class.border-transparent]="pageTab !== 'payments'"
+          [class.theme-muted]="pageTab !== 'payments'">
+          Paiements
+          @if (pendingPayments.length > 0 && pageTab !== 'payments') {
+            <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-gold rounded-full"></span>
+          }
         </button>
       </div>
     </div>
   </div>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+  <!-- ════════ ONGLET CATALOGUE ════════ -->
+  @if (pageTab === 'products') {
 
     <!-- ── Stats KPI ──────────────────────────────────────────────────────── -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -81,20 +136,35 @@
     </div>
 
     <!-- ── Search bar ─────────────────────────────────────────────────────── -->
-    <div class="flex gap-3">
-      <div class="relative flex-1 max-w-md">
-        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 theme-muted pointer-events-none"
-             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+    <div class="relative max-w-md w-full">
+      <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 theme-muted pointer-events-none"
+           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+      </svg>
+      <input
+        [ngModel]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
+        (keyup.enter)="search()"
+        type="text"
+        placeholder="Rechercher un produit…"
+        class="theme-input w-full pl-10 pr-10 py-2.5 rounded-xl text-sm transition-all duration-200 focus:ring-2 focus:ring-gold/40"
+      />
+      @if (loading && searchQuery) {
+        <svg class="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gold animate-spin pointer-events-none"
+             fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
-        <input [(ngModel)]="searchQuery" (keyup.enter)="search()" type="text"
-               placeholder="Rechercher un produit…"
-               class="theme-input w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-all"/>
-      </div>
-      <button (click)="search()"
-        class="px-5 py-2.5 bg-gold text-black rounded-xl text-sm font-bold hover:shadow-lg transition-all">
-        Chercher
-      </button>
+      }
+      @if (searchQuery && !loading) {
+        <button (click)="clearSearch()"
+          class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center
+                 rounded-full bg-white/10 hover:bg-white/20 theme-muted hover:text-gold transition-all duration-150">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      }
     </div>
 
     <!-- ── Products table ─────────────────────────────────────────────────── -->
@@ -289,6 +359,274 @@
       }
     </div>
 
+  } <!-- /pageTab === 'products' -->
+
+  <!-- ════════ ONGLET COMMANDES ════════ -->
+  @if (pageTab === 'orders') {
+
+    <!-- Filtre statut -->
+    <div class="flex items-center gap-3">
+      <select [(ngModel)]="statusFilter" (change)="loadAllOrders(0)"
+        class="theme-input px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
+        <option value="">Tous les statuts</option>
+        @for (s of orderStatuses; track s) {
+          <option [value]="s">{{ orderStatusLabel(s) }}</option>
+        }
+      </select>
+      <span class="text-xs theme-muted">{{ allOrders.length }} résultat{{ allOrders.length > 1 ? 's' : '' }}</span>
+    </div>
+
+    <!-- Table commandes -->
+    <div class="luxury-card rounded-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b theme-border">
+        <h2 class="font-bold theme-text">Toutes les commandes</h2>
+      </div>
+
+      @if (ordersLoading) {
+        <div class="p-8 flex justify-center">
+          <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </div>
+      }
+
+      @if (!ordersLoading && allOrders.length > 0) {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b theme-border">
+                <th class="text-left px-6 py-3 text-xs font-bold theme-muted uppercase tracking-wider">Commande</th>
+                <th class="text-left px-4 py-3 text-xs font-bold theme-muted uppercase tracking-wider hidden md:table-cell">Articles</th>
+                <th class="text-right px-4 py-3 text-xs font-bold theme-muted uppercase tracking-wider">Montant</th>
+                <th class="text-center px-4 py-3 text-xs font-bold theme-muted uppercase tracking-wider">Statut</th>
+                <th class="text-right px-6 py-3 text-xs font-bold theme-muted uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of allOrders; track order.id) {
+                <tr class="border-b theme-border last:border-0 transition-colors">
+
+                  <!-- Commande -->
+                  <td class="px-6 py-4">
+                    <p class="font-bold theme-text text-xs">{{ order.orderNumber }}</p>
+                    <p class="text-xs theme-muted mt-0.5">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                  </td>
+
+                  <!-- Articles -->
+                  <td class="px-4 py-4 hidden md:table-cell">
+                    <p class="text-xs theme-muted max-w-[200px] truncate">
+                      @for (item of order.items; track item.productId; let last = $last) {
+                        {{ item.productName }} ×{{ item.quantity }}{{ last ? '' : ', ' }}
+                      }
+                    </p>
+                    <p class="text-xs theme-muted mt-0.5">{{ order.deliveryAddress | slice:0:40 }}…</p>
+                  </td>
+
+                  <!-- Montant -->
+                  <td class="px-4 py-4 text-right">
+                    <span class="font-black text-gold">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K</span>
+                    <span class="text-xs theme-muted ml-1">XOF</span>
+                  </td>
+
+                  <!-- Statut -->
+                  <td class="px-4 py-4 text-center">
+                    <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold" [class]="orderStatusClass(order.orderStatus)">
+                      {{ orderStatusLabel(order.orderStatus) }}
+                    </span>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="px-6 py-4">
+                    @if (statusUpdatingId === order.id) {
+                      <svg class="w-5 h-5 text-gold animate-spin ml-auto" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      </svg>
+                    } @else {
+                      <div class="flex items-center justify-end gap-2">
+                        @if (nextStatusMap[order.orderStatus]) {
+                          <button type="button" (click)="advanceOrderStatus(order)"
+                            class="flex items-center gap-1.5 px-3 py-1.5 bg-gold text-black text-xs font-bold rounded-lg hover:shadow-md transition-all">
+                            {{ nextStatusLabel(order.orderStatus) }}
+                          </button>
+                        }
+                        @if (order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'DELIVERED') {
+                          <button type="button" (click)="cancelOrderByManager(order)"
+                            class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400
+                                   flex items-center justify-center hover:bg-red-500/20 transition-colors" title="Annuler">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (ordersTotalPages > 1) {
+          <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
+            <span class="text-xs theme-muted">Page {{ ordersPage + 1 }} / {{ ordersTotalPages }}</span>
+            <div class="flex gap-2">
+              <button (click)="loadAllOrders(ordersPage - 1)" [disabled]="ordersPage === 0"
+                class="px-3 py-1.5 rounded-lg luxury-card text-xs font-semibold theme-muted
+                       hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                ← Préc.
+              </button>
+              @for (page of orderPages; track page) {
+                <button (click)="loadAllOrders(page)"
+                  class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                  [class]="page === ordersPage ? 'bg-gold text-black' : 'luxury-card theme-muted hover:text-gold'">
+                  {{ page + 1 }}
+                </button>
+              }
+              <button (click)="loadAllOrders(ordersPage + 1)" [disabled]="ordersPage >= ordersTotalPages - 1"
+                class="px-3 py-1.5 rounded-lg luxury-card text-xs font-semibold theme-muted
+                       hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                Suiv. →
+              </button>
+            </div>
+          </div>
+        }
+      }
+
+      @if (!ordersLoading && allOrders.length === 0) {
+        <div class="py-16 text-center">
+          <div class="w-16 h-16 luxury-card rounded-2xl mx-auto flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <p class="theme-text font-bold mb-1">Aucune commande</p>
+          <p class="theme-muted text-sm">Aucune commande ne correspond à ce filtre</p>
+        </div>
+      }
+    </div>
+
+  } <!-- /pageTab === 'orders' -->
+
+  <!-- ════════ ONGLET PAIEMENTS ════════ -->
+  @if (pageTab === 'payments') {
+
+    @if (paymentsLoading) {
+      <div class="flex justify-center py-16">
+        <svg class="w-8 h-8 animate-spin text-gold" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+      </div>
+    } @else if (pendingPayments.length === 0) {
+      <div class="luxury-card rounded-2xl p-12 text-center">
+        <svg class="w-12 h-12 text-green-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="font-bold theme-text">Aucun paiement à valider</p>
+        <p class="text-sm theme-muted mt-1">Tous les paiements déclarés ont été traités.</p>
+      </div>
+    } @else {
+      <div class="space-y-4">
+        @for (order of pendingPayments; track order.id) {
+          <div class="luxury-card rounded-2xl p-5">
+            <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+
+              <!-- Order info -->
+              <div class="flex-1 space-y-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-sm font-bold text-gold">{{ order.orderNumber }}</span>
+                  <span class="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/25">
+                    Paiement à valider
+                  </span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Montant</p>
+                    <p class="font-bold theme-text">{{ order.totalAmount | number:'1.0-0' }} XOF</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Référence Wave</p>
+                    <p class="font-semibold" [class]="order.paymentReference ? 'theme-text' : 'theme-muted italic'">
+                      {{ order.paymentReference || 'Non renseignée' }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Livraison</p>
+                    <p class="text-xs theme-text truncate">{{ order.deliveryAddress }}</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Date commande</p>
+                    <p class="text-xs theme-muted">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                  </div>
+                </div>
+                <!-- Items preview -->
+                <div class="text-xs theme-muted">
+                  @for (item of order.items; track item.productId; let last = $last) {
+                    <span>{{ item.productName }} ×{{ item.quantity }}{{ !last ? ', ' : '' }}</span>
+                  }
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex sm:flex-col gap-2 shrink-0">
+                <button (click)="validatePayment(order)"
+                  [disabled]="paymentActionId === order.id"
+                  class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-green-500/15 text-green-400
+                         border border-green-500/30 rounded-xl text-sm font-bold hover:bg-green-500/25 disabled:opacity-50 transition-all">
+                  @if (paymentActionId === order.id) {
+                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                  } @else {
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  }
+                  Valider
+                </button>
+                <button (click)="rejectPayment(order)"
+                  [disabled]="paymentActionId === order.id"
+                  class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-500/10 text-red-400
+                         border border-red-500/25 rounded-xl text-sm font-bold hover:bg-red-500/20 disabled:opacity-50 transition-all">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                  Rejeter
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (paymentsTotalPages > 1) {
+        <div class="flex justify-center items-center gap-2 pt-4">
+          <button (click)="loadPendingPayments(paymentsPage - 1)" [disabled]="paymentsPage === 0"
+            class="px-4 py-2 luxury-card rounded-xl text-sm font-semibold theme-muted hover:text-gold disabled:opacity-30 transition-all">
+            ← Préc.
+          </button>
+          @for (p of paymentPages; track p) {
+            <button (click)="loadPendingPayments(p)"
+              class="w-9 h-9 rounded-xl text-sm font-bold transition-all"
+              [class]="paymentsPage === p ? 'bg-gold text-black' : 'luxury-card theme-muted hover:text-gold'">
+              {{ p + 1 }}
+            </button>
+          }
+          <button (click)="loadPendingPayments(paymentsPage + 1)" [disabled]="paymentsPage >= paymentsTotalPages - 1"
+            class="px-4 py-2 luxury-card rounded-xl text-sm font-semibold theme-muted hover:text-gold disabled:opacity-30 transition-all">
+            Suiv. →
+          </button>
+        </div>
+      }
+    }
+
+  } <!-- /pageTab === 'payments' -->
+
   </div>
 </div>
 
@@ -305,26 +643,136 @@
     <div class="relative w-full max-w-md h-full theme-surface border-l theme-border shadow-2xl flex flex-col drawer-panel">
 
       <!-- Sticky header -->
-      <div class="flex items-center justify-between px-6 py-5 border-b theme-border flex-shrink-0">
-        <div>
-          <h2 class="text-lg font-black theme-text">
-            {{ editingProduct ? 'Modifier le produit' : 'Nouveau produit' }}
-          </h2>
-          <p class="text-xs theme-muted mt-0.5">
-            {{ editingProduct ? editingProduct.name : 'Remplissez les informations ci-dessous' }}
-          </p>
+      <div class="flex-shrink-0">
+        <div class="flex items-center justify-between px-6 py-5 border-b theme-border">
+          <div>
+            <h2 class="text-lg font-black theme-text">
+              {{ editingProduct ? 'Modifier le produit' : 'Nouveau produit' }}
+            </h2>
+            <p class="text-xs theme-muted mt-0.5">
+              {{ editingProduct ? editingProduct.name : 'Remplissez les informations ci-dessous' }}
+            </p>
+          </div>
+          <button (click)="closeDrawer()"
+            class="w-9 h-9 rounded-xl luxury-card theme-muted flex items-center justify-center hover:text-gold transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
-        <button (click)="closeDrawer()"
-          class="w-9 h-9 rounded-xl luxury-card theme-muted flex items-center justify-center hover:text-gold transition-colors flex-shrink-0">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
+        <!-- Tabs (edit only) -->
+        @if (editingProduct) {
+          <div class="flex border-b theme-border px-6">
+            <button type="button" (click)="drawerTab = 'info'"
+              class="py-3 px-1 mr-6 text-sm font-bold border-b-2 transition-colors"
+              [class.border-gold]="drawerTab === 'info'"
+              [class.text-gold]="drawerTab === 'info'"
+              [class.border-transparent]="drawerTab !== 'info'"
+              [class.theme-muted]="drawerTab !== 'info'">
+              Informations
+            </button>
+            <button type="button" (click)="drawerTab = 'media'"
+              class="py-3 px-1 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
+              [class.border-gold]="drawerTab === 'media'"
+              [class.text-gold]="drawerTab === 'media'"
+              [class.border-transparent]="drawerTab !== 'media'"
+              [class.theme-muted]="drawerTab !== 'media'">
+              Galerie médias
+              @if (productMedia.length > 0) {
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-gold/15 text-gold">{{ productMedia.length }}</span>
+              }
+            </button>
+          </div>
+        }
       </div>
 
       <!-- Scrollable form body -->
       <div class="flex-1 overflow-y-auto">
-        <form [formGroup]="productForm" (ngSubmit)="saveProduct()" id="productForm" class="p-6 space-y-5">
+
+        <!-- ── Onglet Médias ──────────────────────────────────────────────── -->
+        @if (drawerTab === 'media' && editingProduct) {
+          <div class="p-6 space-y-5">
+
+            <!-- Upload button -->
+            <label class="flex items-center justify-center gap-2 w-full py-4 rounded-2xl border-2 border-dashed theme-drop-border cursor-pointer transition-all hover:border-gold/50 hover:bg-gold/5">
+              @if (mediaUploading) {
+                <svg class="w-5 h-5 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                <span class="text-sm font-semibold theme-muted">Upload en cours…</span>
+              } @else {
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                <span class="text-sm font-semibold theme-text">Ajouter une image ou vidéo</span>
+              }
+              <input type="file" accept="image/*,video/*" class="hidden" [disabled]="mediaUploading" (change)="onMediaSelected($event)"/>
+            </label>
+
+            <!-- Loading skeleton -->
+            @if (mediaLoading) {
+              <div class="grid grid-cols-2 gap-3">
+                @for (i of [1,2,3,4]; track i) {
+                  <div class="aspect-square rounded-xl luxury-card animate-pulse"></div>
+                }
+              </div>
+            }
+
+            <!-- Media grid -->
+            @if (!mediaLoading && productMedia.length > 0) {
+              <div class="grid grid-cols-2 gap-3">
+                @for (media of productMedia; track media.id; let i = $index) {
+                  <div class="relative group rounded-xl overflow-hidden aspect-square luxury-card">
+                    @if (media.mediaType === 'VIDEO') {
+                      <video [src]="media.url" class="w-full h-full object-cover" muted></video>
+                      <div class="absolute top-2 left-2 px-1.5 py-0.5 rounded-md bg-black/70 text-[10px] font-bold text-white">VIDEO</div>
+                    } @else {
+                      <img [src]="media.url" [alt]="'Média ' + (i + 1)" class="w-full h-full object-cover"
+                           (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
+                    }
+                    <!-- Position badge -->
+                    <div class="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/70 text-[10px] font-black text-white flex items-center justify-center">
+                      {{ i + 1 }}
+                    </div>
+                    <!-- Hover actions -->
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                      <div class="flex gap-1">
+                        <button type="button" (click)="moveMedia(i, 'up')" [disabled]="i === 0"
+                          class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center disabled:opacity-30 transition-colors">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                        </button>
+                        <button type="button" (click)="moveMedia(i, 'down')" [disabled]="i === productMedia.length - 1"
+                          class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center disabled:opacity-30 transition-colors">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                      </div>
+                      <button type="button" (click)="deleteMedia(media.id)"
+                        class="flex items-center gap-1 px-2.5 py-1.5 bg-red-500/80 hover:bg-red-500 text-white text-xs font-bold rounded-lg transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        Supprimer
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (!mediaLoading && productMedia.length === 0) {
+              <div class="py-10 text-center">
+                <div class="w-12 h-12 luxury-card rounded-xl mx-auto flex items-center justify-center mb-3">
+                  <svg class="w-6 h-6 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <p class="theme-muted text-sm">Aucun média pour ce produit</p>
+              </div>
+            }
+          </div>
+        }
+
+        <form [formGroup]="productForm" (ngSubmit)="saveProduct()" id="productForm"
+              class="p-6 space-y-5" [class.hidden]="drawerTab === 'media'">
 
           @if (drawerError) {
             <div class="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">
@@ -434,15 +882,25 @@
             </div>
           </div>
 
-          <!-- ── Catégorie ─────────────────────────────────────────────── -->
-          <div>
-            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Catégorie *</label>
-            <select formControlName="categoryId" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
-              <option value="" class="theme-option">Sélectionner une catégorie…</option>
-              @for (cat of categories; track cat.id) {
-                <option [value]="cat.id" class="theme-option">{{ cat.name }}</option>
-              }
-            </select>
+          <!-- ── Catégorie & Genre ─────────────────────────────────────── -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Catégorie *</label>
+              <select formControlName="categoryId" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
+                <option value="" class="theme-option">Catégorie…</option>
+                @for (cat of categories; track cat.id) {
+                  <option [value]="cat.id" class="theme-option">{{ cat.name }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Genre *</label>
+              <select formControlName="gender" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
+                @for (g of genders; track g.value) {
+                  <option [value]="g.value" class="theme-option">{{ g.label }}</option>
+                }
+              </select>
+            </div>
           </div>
 
         </form>

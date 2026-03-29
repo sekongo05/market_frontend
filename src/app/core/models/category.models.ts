@@ -6,12 +6,13 @@ export interface CategoryResponse {
   imageUrl: string;
   active: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateCategoryRequest {
   name: string;
-  description: string;
-  imageUrl: string;
+  description?: string;
+  imageUrl?: string;
 }
 
 export interface UpdateCategoryRequest extends CreateCategoryRequest {}

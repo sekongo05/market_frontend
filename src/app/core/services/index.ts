@@ -11,3 +11,4 @@ export * from './stock.service';
 export * from './dashboard.service';
 export * from './upload.service';
 export * from './cart.service';
+export * from './product-media.service';

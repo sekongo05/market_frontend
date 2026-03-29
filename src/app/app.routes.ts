@@ -7,6 +7,7 @@ import { OrdersComponent } from './features/orders/pages';
 import { ProfileComponent } from './features/profile/pages';
 import { AdminDashboardComponent } from './features/admin/pages';
 import { ManagerComponent } from './features/manager/pages';
+import { PaymentPageComponent } from './features/payment/payment-page.component';
 
 export const APP_ROUTES: Routes = [
   {
@@ -31,6 +32,10 @@ export const APP_ROUTES: Routes = [
       {
         path: 'manager',
         component: ManagerComponent,
+      },
+      {
+        path: 'payment/:orderId',
+        component: PaymentPageComponent,
       },
     ],
   },

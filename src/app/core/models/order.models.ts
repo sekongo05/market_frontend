@@ -28,6 +28,8 @@ export interface OrderResponse {
   deliveryStatus: DeliveryStatus;
   deliveryAddress: string;
   paymentReference: string | null;
+  trackingNumber: string | null;
+  customerName: string | null;
   createdAt: string;
   updatedAt: string;
 }

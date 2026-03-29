@@ -30,6 +30,14 @@ export class CategoryService {
     return this.apiService.put(`/categories/${id}`, data);
   }
 
+  getAllForAdmin(): Observable<ApiResponse<CategoryResponse[]>> {
+    return this.apiService.get('/categories/admin/all');
+  }
+
+  toggleCategoryActive(id: number): Observable<ApiResponse<CategoryResponse>> {
+    return this.apiService.patch(`/categories/${id}/toggle`, {});
+  }
+
   deleteCategory(id: number): Observable<ApiResponse<null>> {
     return this.apiService.delete(`/categories/${id}`);
   }

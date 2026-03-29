@@ -1,6 +1,7 @@
 import { CategoryResponse } from './category.models';
 
 export type MediaType = 'IMAGE' | 'VIDEO';
+export type Gender = 'HOMME' | 'FEMME' | 'UNISEX';
 
 export interface ProductMediaItem {
   id: number;
@@ -16,6 +17,7 @@ export interface ProductResponse {
   description: string;
   price: number;
   stock: number;
+  gender: Gender;
   imageUrl: string;
   media?: ProductMediaItem[];
   category: CategoryResponse;
@@ -29,6 +31,7 @@ export interface CreateProductRequest {
   description: string;
   price: number;
   stock: number;
+  gender: Gender;
   imageUrl: string;
   categoryId: number;
 }
@@ -39,5 +42,6 @@ export interface GetProductsParams {
   page?: number;
   size?: number;
   categoryId?: number;
+  gender?: Gender;
   search?: string;
 }

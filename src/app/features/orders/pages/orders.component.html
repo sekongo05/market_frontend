@@ -209,9 +209,49 @@
                 </div>
               </div>
 
-              <!-- Annulation (PENDING uniquement) -->
+              <!-- Numéro de suivi -->
+              @if (order.trackingNumber) {
+                <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2)">
+                  <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                  </svg>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">N° de suivi</p>
+                    <p class="text-sm font-mono font-bold theme-text">{{ order.trackingNumber }}</p>
+                  </div>
+                </div>
+              }
+
+              <!-- Actions (PENDING order) -->
               @if (order.orderStatus === 'PENDING') {
-                <div class="border-t theme-border pt-4">
+                <div class="border-t theme-border pt-4 space-y-3">
+
+                  <!-- Payer button (only when payment not yet submitted) -->
+                  @if (order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED') {
+                    <button (click)="goToPayment(order.id)"
+                      class="flex items-center gap-2 px-4 py-2.5 bg-gold text-black text-sm font-bold rounded-xl hover:brightness-110 transition-all">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0zM6 7.5a.5.5 0 11-1 0 .5.5 0 011 0zm.5 8.5a.5.5 0 110-1 .5.5 0 010 1zm11-8a.5.5 0 110-1 .5.5 0 010 1z"/>
+                      </svg>
+                      Payer via Wave
+                    </button>
+                  }
+
+                  <!-- Submitted notice -->
+                  @if (order.paymentStatus === 'SUBMITTED') {
+                    <div class="flex items-center gap-2 p-3 rounded-xl"
+                         style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)">
+                      <svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <p class="text-xs text-blue-300 font-medium">Paiement déclaré — en attente de validation par notre équipe</p>
+                    </div>
+                  }
+
+                  <!-- Cancel -->
                   @if (cancelConfirmId === order.id) {
                     <div class="flex items-center gap-3 p-3 rounded-xl"
                          style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">
@@ -240,6 +280,7 @@
                       Annuler cette commande
                     </button>
                   }
+
                 </div>
               }
 

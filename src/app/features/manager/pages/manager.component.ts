@@ -1,4 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -6,9 +8,13 @@ import { ProductService } from '../../../core/services/product.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { UploadService } from '../../../core/services/upload.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { ProductResponse, GetProductsParams } from '../../../core/models/product.models';
+import { ProductMediaService } from '../../../core/services/product-media.service';
+import { OrderService } from '../../../core/services/order.service';
+import { PaymentService } from '../../../core/services/payment.service';
+import { ProductResponse, GetProductsParams, ProductMediaItem, Gender } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
-import { PageResponse } from '../../../core/models/common.models';
+import { OrderResponse } from '../../../core/models/order.models';
+import { PageResponse, OrderStatus } from '../../../core/models/common.models';
 
 interface Toast { id: number; msg: string; type: 'success' | 'error'; }
 
@@ -19,7 +25,10 @@ interface Toast { id: number; msg: string; type: 'success' | 'error'; }
   templateUrl: './manager.component.html',
   styleUrls: ['./manager.component.css'],
 })
-export class ManagerComponent implements OnInit {
+export class ManagerComponent implements OnInit, OnDestroy {
+
+  // ── Page tab ──────────────────────────────────────────────────────────────
+  pageTab: 'products' | 'orders' | 'payments' = 'products';
 
   // ── Data ──────────────────────────────────────────────────────────────────
   products: ProductResponse[] = [];
@@ -48,6 +57,36 @@ export class ManagerComponent implements OnInit {
   uploadError: string | null = null;
   dragOver = false;
 
+  // ── Drawer tabs & media ───────────────────────────────────────────────────
+  drawerTab: 'info' | 'media' = 'info';
+  productMedia: ProductMediaItem[] = [];
+  mediaLoading = false;
+  mediaUploading = false;
+
+  // ── Orders management ─────────────────────────────────────────────────────
+  allOrders: OrderResponse[] = [];
+  ordersLoading = false;
+  ordersPage = 0;
+  ordersTotalPages = 0;
+  statusFilter: OrderStatus | '' = '';
+  statusUpdatingId: number | null = null;
+  readonly orderStatuses = Object.values(OrderStatus);
+  readonly nextStatusMap: Record<string, OrderStatus | null> = {
+    PENDING:    OrderStatus.CONFIRMED,
+    CONFIRMED:  OrderStatus.PROCESSING,
+    PROCESSING: OrderStatus.SHIPPED,
+    SHIPPED:    OrderStatus.DELIVERED,
+    DELIVERED:  null,
+    CANCELLED:  null,
+  };
+
+  // ── Pending payments ──────────────────────────────────────────────────────
+  pendingPayments: OrderResponse[] = [];
+  paymentsLoading = false;
+  paymentsPage = 0;
+  paymentsTotalPages = 0;
+  paymentActionId: number | null = null;
+
   // ── Inline stock edit ─────────────────────────────────────────────────────
   editingStockId: number | null = null;
   editingStockValue = 0;
@@ -60,22 +99,30 @@ export class ManagerComponent implements OnInit {
   toasts: Toast[] = [];
   private _toastId = 0;
 
+  private readonly searchSubject = new Subject<string>();
+  private readonly destroy$ = new Subject<void>();
+
+  readonly genders: { value: Gender; label: string }[] = [
+    { value: 'HOMME',  label: 'Homme'   },
+    { value: 'FEMME',  label: 'Femme'   },
+    { value: 'UNISEX', label: 'Unisexe' },
+  ];
+
   // ── Fallback categories ───────────────────────────────────────────────────
-  private readonly CAT_ELEC   = { id: 1, name: 'Électronique',    slug: 'electronique',   description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_MODE   = { id: 2, name: 'Mode & Vêtements', slug: 'mode-vetements', description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_MAISON = { id: 3, name: 'Maison & Cuisine',  slug: 'maison-cuisine', description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_BEAUTE = { id: 4, name: 'Beauté & Santé',    slug: 'beaute-sante',   description: '', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_SPORT  = { id: 5, name: 'Sports & Loisirs',  slug: 'sports-loisirs', description: '', imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_MONTRES    = { id: 1, name: 'Montres',    slug: 'montres',    description: '', imageUrl: '', active: true, createdAt: '', updatedAt: '' };
+  private readonly CAT_BAGUES     = { id: 2, name: 'Bagues',     slug: 'bagues',     description: '', imageUrl: '', active: true, createdAt: '', updatedAt: '' };
+  private readonly CAT_COLLIERS   = { id: 3, name: 'Colliers',   slug: 'colliers',   description: '', imageUrl: '', active: true, createdAt: '', updatedAt: '' };
+  private readonly CAT_CHAUSSURES = { id: 4, name: 'Chaussures', slug: 'chaussures', description: '', imageUrl: '', active: true, createdAt: '', updatedAt: '' };
 
   private readonly mockProducts: ProductResponse[] = [
-    { id: 1, name: 'iPhone 15 Pro',           slug: 'iphone-15-pro',      description: 'Smartphone Apple iPhone 15 Pro 256Go, puce A17 Pro, appareil photo 48MP.',        price: 650000,  stock: 15, imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
-    { id: 2, name: 'Samsung Galaxy S24',      slug: 'samsung-galaxy-s24', description: 'Smartphone Samsung Galaxy S24 128Go, écran Dynamic AMOLED 6.2 pouces.',          price: 450000,  stock: 20, imageUrl: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
-    { id: 3, name: 'MacBook Air M2',          slug: 'macbook-air-m2',     description: 'Ordinateur portable Apple MacBook Air 13 pouces, puce M2, 8Go RAM, 256Go SSD.',  price: 1200000, stock: 8,  imageUrl: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
-    { id: 4, name: 'Sac à main Cuir',         slug: 'sac-main-cuir',      description: 'Sac à main en cuir véritable, design élégant, compartiments multiples.',          price: 55000,   stock: 18, imageUrl: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
-    { id: 5, name: 'Robe Wax Traditionnelle', slug: 'robe-wax',           description: 'Robe en tissu wax 100% coton, motifs traditionnels africains, taille ajustable.', price: 25000,   stock: 30, imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
-    { id: 6, name: 'Climatiseur Hisense',     slug: 'clim-hisense',       description: 'Climatiseur split Hisense 1.5 CV, fonction froid/chaud, économique en énergie.', price: 280000,  stock: 10, imageUrl: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&q=80', category: this.CAT_MAISON, active: true, createdAt: '', updatedAt: '' },
-    { id: 7, name: 'Crème Hydratante Nivea',  slug: 'creme-nivea',        description: 'Crème hydratante corps Nivea 400ml, formule enrichie en aloe vera.',              price: 3500,    stock: 50, imageUrl: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&q=80', category: this.CAT_BEAUTE, active: true, createdAt: '', updatedAt: '' },
-    { id: 8, name: 'Vélo de Sport',           slug: 'velo-sport',         description: 'Vélo de sport tout terrain 21 vitesses, cadre aluminium, freins à disque.',      price: 120000,  stock: 7,  imageUrl: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=400&q=80', category: this.CAT_SPORT,  active: true, createdAt: '', updatedAt: '' },
+    { id: 1,  name: 'Rolex Submariner',    slug: 'rolex-submariner',    description: 'Montre automatique Rolex Submariner Date, boîtier Oystersteel 41mm.',        price: 4200000, stock: 5,  gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80', category: this.CAT_MONTRES,    active: true, createdAt: '', updatedAt: '' },
+    { id: 2,  name: 'Cartier Panthère',    slug: 'cartier-panthere',    description: 'Montre Cartier Panthère, boîtier or rose 25mm, bracelet milanais.',           price: 5800000, stock: 3,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1461595383984-b56f78f9223f?w=400&q=80', category: this.CAT_MONTRES,    active: true, createdAt: '', updatedAt: '' },
+    { id: 3,  name: 'Chevalière Or 18K',   slug: 'chevaliere-or-18k',   description: 'Chevalière homme en or jaune 18 carats, gravure personnalisable.',            price: 650000,  stock: 10, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80', category: this.CAT_BAGUES,     active: true, createdAt: '', updatedAt: '' },
+    { id: 4,  name: 'Solitaire Diamant',   slug: 'solitaire-diamant',   description: 'Bague solitaire or blanc 18K, diamant 0.50ct certifié GIA.',                   price: 1850000, stock: 6,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&q=80', category: this.CAT_BAGUES,     active: true, createdAt: '', updatedAt: '' },
+    { id: 5,  name: 'Chaîne Gourmette Or', slug: 'chaine-gourmette-or', description: 'Chaîne gourmette homme or jaune 18K, maille cubaine, longueur 60cm.',          price: 780000,  stock: 10, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80', category: this.CAT_COLLIERS,   active: true, createdAt: '', updatedAt: '' },
+    { id: 6,  name: 'Sautoir Perles Akoya',slug: 'sautoir-perles',      description: 'Collier sautoir perles d\'Akoya naturelles, fermeture or blanc, 80cm.',        price: 1200000, stock: 4,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=80', category: this.CAT_COLLIERS,   active: true, createdAt: '', updatedAt: '' },
+    { id: 7,  name: 'Derby Cuir Italiens',  slug: 'derby-cuir',          description: 'Derbies cuir veau grainé marron, semelle cuir, fabrication artisanale.',        price: 185000,  stock: 15, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80', category: this.CAT_CHAUSSURES, active: true, createdAt: '', updatedAt: '' },
+    { id: 8,  name: 'Escarpins Louboutin',  slug: 'escarpins-louboutin', description: 'Escarpins Christian Louboutin So Kate, talon aiguille 10cm, cuir vernis.',     price: 950000,  stock: 6,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80', category: this.CAT_CHAUSSURES, active: true, createdAt: '', updatedAt: '' },
   ];
 
   constructor(
@@ -83,6 +130,9 @@ export class ManagerComponent implements OnInit {
     private categoryService: CategoryService,
     private uploadService: UploadService,
     private authService: AuthService,
+    private productMediaService: ProductMediaService,
+    private orderService: OrderService,
+    private paymentService: PaymentService,
     private fb: FormBuilder,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -104,6 +154,16 @@ export class ManagerComponent implements OnInit {
     this.initForm();
     this.loadProducts();
     this.loadCategories();
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.loadProducts(0));
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get currentUser() { return this.authService.getCurrentUser(); }
@@ -146,12 +206,13 @@ export class ManagerComponent implements OnInit {
 
   private initForm(product?: ProductResponse): void {
     this.productForm = this.fb.group({
-      name:        [product?.name        ?? '', Validators.required],
-      description: [product?.description ?? '', Validators.required],
-      price:       [product?.price       ?? null, [Validators.required, Validators.min(1)]],
-      stock:       [product?.stock       ?? null, [Validators.required, Validators.min(0)]],
-      imageUrl:    [product?.imageUrl    ?? ''],
-      categoryId:  [product?.category?.id ?? null, Validators.required],
+      name:        [product?.name           ?? '', Validators.required],
+      description: [product?.description    ?? '', Validators.required],
+      price:       [product?.price          ?? null, [Validators.required, Validators.min(1)]],
+      stock:       [product?.stock          ?? null, [Validators.required, Validators.min(0)]],
+      gender:      [product?.gender         ?? 'UNISEX', Validators.required],
+      imageUrl:    [product?.imageUrl       ?? ''],
+      categoryId:  [product?.category?.id  ?? null, Validators.required],
     });
   }
 
@@ -160,6 +221,8 @@ export class ManagerComponent implements OnInit {
     this.drawerError = null;
     this.imagePreview = null;
     this.uploadError = null;
+    this.drawerTab = 'info';
+    this.productMedia = [];
     this.initForm();
     this.drawerOpen = true;
     this.cdr.detectChanges();
@@ -170,8 +233,11 @@ export class ManagerComponent implements OnInit {
     this.drawerError = null;
     this.imagePreview = product.imageUrl || null;
     this.uploadError = null;
+    this.drawerTab = 'info';
+    this.productMedia = product.media ?? [];
     this.initForm(product);
     this.drawerOpen = true;
+    this.loadMedia(product.id);
     this.cdr.detectChanges();
   }
 
@@ -182,6 +248,8 @@ export class ManagerComponent implements OnInit {
     this.imagePreview = null;
     this.uploadError = null;
     this.uploadingImage = false;
+    this.drawerTab = 'info';
+    this.productMedia = [];
     this.cdr.detectChanges();
   }
 
@@ -222,12 +290,12 @@ export class ManagerComponent implements OnInit {
       const idx = this.products.findIndex(p => p.id === this.editingProduct!.id);
       if (idx !== -1) {
         this.products = [...this.products];
-        this.products[idx] = { ...this.editingProduct, name: data.name, description: data.description, price: +data.price, stock: +data.stock, imageUrl: data.imageUrl, category };
+        this.products[idx] = { ...this.editingProduct, name: data.name, description: data.description, price: +data.price, stock: +data.stock, gender: data.gender, imageUrl: data.imageUrl, category };
       }
       this.toast('Produit mis à jour ✓');
     } else {
       const newId = Math.max(...this.products.map(p => p.id), 0) + 1;
-      this.products = [{ id: newId, name: data.name, slug: data.name.toLowerCase().replace(/\s+/g, '-'), description: data.description, price: +data.price, stock: +data.stock, imageUrl: data.imageUrl, category, active: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }, ...this.products];
+      this.products = [{ id: newId, name: data.name, slug: data.name.toLowerCase().replace(/\s+/g, '-'), description: data.description, price: +data.price, stock: +data.stock, gender: data.gender, imageUrl: data.imageUrl, category, active: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }, ...this.products];
       this.toast('Produit ajouté ✓');
     }
     this._computeStats();
@@ -252,7 +320,7 @@ export class ManagerComponent implements OnInit {
     this.editingStockId = null;
     if (newStock === product.stock) { this.cdr.detectChanges(); return; }
     this.stockSavingId = product.id;
-    const payload = { name: product.name, description: product.description, price: product.price, stock: newStock, imageUrl: product.imageUrl, categoryId: product.category.id };
+    const payload = { name: product.name, description: product.description, price: product.price, stock: newStock, gender: product.gender, imageUrl: product.imageUrl, categoryId: product.category.id };
     const applyLocally = () => {
       const idx = this.products.findIndex(p => p.id === product.id);
       if (idx !== -1) { this.products = [...this.products]; this.products[idx] = { ...this.products[idx], stock: newStock }; this._computeStats(); }
@@ -370,10 +438,10 @@ export class ManagerComponent implements OnInit {
   private loadCategories(): void {
     this.categoryService.getCategories().subscribe({
       next: (r) => {
-        this.categories = (r.success && Array.isArray(r.data)) ? r.data : [this.CAT_ELEC, this.CAT_MODE, this.CAT_MAISON, this.CAT_BEAUTE, this.CAT_SPORT];
+        this.categories = (r.success && Array.isArray(r.data)) ? r.data : [this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS, this.CAT_CHAUSSURES];
         this.cdr.detectChanges();
       },
-      error: () => { this.categories = [this.CAT_ELEC, this.CAT_MODE, this.CAT_MAISON, this.CAT_BEAUTE, this.CAT_SPORT]; this.cdr.detectChanges(); },
+      error: () => { this.categories = [this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS, this.CAT_CHAUSSURES]; this.cdr.detectChanges(); },
     });
   }
 
@@ -383,8 +451,231 @@ export class ManagerComponent implements OnInit {
     return this.mockProducts.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
   }
 
+  onSearchChange(value: string): void {
+    this.searchQuery = value;
+    this.searchSubject.next(value);
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchSubject.next('');
+  }
+
   search(): void { this.loadProducts(0); }
   previousPage(): void { if (this.currentPage > 0) this.loadProducts(this.currentPage - 1); }
   nextPage(): void { if (this.currentPage < this.totalPages - 1) this.loadProducts(this.currentPage + 1); }
   get pages(): number[] { return Array.from({ length: this.totalPages }, (_, i) => i); }
+
+  setPageTab(tab: 'products' | 'orders' | 'payments'): void {
+    this.pageTab = tab;
+    if (tab === 'orders' && this.allOrders.length === 0) this.loadAllOrders();
+    if (tab === 'payments' && this.pendingPayments.length === 0) this.loadPendingPayments();
+    if (this.drawerOpen) this.closeDrawer();
+    this.cdr.detectChanges();
+  }
+
+  // ── Orders management ─────────────────────────────────────────────────────
+
+  loadAllOrders(page = 0): void {
+    this.ordersLoading = true;
+    const params: any = { page, size: 15 };
+    if (this.statusFilter) params.status = this.statusFilter;
+    this.orderService.getAllOrders(params).subscribe({
+      next: (r) => {
+        if (r.success) {
+          const pg = r.data as PageResponse<OrderResponse>;
+          this.allOrders = pg.content;
+          this.ordersTotalPages = pg.totalPages;
+          this.ordersPage = page;
+        }
+        this.ordersLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.ordersLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  advanceOrderStatus(order: OrderResponse): void {
+    const next = this.nextStatusMap[order.orderStatus];
+    if (!next) return;
+    this.statusUpdatingId = order.id;
+    this.orderService.updateOrderStatus(order.id, next).subscribe({
+      next: (r) => {
+        if (r.success) {
+          const idx = this.allOrders.findIndex(o => o.id === order.id);
+          if (idx !== -1) { this.allOrders = [...this.allOrders]; this.allOrders[idx] = r.data; }
+          this.toast(`Commande ${order.orderNumber} → ${this.orderStatusLabel(next)}`);
+        }
+        this.statusUpdatingId = null;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.statusUpdatingId = null; this.toast('Erreur de mise à jour', 'error'); this.cdr.detectChanges(); },
+    });
+  }
+
+  cancelOrderByManager(order: OrderResponse): void {
+    this.statusUpdatingId = order.id;
+    this.orderService.cancelOrder(order.id).subscribe({
+      next: (r) => {
+        if (r.success) {
+          const idx = this.allOrders.findIndex(o => o.id === order.id);
+          if (idx !== -1) { this.allOrders = [...this.allOrders]; this.allOrders[idx] = r.data; }
+          this.toast(`Commande ${order.orderNumber} annulée`);
+        }
+        this.statusUpdatingId = null;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.statusUpdatingId = null; this.toast('Erreur d\'annulation', 'error'); this.cdr.detectChanges(); },
+    });
+  }
+
+  // ── Pending payment management ─────────────────────────────────────────────
+
+  loadPendingPayments(page = 0): void {
+    this.paymentsLoading = true;
+    this.paymentService.getPendingValidationOrders(page, 15).subscribe({
+      next: (r) => {
+        if (r.success) {
+          const pg = r.data as PageResponse<OrderResponse>;
+          this.pendingPayments = pg.content;
+          this.paymentsTotalPages = pg.totalPages;
+          this.paymentsPage = page;
+        }
+        this.paymentsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.paymentsLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  validatePayment(order: OrderResponse): void {
+    this.paymentActionId = order.id;
+    this.paymentService.validatePayment(order.id).subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.pendingPayments = this.pendingPayments.filter(o => o.id !== order.id);
+          this.toast(`Paiement validé — Commande ${order.orderNumber} confirmée ✓`);
+        }
+        this.paymentActionId = null;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.paymentActionId = null;
+        this.toast(err?.error?.message || 'Erreur lors de la validation', 'error');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  rejectPayment(order: OrderResponse): void {
+    this.paymentActionId = order.id;
+    this.paymentService.rejectPayment(order.id).subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.pendingPayments = this.pendingPayments.filter(o => o.id !== order.id);
+          this.toast(`Paiement rejeté — Commande ${order.orderNumber}`);
+        }
+        this.paymentActionId = null;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.paymentActionId = null;
+        this.toast(err?.error?.message || 'Erreur lors du rejet', 'error');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  get paymentPages(): number[] { return Array.from({ length: this.paymentsTotalPages }, (_, i) => i); }
+
+  orderStatusLabel(s: string): string {
+    const m: Record<string, string> = {
+      PENDING: 'En attente', CONFIRMED: 'Confirmée', PROCESSING: 'En traitement',
+      SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée',
+    };
+    return m[s] ?? s;
+  }
+
+  orderStatusClass(s: string): string {
+    const m: Record<string, string> = {
+      PENDING:    'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
+      CONFIRMED:  'bg-blue-500/15   text-blue-400   border border-blue-500/25',
+      PROCESSING: 'bg-purple-500/15 text-purple-400 border border-purple-500/25',
+      SHIPPED:    'bg-indigo-500/15 text-indigo-400 border border-indigo-500/25',
+      DELIVERED:  'bg-green-500/15  text-green-400  border border-green-500/25',
+      CANCELLED:  'bg-red-500/15    text-red-400    border border-red-500/25',
+    };
+    return m[s] ?? 'bg-white/10 theme-muted border border-white/10';
+  }
+
+  nextStatusLabel(s: string): string {
+    const next = this.nextStatusMap[s];
+    return next ? `→ ${this.orderStatusLabel(next)}` : '';
+  }
+
+  get orderPages(): number[] { return Array.from({ length: this.ordersTotalPages }, (_, i) => i); }
+
+  // ── Media ──────────────────────────────────────────────────────────────────
+
+  loadMedia(productId: number): void {
+    this.mediaLoading = true;
+    this.productMediaService.getAll(productId).subscribe({
+      next: (r) => {
+        if (r.success) this.productMedia = r.data;
+        this.mediaLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.mediaLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  onMediaSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file && this.editingProduct) this._uploadMedia(file);
+    input.value = '';
+  }
+
+  private _uploadMedia(file: File): void {
+    if (!this.editingProduct) return;
+    this.mediaUploading = true;
+    this.cdr.detectChanges();
+    this.productMediaService.upload(this.editingProduct.id, file).subscribe({
+      next: (r) => {
+        if (r.success) this.productMedia = [...this.productMedia, r.data];
+        this.mediaUploading = false;
+        this.toast('Média ajouté ✓');
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.mediaUploading = false;
+        this.toast('Erreur d\'upload', 'error');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  deleteMedia(mediaId: number): void {
+    if (!this.editingProduct) return;
+    this.productMediaService.delete(this.editingProduct.id, mediaId).subscribe({
+      next: () => {
+        this.productMedia = this.productMedia.filter(m => m.id !== mediaId);
+        this.cdr.detectChanges();
+      },
+      error: () => this.toast('Erreur de suppression', 'error'),
+    });
+  }
+
+  moveMedia(index: number, direction: 'up' | 'down'): void {
+    if (!this.editingProduct) return;
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= this.productMedia.length) return;
+    const arr = [...this.productMedia];
+    [arr[index], arr[newIndex]] = [arr[newIndex], arr[index]];
+    this.productMedia = arr;
+    this.cdr.detectChanges();
+    this.productMediaService.reorder(this.editingProduct.id, arr.map(m => m.id)).subscribe({
+      error: () => this.toast('Erreur de réorganisation', 'error'),
+    });
+  }
 }

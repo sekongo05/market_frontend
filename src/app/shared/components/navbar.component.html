@@ -138,18 +138,138 @@
           <!-- Logged-in user -->
           @if (currentUser) {
             <!-- Notifications -->
-            <button class="nav-icon-btn relative">
-              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-              </svg>
-              @if (unreadNotifications > 0) {
-                <span class="absolute -top-1 -right-1 w-[18px] h-[18px] bg-red-500 text-white
-                             text-[10px] font-black rounded-full flex items-center justify-center">
-                  {{ unreadNotifications }}
-                </span>
+            <div class="relative" data-notif-panel>
+              <button (click)="toggleNotifications()" class="nav-icon-btn relative">
+                <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                @if (unreadNotifications > 0) {
+                  <span class="absolute -top-1 -right-1 w-[18px] h-[18px] bg-red-500 text-white
+                               text-[10px] font-black rounded-full flex items-center justify-center">
+                    {{ unreadNotifications }}
+                  </span>
+                }
+              </button>
+
+              <!-- Notification panel -->
+              @if (showNotifications) {
+                <div class="absolute right-0 top-full mt-3 w-[480px] max-w-[calc(100vw-1rem)] theme-surface border theme-border rounded-2xl shadow-2xl z-50 overflow-hidden">
+
+                  <!-- ── Vue détail d'une notification ── -->
+                  @if (selectedNotification) {
+                    <div class="flex flex-col">
+                      <!-- Header détail -->
+                      <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
+                        <button (click)="closeNotificationDetail()"
+                          class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/8 transition-colors flex-shrink-0">
+                          <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                          </svg>
+                        </button>
+                        <p class="text-base font-bold theme-text truncate flex-1">{{ selectedNotification.subject }}</p>
+                        <button (click)="deleteNotification(selectedNotification, $event)"
+                          class="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0"
+                          title="Supprimer">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                          </svg>
+                        </button>
+                      </div>
+                      <!-- Corps HTML de la notification -->
+                      <div class="max-h-[480px] overflow-y-auto p-5">
+                        <p class="text-xs theme-muted mb-4">{{ selectedNotification.createdAt | date:'dd MMMM yyyy à HH:mm' }}</p>
+                        <div class="text-sm theme-text leading-relaxed rounded-xl border theme-border p-4 break-words"
+                             [innerHTML]="selectedNotification.body">
+                        </div>
+                      </div>
+                    </div>
+
+                  } @else {
+
+                    <!-- ── Liste des notifications ── -->
+                    <!-- Header liste -->
+                    <div class="flex items-center justify-between px-5 py-4 border-b theme-border">
+                      <div class="flex items-center gap-2">
+                        <h3 class="font-bold theme-text text-base">Notifications</h3>
+                        @if (unreadNotifications > 0) {
+                          <span class="px-2 py-0.5 bg-red-500 text-white text-xs font-black rounded-full leading-none">
+                            {{ unreadNotifications }}
+                          </span>
+                        }
+                      </div>
+                      <div class="flex items-center gap-3">
+                        @if (unreadNotifications > 0) {
+                          <button (click)="markAllAsRead()"
+                            class="text-sm text-gold font-semibold hover:underline transition-colors">
+                            Tout marquer lu
+                          </button>
+                        }
+                        @if (notifications.length > 0) {
+                          <button (click)="deleteAllNotifications()"
+                            class="text-sm text-red-400 font-semibold hover:underline transition-colors">
+                            Tout supprimer
+                          </button>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Loading -->
+                    @if (notificationsLoading) {
+                      <div class="p-6 flex justify-center">
+                        <svg class="w-6 h-6 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                      </div>
+                    }
+
+                    <!-- Liste -->
+                    @if (!notificationsLoading) {
+                      <div class="max-h-96 overflow-y-auto divide-y theme-border">
+                        @for (notif of notifications; track notif.id) {
+                          <div class="flex items-start gap-3 px-5 py-4 hover:bg-white/5 transition-colors group"
+                               [class.opacity-60]="notif.read">
+                            <!-- Indicateur non-lu -->
+                            <div class="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 transition-colors"
+                                 [class.bg-gold]="!notif.read"
+                                 [class.bg-transparent]="notif.read">
+                            </div>
+                            <!-- Contenu cliquable -->
+                            <button type="button" (click)="openNotification(notif)"
+                              class="flex-1 min-w-0 text-left">
+                              <p class="text-sm font-bold theme-text leading-snug truncate">{{ notif.subject }}</p>
+                              <p class="text-xs theme-muted mt-1">{{ notif.createdAt | date:'dd/MM/yyyy à HH:mm' }}</p>
+                            </button>
+                            <!-- Bouton suppression -->
+                            <button type="button" (click)="deleteNotification(notif, $event)"
+                              class="w-7 h-7 rounded-lg flex items-center justify-center text-red-400/60
+                                     opacity-0 group-hover:opacity-100 hover:bg-red-500/10 hover:text-red-400
+                                     transition-all flex-shrink-0 mt-0.5"
+                              title="Supprimer">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                              </svg>
+                            </button>
+                          </div>
+                        }
+                        @if (notifications.length === 0) {
+                          <div class="py-12 text-center">
+                            <svg class="w-10 h-10 theme-muted mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            <p class="text-sm theme-muted">Aucune notification</p>
+                          </div>
+                        }
+                      </div>
+                    }
+                  }
+                </div>
               }
-            </button>
+            </div>
 
             <!-- Avatar dropdown -->
             <div class="relative">

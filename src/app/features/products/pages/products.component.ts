@@ -1,7 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -18,7 +20,7 @@ import { PageResponse } from '../../../core/models/common.models';
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent implements OnInit, OnDestroy {
   products: ProductResponse[] = [];
   categories: CategoryResponse[] = [];
   loading = false;
@@ -28,6 +30,9 @@ export class ProductsComponent implements OnInit {
   totalPages = 0;
   searchQuery = '';
 
+  private readonly searchSubject = new Subject<string>();
+  private readonly destroy$ = new Subject<void>();
+
   // Modal state
   showModal = false;
   editingProduct: ProductResponse | null = null;
@@ -36,25 +41,25 @@ export class ProductsComponent implements OnInit {
   modalSuccess: string | null = null;
   productForm!: FormGroup;
 
-  private readonly CAT_ELEC   = { id: 1, name: 'Électronique',    slug: 'electronique',     description: 'Smartphones, ordinateurs, accessoires tech', imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_MODE   = { id: 2, name: 'Mode & Vêtements', slug: 'mode-vetements',   description: 'Vêtements, chaussures, accessoires de mode',  imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_MAISON = { id: 3, name: 'Maison & Cuisine',  slug: 'maison-cuisine',   description: 'Électroménager, décoration, ustensiles',       imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_BEAUTE = { id: 4, name: 'Beauté & Santé',    slug: 'beaute-sante',     description: 'Cosmétiques, soins, produits de santé',        imageUrl: '', active: true, createdAt: '' };
-  private readonly CAT_SPORT  = { id: 5, name: 'Sports & Loisirs',  slug: 'sports-loisirs',   description: 'Équipements sportifs, jeux, loisirs',          imageUrl: '', active: true, createdAt: '' };
+  private readonly CAT_ELEC   = { id: 1, name: 'Électronique',    slug: 'electronique',     description: 'Smartphones, ordinateurs, accessoires tech', imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
+  private readonly CAT_MODE   = { id: 2, name: 'Mode & Vêtements', slug: 'mode-vetements',   description: 'Vêtements, chaussures, accessoires de mode',  imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
+  private readonly CAT_MAISON = { id: 3, name: 'Maison & Cuisine',  slug: 'maison-cuisine',   description: 'Électroménager, décoration, ustensiles',       imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
+  private readonly CAT_BEAUTE = { id: 4, name: 'Beauté & Santé',    slug: 'beaute-sante',     description: 'Cosmétiques, soins, produits de santé',        imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
+  private readonly CAT_SPORT  = { id: 5, name: 'Sports & Loisirs',  slug: 'sports-loisirs',   description: 'Équipements sportifs, jeux, loisirs',          imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
 
   private readonly mockProducts: ProductResponse[] = [
-    { id: 1,  name: 'iPhone 15 Pro',          slug: 'iphone-15-pro',         description: 'Smartphone Apple iPhone 15 Pro 256Go, puce A17 Pro, appareil photo 48MP.',         price: 650000,  stock: 15, imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
-    { id: 2,  name: 'Samsung Galaxy S24',     slug: 'samsung-galaxy-s24',    description: 'Smartphone Samsung Galaxy S24 128Go, écran Dynamic AMOLED 6.2 pouces.',           price: 450000,  stock: 20, imageUrl: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
-    { id: 3,  name: 'MacBook Air M2',         slug: 'macbook-air-m2',        description: 'Ordinateur portable Apple MacBook Air 13 pouces, puce M2, 8Go RAM, 256Go SSD.',   price: 1200000, stock: 8,  imageUrl: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
-    { id: 4,  name: 'Sac à main Cuir',        slug: 'sac-main-cuir',         description: 'Sac à main en cuir véritable, design élégant, compartiments multiples.',           price: 55000,   stock: 18, imageUrl: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
-    { id: 5,  name: 'Robe Wax Traditionnelle',slug: 'robe-wax',              description: 'Robe en tissu wax 100% coton, motifs traditionnels africains, taille ajustable.',  price: 25000,   stock: 30, imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
-    { id: 6,  name: 'Climatiseur Hisense',    slug: 'clim-hisense',          description: 'Climatiseur split Hisense 1.5 CV, fonction froid/chaud, économique en énergie.',  price: 280000,  stock: 10, imageUrl: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&q=80', category: this.CAT_MAISON, active: true, createdAt: '', updatedAt: '' },
-    { id: 7,  name: 'Fer à repasser Philips', slug: 'fer-philips',           description: 'Fer à repasser vapeur Philips 2400W, semelle en céramique, bac 350ml.',           price: 22000,   stock: 35, imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', category: this.CAT_MAISON, active: true, createdAt: '', updatedAt: '' },
-    { id: 8,  name: 'Crème Hydratante Nivea', slug: 'creme-nivea',           description: 'Crème hydratante corps Nivea 400ml, formule enrichie en aloe vera.',               price: 3500,    stock: 50, imageUrl: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80', category: this.CAT_BEAUTE, active: true, createdAt: '', updatedAt: '' },
-    { id: 9,  name: 'Parfum Dior Sauvage',    slug: 'parfum-dior',           description: 'Eau de toilette Dior Sauvage 100ml, fragrance boisée et fraîche pour homme.',    price: 85000,   stock: 12, imageUrl: 'https://images.unsplash.com/photo-1541643600914-78b084683702?w=600&q=80', category: this.CAT_BEAUTE, active: true, createdAt: '', updatedAt: '' },
-    { id: 10, name: 'Vélo de Sport',          slug: 'velo-sport',            description: 'Vélo de sport tout terrain 21 vitesses, cadre aluminium, freins à disque.',       price: 120000,  stock: 7,  imageUrl: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=600&q=80', category: this.CAT_SPORT,  active: true, createdAt: '', updatedAt: '' },
-    { id: 11, name: 'Ballon de Football Nike',slug: 'ballon-nike',           description: 'Ballon de football officiel Nike Strike, taille 5, certifié FIFA.',              price: 18000,   stock: 25, imageUrl: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&q=80', category: this.CAT_SPORT,  active: true, createdAt: '', updatedAt: '' },
-    { id: 12, name: 'Tablette iPad 10',       slug: 'ipad-10',               description: 'Tablette Apple iPad 10e génération 64Go WiFi, écran 10.9 pouces Liquid Retina.', price: 380000,  stock: 12, imageUrl: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 1,  name: 'iPhone 15 Pro',          slug: 'iphone-15-pro',         description: 'Smartphone Apple iPhone 15 Pro 256Go, puce A17 Pro, appareil photo 48MP.',         price: 650000,  stock: 15, gender: 'UNISEX', imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 2,  name: 'Samsung Galaxy S24',     slug: 'samsung-galaxy-s24',    description: 'Smartphone Samsung Galaxy S24 128Go, écran Dynamic AMOLED 6.2 pouces.',           price: 450000,  stock: 20, gender: 'UNISEX', imageUrl: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 3,  name: 'MacBook Air M2',         slug: 'macbook-air-m2',        description: 'Ordinateur portable Apple MacBook Air 13 pouces, puce M2, 8Go RAM, 256Go SSD.',   price: 1200000, stock: 8,  gender: 'UNISEX', imageUrl: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
+    { id: 4,  name: 'Sac à main Cuir',        slug: 'sac-main-cuir',         description: 'Sac à main en cuir véritable, design élégant, compartiments multiples.',           price: 55000,   stock: 18, gender: 'FEMME',  imageUrl: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
+    { id: 5,  name: 'Robe Wax Traditionnelle',slug: 'robe-wax',              description: 'Robe en tissu wax 100% coton, motifs traditionnels africains, taille ajustable.',  price: 25000,   stock: 30, gender: 'FEMME',  imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80', category: this.CAT_MODE,   active: true, createdAt: '', updatedAt: '' },
+    { id: 6,  name: 'Climatiseur Hisense',    slug: 'clim-hisense',          description: 'Climatiseur split Hisense 1.5 CV, fonction froid/chaud, économique en énergie.',  price: 280000,  stock: 10, gender: 'UNISEX', imageUrl: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&q=80', category: this.CAT_MAISON, active: true, createdAt: '', updatedAt: '' },
+    { id: 7,  name: 'Fer à repasser Philips', slug: 'fer-philips',           description: 'Fer à repasser vapeur Philips 2400W, semelle en céramique, bac 350ml.',           price: 22000,   stock: 35, gender: 'UNISEX', imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', category: this.CAT_MAISON, active: true, createdAt: '', updatedAt: '' },
+    { id: 8,  name: 'Crème Hydratante Nivea', slug: 'creme-nivea',           description: 'Crème hydratante corps Nivea 400ml, formule enrichie en aloe vera.',               price: 3500,    stock: 50, gender: 'UNISEX', imageUrl: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80', category: this.CAT_BEAUTE, active: true, createdAt: '', updatedAt: '' },
+    { id: 9,  name: 'Parfum Dior Sauvage',    slug: 'parfum-dior',           description: 'Eau de toilette Dior Sauvage 100ml, fragrance boisée et fraîche pour homme.',    price: 85000,   stock: 12, gender: 'HOMME',  imageUrl: 'https://images.unsplash.com/photo-1541643600914-78b084683702?w=600&q=80', category: this.CAT_BEAUTE, active: true, createdAt: '', updatedAt: '' },
+    { id: 10, name: 'Vélo de Sport',          slug: 'velo-sport',            description: 'Vélo de sport tout terrain 21 vitesses, cadre aluminium, freins à disque.',       price: 120000,  stock: 7,  gender: 'UNISEX', imageUrl: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=600&q=80', category: this.CAT_SPORT,  active: true, createdAt: '', updatedAt: '' },
+    { id: 11, name: 'Ballon de Football Nike',slug: 'ballon-nike',           description: 'Ballon de football officiel Nike Strike, taille 5, certifié FIFA.',              price: 18000,   stock: 25, gender: 'UNISEX', imageUrl: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&q=80', category: this.CAT_SPORT,  active: true, createdAt: '', updatedAt: '' },
+    { id: 12, name: 'Tablette iPad 10',       slug: 'ipad-10',               description: 'Tablette Apple iPad 10e génération 64Go WiFi, écran 10.9 pouces Liquid Retina.', price: 380000,  stock: 12, gender: 'UNISEX', imageUrl: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&q=80', category: this.CAT_ELEC,   active: true, createdAt: '', updatedAt: '' },
   ];
 
   // Category filter
@@ -100,6 +105,16 @@ export class ProductsComponent implements OnInit {
     this.initForm();
     this.loadProducts();
     this.loadCategories();
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.loadProducts(0));
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get isManager(): boolean {
@@ -352,6 +367,16 @@ export class ProductsComponent implements OnInit {
     return mocks.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
   }
 
+  onSearchChange(value: string): void {
+    this.searchQuery = value;
+    this.searchSubject.next(value);
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchSubject.next('');
+  }
+
   selectCategory(id: number | null): void {
     this.selectedCategoryId = id;
     this.searchQuery = '';
@@ -367,7 +392,7 @@ export class ProductsComponent implements OnInit {
     return Array.from(map.values());
   }
 
-  search(): void { this.loadProducts(0); }
+  search(): void { this.loadProducts(0); } // gardé pour la compatibilité Enter
 
   previousPage(): void {
     if (this.currentPage > 0) this.loadProducts(this.currentPage - 1);

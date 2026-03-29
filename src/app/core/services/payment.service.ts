@@ -6,6 +6,7 @@ import {
   PaymentTransactionResponse,
   GetPaymentTransactionsParams,
 } from '../models/payment.models';
+import { OrderResponse } from '../models/order.models';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -33,5 +34,23 @@ export class PaymentService {
     params?: GetPaymentTransactionsParams
   ): Observable<ApiResponse<PageResponse<PaymentTransactionResponse>>> {
     return this.apiService.get('/payments/transactions', params);
+  }
+
+  // ---- Paiement manuel QR code ----
+
+  notifyPayment(orderId: number, waveReference?: string): Observable<ApiResponse<null>> {
+    return this.apiService.post(`/payments/manual/notify/${orderId}`, { waveReference: waveReference ?? null });
+  }
+
+  validatePayment(orderId: number): Observable<ApiResponse<OrderResponse>> {
+    return this.apiService.patch(`/payments/manual/validate/${orderId}`);
+  }
+
+  rejectPayment(orderId: number): Observable<ApiResponse<OrderResponse>> {
+    return this.apiService.patch(`/payments/manual/reject/${orderId}`);
+  }
+
+  getPendingValidationOrders(page = 0, size = 20): Observable<ApiResponse<PageResponse<OrderResponse>>> {
+    return this.apiService.get('/payments/manual/pending', { page, size });
   }
 }

@@ -283,52 +283,52 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   /** Fall back to mock data when API is unavailable */
   private _tryMock(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    const CAT_ELEC = { id: 1, name: 'Électronique',   slug: 'electronique',   description: '', imageUrl: '', active: true, createdAt: '' };
-    const CAT_MODE = { id: 2, name: 'Mode & Vêtements', slug: 'mode-vetements', description: '', imageUrl: '', active: true, createdAt: '' };
-    const CAT_MAIS = { id: 3, name: 'Maison & Cuisine', slug: 'maison-cuisine',  description: '', imageUrl: '', active: true, createdAt: '' };
-    const CAT_BEAU = { id: 4, name: 'Beauté & Santé',   slug: 'beaute-sante',   description: '', imageUrl: '', active: true, createdAt: '' };
-    const CAT_SPOR = { id: 5, name: 'Sports & Loisirs', slug: 'sports-loisirs', description: '', imageUrl: '', active: true, createdAt: '' };
+    const CAT_ELEC = { id: 1, name: 'Électronique',   slug: 'electronique',   description: '', imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
+    const CAT_MODE = { id: 2, name: 'Mode & Vêtements', slug: 'mode-vetements', description: '', imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
+    const CAT_MAIS = { id: 3, name: 'Maison & Cuisine', slug: 'maison-cuisine',  description: '', imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
+    const CAT_BEAU = { id: 4, name: 'Beauté & Santé',   slug: 'beaute-sante',   description: '', imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
+    const CAT_SPOR = { id: 5, name: 'Sports & Loisirs', slug: 'sports-loisirs', description: '', imageUrl: '', active: true, gender: 'UNISEX' as const, createdAt: '', updatedAt: '' };
 
     const mocks: ProductResponse[] = [
       {
         id: 1, name: 'iPhone 15 Pro', slug: 'iphone-15-pro',
         description: 'Smartphone Apple iPhone 15 Pro 256Go, puce A17 Pro, appareil photo 48MP',
-        price: 650000, stock: 15,
+        price: 650000, stock: 15, gender: 'UNISEX',
         imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=85',
         category: CAT_ELEC, active: true, createdAt: '', updatedAt: '',
       },
       {
         id: 2, name: 'Samsung Galaxy S24', slug: 'samsung-galaxy-s24',
         description: 'Smartphone Samsung Galaxy S24 128Go, écran Dynamic AMOLED 6.2 pouces',
-        price: 450000, stock: 20,
+        price: 450000, stock: 20, gender: 'UNISEX',
         imageUrl: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=800&q=85',
         category: CAT_ELEC, active: true, createdAt: '', updatedAt: '',
       },
       {
         id: 3, name: 'Sneakers Nike Air Max', slug: 'sneakers-nike-air-max',
         description: 'Chaussures de sport Nike Air Max 270, confort exceptionnel, plusieurs coloris',
-        price: 85000, stock: 25,
+        price: 85000, stock: 25, gender: 'UNISEX',
         imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=85',
         category: CAT_MODE, active: true, createdAt: '', updatedAt: '',
       },
       {
         id: 4, name: 'Climatiseur Hisense 1.5CV', slug: 'climatiseur-hisense-1-5cv',
         description: 'Climatiseur split Hisense 1.5 CV, fonction froid/chaud, économique',
-        price: 280000, stock: 10,
+        price: 280000, stock: 10, gender: 'UNISEX',
         imageUrl: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&q=85',
         category: CAT_MAIS, active: true, createdAt: '', updatedAt: '',
       },
       {
         id: 5, name: 'Parfum Lacoste Homme', slug: 'parfum-lacoste-homme',
         description: 'Eau de toilette Lacoste Essential pour homme, 125ml, fraîcheur boisée',
-        price: 75000, stock: 15,
+        price: 75000, stock: 15, gender: 'HOMME',
         imageUrl: 'https://images.unsplash.com/photo-1541643600914-78b084683702?w=800&q=85',
         category: CAT_BEAU, active: true, createdAt: '', updatedAt: '',
       },
       {
         id: 6, name: 'Vélo de Fitness Statique', slug: 'velo-fitness-statique',
         description: "Vélo d'appartement avec résistance magnétique, écran LCD, charge max 120kg",
-        price: 195000, stock: 6,
+        price: 195000, stock: 6, gender: 'UNISEX',
         imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=85',
         category: CAT_SPOR, active: true, createdAt: '', updatedAt: '',
       },
