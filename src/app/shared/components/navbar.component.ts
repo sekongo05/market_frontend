@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterModule, RouterLinkActive, Router } from '@angular/router';
+import { TooltipDirective } from '../directives/tooltip.directive';
 import { AuthService, CurrentUser } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { NotificationResponse } from '../../core/models/notification.models';
@@ -14,7 +15,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
@@ -56,11 +57,23 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.showCart || this.showUserMenu || this.showNotifications || this.mobileOpen) {
+      this.closeAll();
+    }
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (this.showNotifications && !target.closest('[data-notif-panel]')) {
       this.showNotifications = false;
+      this.selectedNotification = null;
+      this.cdr.detectChanges();
+    }
+    if (this.showUserMenu && !target.closest('[data-user-menu]')) {
+      this.showUserMenu = false;
       this.cdr.detectChanges();
     }
   }

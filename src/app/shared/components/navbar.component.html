@@ -63,6 +63,13 @@
             <span>Collection</span>
           </a>
 
+          @if (currentUser && !isManager) {
+            <a routerLink="/orders" routerLinkActive="nav-active"
+               (click)="closeAll()" class="nav-item">
+              <span>Mes commandes</span>
+            </a>
+          }
+
           @if (currentUser?.role === 'ADMIN') {
             <a routerLink="/admin" routerLinkActive="nav-active"
                (click)="closeAll()" class="nav-item">
@@ -86,7 +93,7 @@
         <div class="hidden lg:flex items-center gap-1.5">
 
           <!-- Theme toggle -->
-          <button (click)="toggleTheme()" title="Changer le thème" class="nav-icon-btn">
+          <button (click)="toggleTheme()" appTooltip="Changer le thème" tooltipPosition="bottom" class="nav-icon-btn">
             @if (themeService.isDark) {
               <svg class="w-[18px] h-[18px] no-transition animate-fade-in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -102,7 +109,7 @@
 
           <!-- Cart (customers only) -->
           @if (!isManager) {
-            <button (click)="toggleCart()" class="nav-icon-btn relative" [class.active-icon]="showCart">
+            <button (click)="toggleCart()" appTooltip="Mon panier" tooltipPosition="bottom" class="nav-icon-btn relative" [class.active-icon]="showCart">
               <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -139,7 +146,7 @@
           @if (currentUser) {
             <!-- Notifications -->
             <div class="relative" data-notif-panel>
-              <button (click)="toggleNotifications()" class="nav-icon-btn relative">
+              <button (click)="toggleNotifications()" appTooltip="Notifications" tooltipPosition="bottom" class="nav-icon-btn relative">
                 <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -162,6 +169,7 @@
                       <!-- Header détail -->
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
                         <button (click)="closeNotificationDetail()"
+                          appTooltip="Retour à la liste" tooltipPosition="bottom"
                           class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/8 transition-colors flex-shrink-0">
                           <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -169,8 +177,8 @@
                         </button>
                         <p class="text-base font-bold theme-text truncate flex-1">{{ selectedNotification.subject }}</p>
                         <button (click)="deleteNotification(selectedNotification, $event)"
-                          class="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0"
-                          title="Supprimer">
+                          appTooltip="Supprimer cette notification" tooltipPosition="bottom"
+                          class="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -202,12 +210,14 @@
                       <div class="flex items-center gap-3">
                         @if (unreadNotifications > 0) {
                           <button (click)="markAllAsRead()"
+                            appTooltip="Marquer toutes les notifications comme lues" tooltipPosition="bottom"
                             class="text-sm text-gold font-semibold hover:underline transition-colors">
                             Tout marquer lu
                           </button>
                         }
                         @if (notifications.length > 0) {
                           <button (click)="deleteAllNotifications()"
+                            appTooltip="Supprimer toutes les notifications" tooltipPosition="bottom"
                             class="text-sm text-red-400 font-semibold hover:underline transition-colors">
                             Tout supprimer
                           </button>
@@ -272,8 +282,8 @@
             </div>
 
             <!-- Avatar dropdown -->
-            <div class="relative">
-              <button (click)="toggleUserMenu()"
+            <div class="relative" data-user-menu>
+              <button (click)="toggleUserMenu()" appTooltip="Mon compte" tooltipPosition="bottom"
                 class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl border transition-all duration-200
                        border-transparent hover:border-white/12 hover:bg-white/5
                        light:hover:border-black/10 light:hover:bg-black/4"
@@ -396,7 +406,7 @@
         <div class="flex lg:hidden items-center gap-1.5">
           <!-- Cart (customers only) -->
           @if (!isManager) {
-            <button (click)="toggleCart()" class="nav-icon-btn relative">
+            <button (click)="toggleCart()" appTooltip="Mon panier" tooltipPosition="bottom" class="nav-icon-btn relative">
               <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -411,8 +421,115 @@
             </button>
           }
 
+          <!-- Notifications (mobile, logged-in only) -->
+          @if (currentUser) {
+            <div class="relative" data-notif-panel>
+              <button (click)="toggleNotifications()" appTooltip="Notifications" tooltipPosition="bottom" class="nav-icon-btn relative">
+                <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                @if (unreadNotifications > 0) {
+                  <span class="absolute -top-1 -right-1 w-[18px] h-[18px] bg-red-500 text-white
+                               text-[10px] font-black rounded-full flex items-center justify-center">
+                    {{ unreadNotifications > 9 ? '9+' : unreadNotifications }}
+                  </span>
+                }
+              </button>
+
+              <!-- Notification panel (mobile — left-aligned to avoid overflow) -->
+              @if (showNotifications) {
+                <div class="absolute right-0 top-full mt-3 w-[calc(100vw-2rem)] max-w-[420px] theme-surface border theme-border rounded-2xl shadow-2xl z-50 overflow-hidden"
+                     style="right: -2.5rem">
+                  <!-- réutilise le même contenu que desktop -->
+                  @if (selectedNotification) {
+                    <div class="flex flex-col">
+                      <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
+                        <button (click)="closeNotificationDetail()"
+                          class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/8 transition-colors flex-shrink-0">
+                          <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                          </svg>
+                        </button>
+                        <p class="text-base font-bold theme-text truncate flex-1">{{ selectedNotification.subject }}</p>
+                        <button (click)="deleteNotification(selectedNotification, $event)"
+                          class="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                          </svg>
+                        </button>
+                      </div>
+                      <div class="max-h-[60vh] overflow-y-auto p-5">
+                        <p class="text-xs theme-muted mb-4">{{ selectedNotification.createdAt | date:'dd MMMM yyyy à HH:mm' }}</p>
+                        <div class="text-sm theme-text leading-relaxed rounded-xl border theme-border p-4 break-words"
+                             [innerHTML]="selectedNotification.body"></div>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="flex items-center justify-between px-5 py-4 border-b theme-border">
+                      <div class="flex items-center gap-2">
+                        <h3 class="font-bold theme-text text-base">Notifications</h3>
+                        @if (unreadNotifications > 0) {
+                          <span class="px-2 py-0.5 bg-red-500 text-white text-xs font-black rounded-full leading-none">
+                            {{ unreadNotifications }}
+                          </span>
+                        }
+                      </div>
+                      <div class="flex items-center gap-3">
+                        @if (unreadNotifications > 0) {
+                          <button (click)="markAllAsRead()" class="text-sm text-gold font-semibold hover:underline">Tout lu</button>
+                        }
+                        @if (notifications.length > 0) {
+                          <button (click)="deleteAllNotifications()" class="text-sm text-red-400 font-semibold hover:underline">Supprimer</button>
+                        }
+                      </div>
+                    </div>
+                    @if (notificationsLoading) {
+                      <div class="p-6 flex justify-center">
+                        <svg class="w-6 h-6 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                      </div>
+                    }
+                    @if (!notificationsLoading) {
+                      <div class="max-h-80 overflow-y-auto divide-y theme-border">
+                        @for (notif of notifications; track notif.id) {
+                          <div class="flex items-start gap-3 px-5 py-4 hover:bg-white/5 transition-colors group"
+                               [class.opacity-60]="notif.read">
+                            <div class="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0"
+                                 [class.bg-gold]="!notif.read" [class.bg-transparent]="notif.read"></div>
+                            <button type="button" (click)="openNotification(notif)" class="flex-1 min-w-0 text-left">
+                              <p class="text-sm font-bold theme-text leading-snug truncate">{{ notif.subject }}</p>
+                              <p class="text-xs theme-muted mt-1">{{ notif.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                            </button>
+                            <button type="button" (click)="deleteNotification(notif, $event)"
+                              class="w-7 h-7 rounded-lg flex items-center justify-center text-red-400/60
+                                     opacity-0 group-hover:opacity-100 hover:bg-red-500/10 hover:text-red-400
+                                     transition-all flex-shrink-0 mt-0.5">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                              </svg>
+                            </button>
+                          </div>
+                        }
+                        @if (notifications.length === 0) {
+                          <div class="py-10 text-center">
+                            <p class="text-sm theme-muted">Aucune notification</p>
+                          </div>
+                        }
+                      </div>
+                    }
+                  }
+                </div>
+              }
+            </div>
+          }
+
           <!-- Hamburger -->
-          <button (click)="toggleMobile()"
+          <button (click)="toggleMobile()" appTooltip="Menu" tooltipPosition="bottom"
             class="w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
                    text-gray-400 hover:text-white hover:bg-white/5
                    light:text-gray-600 light:hover:text-black light:hover:bg-black/5">
@@ -439,8 +556,34 @@
       <div class="lg:hidden border-t animate-fade-in-down"
            [style.border-color]="themeService.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'"
            [style.background]="themeService.isDark ? '#0a0a0a' : '#faf8f3'">
-        <div class="px-4 py-5 space-y-1">
 
+        <!-- User profile card (logged-in) -->
+        @if (currentUser) {
+          <div class="px-4 pt-4 pb-3">
+            <div class="flex items-center gap-3 px-4 py-3 rounded-2xl"
+                 [style.background]="themeService.isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.08)'"
+                 style="border:1px solid rgba(212,175,55,0.18)">
+              <div class="w-10 h-10 bg-gold rounded-xl flex items-center justify-center
+                          text-black font-black text-sm shadow-md shadow-yellow-600/20 flex-shrink-0">
+                {{ initials }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-bold text-sm truncate"
+                   [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ fullName }}</p>
+                <p class="text-[11px] font-semibold" style="color:#d4af37">{{ currentUser.role }}</p>
+              </div>
+              @if (unreadNotifications > 0) {
+                <span class="px-2 py-0.5 bg-red-500 text-white text-xs font-black rounded-full">
+                  {{ unreadNotifications }}
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="px-4 pb-5 space-y-1" [class.pt-4]="!currentUser" [class.pt-1]="currentUser">
+
+          <!-- Navigation principale -->
           <a routerLink="/" routerLinkActive="mobile-nav-active" [routerLinkActiveOptions]="{exact:true}"
              (click)="closeAll()" class="mobile-nav-item">
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -458,6 +601,17 @@
             Collection
           </a>
 
+          @if (currentUser && !isManager) {
+            <a routerLink="/orders" routerLinkActive="mobile-nav-active"
+               (click)="closeAll()" class="mobile-nav-item">
+              <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              Mes commandes
+            </a>
+          }
+
           @if (currentUser?.role === 'ADMIN') {
             <a routerLink="/admin" routerLinkActive="mobile-nav-active"
                (click)="closeAll()" class="mobile-nav-item">
@@ -466,6 +620,16 @@
                   d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
               </svg>
               Administration
+            </a>
+          }
+
+          @if (currentUser?.role === 'MANAGER') {
+            <a routerLink="/manager" routerLinkActive="mobile-nav-active"
+               (click)="closeAll()" class="mobile-nav-item">
+              <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+              </svg>
+              Espace Gestion
             </a>
           }
 
@@ -507,7 +671,7 @@
           }
 
           @if (currentUser) {
-            <div class="pt-2 space-y-1">
+            <div class="space-y-1">
               <a routerLink="/profile" (click)="closeAll()" class="mobile-nav-item">
                 <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -515,25 +679,6 @@
                 </svg>
                 Mon profil
               </a>
-              @if (currentUser.role !== 'MANAGER' && currentUser.role !== 'ADMIN') {
-                <a routerLink="/orders" (click)="closeAll()" class="mobile-nav-item">
-                  <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                  </svg>
-                  Mes commandes
-                </a>
-              }
-              @if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
-                <a routerLink="/manager" routerLinkActive="mobile-nav-active"
-                   (click)="closeAll()" class="mobile-nav-item">
-                  <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                  </svg>
-                  Espace Gestion
-                </a>
-              }
               <button (click)="logout()"
                 class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold
                        text-red-400 hover:bg-red-500/8 transition-colors">
@@ -553,261 +698,293 @@
 
 
 <!-- ══════════════════════════════════════════════════════
-     PANIER — DRAWER
+     PANIER — MODALE PLEIN ÉCRAN
 ══════════════════════════════════════════════════════ -->
 @if (showCart) {
+  <!-- Backdrop — clic pour fermer -->
   <div class="fixed inset-0 z-40 animate-backdrop-in"
-       style="background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);"
+       style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);"
        (click)="showCart = false"></div>
 
-  <aside class="fixed top-0 right-0 z-50 h-full w-full max-w-[420px] flex flex-col animate-drawer-in"
+  <!-- Conteneur plein écran centré -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-10 pointer-events-none">
+    <div class="w-full max-w-5xl h-full max-h-[92vh] flex flex-col lg:flex-row rounded-3xl overflow-hidden pointer-events-auto animate-scale-in"
          [style.background]="themeService.isDark ? '#0f0f0f' : '#faf8f3'"
-         [style.border-left]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.07)'"
-         style="box-shadow:-20px 0 80px rgba(0,0,0,0.5)">
+         style="box-shadow:0 40px 120px rgba(0,0,0,0.7)">
 
-    <!-- Header -->
-    <div class="flex-shrink-0 px-6 pt-6 pb-5"
-         [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
-      <div class="flex items-start justify-between">
-        <div>
-          <h2 class="text-xl font-black tracking-tight"
-              [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Mon panier</h2>
-          @if (cartCount > 0) {
-            <p class="text-xs mt-0.5 font-medium" style="color:#d4af37">
-              {{ cartCount }} article{{ cartCount > 1 ? 's' : '' }}
-            </p>
-          } @else {
-            <p class="text-xs mt-0.5" style="color:#6b7280">Votre sélection est vide</p>
-          }
-        </div>
-        <button (click)="showCart = false"
-          class="w-9 h-9 rounded-2xl flex items-center justify-center transition-all duration-150
-                 text-gray-500 hover:text-white hover:bg-white/8
-                 light:hover:text-black light:hover:bg-black/8">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <div class="mt-4 h-px w-10"
-           style="background:linear-gradient(90deg,#d4af37,#f5e06e,transparent)"></div>
-    </div>
+      <!-- ── COLONNE GAUCHE : articles ── -->
+      <div class="flex flex-col flex-1 min-w-0 overflow-hidden"
+           [style.border-right]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
 
-    <!-- Items -->
-    <div class="flex-1 overflow-y-auto px-6 py-4 space-y-2">
-      @if (cartItems.length === 0) {
-        <div class="flex flex-col items-center justify-center h-full py-12 text-center animate-fade-in">
-          <div class="w-20 h-20 rounded-3xl flex items-center justify-center mb-5"
-               [style.background]="themeService.isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.10)'"
-               style="border:1px solid rgba(212,175,55,0.15)">
-            <svg class="w-9 h-9 animate-float" style="color:rgba(212,175,55,0.5)"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-            </svg>
-          </div>
-          <p class="font-bold text-base mb-1.5"
-             [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Panier vide</p>
-          <p class="text-sm leading-relaxed max-w-[200px] mb-6" style="color:#6b7280">
-            Découvrez notre collection de montres et bijoux d'exception
-          </p>
-          <button (click)="showCart = false" routerLink="/products"
-            class="px-6 py-2.5 text-sm font-bold text-black bg-gold rounded-2xl
-                   hover:shadow-lg hover:shadow-yellow-600/20 hover:-translate-y-0.5 transition-all duration-200">
-            Explorer la boutique
-          </button>
-        </div>
-      }
-
-      @for (item of cartItems; track item.productId; let i = $index) {
-        <div class="group relative rounded-3xl p-4 transition-all duration-200 animate-fade-in"
-             [style.background]="themeService.isDark ? 'rgba(255,255,255,0.03)' : '#ffffff'"
-             [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)'"
-             [style.animation-delay]="(i * 0.05) + 's'">
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 relative">
-              <div class="w-20 h-20 rounded-2xl overflow-hidden"
-                   style="box-shadow:0 4px 20px rgba(0,0,0,0.25)">
-                <img [src]="item.imageUrl || 'https://placehold.co/80x80/1a1a1a/d4af37?text=M'"
-                     [alt]="item.productName"
-                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                     (error)="$any($event.target).src='https://placehold.co/80x80/1a1a1a/d4af37?text=M'"/>
-              </div>
-              <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gold
-                          flex items-center justify-center"
-                   style="box-shadow:0 2px 8px rgba(212,175,55,0.4)">
-                <svg class="w-2 h-2 text-black" fill="currentColor" viewBox="0 0 8 8">
-                  <circle cx="4" cy="4" r="3"/>
-                </svg>
-              </div>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-bold text-sm leading-snug mb-0.5 pr-6"
-                 [style.color]="themeService.isDark ? '#f0f0f0' : '#111111'">{{ item.productName }}</p>
-              <p class="text-xs font-semibold mb-3" style="color:#d4af37">
-                {{ (item.price / 1000) | number:'1.0-0' }}&thinsp;000 XOF / unité
-              </p>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center rounded-2xl overflow-hidden"
-                     [style.background]="themeService.isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'">
-                  <button (click)="cartService.updateQuantity(item.productId, item.quantity - 1)"
-                    class="w-8 h-8 flex items-center justify-center text-lg font-light transition-colors
-                           hover:bg-white/8 light:hover:bg-black/8"
-                    [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">−</button>
-                  <span class="w-8 text-center text-sm font-black"
-                        [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ item.quantity }}</span>
-                  <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1)"
-                    class="w-8 h-8 flex items-center justify-center text-lg font-light transition-colors
-                           hover:bg-white/8 light:hover:bg-black/8"
-                    [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">+</button>
-                </div>
-                <p class="text-sm font-black" style="color:#d4af37">
-                  {{ ((item.price * item.quantity) / 1000) | number:'1.0-0' }}&thinsp;K
-                </p>
-              </div>
-            </div>
-          </div>
-          <button (click)="cartService.removeFromCart(item.productId)"
-            class="absolute top-3 right-3 w-7 h-7 rounded-xl flex items-center justify-center
-                   opacity-0 group-hover:opacity-100 transition-all duration-150
-                   text-gray-600 hover:text-red-400 hover:bg-red-500/10">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-      }
-    </div>
-
-    <!-- Footer -->
-    @if (cartItems.length > 0) {
-      <div class="flex-shrink-0 px-6 pt-5 pb-6 space-y-4"
-           [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
-        <div class="space-y-2.5">
-          <div class="flex items-center justify-between text-sm">
-            <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
-            <span class="font-semibold"
-                  [style.color]="themeService.isDark ? '#d1d5db' : '#374151'">
-              {{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K XOF
-            </span>
-          </div>
-          <div class="flex items-center justify-between text-sm">
-            <span style="color:#6b7280">Livraison</span>
-            <span class="font-semibold text-green-400">Gratuite</span>
-          </div>
-        </div>
-        <div class="h-px" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.3),transparent)"></div>
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-semibold"
-                [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Total</span>
+        <!-- Header -->
+        <div class="flex-shrink-0 flex items-center justify-between px-6 py-5"
+             [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
           <div>
-            <span class="text-2xl font-black gold-text">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K</span>
-            <span class="text-xs ml-1" style="color:#6b7280">XOF</span>
-          </div>
-        </div>
-        @if (!showCheckout) {
-          <!-- Step 1 — bouton Commander -->
-          <button (click)="openCheckout()"
-                  class="w-full py-4 bg-gold text-black font-black rounded-2xl text-sm
-                         flex items-center justify-center gap-2
-                         hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all duration-200">
-            Commander maintenant
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
-          </button>
-        } @else {
-          <!-- Step 2 — saisie adresse + confirmation -->
-          <div class="space-y-3">
-            @if (checkoutSuccess) {
-              <div class="flex flex-col items-center gap-2 py-4 text-center">
-                <div class="w-12 h-12 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center">
-                  <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                  </svg>
-                </div>
-                <p class="text-sm font-bold text-green-400">Commande passée avec succès !</p>
-                <p class="text-xs" style="color:#6b7280">Redirection vers vos commandes…</p>
-              </div>
+            <h2 class="text-xl font-black tracking-tight"
+                [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Mon panier</h2>
+            @if (cartCount > 0) {
+              <p class="text-xs mt-0.5 font-medium" style="color:#d4af37">
+                {{ cartCount }} article{{ cartCount > 1 ? 's' : '' }}
+              </p>
             } @else {
-              <p class="text-xs font-bold theme-muted uppercase tracking-wider">Adresse de livraison</p>
-              <textarea
-                [(ngModel)]="deliveryAddress"
-                rows="2"
-                placeholder="Ex: Cocody, Abidjan, Côte d'Ivoire"
-                class="theme-input w-full px-3 py-2.5 rounded-xl text-sm resize-none transition-all">
-              </textarea>
-              @if (checkoutError) {
-                <p class="text-xs text-red-400 flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  {{ checkoutError }}
-                </p>
-              }
-              <div class="flex gap-2">
-                <button (click)="cancelCheckout()"
-                        class="flex-1 py-2.5 rounded-xl text-xs font-semibold theme-muted luxury-card transition-all hover:text-gold">
-                  Annuler
-                </button>
-                <button (click)="placeOrder()"
-                        [disabled]="checkoutLoading || !deliveryAddress.trim()"
-                        class="flex-1 py-2.5 bg-gold text-black rounded-xl text-xs font-black
-                               flex items-center justify-center gap-1.5
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               hover:shadow-lg hover:shadow-yellow-600/25 transition-all">
-                  @if (checkoutLoading) {
-                    <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                    Envoi…
-                  } @else {
-                    Confirmer la commande
-                  }
-                </button>
-              </div>
+              <p class="text-xs mt-0.5" style="color:#6b7280">Votre sélection est vide</p>
             }
           </div>
+          <div class="flex items-center gap-3">
+            @if (cartItems.length > 0) {
+              <button (click)="cartService.clearCart()"
+                appTooltip="Vider tout le panier" tooltipPosition="bottom"
+                class="text-xs font-semibold transition-colors text-gray-500 hover:text-red-400 px-3 py-1.5 rounded-xl hover:bg-red-500/8">
+                Vider
+              </button>
+            }
+            <button (click)="showCart = false"
+              appTooltip="Fermer le panier" tooltipPosition="bottom"
+              class="w-9 h-9 rounded-2xl flex items-center justify-center transition-all duration-150
+                     text-gray-500 hover:text-white hover:bg-white/8
+                     light:hover:text-black light:hover:bg-black/8">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Liste articles -->
+        <div class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+          @if (cartItems.length === 0) {
+            <div class="flex flex-col items-center justify-center h-full py-16 text-center animate-fade-in">
+              <div class="w-24 h-24 rounded-3xl flex items-center justify-center mb-6"
+                   [style.background]="themeService.isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.10)'"
+                   style="border:1px solid rgba(212,175,55,0.15)">
+                <svg class="w-11 h-11 animate-float" style="color:rgba(212,175,55,0.5)"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+              </div>
+              <p class="font-bold text-lg mb-2"
+                 [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Panier vide</p>
+              <p class="text-sm leading-relaxed max-w-[220px] mb-8" style="color:#6b7280">
+                Découvrez notre collection de montres et bijoux d'exception
+              </p>
+              <button (click)="showCart = false" routerLink="/products"
+                class="px-8 py-3 text-sm font-bold text-black bg-gold rounded-2xl
+                       hover:shadow-lg hover:shadow-yellow-600/20 hover:-translate-y-0.5 transition-all duration-200">
+                Explorer la boutique
+              </button>
+            </div>
+          }
+
+          @for (item of cartItems; track item.productId; let i = $index) {
+            <div class="group relative rounded-3xl p-5 transition-all duration-200 animate-fade-in"
+                 [style.background]="themeService.isDark ? 'rgba(255,255,255,0.03)' : '#ffffff'"
+                 [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)'"
+                 [style.animation-delay]="(i * 0.05) + 's'">
+              <div class="flex gap-5">
+                <!-- Image -->
+                <div class="flex-shrink-0 relative">
+                  <div class="w-24 h-24 rounded-2xl overflow-hidden"
+                       style="box-shadow:0 4px 20px rgba(0,0,0,0.25)">
+                    <img [src]="item.imageUrl || 'https://placehold.co/96x96/1a1a1a/d4af37?text=M'"
+                         [alt]="item.productName"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                         (error)="$any($event.target).src='https://placehold.co/96x96/1a1a1a/d4af37?text=M'"/>
+                  </div>
+                </div>
+                <!-- Infos -->
+                <div class="flex-1 min-w-0">
+                  <p class="font-bold text-base leading-snug mb-1 pr-8"
+                     [style.color]="themeService.isDark ? '#f0f0f0' : '#111111'">{{ item.productName }}</p>
+                  <p class="text-sm font-semibold mb-4" style="color:#d4af37">
+                    {{ (item.price / 1000) | number:'1.0-0' }}&thinsp;000 XOF / unité
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <!-- Quantité -->
+                    <div class="flex items-center rounded-2xl overflow-hidden"
+                         [style.background]="themeService.isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'">
+                      <button (click)="cartService.updateQuantity(item.productId, item.quantity - 1)"
+                        appTooltip="Diminuer la quantité" tooltipPosition="top"
+                        class="w-9 h-9 flex items-center justify-center text-xl font-light transition-colors
+                               hover:bg-white/8 light:hover:bg-black/8"
+                        [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">−</button>
+                      <span class="w-9 text-center text-sm font-black"
+                            [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ item.quantity }}</span>
+                      <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1)"
+                        appTooltip="Augmenter la quantité" tooltipPosition="top"
+                        class="w-9 h-9 flex items-center justify-center text-xl font-light transition-colors
+                               hover:bg-white/8 light:hover:bg-black/8"
+                        [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">+</button>
+                    </div>
+                    <!-- Sous-total ligne -->
+                    <p class="text-base font-black" style="color:#d4af37">
+                      {{ ((item.price * item.quantity) / 1000) | number:'1.0-0' }}&thinsp;K XOF
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <!-- Bouton supprimer -->
+              <button (click)="cartService.removeFromCart(item.productId)"
+                appTooltip="Retirer cet article" tooltipPosition="left"
+                class="absolute top-4 right-4 w-8 h-8 rounded-xl flex items-center justify-center
+                       opacity-0 group-hover:opacity-100 transition-all duration-150
+                       text-gray-500 hover:text-red-400 hover:bg-red-500/10">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Lien continuer -->
+        @if (cartItems.length > 0) {
+          <div class="flex-shrink-0 px-6 py-3"
+               [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.05)'">
+            <button (click)="showCart = false" routerLink="/products"
+              class="text-sm font-semibold transition-colors text-gray-500 hover:text-gold flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Continuer mes achats
+            </button>
+          </div>
         }
-        <div class="flex items-center justify-between">
-          <button (click)="showCart = false" routerLink="/products"
-            class="text-xs font-semibold transition-colors text-gray-500 hover:text-gold">
-            ← Continuer mes achats
-          </button>
-          <button (click)="cartService.clearCart()"
-            class="text-xs font-semibold transition-colors text-gray-600 hover:text-red-400">
-            Vider le panier
-          </button>
-        </div>
-        <div class="flex items-center justify-center gap-4 pt-1">
-          <div class="flex items-center gap-1.5 text-[11px]" style="color:#4b5563">
-            <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-            Authentique
-          </div>
-          <div class="w-px h-3"
-               [style.background]="themeService.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'"></div>
-          <div class="flex items-center gap-1.5 text-[11px]" style="color:#4b5563">
-            <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
-            Sécurisé
-          </div>
-          <div class="w-px h-3"
-               [style.background]="themeService.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'"></div>
-          <div class="flex items-center gap-1.5 text-[11px]" style="color:#4b5563">
-            <svg class="w-3.5 h-3.5" style="color:#d4af37" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
-            Livraison 48h
-          </div>
-        </div>
       </div>
-    }
-  </aside>
+
+      <!-- ── COLONNE DROITE : récapitulatif & commande ── -->
+      @if (cartItems.length > 0) {
+        <div class="flex-shrink-0 w-full lg:w-[340px] flex flex-col"
+             [style.background]="themeService.isDark ? '#0a0a0a' : '#f3f0e8'">
+
+          <!-- Titre récap -->
+          <div class="flex-shrink-0 px-6 py-5"
+               [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
+            <h3 class="font-bold text-base"
+                [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Récapitulatif</h3>
+          </div>
+
+          <div class="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
+
+            <!-- Totaux -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between text-sm">
+                <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
+                <span class="font-semibold"
+                      [style.color]="themeService.isDark ? '#d1d5db' : '#374151'">
+                  {{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K XOF
+                </span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <span style="color:#6b7280">Livraison</span>
+                <span class="font-semibold text-green-400">Gratuite</span>
+              </div>
+              <div class="h-px" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.3),transparent)"></div>
+              <div class="flex items-center justify-between">
+                <span class="font-bold"
+                      [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Total</span>
+                <div>
+                  <span class="text-3xl font-black gold-text">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K</span>
+                  <span class="text-sm ml-1" style="color:#6b7280">XOF</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Checkout -->
+            @if (!showCheckout) {
+              <button (click)="openCheckout()"
+                      class="w-full py-4 bg-gold text-black font-black rounded-2xl text-sm
+                             flex items-center justify-center gap-2
+                             hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all duration-200">
+                Commander maintenant
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </button>
+            } @else {
+              <div class="space-y-3">
+                @if (checkoutSuccess) {
+                  <div class="flex flex-col items-center gap-3 py-6 text-center">
+                    <div class="w-14 h-14 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center">
+                      <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                    <p class="text-sm font-bold text-green-400">Commande passée avec succès !</p>
+                    <p class="text-xs" style="color:#6b7280">Redirection vers vos commandes…</p>
+                  </div>
+                } @else {
+                  <p class="text-xs font-bold uppercase tracking-wider" style="color:#6b7280">Adresse de livraison</p>
+                  <textarea
+                    [(ngModel)]="deliveryAddress"
+                    rows="3"
+                    placeholder="Ex: Cocody, Abidjan, Côte d'Ivoire"
+                    class="theme-input w-full px-4 py-3 rounded-xl text-sm resize-none transition-all">
+                  </textarea>
+                  @if (checkoutError) {
+                    <p class="text-xs text-red-400 flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      {{ checkoutError }}
+                    </p>
+                  }
+                  <div class="flex gap-2">
+                    <button (click)="cancelCheckout()"
+                            class="flex-1 py-3 rounded-xl text-sm font-semibold theme-muted luxury-card transition-all hover:text-gold">
+                      Annuler
+                    </button>
+                    <button (click)="placeOrder()"
+                            [disabled]="checkoutLoading || !deliveryAddress.trim()"
+                            class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-black
+                                   flex items-center justify-center gap-1.5
+                                   disabled:opacity-50 disabled:cursor-not-allowed
+                                   hover:shadow-lg hover:shadow-yellow-600/25 transition-all">
+                      @if (checkoutLoading) {
+                        <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                        Envoi…
+                      } @else {
+                        Confirmer
+                      }
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Garanties -->
+            <div class="mt-auto pt-4"
+                 [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
+              <div class="flex flex-col gap-2.5">
+                <div class="flex items-center gap-2.5 text-xs" style="color:#6b7280">
+                  <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                  </svg>
+                  Produits 100% authentiques
+                </div>
+                <div class="flex items-center gap-2.5 text-xs" style="color:#6b7280">
+                  <svg class="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                  Paiement sécurisé via Wave
+                </div>
+                <div class="flex items-center gap-2.5 text-xs" style="color:#6b7280">
+                  <svg class="w-4 h-4 flex-shrink-0" style="color:#d4af37" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                  </svg>
+                  Livraison sous 48h
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
 }

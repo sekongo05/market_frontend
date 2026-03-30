@@ -6,7 +6,6 @@ import { RouterLink, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService } from '../../../core/services/category.service';
-import { UploadService } from '../../../core/services/upload.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ProductMediaService } from '../../../core/services/product-media.service';
 import { OrderService } from '../../../core/services/order.service';
@@ -55,8 +54,14 @@ export class ManagerComponent implements OnInit, OnDestroy {
   productForm!: FormGroup;
 
   // ── Image upload ──────────────────────────────────────────────────────────
+  // Create mode: multi-image (max 4) + video
+  selectedImages: File[] = [];
+  imagePreviews: string[] = [];
+  selectedVideo: File | null = null;
+  videoPreview: string | null = null;
+  // Edit mode: single main image
   imagePreview: string | null = null;
-  uploadingImage = false;
+  selectedImageFile: File | null = null;
   uploadError: string | null = null;
   dragOver = false;
 
@@ -159,7 +164,6 @@ export class ManagerComponent implements OnInit, OnDestroy {
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
-    private uploadService: UploadService,
     private authService: AuthService,
     private productMediaService: ProductMediaService,
     private orderService: OrderService,
@@ -244,7 +248,6 @@ export class ManagerComponent implements OnInit, OnDestroy {
       price:       [product?.price          ?? null, [Validators.required, Validators.min(1)]],
       stock:       [product?.stock          ?? null, [Validators.required, Validators.min(0)]],
       gender:      [product?.gender         ?? 'UNISEX', Validators.required],
-      imageUrl:    [product?.imageUrl       ?? ''],
       categoryId:  [product?.category?.id  ?? null, Validators.required],
     });
   }
@@ -252,7 +255,12 @@ export class ManagerComponent implements OnInit, OnDestroy {
   openCreateDrawer(): void {
     this.editingProduct = null;
     this.drawerError = null;
+    this.selectedImages = [];
+    this.imagePreviews = [];
+    this.selectedVideo = null;
+    this.videoPreview = null;
     this.imagePreview = null;
+    this.selectedImageFile = null;
     this.uploadError = null;
     this.drawerTab = 'info';
     this.productMedia = [];
@@ -264,7 +272,12 @@ export class ManagerComponent implements OnInit, OnDestroy {
   openEditDrawer(product: ProductResponse): void {
     this.editingProduct = product;
     this.drawerError = null;
+    this.selectedImages = [];
+    this.imagePreviews = [];
+    this.selectedVideo = null;
+    this.videoPreview = null;
     this.imagePreview = product.imageUrl || null;
+    this.selectedImageFile = null;
     this.uploadError = null;
     this.drawerTab = 'info';
     this.productMedia = product.media ?? [];
@@ -278,9 +291,13 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.drawerOpen = false;
     this.editingProduct = null;
     this.drawerError = null;
+    this.selectedImages = [];
+    this.imagePreviews = [];
+    this.selectedVideo = null;
+    this.videoPreview = null;
     this.imagePreview = null;
+    this.selectedImageFile = null;
     this.uploadError = null;
-    this.uploadingImage = false;
     this.drawerTab = 'info';
     this.productMedia = [];
     this.cdr.detectChanges();
@@ -290,13 +307,29 @@ export class ManagerComponent implements OnInit, OnDestroy {
     if (this.productForm.invalid) return;
     this.drawerLoading = true;
     this.drawerError = null;
-    const data = { ...this.productForm.value };
-    if (!data.imageUrl) {
-      data.imageUrl = 'https://placehold.co/600x400/1a1400/d4af37?text=' + encodeURIComponent(data.name || 'Produit');
+
+    const v = this.productForm.value;
+    const fd = new FormData();
+    fd.append('name', v.name);
+    if (v.description) fd.append('description', v.description);
+    fd.append('price', v.price.toString());
+    fd.append('stock', v.stock.toString());
+    if (v.gender) fd.append('gender', v.gender);
+    if (v.categoryId) fd.append('categoryId', v.categoryId.toString());
+
+    let req$;
+    if (this.editingProduct) {
+      // Édition : 1 image principale + vidéo optionnelle
+      if (this.selectedImageFile) fd.append('mainImage', this.selectedImageFile);
+      if (this.selectedVideo) fd.append('video', this.selectedVideo);
+      req$ = this.productService.updateProduct(this.editingProduct.id, fd);
+    } else {
+      // Création : jusqu'à 4 images (1ère = principale) + vidéo optionnelle
+      for (const img of this.selectedImages) fd.append('images', img);
+      if (this.selectedVideo) fd.append('video', this.selectedVideo);
+      req$ = this.productService.createProduct(fd);
     }
-    const req$ = this.editingProduct
-      ? this.productService.updateProduct(this.editingProduct.id, data)
-      : this.productService.createProduct(data);
+
     req$.subscribe({
       next: (r) => {
         this.drawerLoading = false;
@@ -304,14 +337,14 @@ export class ManagerComponent implements OnInit, OnDestroy {
           this.toast(this.editingProduct ? 'Produit mis à jour ✓' : 'Produit ajouté ✓');
           this.loadProducts(this.currentPage);
         } else {
-          this._applyLocalSave(data);
+          this._applyLocalSave(v);
         }
         this.closeDrawer();
         this.cdr.detectChanges();
       },
       error: () => {
         this.drawerLoading = false;
-        this._applyLocalSave(data);
+        this._applyLocalSave(v);
         this.closeDrawer();
       },
     });
@@ -353,7 +386,13 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.editingStockId = null;
     if (newStock === product.stock) { this.cdr.detectChanges(); return; }
     this.stockSavingId = product.id;
-    const payload = { name: product.name, description: product.description, price: product.price, stock: newStock, gender: product.gender, imageUrl: product.imageUrl, categoryId: product.category.id };
+    const fd = new FormData();
+    fd.append('name', product.name);
+    if (product.description) fd.append('description', product.description);
+    fd.append('price', product.price.toString());
+    fd.append('stock', newStock.toString());
+    fd.append('gender', product.gender);
+    if (product.category?.id) fd.append('categoryId', product.category.id.toString());
     const applyLocally = () => {
       const idx = this.products.findIndex(p => p.id === product.id);
       if (idx !== -1) { this.products = [...this.products]; this.products[idx] = { ...this.products[idx], stock: newStock }; this._computeStats(); }
@@ -361,7 +400,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
       this.stockSavingId = null;
       this.cdr.detectChanges();
     };
-    this.productService.updateProduct(product.id, payload).subscribe({ next: applyLocally, error: applyLocally });
+    this.productService.updateProduct(product.id, fd).subscribe({ next: applyLocally, error: applyLocally });
   }
 
   cancelEditStock(): void { this.editingStockId = null; this.cdr.detectChanges(); }
@@ -398,12 +437,17 @@ export class ManagerComponent implements OnInit, OnDestroy {
 
   onFileDrop(event: DragEvent): void {
     event.preventDefault(); this.dragOver = false;
-    const file = event.dataTransfer?.files?.[0];
-    if (file) this._uploadFile(file);
+    const files = event.dataTransfer?.files;
+    if (files) Array.from(files).forEach(f => this._uploadFile(f));
   }
   onDragOver(event: DragEvent): void { event.preventDefault(); this.dragOver = true; this.cdr.detectChanges(); }
   onDragLeave(): void { this.dragOver = false; this.cdr.detectChanges(); }
   onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) Array.from(input.files).forEach(f => this._uploadFile(f));
+    input.value = '';
+  }
+  onVideoSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (file) this._uploadFile(file);
@@ -416,31 +460,53 @@ export class ManagerComponent implements OnInit, OnDestroy {
     return ['heic', 'heif'].includes(ext);
   }
 
-  private _uploadFile(file: File): void {
-    if (!this._isImageFile(file)) { this.uploadError = 'Format non supporté — JPEG, PNG, WEBP, GIF, BMP, TIFF, SVG, AVIF, HEIC'; this.cdr.detectChanges(); return; }
-    if (file.size > 10 * 1024 * 1024) { this.uploadError = 'Fichier trop lourd — max 10 Mo'; this.cdr.detectChanges(); return; }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.imagePreview = e.target?.result as string;
-      this.productForm.patchValue({ imageUrl: this.imagePreview });
-      this.uploadingImage = true;
-      this.uploadError = null;
-      this.cdr.detectChanges();
-      this.uploadService.uploadProductImage(file).subscribe({
-        next: (url) => { this.productForm.patchValue({ imageUrl: url }); this.imagePreview = url; this.uploadingImage = false; this.cdr.detectChanges(); },
-        error: () => { this.uploadingImage = false; this.cdr.detectChanges(); },
-      });
-    };
-    reader.readAsDataURL(file);
+  private _isVideoFile(file: File): boolean {
+    return file.type.startsWith('video/');
   }
 
-  clearImage(): void { this.imagePreview = null; this.productForm.patchValue({ imageUrl: '' }); this.uploadError = null; this.cdr.detectChanges(); }
+  private _uploadFile(file: File): void {
+    if (this._isVideoFile(file)) {
+      if (file.size > 50 * 1024 * 1024) { this.uploadError = 'Vidéo trop lourde — max 50 Mo'; this.cdr.detectChanges(); return; }
+      this.selectedVideo = file;
+      this.uploadError = null;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.videoPreview = e.target?.result as string; this.cdr.detectChanges(); };
+      reader.readAsDataURL(file);
+      return;
+    }
+    if (!this._isImageFile(file)) { this.uploadError = 'Format non supporté — JPEG, PNG, WEBP, GIF, BMP, TIFF, SVG, AVIF, HEIC'; this.cdr.detectChanges(); return; }
+    if (file.size > 20 * 1024 * 1024) { this.uploadError = 'Image trop lourde — max 20 Mo'; this.cdr.detectChanges(); return; }
 
-  onImageUrlInput(event: Event): void {
-    const url = (event.target as HTMLInputElement).value.trim();
-    this.imagePreview = url || null;
+    if (this.editingProduct) {
+      // Mode édition : 1 seule image principale
+      this.selectedImageFile = file;
+      this.uploadError = null;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.imagePreview = e.target?.result as string; this.cdr.detectChanges(); };
+      reader.readAsDataURL(file);
+    } else {
+      // Mode création : jusqu'à 4 images
+      if (this.selectedImages.length >= 4) { this.uploadError = 'Maximum 4 images autorisées'; this.cdr.detectChanges(); return; }
+      this.uploadError = null;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.selectedImages = [...this.selectedImages, file];
+        this.imagePreviews = [...this.imagePreviews, e.target?.result as string];
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeImage(index: number): void {
+    this.selectedImages = this.selectedImages.filter((_, i) => i !== index);
+    this.imagePreviews = this.imagePreviews.filter((_, i) => i !== index);
     this.cdr.detectChanges();
   }
+
+  removeVideo(): void { this.selectedVideo = null; this.videoPreview = null; this.cdr.detectChanges(); }
+
+  clearImage(): void { this.imagePreview = null; this.selectedImageFile = null; this.uploadError = null; this.cdr.detectChanges(); }
 
   // ── Catalogue ─────────────────────────────────────────────────────────────
 

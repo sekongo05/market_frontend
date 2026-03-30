@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DashboardService } from '../../../core/services/dashboard.service';
+import { DashboardService, MonthlyRevenueItem, TopProductItem } from '../../../core/services/dashboard.service';
 import { UserService } from '../../../core/services/user.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { UserResponse } from '../../../core/models/user.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { UserRole, PageResponse } from '../../../core/models/common.models';
+import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TooltipDirective],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
@@ -20,6 +21,12 @@ export class AdminDashboardComponent implements OnInit {
   stats: any = null;
   loading = false;
   error: string | null = null;
+
+  // ── Charts ─────────────────────────────────────────────────────────────────
+  monthlyRevenue: MonthlyRevenueItem[] = [];
+  topProducts: TopProductItem[] = [];
+  selectedYear: number = new Date().getFullYear();
+  chartsLoading = false;
 
   // ── Tabs ───────────────────────────────────────────────────────────────────
   activeTab: 'stats' | 'users' | 'categories' = 'stats';
@@ -77,6 +84,41 @@ export class AdminDashboardComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+    this.loadCharts();
+  }
+
+  loadCharts(): void {
+    this.chartsLoading = true;
+    this.dashboardService.getMonthlyRevenue(this.selectedYear).subscribe({
+      next: (r) => { if (r.success) this.monthlyRevenue = r.data; this.cdr.detectChanges(); },
+      error: () => { this.cdr.detectChanges(); },
+    });
+    this.dashboardService.getTopProducts(6).subscribe({
+      next: (r) => {
+        if (r.success) this.topProducts = r.data;
+        this.chartsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.chartsLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  changeYear(delta: number): void {
+    this.selectedYear += delta;
+    this.dashboardService.getMonthlyRevenue(this.selectedYear).subscribe({
+      next: (r) => { if (r.success) this.monthlyRevenue = r.data; this.cdr.detectChanges(); },
+      error: () => { this.cdr.detectChanges(); },
+    });
+  }
+
+  get maxMonthlyRevenue(): number {
+    if (!this.monthlyRevenue.length) return 1;
+    return Math.max(...this.monthlyRevenue.map(m => m.revenue), 1);
+  }
+
+  get maxTopProduct(): number {
+    if (!this.topProducts.length) return 1;
+    return Math.max(...this.topProducts.map(p => p.totalSold), 1);
   }
 
   getStatusColor(status: string): string {

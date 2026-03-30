@@ -11,6 +11,7 @@ import { ProductService } from '../../../core/services/product.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ProductMediaItem, ProductResponse } from '../../../core/models/product.models';
+import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
 export interface GalleryItem {
   url: string;
@@ -62,7 +63,7 @@ const DEFAULT_GALLERY = [
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TooltipDirective],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css'],
 })

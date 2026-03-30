@@ -381,81 +381,90 @@
           </div>
         </div>
 
-        <!-- Image upload -->
+        <!-- Images & Vidéo -->
         <div>
-          <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-2">Image du produit</label>
-
-          <!-- Preview (shown once an image is selected) -->
-          @if (imagePreview) {
-            <div class="relative rounded-2xl overflow-hidden mb-3 aspect-video">
-              <img [src]="imagePreview" alt="Aperçu"
-                   class="w-full h-full object-cover"/>
-              <!-- Overlay with actions -->
-              <div class="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                <label class="flex items-center gap-1.5 px-3 py-2 bg-gold text-black text-xs font-bold rounded-xl cursor-pointer hover:shadow-lg transition-all">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                  </svg>
-                  Changer
-                  <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="onFileSelected($event)"/>
-                </label>
-                <button type="button" (click)="clearImage()"
-                  class="flex items-center gap-1.5 px-3 py-2 bg-red-500/80 text-white text-xs font-bold rounded-xl hover:bg-red-500 transition-all">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                  </svg>
-                  Supprimer
-                </button>
-              </div>
-              <!-- Upload spinner overlay -->
-              @if (uploadingImage) {
-                <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
-                  <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                  </svg>
-                  <span class="text-white text-xs font-semibold">Envoi en cours…</span>
+          <!-- ══ Création : 4 slots images + vidéo ══ -->
+          @if (!editingProduct) {
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-2">
+              Images <span class="text-gold">({{ selectedImages.length }}/4)</span>
+              <span class="normal-case font-normal ml-1">— 1ère = principale</span>
+            </label>
+            <div class="grid grid-cols-4 gap-2 mb-2"
+                 (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onFileDrop($event)">
+              @for (preview of imagePreviews; track $index) {
+                <div class="relative aspect-square rounded-xl overflow-hidden border-2"
+                     [class.border-gold]="$index === 0" [class.border-white\/15]="$index > 0">
+                  <img [src]="preview" class="w-full h-full object-cover"/>
+                  @if ($index === 0) {
+                    <span class="absolute top-1 left-1 px-1.5 py-0.5 bg-gold text-black text-[8px] font-black rounded uppercase">Principale</span>
+                  }
+                  <button type="button" (click)="removeImage($index)"
+                    class="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                    <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
                 </div>
+              }
+              @if (selectedImages.length < 4) {
+                <label class="aspect-square rounded-xl border-2 border-dashed border-white/15 hover:border-gold/50 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all"
+                       [class.border-yellow-500]="dragOver && selectedImages.length === 0">
+                  <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  <span class="text-[9px] theme-muted font-semibold">
+                    {{ selectedImages.length === 0 ? 'Principale' : 'Photo ' + (selectedImages.length + 1) }}
+                  </span>
+                  <input type="file" accept="image/*,.heic,.heif" multiple class="hidden" (change)="onFileSelected($event)"/>
+                </label>
               }
             </div>
+            <p class="text-[10px] theme-muted mb-3">JPEG · PNG · WEBP · AVIF · HEIC · max 20 Mo · compression auto</p>
+            <!-- Vidéo -->
+            @if (videoPreview) {
+              <div class="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 mb-1">
+                <svg class="w-6 h-6 text-gold flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <span class="text-xs theme-text truncate flex-1">{{ selectedVideo?.name }}</span>
+                <button type="button" (click)="removeVideo()" class="w-5 h-5 bg-red-500/80 rounded-full flex items-center justify-center">
+                  <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+            } @else {
+              <label class="flex items-center gap-2 w-full py-2.5 px-3 rounded-xl border border-dashed border-white/15 hover:border-gold/40 cursor-pointer transition-all">
+                <svg class="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+                <span class="text-xs theme-muted">Ajouter une vidéo <span class="text-gold">(optionnel)</span> · MP4 · WEBM · max 50 Mo</span>
+                <input type="file" accept="video/*" class="hidden" (change)="onVideoSelected($event)"/>
+              </label>
+            }
           }
 
-          <!-- Drop zone (shown when no image yet) -->
-          @if (!imagePreview) {
-            <label
-              class="flex flex-col items-center justify-center gap-3 w-full py-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200"
-              [class.border-yellow-500]="dragOver"
-              [class.bg-yellow-500\/5]="dragOver"
-              [class.border-white\/15]="!dragOver"
-              [class.hover\:border-white\/30]="!dragOver"
-              (dragover)="onDragOver($event)"
-              (dragleave)="onDragLeave()"
-              (drop)="onFileDrop($event)">
-
-              @if (uploadingImage) {
-                <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
-                <span class="text-sm theme-muted">Envoi en cours…</span>
-              } @else {
-                <div class="w-12 h-12 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
-                  <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                  </svg>
+          <!-- ══ Édition : image principale unique ══ -->
+          @if (editingProduct) {
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-2">Image principale</label>
+            @if (imagePreview) {
+              <div class="relative rounded-2xl overflow-hidden mb-3 aspect-video">
+                <img [src]="imagePreview" alt="Aperçu" class="w-full h-full object-cover"/>
+                <div class="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                  <label class="flex items-center gap-1.5 px-3 py-2 bg-gold text-black text-xs font-bold rounded-xl cursor-pointer">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Changer
+                    <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="onFileSelected($event)"/>
+                  </label>
+                  <button type="button" (click)="clearImage()" class="flex items-center gap-1.5 px-3 py-2 bg-red-500/80 text-white text-xs font-bold rounded-xl">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Supprimer
+                  </button>
                 </div>
-                <div class="text-center">
-                  <p class="text-sm font-semibold theme-text">Glissez une image ici</p>
-                  <p class="text-xs theme-muted mt-0.5">ou <span class="text-gold underline">parcourez vos fichiers</span></p>
-                  <p class="text-[10px] theme-muted mt-1">JPEG · PNG · WEBP · GIF · BMP · TIFF · SVG · AVIF · HEIC · max 10 Mo</p>
-                </div>
-              }
-              <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="onFileSelected($event)"/>
-            </label>
+              </div>
+            } @else {
+              <label class="flex flex-col items-center justify-center gap-2 w-full py-6 rounded-2xl border-2 border-dashed border-white/15 hover:border-gold/50 cursor-pointer transition-all mb-3">
+                <svg class="w-6 h-6 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <p class="text-xs theme-muted">Changer l'image principale</p>
+                <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="onFileSelected($event)"/>
+              </label>
+            }
           }
 
-          <!-- Upload error -->
           @if (uploadError) {
             <p class="flex items-center gap-1.5 text-xs text-orange-400 mt-2">
               <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -464,9 +473,6 @@
               {{ uploadError }}
             </p>
           }
-
-          <!-- Hidden form control (filled automatically after upload) -->
-          <input formControlName="imageUrl" type="hidden"/>
         </div>
 
         <!-- Category -->

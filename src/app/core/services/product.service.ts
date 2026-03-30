@@ -27,12 +27,12 @@ export class ProductService {
     return this.apiService.get(`/products/slug/${slug}`);
   }
 
-  createProduct(data: CreateProductRequest): Observable<ApiResponse<ProductResponse>> {
-    return this.apiService.post('/products', data);
+  createProduct(formData: FormData): Observable<ApiResponse<ProductResponse>> {
+    return this.apiService.post('/products', formData);
   }
 
-  updateProduct(id: number, data: UpdateProductRequest): Observable<ApiResponse<ProductResponse>> {
-    return this.apiService.put(`/products/${id}`, data);
+  updateProduct(id: number, formData: FormData): Observable<ApiResponse<ProductResponse>> {
+    return this.apiService.put(`/products/${id}`, formData);
   }
 
   deleteProduct(id: number): Observable<ApiResponse<null>> {

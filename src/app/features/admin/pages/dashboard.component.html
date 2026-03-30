@@ -273,6 +273,81 @@
           </div>
         </div>
       }
+      <!-- ── Monthly Revenue Chart ─────────────────────────────────────── -->
+      @if (monthlyRevenue.length > 0) {
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mt-6 animate-fade-in-up delay-500">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Revenus mensuels</h2>
+              <p class="text-xs text-gray-400 mt-0.5">Évolution sur l'année {{ selectedYear }}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button (click)="changeYear(-1)" class="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <span class="text-sm font-bold text-gray-700 w-12 text-center">{{ selectedYear }}</span>
+              <button (click)="changeYear(1)" class="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="flex items-end gap-1 h-48">
+            @for (item of monthlyRevenue; track item.month) {
+              <div class="flex-1 flex flex-col items-center gap-1 group">
+                <span class="text-[10px] text-gray-400 font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {{ (item.revenue / 1000) | number:'1.0-0' }}K
+                </span>
+                <div class="w-full rounded-t-lg transition-all duration-500 min-h-[4px]"
+                     [style.height.%]="(item.revenue / maxMonthlyRevenue) * 100"
+                     [class.bg-gradient-to-t]="item.revenue > 0"
+                     [class.from-indigo-500]="item.revenue > 0"
+                     [class.to-purple-400]="item.revenue > 0"
+                     [class.bg-gray-100]="item.revenue === 0">
+                </div>
+                <span class="text-[10px] text-gray-400 font-medium">{{ item.monthName.slice(0,3) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ── Top Products ──────────────────────────────────────────────── -->
+      @if (topProducts.length > 0) {
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mt-6 animate-fade-in-up delay-500">
+          <div class="mb-5">
+            <h2 class="text-lg font-bold text-gray-900">Top produits vendus</h2>
+            <p class="text-xs text-gray-400 mt-0.5">Classés par quantité totale vendue</p>
+          </div>
+          <div class="space-y-4">
+            @for (product of topProducts; track product.productId; let i = $index) {
+              <div class="flex items-center gap-4">
+                <div class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0"
+                     [class.bg-indigo-600]="i === 0" [class.text-white]="i === 0"
+                     [class.bg-indigo-100]="i === 1" [class.text-indigo-700]="i === 1"
+                     [class.bg-gray-100]="i >= 2" [class.text-gray-600]="i >= 2">
+                  {{ i + 1 }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-sm font-semibold text-gray-800 truncate">{{ product.productName }}</span>
+                    <span class="text-sm font-black text-gray-900 ml-2 shrink-0">{{ product.totalSold }} vendus</span>
+                  </div>
+                  <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-700"
+                         [style.width.%]="(product.totalSold / maxTopProduct) * 100"
+                         [class.bg-gradient-to-r]="true"
+                         [class.from-indigo-500]="i === 0" [class.to-purple-500]="i === 0"
+                         [class.from-indigo-400]="i === 1" [class.to-indigo-300]="i === 1"
+                         [class.from-gray-400]="i >= 2" [class.to-gray-300]="i >= 2">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
     }
 
   } <!-- /activeTab === 'stats' -->

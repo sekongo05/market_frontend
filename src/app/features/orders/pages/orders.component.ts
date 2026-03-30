@@ -4,11 +4,12 @@ import { RouterLink, Router } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { OrderResponse } from '../../../core/models/order.models';
 import { PageResponse } from '../../../core/models/common.models';
+import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TooltipDirective],
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css'],
 })

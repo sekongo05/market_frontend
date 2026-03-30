@@ -8,15 +8,15 @@ import { ProductService } from '../../../core/services/product.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
-import { UploadService } from '../../../core/services/upload.service';
 import { ProductResponse, GetProductsParams } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
+import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule, TooltipDirective],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })
@@ -68,9 +68,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
   // Tracks product ids that were just added (for button feedback)
   addedIds = new Set<number>();
 
-  // Image upload state
+  // Image upload state — création : multi-images ; édition : image unique
+  selectedImages: File[] = [];
+  imagePreviews: string[] = [];
+  selectedVideo: File | null = null;
+  videoPreview: string | null = null;
   imagePreview: string | null = null;
-  uploadingImage = false;
+  selectedImageFile: File | null = null;
   uploadError: string | null = null;
   dragOver = false;
 
@@ -79,7 +83,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private categoryService: CategoryService,
     private authService: AuthService,
     private cartService: CartService,
-    private uploadService: UploadService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
   ) {}
@@ -130,7 +133,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       description: [product?.description ?? '', Validators.required],
       price:       [product?.price       ?? null, [Validators.required, Validators.min(1)]],
       stock:       [product?.stock       ?? null, [Validators.required, Validators.min(0)]],
-      imageUrl:    [product?.imageUrl    ?? '', Validators.required],
       categoryId:  [product?.category?.id ?? null, Validators.required],
     });
   }
@@ -139,7 +141,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.editingProduct = null;
     this.modalError = null;
     this.modalSuccess = null;
+    this.selectedImages = [];
+    this.imagePreviews = [];
+    this.selectedVideo = null;
+    this.videoPreview = null;
     this.imagePreview = null;
+    this.selectedImageFile = null;
     this.uploadError = null;
     this.initForm();
     this.showModal = true;
@@ -150,7 +157,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.editingProduct = product;
     this.modalError = null;
     this.modalSuccess = null;
+    this.selectedImages = [];
+    this.imagePreviews = [];
+    this.selectedVideo = null;
+    this.videoPreview = null;
     this.imagePreview = product.imageUrl || null;
+    this.selectedImageFile = null;
     this.uploadError = null;
     this.initForm(product);
     this.showModal = true;
@@ -162,9 +174,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.editingProduct = null;
     this.modalError = null;
     this.modalSuccess = null;
+    this.selectedImages = [];
+    this.imagePreviews = [];
+    this.selectedVideo = null;
+    this.videoPreview = null;
     this.imagePreview = null;
+    this.selectedImageFile = null;
     this.uploadError = null;
-    this.uploadingImage = false;
     this.cdr.detectChanges();
   }
 
@@ -173,8 +189,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
   onFileDrop(event: DragEvent): void {
     event.preventDefault();
     this.dragOver = false;
-    const file = event.dataTransfer?.files?.[0];
-    if (file) this._uploadFile(file);
+    const files = event.dataTransfer?.files;
+    if (files) Array.from(files).forEach(f => this._uploadFile(f));
   }
 
   onDragOver(event: DragEvent): void {
@@ -190,6 +206,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
+    if (input.files) Array.from(input.files).forEach(f => this._uploadFile(f));
+    input.value = '';
+  }
+
+  onVideoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (file) this._uploadFile(file);
     input.value = '';
@@ -201,54 +223,61 @@ export class ProductsComponent implements OnInit, OnDestroy {
     return ['heic', 'heif'].includes(ext);
   }
 
+  private _isVideoFile(file: File): boolean {
+    return file.type.startsWith('video/');
+  }
+
   private _uploadFile(file: File): void {
+    if (this._isVideoFile(file)) {
+      if (file.size > 50 * 1024 * 1024) { this.uploadError = 'Vidéo trop lourde — max 50 Mo'; this.cdr.detectChanges(); return; }
+      this.selectedVideo = file;
+      this.uploadError = null;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.videoPreview = e.target?.result as string; this.cdr.detectChanges(); };
+      reader.readAsDataURL(file);
+      return;
+    }
     if (!this._isImageFile(file)) {
       this.uploadError = 'Format non supporté — JPEG, PNG, WEBP, GIF, BMP, TIFF, SVG, AVIF, HEIC';
       this.cdr.detectChanges();
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      this.uploadError = 'Fichier trop lourd — maximum 10 Mo';
+    if (file.size > 20 * 1024 * 1024) {
+      this.uploadError = 'Image trop lourde — maximum 20 Mo';
       this.cdr.detectChanges();
       return;
     }
 
-    // Immediate local preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.imagePreview = e.target?.result as string;
-      this.cdr.detectChanges();
-    };
-    reader.readAsDataURL(file);
-
-    // Upload to server
-    this.uploadingImage = true;
-    this.uploadError = null;
-    this.cdr.detectChanges();
-
-    this.uploadService.uploadProductImage(file).subscribe({
-      next: (url) => {
-        this.productForm.patchValue({ imageUrl: url });
-        this.imagePreview = url;
-        this.uploadingImage = false;
+    if (this.editingProduct) {
+      this.selectedImageFile = file;
+      this.uploadError = null;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.imagePreview = e.target?.result as string; this.cdr.detectChanges(); };
+      reader.readAsDataURL(file);
+    } else {
+      if (this.selectedImages.length >= 4) { this.uploadError = 'Maximum 4 images autorisées'; this.cdr.detectChanges(); return; }
+      this.uploadError = null;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.selectedImages = [...this.selectedImages, file];
+        this.imagePreviews = [...this.imagePreviews, e.target?.result as string];
         this.cdr.detectChanges();
-      },
-      error: () => {
-        // Keep local preview; warn but allow saving with preview URL
-        this.uploadError = 'Serveur indisponible — l\'image sera utilisée localement';
-        this.uploadingImage = false;
-        // Still set the local data-url so the form is valid
-        if (this.imagePreview) {
-          this.productForm.patchValue({ imageUrl: this.imagePreview });
-        }
-        this.cdr.detectChanges();
-      },
-    });
+      };
+      reader.readAsDataURL(file);
+    }
   }
+
+  removeImage(index: number): void {
+    this.selectedImages = this.selectedImages.filter((_, i) => i !== index);
+    this.imagePreviews = this.imagePreviews.filter((_, i) => i !== index);
+    this.cdr.detectChanges();
+  }
+
+  removeVideo(): void { this.selectedVideo = null; this.videoPreview = null; this.cdr.detectChanges(); }
 
   clearImage(): void {
     this.imagePreview = null;
-    this.productForm.patchValue({ imageUrl: '' });
+    this.selectedImageFile = null;
     this.uploadError = null;
     this.cdr.detectChanges();
   }
@@ -258,11 +287,24 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.modalLoading = true;
     this.modalError = null;
 
-    const data = this.productForm.value;
+    const v = this.productForm.value;
+    const fd = new FormData();
+    fd.append('name', v.name);
+    if (v.description) fd.append('description', v.description);
+    fd.append('price', v.price.toString());
+    fd.append('stock', v.stock.toString());
+    if (v.categoryId) fd.append('categoryId', v.categoryId.toString());
 
-    const request$ = this.editingProduct
-      ? this.productService.updateProduct(this.editingProduct.id, data)
-      : this.productService.createProduct(data);
+    let request$;
+    if (this.editingProduct) {
+      if (this.selectedImageFile) fd.append('mainImage', this.selectedImageFile);
+      if (this.selectedVideo) fd.append('video', this.selectedVideo);
+      request$ = this.productService.updateProduct(this.editingProduct.id, fd);
+    } else {
+      for (const img of this.selectedImages) fd.append('images', img);
+      if (this.selectedVideo) fd.append('video', this.selectedVideo);
+      request$ = this.productService.createProduct(fd);
+    }
 
     request$.subscribe({
       next: (response) => {
