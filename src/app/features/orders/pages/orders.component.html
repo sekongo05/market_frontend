@@ -148,7 +148,7 @@
                 <p class="text-[10px] theme-muted uppercase tracking-wider font-semibold mb-0.5">Total</p>
                 <p class="text-xl font-black text-gold">
                   {{ (order.totalAmount / 1000) | number:'1.0-0' }}<span class="text-sm font-bold">K</span>
-                  <span class="text-xs theme-muted font-semibold ml-1">XOF</span>
+                  <span class="text-xs theme-muted font-semibold ml-1">FCFA</span>
                 </p>
               </div>
 
@@ -182,7 +182,7 @@
                         <span class="text-xs theme-muted flex-shrink-0">× {{ item.quantity }}</span>
                       </div>
                       <span class="font-black text-gold flex-shrink-0 ml-4">
-                        {{ (item.subtotal / 1000) | number:'1.0-0' }}K XOF
+                        {{ (item.subtotal / 1000) | number:'1.0-0' }}K FCFA
                       </span>
                     </div>
                   }
@@ -190,7 +190,7 @@
                   <div class="flex justify-between items-center px-4 py-2.5 border-t theme-border"
                        style="background:rgba(212,175,55,0.06)">
                     <span class="text-xs font-bold theme-muted uppercase tracking-wider">Total</span>
-                    <span class="font-black text-gold">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K XOF</span>
+                    <span class="font-black text-gold">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K FCFA</span>
                   </div>
                 </div>
               </div>
@@ -317,6 +317,7 @@
       @if (totalPages > 1) {
         <div class="flex justify-center items-center gap-2 pt-2">
           <button (click)="previousPage()" [disabled]="currentPage === 0"
+            appTooltip="Page précédente" tooltipPosition="top"
             class="flex items-center gap-2 px-4 py-2 luxury-card rounded-xl text-sm font-semibold theme-muted
                    hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,6 +327,7 @@
           </button>
           <span class="px-4 py-2 text-sm font-bold theme-muted">{{ currentPage + 1 }} / {{ totalPages }}</span>
           <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1"
+            appTooltip="Page suivante" tooltipPosition="top"
             class="flex items-center gap-2 px-4 py-2 luxury-card rounded-xl text-sm font-semibold theme-muted
                    hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
             Suivant

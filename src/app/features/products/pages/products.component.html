@@ -36,6 +36,7 @@
             <!-- Bouton effacer -->
             @if (searchQuery && !loading) {
               <button (click)="clearSearch()"
+                appTooltip="Effacer la recherche" tooltipPosition="bottom"
                 class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center
                        rounded-full bg-white/10 hover:bg-white/20 theme-muted hover:text-gold transition-all duration-150">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,7 +149,7 @@
               @for (product of group.items; track product.id; let i = $index) {
                 <div class="group luxury-card rounded-3xl overflow-hidden animate-fade-in-up"
                      [style.animation-delay]="(i % 8 * 0.07) + 's'">
-                  <a [routerLink]="['/products', product.id]" class="block relative overflow-hidden h-52">
+                  <div (click)="openProductView(product)" class="cursor-pointer block relative overflow-hidden h-52">
                     <img [src]="product.imageUrl || 'https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'" [alt]="product.name"
                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                          (error)="$any($event.target).src='https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'"/>
@@ -158,28 +159,36 @@
                     } @else {
                       <span class="absolute top-3 left-3 bg-red-900/80 text-red-300 text-xs font-bold px-2.5 py-1 rounded-full">Épuisé</span>
                     }
+                    @if (isNew(product)) {
+                      <span class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-violet-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-violet-900/40">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                        NOUVEAU
+                      </span>
+                    }
                     @if (isManager) {
                       <div class="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <button (click)="$event.preventDefault(); $event.stopPropagation(); openEditModal(product)" title="Modifier"
+                        <button (click)="$event.stopPropagation(); openEditModal(product)"
+                          appTooltip="Modifier ce produit" tooltipPosition="bottom"
                           class="w-8 h-8 bg-black/70 border border-yellow-600/40 text-yellow-400 rounded-lg flex items-center justify-center hover:bg-yellow-600/20 transition-colors">
                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         </button>
-                        <button (click)="$event.preventDefault(); $event.stopPropagation(); deleteProduct(product)" title="Supprimer"
+                        <button (click)="$event.stopPropagation(); deleteProduct(product)"
+                          appTooltip="Supprimer ce produit" tooltipPosition="bottom"
                           class="w-8 h-8 bg-black/70 border border-red-500/40 text-red-400 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors">
                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         </button>
                       </div>
                     }
-                  </a>
-                  <a [routerLink]="['/products', product.id]" class="block p-4 pb-0">
+                  </div>
+                  <div (click)="openProductView(product)" class="cursor-pointer block p-4 pb-0">
                     <p class="text-xs text-gold font-semibold uppercase tracking-wider mb-1">{{ product.category.name }}</p>
                     <h3 class="font-bold theme-text text-sm leading-tight truncate mb-1">{{ product.name }}</h3>
                     <p class="text-xs theme-muted line-clamp-2 mb-3">{{ product.description }}</p>
-                  </a>
+                  </div>
                   <div class="px-4 pb-4 flex items-center justify-between">
                     <div>
                       <span class="text-xl font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
-                      <span class="text-xs theme-muted ml-1">XOF</span>
+                      <span class="text-xs theme-muted ml-1">FCFA</span>
                     </div>
                     @if (!isManager) {
                       <button (click)="addToCart(product)" [disabled]="product.stock === 0"
@@ -209,7 +218,7 @@
         @for (product of products; track product.id; let i = $index) {
           <div class="group luxury-card rounded-3xl overflow-hidden animate-fade-in-up"
                [style.animation-delay]="(i % 8 * 0.07) + 's'">
-            <a [routerLink]="['/products', product.id]" class="block relative overflow-hidden h-52">
+            <div (click)="openProductView(product)" class="cursor-pointer block relative overflow-hidden h-52">
               <img [src]="product.imageUrl || 'https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'" [alt]="product.name"
                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                    (error)="$any($event.target).src='https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'"/>
@@ -219,28 +228,36 @@
               } @else {
                 <span class="absolute top-3 left-3 bg-red-900/80 text-red-300 text-xs font-bold px-2.5 py-1 rounded-full">Épuisé</span>
               }
+              @if (isNew(product)) {
+                <span class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-violet-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-violet-900/40">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                  NOUVEAU
+                </span>
+              }
               @if (isManager) {
                 <div class="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <button (click)="$event.preventDefault(); $event.stopPropagation(); openEditModal(product)" title="Modifier"
+                  <button (click)="$event.stopPropagation(); openEditModal(product)"
+                    appTooltip="Modifier ce produit" tooltipPosition="bottom"
                     class="w-8 h-8 bg-black/70 border border-yellow-600/40 text-yellow-400 rounded-lg flex items-center justify-center hover:bg-yellow-600/20 transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                   </button>
-                  <button (click)="$event.preventDefault(); $event.stopPropagation(); deleteProduct(product)" title="Supprimer"
+                  <button (click)="$event.stopPropagation(); deleteProduct(product)"
+                    appTooltip="Supprimer ce produit" tooltipPosition="bottom"
                     class="w-8 h-8 bg-black/70 border border-red-500/40 text-red-400 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                   </button>
                 </div>
               }
-            </a>
-            <a [routerLink]="['/products', product.id]" class="block p-4 pb-0">
+            </div>
+            <div (click)="openProductView(product)" class="cursor-pointer block p-4 pb-0">
               <p class="text-xs text-gold font-semibold uppercase tracking-wider mb-1">{{ product.category.name }}</p>
               <h3 class="font-bold theme-text text-sm leading-tight truncate mb-1">{{ product.name }}</h3>
               <p class="text-xs theme-muted line-clamp-2 mb-3">{{ product.description }}</p>
-            </a>
+            </div>
             <div class="px-4 pb-4 flex items-center justify-between">
               <div>
                 <span class="text-xl font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
-                <span class="text-xs theme-muted ml-1">XOF</span>
+                <span class="text-xs theme-muted ml-1">FCFA</span>
               </div>
               @if (!isManager) {
                 <button (click)="addToCart(product)" [disabled]="product.stock === 0"
@@ -311,6 +328,205 @@
   </div>
 </div>
 
+<!-- ===== PANNEAU PLEINE PAGE — DÉTAIL PRODUIT ===== -->
+@if (selectedProduct) {
+  <div class="fixed left-0 right-0 bottom-0 z-40 overflow-y-auto theme-bg animate-fade-in"
+       style="top: 70px">
+
+    <!-- Barre de navigation interne -->
+    <div class="sticky top-0 z-10 theme-surface border-b theme-border backdrop-blur-xl">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+        <button (click)="closeProductView()"
+          class="flex items-center gap-2 text-sm font-semibold theme-muted hover:text-gold transition-colors duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Retour à la collection
+        </button>
+        <span class="text-xs text-gold font-semibold uppercase tracking-widest hidden sm:block">
+          {{ selectedProduct.category.name }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Contenu produit -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+
+        <!-- Galerie images -->
+        <div>
+          <!-- Visionneuse principale -->
+          <div class="relative rounded-3xl overflow-hidden aspect-square max-h-[520px] mb-4">
+
+            <!-- Flèche gauche -->
+            @if (viewGallery.length > 1) {
+              <button (click)="prevViewImage()"
+                class="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white flex items-center justify-center hover:bg-black/70 transition-all duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <button (click)="nextViewImage()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white flex items-center justify-center hover:bg-black/70 transition-all duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            }
+
+            <!-- Image active -->
+            @if (viewActiveItem.type === 'IMAGE') {
+              <img [src]="viewActiveItem.url || 'https://placehold.co/600x600/1a1a1a/d4af37?text=Luxe'"
+                   [alt]="selectedProduct.name"
+                   class="w-full h-full object-cover transition-all duration-500"
+                   (error)="$any($event.target).src='https://placehold.co/600x600/1a1a1a/d4af37?text=Luxe'"/>
+            }
+            @if (viewActiveItem.type === 'VIDEO') {
+              <div class="w-full h-full flex items-center justify-center bg-black">
+                <video [src]="viewActiveItem.url" controls playsinline preload="metadata"
+                       class="w-full h-full object-contain max-h-full">
+                </video>
+              </div>
+            }
+
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
+
+            <!-- Badges -->
+            @if (selectedProduct.stock > 0) {
+              <span class="absolute top-4 left-4 bg-gold text-black text-xs font-bold px-3 py-1.5 rounded-full shadow">En stock</span>
+            } @else {
+              <span class="absolute top-4 left-4 bg-red-900/80 text-red-300 text-xs font-bold px-3 py-1.5 rounded-full">Épuisé</span>
+            }
+            @if (isNew(selectedProduct)) {
+              <span class="absolute top-4 right-4 flex items-center gap-1.5 bg-violet-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg shadow-violet-900/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                NOUVEAU
+              </span>
+            }
+
+            <!-- Compteur -->
+            @if (viewGallery.length > 1) {
+              <div class="absolute bottom-4 right-4 px-2.5 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-white text-xs font-semibold">
+                {{ viewGalleryIndex + 1 }} / {{ viewGallery.length }}
+              </div>
+            }
+          </div>
+
+          <!-- Miniatures -->
+          @if (viewGallery.length > 1) {
+            <div class="grid grid-cols-4 gap-3">
+              @for (item of viewGallery; track item.url; let i = $index) {
+                <button (click)="setViewImage(i)"
+                  class="relative aspect-square rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105"
+                  [style.border-color]="viewGalleryIndex === i ? '#d4af37' : 'transparent'">
+                  @if (item.type === 'IMAGE') {
+                    <img [src]="item.url" [alt]="'Photo ' + (i+1)"
+                         class="w-full h-full object-cover"
+                         (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
+                  }
+                  @if (item.type === 'VIDEO') {
+                    <div class="w-full h-full flex items-center justify-center bg-zinc-900">
+                      <svg class="w-7 h-7 text-gold" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  }
+                  @if (viewGalleryIndex === i) {
+                    <div class="absolute inset-0 ring-2 ring-gold rounded-2xl pointer-events-none"></div>
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Infos -->
+        <div class="flex flex-col gap-6">
+
+          <!-- En-tête -->
+          <div>
+            <p class="text-xs text-gold font-semibold uppercase tracking-widest mb-2">{{ selectedProduct.category.name }}</p>
+            <h1 class="text-3xl lg:text-4xl font-black theme-text leading-tight mb-3">{{ selectedProduct.name }}</h1>
+            <p class="text-sm theme-muted leading-relaxed">{{ selectedProduct.description }}</p>
+          </div>
+
+          <!-- Prix -->
+          <div class="flex items-baseline gap-2">
+            <span class="text-4xl font-black text-gold">{{ (selectedProduct.price / 1000) | number:'1.0-0' }}K</span>
+            <span class="text-base theme-muted">FCFA · TTC</span>
+          </div>
+
+          <!-- Stock -->
+          <div class="flex items-center gap-2">
+            @if (selectedProduct.stock > 0) {
+              <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+              <span class="text-sm text-green-400 font-medium">{{ selectedProduct.stock }} unités disponibles</span>
+            } @else {
+              <div class="w-2 h-2 rounded-full bg-red-400"></div>
+              <span class="text-sm text-red-400 font-medium">Rupture de stock</span>
+            }
+          </div>
+
+          <!-- Actions client -->
+          @if (!isManager) {
+            <div class="flex items-center gap-4">
+              <!-- Quantité -->
+              <div class="flex items-center border theme-border rounded-xl overflow-hidden">
+                <button (click)="selectedProductQty = selectedProductQty > 1 ? selectedProductQty - 1 : 1"
+                  appTooltip="Diminuer la quantité" tooltipPosition="top"
+                  class="w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-gold/5 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                </button>
+                <span class="w-10 text-center font-bold theme-text text-sm">{{ selectedProductQty }}</span>
+                <button (click)="selectedProductQty = selectedProductQty < selectedProduct.stock ? selectedProductQty + 1 : selectedProductQty"
+                  appTooltip="Augmenter la quantité" tooltipPosition="top"
+                  class="w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-gold/5 transition-colors"
+                  [disabled]="selectedProductQty >= selectedProduct.stock">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </button>
+              </div>
+              <!-- Ajouter au panier -->
+              <button (click)="addToCartFromView()" [disabled]="selectedProduct.stock === 0"
+                class="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                [class]="addedIds.has(selectedProduct.id) ? 'bg-green-500 text-white scale-95' : 'bg-gold text-black hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5'">
+                @if (addedIds.has(selectedProduct.id)) {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                  Ajouté au panier !
+                } @else {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                  Ajouter au panier
+                }
+              </button>
+            </div>
+          }
+
+          <!-- Actions manager -->
+          @if (isManager) {
+            <div class="flex gap-3">
+              <button (click)="openEditModal(selectedProduct)"
+                class="flex items-center gap-2 px-5 py-3 rounded-xl border border-yellow-600/40 text-yellow-400 hover:bg-yellow-600/10 font-semibold text-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Modifier
+              </button>
+              <button (click)="deleteProduct(selectedProduct); closeProductView()"
+                class="flex items-center gap-2 px-5 py-3 rounded-xl border border-red-500/40 text-red-400 hover:bg-red-500/10 font-semibold text-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Supprimer
+              </button>
+            </div>
+          }
+
+          <!-- Séparateur -->
+          <div class="border-t theme-border pt-4 space-y-2 text-sm theme-muted">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              Authenticité garantie
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+              Livraison premium disponible
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
 <!-- ===== MODAL AJOUT / MODIFICATION ===== -->
 @if (showModal) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
@@ -370,7 +586,7 @@
         <!-- Price + Stock -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Prix (XOF)</label>
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Prix (FCFA)</label>
             <input formControlName="price" type="number" min="0" placeholder="8500000"
               class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
           </div>

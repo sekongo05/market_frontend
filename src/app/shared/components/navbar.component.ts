@@ -28,6 +28,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   mobileOpen         = false;
   scrolled           = false;
   cartItems: CartItem[] = [];
+  pendingPaymentCount = 0;
   notifications: NotificationResponse[] = [];
   notificationsLoading = false;
   selectedNotification: NotificationResponse | null = null;
@@ -86,6 +87,23 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.cartService.cart$
       .pipe(takeUntil(this.destroy$))
       .subscribe(items => { this.cartItems = items; this.cdr.detectChanges(); });
+
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        if (user && user.role === 'CUSTOMER') {
+          this.orderService.refreshPendingCount();
+        } else {
+          this.orderService.clearPendingCount();
+        }
+      });
+
+    this.orderService.pendingPaymentCount$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(count => {
+        this.pendingPaymentCount = count;
+        this.cdr.detectChanges();
+      });
 
     if (this.currentUser) this.loadUnreadCount();
   }
@@ -208,6 +226,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
+    this.orderService.clearPendingCount();
     this.authService.logout();
     this.closeAll();
   }

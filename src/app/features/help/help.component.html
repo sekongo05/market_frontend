@@ -1,0 +1,117 @@
+<div class="min-h-screen theme-bg">
+
+  <!-- ── Header ─────────────────────────────────────────────────────── -->
+  <div class="theme-surface border-b theme-border">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+      <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-3">Support</p>
+      <h1 class="text-4xl font-black theme-text mb-4">Centre d'aide</h1>
+      <p class="theme-muted text-base max-w-xl mx-auto leading-relaxed">
+        Trouvez rapidement les réponses à vos questions. Notre équipe est également disponible pour vous accompagner.
+      </p>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+
+    <!-- ── Cartes de contact rapide ───────────────────────────────── -->
+    <div class="grid sm:grid-cols-3 gap-4 mb-14">
+
+      <div class="luxury-card rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center">
+          <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-bold theme-text text-sm">Téléphone</p>
+          <p class="text-gold font-semibold text-sm mt-1">+225 07 00 00 00 00</p>
+          <p class="theme-muted text-xs mt-0.5">Lun – Sam · 8h – 20h</p>
+        </div>
+      </div>
+
+      <div class="luxury-card rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center">
+          <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-bold theme-text text-sm">Email</p>
+          <p class="text-gold font-semibold text-sm mt-1">support&#64;chronolux.ci</p>
+          <p class="theme-muted text-xs mt-0.5">Réponse sous 24h</p>
+        </div>
+      </div>
+
+      <div class="luxury-card rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center">
+          <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-bold theme-text text-sm">Showroom</p>
+          <p class="text-gold font-semibold text-sm mt-1">Cocody, Abidjan</p>
+          <p class="theme-muted text-xs mt-0.5">Lun – Sam · 9h – 18h</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FAQ ────────────────────────────────────────────────────── -->
+    <div class="mb-4">
+      <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-2">FAQ</p>
+      <h2 class="text-2xl font-black theme-text">Questions fréquentes</h2>
+    </div>
+
+    <div class="space-y-3">
+      @for (faq of faqs; track faq.q; let i = $index) {
+        <div class="luxury-card rounded-2xl overflow-hidden">
+          <button (click)="toggle(i)"
+            class="w-full flex items-center justify-between px-6 py-5 text-left gap-4 hover:bg-gold/5 transition-colors duration-200">
+            <span class="font-bold theme-text text-sm">{{ faq.q }}</span>
+            <svg class="w-5 h-5 text-gold flex-shrink-0 transition-transform duration-300"
+              [class.rotate-45]="openFaq === i"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+          </button>
+          @if (openFaq === i) {
+            <div class="px-6 pb-5 theme-muted text-sm leading-relaxed border-t theme-border pt-4">
+              {{ faq.a }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- ── Bloc CTA ────────────────────────────────────────────────── -->
+    <div class="mt-14 luxury-card rounded-3xl p-8 text-center">
+      <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-3">Pas encore de réponse ?</p>
+      <h3 class="text-xl font-black theme-text mb-3">Notre équipe est là pour vous</h3>
+      <p class="theme-muted text-sm mb-6 max-w-md mx-auto">
+        Envoyez-nous un message directement ou appelez-nous. Nous répondons toujours dans les meilleurs délais.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="mailto:support@chronolux.ci"
+          class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold text-black font-bold rounded-xl text-sm hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all duration-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          Nous écrire
+        </a>
+        <a routerLink="/products"
+          class="inline-flex items-center justify-center gap-2 px-6 py-3 border theme-border theme-muted font-bold rounded-xl text-sm hover:text-gold hover:border-gold/40 transition-all duration-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Retour à la boutique
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>

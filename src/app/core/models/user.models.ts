@@ -21,3 +21,12 @@ export interface ChangePasswordRequest {
   oldPassword: string;
   newPassword: string;
 }
+
+export interface AdminCreateUserRequest {
+  nom: string;
+  prenom: string;
+  email: string;
+  password: string;
+  phone: string;
+  role: UserRole;
+}

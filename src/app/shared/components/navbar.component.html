@@ -66,7 +66,14 @@
           @if (currentUser && !isManager) {
             <a routerLink="/orders" routerLinkActive="nav-active"
                (click)="closeAll()" class="nav-item">
-              <span>Mes commandes</span>
+              <span class="relative">
+  Mes commandes
+  @if (pendingPaymentCount > 0) {
+    <span class="absolute -top-2 -right-3 min-w-[16px] h-4 px-1 rounded-full bg-gold text-black text-[10px] font-black flex items-center justify-center leading-none">
+      {{ pendingPaymentCount }}
+    </span>
+  }
+</span>
             </a>
           }
 
@@ -357,8 +364,15 @@
                           </svg>
                         </div>
                         <div>
-                          <p class="text-sm font-semibold"
-                             [style.color]="themeService.isDark ? '#e5e7eb' : '#111111'">Mes commandes</p>
+                          <p class="text-sm font-semibold flex items-center gap-2"
+                             [style.color]="themeService.isDark ? '#e5e7eb' : '#111111'">
+  Mes commandes
+  @if (pendingPaymentCount > 0) {
+    <span class="min-w-[18px] h-[18px] px-1 rounded-full bg-gold text-black text-[10px] font-black flex items-center justify-center leading-none">
+      {{ pendingPaymentCount }}
+    </span>
+  }
+</p>
                           <p class="text-[11px]" style="color:#6b7280">Historique & suivi</p>
                         </div>
                       </a>
@@ -609,6 +623,11 @@
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
               </svg>
               Mes commandes
+              @if (pendingPaymentCount > 0) {
+                <span class="ml-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-gold text-black text-[10px] font-black inline-flex items-center justify-center leading-none">
+                  {{ pendingPaymentCount }}
+                </span>
+              }
             </a>
           }
 
@@ -797,7 +816,7 @@
                   <p class="font-bold text-base leading-snug mb-1 pr-8"
                      [style.color]="themeService.isDark ? '#f0f0f0' : '#111111'">{{ item.productName }}</p>
                   <p class="text-sm font-semibold mb-4" style="color:#d4af37">
-                    {{ (item.price / 1000) | number:'1.0-0' }}&thinsp;000 XOF / unité
+                    {{ (item.price / 1000) | number:'1.0-0' }}&thinsp;000 FCFA / unité
                   </p>
                   <div class="flex items-center justify-between">
                     <!-- Quantité -->
@@ -818,7 +837,7 @@
                     </div>
                     <!-- Sous-total ligne -->
                     <p class="text-base font-black" style="color:#d4af37">
-                      {{ ((item.price * item.quantity) / 1000) | number:'1.0-0' }}&thinsp;K XOF
+                      {{ ((item.price * item.quantity) / 1000) | number:'1.0-0' }}&thinsp;K FCFA
                     </p>
                   </div>
                 </div>
@@ -872,7 +891,7 @@
                 <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
                 <span class="font-semibold"
                       [style.color]="themeService.isDark ? '#d1d5db' : '#374151'">
-                  {{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K XOF
+                  {{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K FCFA
                 </span>
               </div>
               <div class="flex items-center justify-between text-sm">
@@ -885,7 +904,7 @@
                       [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Total</span>
                 <div>
                   <span class="text-3xl font-black gold-text">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K</span>
-                  <span class="text-sm ml-1" style="color:#6b7280">XOF</span>
+                  <span class="text-sm ml-1" style="color:#6b7280">FCFA</span>
                 </div>
               </div>
             </div>

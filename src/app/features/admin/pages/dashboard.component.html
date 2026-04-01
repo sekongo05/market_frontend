@@ -1,45 +1,38 @@
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen theme-bg">
 
-  <!-- Header -->
-  <div class="bg-white border-b border-gray-100">
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="theme-surface border-b theme-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 animate-fade-in-down">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <p class="text-indigo-600 font-semibold text-sm uppercase tracking-widest mb-1">Administration</p>
-          <h1 class="text-3xl font-black text-gray-900">Tableau de bord</h1>
+          <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-1">Administration</p>
+          <h1 class="text-3xl font-black theme-text">Tableau de bord</h1>
         </div>
-        <button (click)="loadStats()" class="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 text-indigo-600 font-semibold text-sm rounded-xl hover:bg-indigo-100 transition-colors duration-200">
+        <button (click)="loadStats()"
+          class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors duration-200">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           Actualiser
         </button>
       </div>
+
       <!-- Tabs -->
       <div class="flex gap-1">
-        <button (click)="setTab('stats')"
-          class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2"
-          [class.border-indigo-600]="activeTab === 'stats'"
-          [class.text-indigo-600]="activeTab === 'stats'"
-          [class.bg-indigo-50]="activeTab === 'stats'"
-          [class.border-transparent]="activeTab !== 'stats'"
-          [class.text-gray-500]="activeTab !== 'stats'">
+        <button (click)="setTab('stats')" class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2"
+          [ngClass]="activeTab === 'stats'
+            ? 'border-[#d4af37] text-gold bg-gold/8'
+            : 'border-transparent theme-muted hover:text-gold'">
           Statistiques
         </button>
-        <button (click)="setTab('users')"
-          class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2"
-          [class.border-indigo-600]="activeTab === 'users'"
-          [class.text-indigo-600]="activeTab === 'users'"
-          [class.bg-indigo-50]="activeTab === 'users'"
-          [class.border-transparent]="activeTab !== 'users'"
-          [class.text-gray-500]="activeTab !== 'users'">
+        <button (click)="setTab('users')" class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2"
+          [ngClass]="activeTab === 'users'
+            ? 'border-[#d4af37] text-gold bg-gold/8'
+            : 'border-transparent theme-muted hover:text-gold'">
           Utilisateurs
         </button>
-        <button (click)="setTab('categories')"
-          class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2"
-          [class.border-indigo-600]="activeTab === 'categories'"
-          [class.text-indigo-600]="activeTab === 'categories'"
-          [class.bg-indigo-50]="activeTab === 'categories'"
-          [class.border-transparent]="activeTab !== 'categories'"
-          [class.text-gray-500]="activeTab !== 'categories'">
+        <button (click)="setTab('categories')" class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2"
+          [ngClass]="activeTab === 'categories'
+            ? 'border-[#d4af37] text-gold bg-gold/8'
+            : 'border-transparent theme-muted hover:text-gold'">
           Catégories
         </button>
       </div>
@@ -53,7 +46,7 @@
 
     <!-- Error -->
     @if (error) {
-      <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 mb-6 animate-fade-in">
+      <div class="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/25 rounded-2xl text-red-400 mb-6 animate-fade-in">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         {{ error }}
       </div>
@@ -64,24 +57,25 @@
       <div class="space-y-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           @for (i of [1,2,3,4]; track i) {
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <div class="theme-surface border theme-border rounded-3xl p-6">
               <div class="skeleton h-4 w-24 mb-3"></div>
               <div class="skeleton h-10 w-20"></div>
             </div>
           }
         </div>
         <div class="grid lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm border border-gray-100"><div class="skeleton h-48 w-full"></div></div>
-          <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100"><div class="skeleton h-48 w-full"></div></div>
+          <div class="lg:col-span-2 theme-surface border theme-border rounded-3xl p-6"><div class="skeleton h-48 w-full"></div></div>
+          <div class="theme-surface border theme-border rounded-3xl p-6"><div class="skeleton h-48 w-full"></div></div>
         </div>
       </div>
     }
 
     @if (!loading && stats) {
+
       <!-- KPI Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
 
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-200 card-hover animate-fade-in-up delay-100">
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-500/20 card-hover animate-fade-in-up delay-100">
           <div class="flex items-center justify-between mb-4">
             <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
@@ -92,7 +86,7 @@
           <p class="text-white/70 text-sm mt-1">Commandes totales</p>
         </div>
 
-        <div class="bg-gradient-to-br from-green-500 to-teal-500 rounded-3xl p-6 text-white shadow-xl shadow-green-200 card-hover animate-fade-in-up delay-200">
+        <div class="bg-gradient-to-br from-green-500 to-teal-500 rounded-3xl p-6 text-white shadow-xl shadow-green-500/20 card-hover animate-fade-in-up delay-200">
           <div class="flex items-center justify-between mb-4">
             <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -103,7 +97,7 @@
           <p class="text-white/70 text-sm mt-1">Utilisateurs</p>
         </div>
 
-        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-6 text-white shadow-xl shadow-purple-200 card-hover animate-fade-in-up delay-300">
+        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-6 text-white shadow-xl shadow-purple-500/20 card-hover animate-fade-in-up delay-300">
           <div class="flex items-center justify-between mb-4">
             <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
@@ -114,15 +108,15 @@
           <p class="text-white/70 text-sm mt-1">Produits actifs</p>
         </div>
 
-        <div class="bg-gradient-to-br from-orange-400 to-red-500 rounded-3xl p-6 text-white shadow-xl shadow-orange-200 card-hover animate-fade-in-up delay-400">
+        <div class="bg-gradient-to-br from-[#b8860b] to-[#d4af37] rounded-3xl p-6 text-black shadow-xl shadow-yellow-600/20 card-hover animate-fade-in-up delay-400">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-black/15 rounded-xl flex items-center justify-center">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-            <span class="text-white/70 text-xs font-medium">À traiter</span>
+            <span class="text-black/60 text-xs font-medium">À traiter</span>
           </div>
           <p class="text-4xl font-black">{{ stats.pendingOrders }}</p>
-          <p class="text-white/70 text-sm mt-1">En attente</p>
+          <p class="text-black/60 text-sm mt-1">En attente</p>
         </div>
       </div>
 
@@ -130,94 +124,89 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
 
         <!-- Paiements à valider -->
-        <div class="bg-white rounded-3xl shadow-sm border p-5 card-hover animate-fade-in-up delay-100"
-             [class.border-blue-200]="stats.pendingPaymentsCount > 0"
-             [class.border-gray-100]="!stats.pendingPaymentsCount">
+        <div class="theme-surface border theme-border rounded-3xl p-5 card-hover animate-fade-in-up delay-100"
+             [class.border-blue-500/30]="stats.pendingPaymentsCount > 0">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-                 [class.bg-blue-50]="stats.pendingPaymentsCount > 0"
-                 [class.bg-gray-50]="!stats.pendingPaymentsCount">
-              <svg class="w-6 h-6" [class.text-blue-500]="stats.pendingPaymentsCount > 0" [class.text-gray-400]="!stats.pendingPaymentsCount"
+                 [ngClass]="stats.pendingPaymentsCount > 0 ? 'bg-blue-500/15' : 'bg-white/5'">
+              <svg class="w-6 h-6" [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'"
                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0zM6 7.5a.5.5 0 11-1 0 .5.5 0 011 0zm.5 8.5a.5.5 0 110-1 .5.5 0 010 1zm11-8a.5.5 0 110-1 .5.5 0 010 1z"/>
               </svg>
             </div>
             <div>
-              <p class="text-3xl font-black" [class.text-blue-600]="stats.pendingPaymentsCount > 0" [class.text-gray-300]="!stats.pendingPaymentsCount">
+              <p class="text-3xl font-black"
+                 [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'">
                 {{ stats.pendingPaymentsCount }}
               </p>
-              <p class="text-sm font-semibold text-gray-500">Paiements à valider</p>
+              <p class="text-sm font-semibold theme-muted">Paiements à valider</p>
               @if (stats.pendingPaymentsCount > 0) {
-                <p class="text-xs text-blue-500 font-medium mt-0.5">Action requise →</p>
+                <p class="text-xs text-blue-400 font-medium mt-0.5">Action requise →</p>
               }
             </div>
           </div>
         </div>
 
         <!-- Stock faible -->
-        <div class="bg-white rounded-3xl shadow-sm border p-5 card-hover animate-fade-in-up delay-200"
-             [class.border-amber-200]="stats.lowStockCount > 0"
-             [class.border-gray-100]="!stats.lowStockCount">
+        <div class="theme-surface border theme-border rounded-3xl p-5 card-hover animate-fade-in-up delay-200"
+             [class.border-amber-500/30]="stats.lowStockCount > 0">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-                 [class.bg-amber-50]="stats.lowStockCount > 0"
-                 [class.bg-gray-50]="!stats.lowStockCount">
-              <svg class="w-6 h-6" [class.text-amber-500]="stats.lowStockCount > 0" [class.text-gray-400]="!stats.lowStockCount"
+                 [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/15' : 'bg-white/5'">
+              <svg class="w-6 h-6" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'"
                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
               </svg>
             </div>
             <div>
-              <p class="text-3xl font-black" [class.text-amber-500]="stats.lowStockCount > 0" [class.text-gray-300]="!stats.lowStockCount">
+              <p class="text-3xl font-black"
+                 [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'">
                 {{ stats.lowStockCount }}
               </p>
-              <p class="text-sm font-semibold text-gray-500">Produits stock faible</p>
+              <p class="text-sm font-semibold theme-muted">Produits stock faible</p>
               @if (stats.lowStockCount > 0) {
-                <p class="text-xs text-amber-500 font-medium mt-0.5">≤ 5 unités restantes</p>
+                <p class="text-xs text-amber-400 font-medium mt-0.5">≤ 5 unités restantes</p>
               }
             </div>
           </div>
         </div>
-
       </div>
 
       <!-- Revenue + Status row -->
       <div class="grid lg:grid-cols-3 gap-6 mb-6">
 
         <!-- Revenue card -->
-        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 card-hover animate-fade-in-up delay-200">
+        <div class="lg:col-span-2 theme-surface border theme-border rounded-3xl p-6 card-hover animate-fade-in-up delay-200">
           <div class="flex items-center justify-between mb-6">
             <div>
-              <h2 class="text-lg font-bold text-gray-900">Revenus totaux</h2>
-              <p class="text-xs text-gray-400 mt-0.5">Montant total des ventes</p>
+              <h2 class="text-lg font-bold theme-text">Revenus totaux</h2>
+              <p class="text-xs theme-muted mt-0.5">Montant total des ventes</p>
             </div>
-            <span class="px-3 py-1.5 bg-green-50 text-green-600 text-xs font-bold rounded-xl">+18% ce mois</span>
+            <span class="px-3 py-1.5 bg-green-500/15 text-green-400 text-xs font-bold rounded-xl">+18% ce mois</span>
           </div>
-          <p class="text-5xl font-black text-gray-900 mb-2">
-            {{ (stats.totalRevenue / 1000000) | number:'1.0-2' }}<span class="text-2xl text-gray-400 font-semibold ml-1">M XOF</span>
+          <p class="text-5xl font-black theme-text mb-2">
+            {{ (stats.totalRevenue / 1000000) | number:'1.0-2' }}<span class="text-2xl theme-muted font-semibold ml-1">M FCFA</span>
           </p>
-          <div class="mt-6 h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style="width: 73%"></div>
+          <div class="mt-6 h-2 bg-white/8 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] rounded-full" style="width: 73%"></div>
           </div>
-          <div class="flex justify-between text-xs text-gray-400 mt-2">
+          <div class="flex justify-between text-xs theme-muted mt-2">
             <span>Objectif mensuel</span>
-            <span class="font-bold text-indigo-600">73%</span>
+            <span class="font-bold text-gold">73%</span>
           </div>
         </div>
 
         <!-- Orders by status -->
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 card-hover animate-fade-in-up delay-300">
-          <h2 class="text-lg font-bold text-gray-900 mb-5">Statut des commandes</h2>
+        <div class="theme-surface border theme-border rounded-3xl p-6 card-hover animate-fade-in-up delay-300">
+          <h2 class="text-lg font-bold theme-text mb-5">Statut des commandes</h2>
           @if (stats.ordersByStatus) {
             <div class="space-y-3">
               @for (item of stats.ordersByStatus; track item.status) {
                 <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold" [ngClass]="getStatusColor(item.status)">{{ item.status }}</span>
-                  </div>
-                  <span class="text-lg font-black text-gray-800">{{ item.count }}</span>
+                  <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold" [ngClass]="getStatusColor(item.status)">{{ item.status }}</span>
+                  <span class="text-lg font-black theme-text">{{ item.count }}</span>
                 </div>
               }
             </div>
@@ -227,39 +216,39 @@
 
       <!-- Recent orders table -->
       @if (stats.recentOrders) {
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden animate-fade-in-up delay-400">
-          <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+        <div class="theme-surface border theme-border rounded-3xl overflow-hidden animate-fade-in-up delay-400">
+          <div class="px-6 py-4 border-b theme-border flex items-center justify-between">
             <div>
-              <h2 class="text-lg font-bold text-gray-900">Commandes récentes</h2>
-              <p class="text-xs text-gray-400 mt-0.5">Les dernières commandes passées</p>
+              <h2 class="text-lg font-bold theme-text">Commandes récentes</h2>
+              <p class="text-xs theme-muted mt-0.5">Les dernières commandes passées</p>
             </div>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead>
-                <tr class="bg-gray-50">
-                  <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Commande</th>
-                  <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Client</th>
-                  <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Montant</th>
-                  <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Statut</th>
+                <tr class="theme-surface-2">
+                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Commande</th>
+                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Client</th>
+                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Montant</th>
+                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Statut</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-50">
+              <tbody>
                 @for (order of stats.recentOrders; track order.orderNumber) {
-                  <tr class="hover:bg-gray-50 transition-colors duration-150">
+                  <tr class="border-t theme-border hover:bg-white/3 transition-colors duration-150">
                     <td class="px-6 py-4">
-                      <span class="font-semibold text-sm text-gray-800">{{ order.orderNumber }}</span>
+                      <span class="font-semibold text-sm theme-text">{{ order.orderNumber }}</span>
                     </td>
                     <td class="px-6 py-4">
                       <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-lg flex items-center justify-center text-white text-xs font-bold">
                           {{ order.customerName?.[0] }}
                         </div>
-                        <span class="text-sm text-gray-700 font-medium">{{ order.customerName }}</span>
+                        <span class="text-sm theme-muted font-medium">{{ order.customerName }}</span>
                       </div>
                     </td>
                     <td class="px-6 py-4">
-                      <span class="font-bold text-gray-900">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K XOF</span>
+                      <span class="font-bold text-gold">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K FCFA</span>
                     </td>
                     <td class="px-6 py-4">
                       <span class="inline-flex px-3 py-1.5 rounded-xl text-xs font-bold" [ngClass]="getStatusColor(order.orderStatus)">
@@ -273,20 +262,23 @@
           </div>
         </div>
       }
-      <!-- ── Monthly Revenue Chart ─────────────────────────────────────── -->
+
+      <!-- ── Monthly Revenue Chart ────────────────────────────────────── -->
       @if (monthlyRevenue.length > 0) {
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mt-6 animate-fade-in-up delay-500">
+        <div class="theme-surface border theme-border rounded-3xl p-6 mt-6 animate-fade-in-up delay-500">
           <div class="flex items-center justify-between mb-6">
             <div>
-              <h2 class="text-lg font-bold text-gray-900">Revenus mensuels</h2>
-              <p class="text-xs text-gray-400 mt-0.5">Évolution sur l'année {{ selectedYear }}</p>
+              <h2 class="text-lg font-bold theme-text">Revenus mensuels</h2>
+              <p class="text-xs theme-muted mt-0.5">Évolution sur l'année {{ selectedYear }}</p>
             </div>
             <div class="flex items-center gap-2">
-              <button (click)="changeYear(-1)" class="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors">
+              <button (click)="changeYear(-1)" appTooltip="Année précédente" tooltipPosition="bottom"
+                class="w-8 h-8 rounded-xl bg-white/8 hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
               </button>
-              <span class="text-sm font-bold text-gray-700 w-12 text-center">{{ selectedYear }}</span>
-              <button (click)="changeYear(1)" class="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors">
+              <span class="text-sm font-bold theme-text w-12 text-center">{{ selectedYear }}</span>
+              <button (click)="changeYear(1)" appTooltip="Année suivante" tooltipPosition="bottom"
+                class="w-8 h-8 rounded-xl bg-white/8 hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </button>
             </div>
@@ -294,17 +286,14 @@
           <div class="flex items-end gap-1 h-48">
             @for (item of monthlyRevenue; track item.month) {
               <div class="flex-1 flex flex-col items-center gap-1 group">
-                <span class="text-[10px] text-gray-400 font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                <span class="text-[10px] theme-muted font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                   {{ (item.revenue / 1000) | number:'1.0-0' }}K
                 </span>
                 <div class="w-full rounded-t-lg transition-all duration-500 min-h-[4px]"
                      [style.height.%]="(item.revenue / maxMonthlyRevenue) * 100"
-                     [class.bg-gradient-to-t]="item.revenue > 0"
-                     [class.from-indigo-500]="item.revenue > 0"
-                     [class.to-purple-400]="item.revenue > 0"
-                     [class.bg-gray-100]="item.revenue === 0">
+                     [ngClass]="item.revenue > 0 ? 'bg-gradient-to-t from-[#b8860b] to-[#d4af37]' : 'bg-white/8'">
                 </div>
-                <span class="text-[10px] text-gray-400 font-medium">{{ item.monthName.slice(0,3) }}</span>
+                <span class="text-[10px] theme-muted font-medium">{{ item.monthName.slice(0,3) }}</span>
               </div>
             }
           </div>
@@ -313,32 +302,35 @@
 
       <!-- ── Top Products ──────────────────────────────────────────────── -->
       @if (topProducts.length > 0) {
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mt-6 animate-fade-in-up delay-500">
+        <div class="theme-surface border theme-border rounded-3xl p-6 mt-6 animate-fade-in-up delay-500">
           <div class="mb-5">
-            <h2 class="text-lg font-bold text-gray-900">Top produits vendus</h2>
-            <p class="text-xs text-gray-400 mt-0.5">Classés par quantité totale vendue</p>
+            <h2 class="text-lg font-bold theme-text">Top produits vendus</h2>
+            <p class="text-xs theme-muted mt-0.5">Classés par quantité totale vendue</p>
           </div>
           <div class="space-y-4">
             @for (product of topProducts; track product.productId; let i = $index) {
               <div class="flex items-center gap-4">
                 <div class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0"
-                     [class.bg-indigo-600]="i === 0" [class.text-white]="i === 0"
-                     [class.bg-indigo-100]="i === 1" [class.text-indigo-700]="i === 1"
-                     [class.bg-gray-100]="i >= 2" [class.text-gray-600]="i >= 2">
+                     [ngClass]="{
+                       'bg-gold text-black': i === 0,
+                       'bg-gold/20 text-gold': i === 1,
+                       'bg-white/8 theme-muted': i >= 2
+                     }">
                   {{ i + 1 }}
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center justify-between mb-1">
-                    <span class="text-sm font-semibold text-gray-800 truncate">{{ product.productName }}</span>
-                    <span class="text-sm font-black text-gray-900 ml-2 shrink-0">{{ product.totalSold }} vendus</span>
+                    <span class="text-sm font-semibold theme-text truncate">{{ product.productName }}</span>
+                    <span class="text-sm font-black theme-text ml-2 shrink-0">{{ product.totalSold }} vendus</span>
                   </div>
-                  <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-1.5 bg-white/8 rounded-full overflow-hidden">
                     <div class="h-full rounded-full transition-all duration-700"
                          [style.width.%]="(product.totalSold / maxTopProduct) * 100"
-                         [class.bg-gradient-to-r]="true"
-                         [class.from-indigo-500]="i === 0" [class.to-purple-500]="i === 0"
-                         [class.from-indigo-400]="i === 1" [class.to-indigo-300]="i === 1"
-                         [class.from-gray-400]="i >= 2" [class.to-gray-300]="i >= 2">
+                         [ngClass]="{
+                           'bg-gradient-to-r from-[#b8860b] to-[#d4af37]': i === 0,
+                           'bg-gold/50': i === 1,
+                           'bg-white/25': i >= 2
+                         }">
                     </div>
                   </div>
                 </div>
@@ -350,28 +342,36 @@
 
     }
 
-  } <!-- /activeTab === 'stats' -->
+  } <!-- /stats -->
 
   <!-- ══════════ ONGLET UTILISATEURS ══════════ -->
   @if (activeTab === 'users') {
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
 
       <!-- Header -->
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div class="px-6 py-4 border-b theme-border flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-bold text-gray-900">Gestion des utilisateurs</h2>
-          <p class="text-xs text-gray-400 mt-0.5">Activez, désactivez ou changez les rôles</p>
+          <h2 class="text-lg font-bold theme-text">Gestion des utilisateurs</h2>
+          <p class="text-xs theme-muted mt-0.5">Activez ou désactivez des comptes utilisateurs</p>
         </div>
-        <button (click)="loadUsers()" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 font-semibold text-sm rounded-xl hover:bg-indigo-100 transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          Actualiser
-        </button>
+        <div class="flex items-center gap-2">
+          <button (click)="openCreateUserModal()"
+            class="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/25 text-green-400 font-semibold text-sm rounded-xl hover:bg-green-500/15 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Créer
+          </button>
+          <button (click)="loadUsers()"
+            class="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Actualiser
+          </button>
+        </div>
       </div>
 
       <!-- Loading -->
       @if (usersLoading) {
         <div class="p-8 flex justify-center">
-          <svg class="w-8 h-8 text-indigo-500 animate-spin" fill="none" viewBox="0 0 24 24">
+          <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
@@ -383,67 +383,48 @@
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
-              <tr class="bg-gray-50">
-                <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Utilisateur</th>
-                <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3 hidden md:table-cell">Email</th>
-                <th class="text-center text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Rôle</th>
-                <th class="text-center text-xs font-bold text-gray-500 uppercase tracking-wide px-6 py-3">Statut</th>
+              <tr class="theme-surface-2">
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Utilisateur</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3 hidden md:table-cell">Email</th>
+                <th class="text-center text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Statut</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody>
               @for (user of users; track user.id) {
-                <tr class="hover:bg-gray-50 transition-colors">
+                <tr class="border-t theme-border hover:bg-white/3 transition-colors">
                   <!-- Nom -->
                   <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
                       <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-black flex-shrink-0"
-                           [class.bg-gradient-to-br]="true"
-                           [class.from-indigo-400]="user.role === 'CUSTOMER'"
-                           [class.to-purple-400]="user.role === 'CUSTOMER'"
-                           [class.from-orange-400]="user.role === 'MANAGER'"
-                           [class.to-red-400]="user.role === 'MANAGER'"
-                           [class.from-yellow-400]="user.role === 'ADMIN'"
-                           [class.to-amber-500]="user.role === 'ADMIN'">
+                           [ngClass]="{
+                             'bg-gradient-to-br from-indigo-400 to-purple-400': user.role === 'CUSTOMER',
+                             'bg-gradient-to-br from-orange-400 to-red-400': user.role === 'MANAGER',
+                             'bg-gradient-to-br from-[#b8860b] to-[#d4af37]': user.role === 'ADMIN'
+                           }">
                         {{ user.prenom[0] }}{{ user.nom[0] }}
                       </div>
                       <div>
-                        <p class="text-sm font-semibold text-gray-800">{{ user.prenom }} {{ user.nom }}</p>
-                        <p class="text-xs text-gray-400">{{ user.phone }}</p>
+                        <p class="text-sm font-semibold theme-text">{{ user.prenom }} {{ user.nom }}</p>
+                        <p class="text-xs theme-muted">{{ user.phone }}</p>
                       </div>
                     </div>
                   </td>
                   <!-- Email -->
                   <td class="px-6 py-4 hidden md:table-cell">
-                    <span class="text-sm text-gray-600">{{ user.email }}</span>
-                  </td>
-                  <!-- Rôle -->
-                  <td class="px-6 py-4 text-center">
-                    @if (roleUpdatingId === user.id) {
-                      <svg class="w-4 h-4 text-indigo-500 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                      </svg>
-                    } @else {
-                      <select [value]="user.role" (change)="changeRole(user, $any($event.target).value)"
-                        class="text-xs font-bold rounded-lg px-2 py-1.5 border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer">
-                        @for (role of roles; track role) {
-                          <option [value]="role">{{ role }}</option>
-                        }
-                      </select>
-                    }
+                    <span class="text-sm theme-muted">{{ user.email }}</span>
                   </td>
                   <!-- Toggle actif -->
                   <td class="px-6 py-4 text-center">
                     @if (toggleUpdatingId === user.id) {
-                      <svg class="w-4 h-4 text-indigo-500 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4 text-gold animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                       </svg>
                     } @else {
                       <button type="button" (click)="toggleUser(user)"
+                        [appTooltip]="user.enabled ? 'Désactiver ce compte' : 'Activer ce compte'" tooltipPosition="left"
                         class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
-                        [class.bg-indigo-500]="user.enabled"
-                        [class.bg-gray-200]="!user.enabled">
+                        [ngClass]="user.enabled ? 'bg-gold' : 'bg-white/15'">
                         <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform"
                               [class.translate-x-6]="user.enabled"
                               [class.translate-x-1]="!user.enabled">
@@ -459,25 +440,22 @@
 
         <!-- Pagination -->
         @if (usersTotalPages > 1) {
-          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-            <span class="text-xs text-gray-400">Page {{ usersPage + 1 }} / {{ usersTotalPages }}</span>
+          <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
+            <span class="text-xs theme-muted">Page {{ usersPage + 1 }} / {{ usersTotalPages }}</span>
             <div class="flex gap-2">
               <button (click)="loadUsers(usersPage - 1)" [disabled]="usersPage === 0"
-                class="px-3 py-1.5 rounded-lg bg-gray-50 text-xs font-semibold text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                 ← Préc.
               </button>
               @for (page of userPages; track page) {
                 <button (click)="loadUsers(page)"
                   class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
-                  [class.bg-indigo-500]="page === usersPage"
-                  [class.text-white]="page === usersPage"
-                  [class.bg-gray-50]="page !== usersPage"
-                  [class.text-gray-500]="page !== usersPage">
+                  [ngClass]="page === usersPage ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-gold/15 hover:text-gold'">
                   {{ page + 1 }}
                 </button>
               }
               <button (click)="loadUsers(usersPage + 1)" [disabled]="usersPage >= usersTotalPages - 1"
-                class="px-3 py-1.5 rounded-lg bg-gray-50 text-xs font-semibold text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                 Suiv. →
               </button>
             </div>
@@ -488,11 +466,11 @@
       <!-- Empty -->
       @if (!usersLoading && users.length === 0) {
         <div class="py-16 text-center">
-          <p class="text-gray-400 font-semibold">Aucun utilisateur trouvé</p>
+          <p class="theme-muted font-semibold">Aucun utilisateur trouvé</p>
         </div>
       }
     </div>
-  } <!-- /activeTab === 'users' -->
+  } <!-- /users -->
 
   <!-- ══════════ ONGLET CATÉGORIES ══════════ -->
   @if (activeTab === 'categories') {
@@ -500,13 +478,13 @@
 
       <!-- Barre d'action -->
       <div class="flex items-center justify-between mb-6">
-        <p class="text-sm text-gray-500 font-medium">
+        <p class="text-sm theme-muted font-medium">
           {{ categories.length }} catégorie(s) —
-          <span class="text-green-600">{{ activeCategories }} active(s)</span>,
+          <span class="text-green-400">{{ activeCategories }} active(s)</span>,
           <span class="text-red-400">{{ inactiveCategories }} inactive(s)</span>
         </p>
         <button (click)="openCategoryForm()"
-          class="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition-colors">
+          class="flex items-center gap-2 px-4 py-2.5 bg-gold text-black font-bold text-sm rounded-xl hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all duration-200">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
@@ -516,35 +494,32 @@
 
       <!-- Formulaire création / édition -->
       @if (showCategoryForm) {
-        <div class="bg-white border border-indigo-100 rounded-2xl shadow-sm p-6 mb-6 animate-fade-in">
-          <h3 class="text-base font-bold text-gray-900 mb-4">
+        <div class="theme-surface border border-gold/20 rounded-2xl p-6 mb-6 animate-fade-in shadow-lg shadow-yellow-600/5">
+          <h3 class="text-base font-bold theme-text mb-4">
             {{ editingCategory ? 'Modifier' : 'Créer' }} une catégorie
           </h3>
           @if (categoryFormError) {
-            <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+            <div class="mb-4 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">
               {{ categoryFormError }}
             </div>
           }
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold text-gray-600 mb-1">Nom *</label>
-              <input [(ngModel)]="categoryForm.name" type="text" placeholder="ex: Montres"
-                class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+              <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Nom *</label>
+              <input [(ngModel)]="categoryForm.name" type="text" placeholder="ex: Montres" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
             </div>
             <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold text-gray-600 mb-1">Description</label>
-              <input [(ngModel)]="categoryForm.description" type="text" placeholder="Courte description..."
-                class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+              <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Description</label>
+              <input [(ngModel)]="categoryForm.description" type="text" placeholder="Courte description..." class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
             </div>
             <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold text-gray-600 mb-1">URL de l'image</label>
-              <input [(ngModel)]="categoryForm.imageUrl" type="text" placeholder="https://..."
-                class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+              <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">URL de l'image</label>
+              <input [(ngModel)]="categoryForm.imageUrl" type="text" placeholder="https://..." class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
             </div>
           </div>
           <div class="flex gap-3 mt-5">
             <button (click)="submitCategory()" [disabled]="categoryFormLoading"
-              class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+              class="flex items-center gap-2 px-5 py-2.5 bg-gold text-black font-bold text-sm rounded-xl hover:shadow-lg hover:shadow-yellow-600/25 disabled:opacity-50 transition-all">
               @if (categoryFormLoading) {
                 <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -554,7 +529,7 @@
               {{ editingCategory ? 'Enregistrer' : 'Créer' }}
             </button>
             <button (click)="closeCategoryForm()"
-              class="px-5 py-2.5 bg-gray-100 text-gray-600 font-semibold text-sm rounded-xl hover:bg-gray-200 transition-colors">
+              class="px-5 py-2.5 bg-white/8 theme-muted font-semibold text-sm rounded-xl hover:bg-white/12 transition-colors">
               Annuler
             </button>
           </div>
@@ -564,7 +539,7 @@
       <!-- Chargement -->
       @if (categoriesLoading) {
         <div class="flex justify-center py-16">
-          <svg class="w-8 h-8 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
@@ -575,18 +550,16 @@
       @if (!categoriesLoading) {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (cat of categories; track cat.id) {
-            <div class="bg-white border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-                 [class.border-gray-100]="cat.active"
-                 [class.border-red-100]="!cat.active"
-                 [class.opacity-60]="!cat.active">
+            <div class="luxury-card rounded-2xl overflow-hidden transition-shadow"
+                 [class.opacity-50]="!cat.active">
               <!-- Image -->
               @if (cat.imageUrl) {
                 <div class="h-32 overflow-hidden">
                   <img [src]="cat.imageUrl" [alt]="cat.name" class="w-full h-full object-cover"/>
                 </div>
               } @else {
-                <div class="h-32 bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
-                  <svg class="w-10 h-10 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="h-32 bg-gradient-to-br from-[#b8860b]/10 to-[#d4af37]/5 flex items-center justify-center">
+                  <svg class="w-10 h-10 text-gold/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
                   </svg>
                 </div>
@@ -595,45 +568,39 @@
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0 flex-1">
                     <div class="flex items-center gap-2 mb-1">
-                      <p class="font-bold text-gray-900 text-sm truncate">{{ cat.name }}</p>
+                      <p class="font-bold theme-text text-sm truncate">{{ cat.name }}</p>
                       @if (!cat.active) {
-                        <span class="flex-shrink-0 text-xs font-bold px-2 py-0.5 bg-red-50 text-red-500 rounded-lg">Inactif</span>
+                        <span class="flex-shrink-0 text-xs font-bold px-2 py-0.5 bg-red-500/15 text-red-400 rounded-lg">Inactif</span>
                       }
                     </div>
                     @if (cat.description) {
-                      <p class="text-xs text-gray-400 leading-snug line-clamp-2">{{ cat.description }}</p>
+                      <p class="text-xs theme-muted leading-snug line-clamp-2">{{ cat.description }}</p>
                     }
-                    <p class="text-xs text-gray-300 mt-1.5 font-mono">{{ cat.slug }}</p>
+                    <p class="text-xs theme-muted opacity-50 mt-1.5 font-mono">{{ cat.slug }}</p>
                   </div>
                   <!-- Actions -->
                   <div class="flex flex-col gap-1 flex-shrink-0">
-                    <!-- Éditer -->
                     <button (click)="openEditCategoryForm(cat)"
-                      class="w-8 h-8 flex items-center justify-center rounded-xl text-indigo-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                      appTooltip="Modifier la catégorie" tooltipPosition="left"
+                      class="w-8 h-8 flex items-center justify-center rounded-xl text-gold/60 hover:bg-gold/10 hover:text-gold transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                       </svg>
                     </button>
-                    <!-- Toggle actif/inactif -->
                     <button (click)="toggleCategory(cat)" [disabled]="categoryToggleId === cat.id"
+                      [appTooltip]="cat.active ? 'Désactiver la catégorie' : 'Activer la catégorie'" tooltipPosition="left"
                       class="w-8 h-8 flex items-center justify-center rounded-xl transition-colors disabled:opacity-40"
-                      [class.text-green-500]="!cat.active"
-                      [class.hover:bg-green-50]="!cat.active"
-                      [class.text-orange-400]="cat.active"
-                      [class.hover:bg-orange-50]="cat.active">
+                      [ngClass]="cat.active ? 'text-orange-400 hover:bg-orange-500/10' : 'text-green-400 hover:bg-green-500/10'">
                       @if (categoryToggleId === cat.id) {
                         <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                         </svg>
                       } @else if (cat.active) {
-                        <!-- désactiver -->
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                         </svg>
                       } @else {
-                        <!-- réactiver -->
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -648,16 +615,105 @@
 
         @if (categories.length === 0) {
           <div class="py-20 text-center">
-            <svg class="w-12 h-12 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-12 h-12 text-gold/20 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
-            <p class="text-gray-400 font-semibold">Aucune catégorie</p>
-            <p class="text-sm text-gray-300 mt-1">Créez votre première catégorie ci-dessus</p>
+            <p class="theme-muted font-semibold">Aucune catégorie</p>
+            <p class="text-sm theme-muted opacity-60 mt-1">Créez votre première catégorie ci-dessus</p>
           </div>
         }
       }
     </div>
-  } <!-- /activeTab === 'categories' -->
+  } <!-- /categories -->
 
   </div>
 </div>
+
+<!-- ══════════ MODAL CRÉER UTILISATEUR ══════════ -->
+@if (showCreateUserModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeCreateUserModal()"></div>
+
+    <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl overflow-hidden animate-scale-in">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-5 border-b theme-border">
+        <div>
+          <h3 class="text-lg font-bold theme-text">Créer un utilisateur</h3>
+          <p class="text-xs theme-muted mt-0.5">Le compte sera actif immédiatement</p>
+        </div>
+        <button (click)="closeCreateUserModal()"
+          class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/8 theme-muted hover:bg-white/12 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <div class="px-6 py-5 space-y-4">
+
+        @if (createUserError) {
+          <div class="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {{ createUserError }}
+          </div>
+        }
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Prénom</label>
+            <input [(ngModel)]="createUserForm.prenom" type="text" placeholder="Jean" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Nom</label>
+            <input [(ngModel)]="createUserForm.nom" type="text" placeholder="Dupont" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Email</label>
+          <input [(ngModel)]="createUserForm.email" type="email" autocomplete="off" placeholder="jean@exemple.com" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Téléphone</label>
+          <input [(ngModel)]="createUserForm.phone" type="tel" placeholder="+225 07 000 00 00" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Mot de passe</label>
+          <input [(ngModel)]="createUserForm.password" type="password" autocomplete="new-password" placeholder="Min. 6 caractères" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Rôle</label>
+          <select [(ngModel)]="createUserForm.role" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all">
+            @for (r of roles; track r) {
+              <option [value]="r" class="theme-option">{{ r }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex gap-3 px-6 pb-6">
+        <button (click)="closeCreateUserModal()" [disabled]="createUserLoading"
+          class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors disabled:opacity-50">
+          Annuler
+        </button>
+        <button (click)="submitCreateUser()" [disabled]="createUserLoading || !createUserForm.prenom || !createUserForm.nom || !createUserForm.email || !createUserForm.password || !createUserForm.phone"
+          class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-yellow-600/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (createUserLoading) {
+            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+          } @else {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          }
+          Créer
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -72,7 +72,7 @@
           <div class="relative overflow-hidden rounded-3xl luxury-card mb-4 aspect-square">
 
             <!-- Navigation arrows -->
-            <button (click)="prevImage()"
+            <button (click)="prevImage()" appTooltip="Image précédente" tooltipPosition="right"
               class="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full
                      bg-black/50 backdrop-blur-sm border border-white/15 text-white
                      flex items-center justify-center hover:bg-black/70 transition-all duration-200"
@@ -82,7 +82,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
               </svg>
             </button>
-            <button (click)="nextImage()"
+            <button (click)="nextImage()" appTooltip="Image suivante" tooltipPosition="left"
               class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full
                      bg-black/50 backdrop-blur-sm border border-white/15 text-white
                      flex items-center justify-center hover:bg-black/70 transition-all duration-200"
@@ -95,7 +95,7 @@
 
             <!-- Zoom (images only) -->
             @if (activeItem.type === 'IMAGE') {
-              <button (click)="toggleZoom()"
+              <button (click)="toggleZoom()" [appTooltip]="zoomed ? 'Dézoomer' : 'Zoomer'"  tooltipPosition="left"
                 class="absolute top-4 right-4 z-10 w-9 h-9 rounded-xl
                        bg-black/50 backdrop-blur-sm border border-white/15 text-white
                        flex items-center justify-center hover:bg-black/70 transition-all duration-200">
@@ -226,7 +226,7 @@
               <div>
                 <p class="text-xs theme-muted uppercase tracking-wider mb-1">Prix</p>
                 <p class="text-4xl font-black gold-text leading-none">{{ formattedPrice }}</p>
-                <p class="text-sm theme-muted mt-1">XOF · TTC</p>
+                <p class="text-sm theme-muted mt-1">FCFA · TTC</p>
               </div>
               <div class="flex-1 min-w-[120px]">
                 <p class="text-xs theme-muted uppercase tracking-wider mb-1">Disponibilité</p>
@@ -293,6 +293,7 @@
                   <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
                   <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
                     <button (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1"
+                      appTooltip="Diminuer la quantité" tooltipPosition="top"
                       class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
                              hover:text-gold hover:bg-white/5 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,6 +302,7 @@
                     </button>
                     <span class="w-12 text-center font-black theme-text text-sm">{{ quantity }}</span>
                     <button (click)="setQuantity(quantity + 1)" [disabled]="quantity >= product.stock"
+                      appTooltip="Augmenter la quantité" tooltipPosition="top"
                       class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
                              hover:text-gold hover:bg-white/5 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,7 +328,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
-                    Ajouter au panier · {{ formattedPrice }} XOF
+                    Ajouter au panier · {{ formattedPrice }} FCFA
                   }
                 </button>
                 <button (click)="goBack()"
@@ -462,7 +464,7 @@
                   <p class="font-bold theme-text text-sm leading-tight truncate mb-2">{{ related.name }}</p>
                   <div class="flex items-center justify-between">
                     <span class="font-black text-gold text-base">{{ (related.price / 1000) | number:'1.0-0' }}K</span>
-                    <span class="text-[10px] theme-muted">XOF</span>
+                    <span class="text-[10px] theme-muted">FCFA</span>
                   </div>
                 </div>
               </a>

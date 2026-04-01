@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DashboardService, MonthlyRevenueItem, TopProductItem } from '../../../core/services/dashboard.service';
 import { UserService } from '../../../core/services/user.service';
 import { CategoryService } from '../../../core/services/category.service';
-import { UserResponse } from '../../../core/models/user.models';
+import { UserResponse, AdminCreateUserRequest } from '../../../core/models/user.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { UserRole, PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
@@ -37,8 +37,13 @@ export class AdminDashboardComponent implements OnInit {
   usersPage = 0;
   usersTotalPages = 0;
   toggleUpdatingId: number | null = null;
-  roleUpdatingId: number | null = null;
   readonly roles = Object.values(UserRole);
+
+  // Create user modal
+  showCreateUserModal = false;
+  createUserLoading = false;
+  createUserError: string | null = null;
+  createUserForm: AdminCreateUserRequest = { nom: '', prenom: '', email: '', password: '', phone: '+225', role: UserRole.CUSTOMER };
 
   // ── Categories ─────────────────────────────────────────────────────────────
   categories: CategoryResponse[] = [];
@@ -123,14 +128,14 @@ export class AdminDashboardComponent implements OnInit {
 
   getStatusColor(status: string): string {
     const colors: { [key: string]: string } = {
-      PENDING: 'bg-yellow-100 text-yellow-800',
-      CONFIRMED: 'bg-blue-100 text-blue-800',
-      PROCESSING: 'bg-purple-100 text-purple-800',
-      SHIPPED: 'bg-indigo-100 text-indigo-800',
-      DELIVERED: 'bg-green-100 text-green-800',
-      CANCELLED: 'bg-red-100 text-red-800',
+      PENDING:    'bg-yellow-500/15 text-yellow-500',
+      CONFIRMED:  'bg-blue-500/15 text-blue-400',
+      PROCESSING: 'bg-purple-500/15 text-purple-400',
+      SHIPPED:    'bg-indigo-500/15 text-indigo-400',
+      DELIVERED:  'bg-green-500/15 text-green-400',
+      CANCELLED:  'bg-red-500/15 text-red-400',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'bg-white/10 text-gray-400';
   }
 
   // ── Users ──────────────────────────────────────────────────────────────────
@@ -168,22 +173,35 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  changeRole(user: UserResponse, role: string): void {
-    if (user.role === role) return;
-    this.roleUpdatingId = user.id;
-    this.userService.changeRole(user.id, role as UserRole).subscribe({
+openCreateUserModal(): void {
+    this.createUserForm = { nom: '', prenom: '', email: '', password: '', phone: '+225', role: UserRole.CUSTOMER };
+    this.createUserError = null;
+    this.showCreateUserModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeCreateUserModal(): void {
+    this.showCreateUserModal = false;
+    this.cdr.detectChanges();
+  }
+
+  submitCreateUser(): void {
+    this.createUserLoading = true;
+    this.createUserError = null;
+    this.userService.createUser(this.createUserForm).subscribe({
       next: (r) => {
         if (r.success) {
-          const idx = this.users.findIndex(u => u.id === user.id);
-          if (idx !== -1) {
-            this.users = [...this.users];
-            this.users[idx] = { ...this.users[idx], role: role as UserRole };
-          }
+          this.users = [r.data, ...this.users];
+          this.showCreateUserModal = false;
         }
-        this.roleUpdatingId = null;
+        this.createUserLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => { this.roleUpdatingId = null; this.cdr.detectChanges(); },
+      error: (err) => {
+        this.createUserError = err?.error?.message || 'Une erreur est survenue';
+        this.createUserLoading = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 

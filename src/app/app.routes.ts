@@ -8,6 +8,10 @@ import { ProfileComponent } from './features/profile/pages';
 import { AdminDashboardComponent } from './features/admin/pages';
 import { ManagerComponent } from './features/manager/pages';
 import { PaymentPageComponent } from './features/payment/payment-page.component';
+import { HelpComponent } from './features/help/help.component';
+import { PrivacyComponent } from './features/privacy/privacy.component';
+import { AuthenticityComponent } from './features/authenticity/authenticity.component';
+import { ReturnsComponent } from './features/returns/returns.component';
 
 export const APP_ROUTES: Routes = [
   {
@@ -37,6 +41,10 @@ export const APP_ROUTES: Routes = [
         path: 'payment/:orderId',
         component: PaymentPageComponent,
       },
+      { path: 'help', component: HelpComponent },
+      { path: 'privacy', component: PrivacyComponent },
+      { path: 'authenticity', component: AuthenticityComponent },
+      { path: 'returns', component: ReturnsComponent },
     ],
   },
   {

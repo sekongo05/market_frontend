@@ -60,7 +60,7 @@
           </div>
           <div class="flex justify-between items-center px-4 py-3 border-b theme-border">
             <span class="text-xs theme-muted">Montant</span>
-            <span class="text-sm font-bold theme-text">{{ order.totalAmount | number:'1.0-0' }} XOF</span>
+            <span class="text-sm font-bold theme-text">{{ order.totalAmount | number:'1.0-0' }} FCFA</span>
           </div>
           @if (order.paymentReference) {
             <div class="flex justify-between items-center px-4 py-3">
@@ -189,7 +189,7 @@
             <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(255,196,0,0.06);border:1px solid rgba(255,196,0,0.15)">
               <span class="text-lg">⚠️</span>
               <p class="text-xs theme-muted leading-snug">
-                Envoyez <strong class="text-gold">exactement {{ order.totalAmount | number:'1.0-0' }} XOF</strong> — tout écart retardera la validation
+                Envoyez <strong class="text-gold">exactement {{ order.totalAmount | number:'1.0-0' }} FCFA</strong> — tout écart retardera la validation
               </p>
             </div>
           </div>
@@ -202,7 +202,7 @@
           <div class="luxury-card rounded-3xl p-6 text-center">
             <p class="text-xs font-bold theme-muted uppercase tracking-widest mb-3">Montant à envoyer via Wave</p>
             <p class="text-6xl font-black text-gold leading-none">{{ order.totalAmount | number:'1.0-0' }}</p>
-            <p class="text-xl font-semibold theme-muted mt-2">XOF</p>
+            <p class="text-xl font-semibold theme-muted mt-2">FCFA</p>
             <div class="mt-4 pt-4 border-t theme-border flex items-center justify-between text-xs theme-muted">
               <span>Commande</span>
               <span class="font-bold text-gold">{{ order.orderNumber }}</span>
@@ -225,7 +225,7 @@
               </label>
               <input
                 type="text"
-                [(ngModel)]="waveReference"
+                [(ngModel)]="paymentReference"
                 (input)="referenceError = null"
                 placeholder="Ex : TXN-XXXXXXXX"
                 [class.ring-2]="referenceError"

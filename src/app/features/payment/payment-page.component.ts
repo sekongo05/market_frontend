@@ -15,7 +15,7 @@ import { PaymentStatus } from '../../core/models/common.models';
 })
 export class PaymentPageComponent implements OnInit {
   order: OrderResponse | null = null;
-  waveReference = '';
+  paymentReference = '';
   loading = false;
   submitting = false;
   success = false;
@@ -70,9 +70,9 @@ export class PaymentPageComponent implements OnInit {
     if (!this.order || this.submitting) return;
 
     // Validation de la référence côté client
-    const ref = this.waveReference.trim();
+    const ref = this.paymentReference.trim();
     if (!ref) {
-      this.referenceError = 'La référence Wave est obligatoire';
+      this.referenceError = 'La référence de paiement est obligatoire';
       this.cdr.detectChanges();
       return;
     }
@@ -89,6 +89,7 @@ export class PaymentPageComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.success = true;
+          this.orderService.refreshPendingCount();
           // Mettre à jour l'ordre local pour afficher l'état SUBMITTED
           if (this.order) {
             this.order = { ...this.order, paymentStatus: PaymentStatus.SUBMITTED, paymentReference: ref };
@@ -102,7 +103,7 @@ export class PaymentPageComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        const msg = err?.error?.message || err?.error?.errors?.waveReference;
+        const msg = err?.error?.message || err?.error?.errors?.paymentReference;
         this.error = msg || 'Erreur lors de la déclaration de paiement';
         this.submitting = false;
         this.cdr.detectChanges();
