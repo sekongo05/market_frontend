@@ -76,8 +76,8 @@ export class PaymentPageComponent implements OnInit {
       this.cdr.detectChanges();
       return;
     }
-    if (ref.length < 3) {
-      this.referenceError = 'La référence est trop courte (minimum 3 caractères)';
+    if (ref.length < 4 || ref.length > 100) {
+      this.referenceError = 'La référence doit contenir entre 4 et 100 caractères';
       this.cdr.detectChanges();
       return;
     }

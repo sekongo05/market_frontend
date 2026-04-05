@@ -31,8 +31,8 @@
             <!-- Face -->
             <div class="relative w-full h-full bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl
                         flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-              <!-- CL monogram -->
-              <span class="text-black font-black text-[11px] tracking-tighter select-none leading-none">CL</span>
+              <!-- SDM monogram -->
+              <span class="text-black font-black text-[9px] tracking-tighter select-none leading-none">SDM</span>
               <!-- small diamond accent top-right -->
               <span class="absolute -top-1 -right-1 text-[8px] select-none">◆</span>
             </div>
@@ -42,11 +42,11 @@
             <div class="flex items-baseline gap-0">
               <span class="text-[15px] font-black tracking-tight transition-colors duration-200
                            text-white light:text-neutral-900
-                           group-hover:text-gold light:group-hover:text-yellow-700">Chrono</span>
-              <span class="text-[15px] font-black tracking-tight transition-colors duration-200 text-gold">Lux</span>
+                           group-hover:text-gold light:group-hover:text-yellow-700">SDM</span>
+              <span class="text-[15px] font-black tracking-tight transition-colors duration-200 text-gold">STORE</span>
             </div>
             <span class="block text-[9px] font-semibold tracking-[0.22em] uppercase mt-0.5"
-                  style="color:#6b7280">Montres & Bijoux</span>
+                  style="color:#6b7280">Votre boutique en ligne</span>
           </div>
         </a>
 
@@ -172,6 +172,7 @@
 
                   <!-- ── Vue détail d'une notification ── -->
                   @if (selectedNotification) {
+                    @let tpl = getTemplate(selectedNotification.type);
                     <div class="flex flex-col">
                       <!-- Header détail -->
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
@@ -192,11 +193,27 @@
                           </svg>
                         </button>
                       </div>
-                      <!-- Corps HTML de la notification -->
-                      <div class="max-h-[480px] overflow-y-auto p-5">
-                        <p class="text-xs theme-muted mb-4">{{ selectedNotification.createdAt | date:'dd MMMM yyyy à HH:mm' }}</p>
-                        <div class="text-sm theme-text leading-relaxed rounded-xl border theme-border p-4 break-words"
-                             [innerHTML]="selectedNotification.body">
+                      <!-- Bandeau type -->
+                      <div class="flex items-center gap-3 px-5 py-3 border-b"
+                           [ngClass]="[tpl.bannerClass, tpl.borderClass]">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                             [ngClass]="tpl.bgClass">
+                          <svg class="w-4 h-4" [ngClass]="tpl.colorClass" fill="none" stroke="currentColor" [attr.viewBox]="tpl.iconViewBox">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="tpl.iconPath"/>
+                          </svg>
+                        </div>
+                        <span class="text-xs font-semibold uppercase tracking-wider" [ngClass]="tpl.colorClass">
+                          {{ tpl.label }}
+                        </span>
+                        <span class="ml-auto text-xs theme-muted">
+                          {{ selectedNotification.createdAt | date:'dd MMM yyyy, HH:mm' }}
+                        </span>
+                      </div>
+                      <!-- Corps de la notification -->
+                      <div class="max-h-[420px] overflow-y-auto p-5">
+                        <div class="notif-body rounded-xl border p-4 break-words text-sm theme-text leading-relaxed"
+                             [ngClass]="[tpl.borderClass, tpl.bannerClass]"
+                             [innerHTML]="selectedNotification.body | notifBody">
                         </div>
                       </div>
                     </div>
@@ -246,16 +263,24 @@
                     @if (!notificationsLoading) {
                       <div class="max-h-96 overflow-y-auto divide-y theme-border">
                         @for (notif of notifications; track notif.id) {
+                          @let t = getTemplate(notif.type);
                           <div class="flex items-start gap-3 px-5 py-4 hover:bg-white/5 transition-colors group"
-                               [class.opacity-60]="notif.read">
-                            <!-- Indicateur non-lu -->
-                            <div class="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 transition-colors"
-                                 [class.bg-gold]="!notif.read"
-                                 [class.bg-transparent]="notif.read">
+                               [class.opacity-55]="notif.read">
+                            <!-- Icône type -->
+                            <div class="relative flex-shrink-0 mt-0.5">
+                              <div class="w-9 h-9 rounded-xl flex items-center justify-center" [ngClass]="t.bgClass">
+                                <svg class="w-4 h-4" [ngClass]="t.colorClass" fill="none" stroke="currentColor" [attr.viewBox]="t.iconViewBox">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="t.iconPath"/>
+                                </svg>
+                              </div>
+                              @if (!notif.read) {
+                                <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-gold border-2 border-[var(--surface)]"></span>
+                              }
                             </div>
                             <!-- Contenu cliquable -->
                             <button type="button" (click)="openNotification(notif)"
                               class="flex-1 min-w-0 text-left">
+                              <p class="text-xs font-semibold uppercase tracking-wider mb-0.5" [ngClass]="t.colorClass">{{ t.label }}</p>
                               <p class="text-sm font-bold theme-text leading-snug truncate">{{ notif.subject }}</p>
                               <p class="text-xs theme-muted mt-1">{{ notif.createdAt | date:'dd/MM/yyyy à HH:mm' }}</p>
                             </button>
@@ -457,6 +482,7 @@
                      style="right: -2.5rem">
                   <!-- réutilise le même contenu que desktop -->
                   @if (selectedNotification) {
+                    @let tplM = getTemplate(selectedNotification.type);
                     <div class="flex flex-col">
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
                         <button (click)="closeNotificationDetail()"
@@ -474,10 +500,22 @@
                           </svg>
                         </button>
                       </div>
-                      <div class="max-h-[60vh] overflow-y-auto p-5">
-                        <p class="text-xs theme-muted mb-4">{{ selectedNotification.createdAt | date:'dd MMMM yyyy à HH:mm' }}</p>
-                        <div class="text-sm theme-text leading-relaxed rounded-xl border theme-border p-4 break-words"
-                             [innerHTML]="selectedNotification.body"></div>
+                      <!-- Bandeau type (mobile) -->
+                      <div class="flex items-center gap-3 px-5 py-3 border-b"
+                           [ngClass]="[tplM.bannerClass, tplM.borderClass]">
+                        <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                             [ngClass]="tplM.bgClass">
+                          <svg class="w-3.5 h-3.5" [ngClass]="tplM.colorClass" fill="none" stroke="currentColor" [attr.viewBox]="tplM.iconViewBox">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="tplM.iconPath"/>
+                          </svg>
+                        </div>
+                        <span class="text-xs font-semibold uppercase tracking-wider" [ngClass]="tplM.colorClass">{{ tplM.label }}</span>
+                        <span class="ml-auto text-xs theme-muted">{{ selectedNotification.createdAt | date:'dd/MM/yy HH:mm' }}</span>
+                      </div>
+                      <div class="max-h-[55vh] overflow-y-auto p-5">
+                        <div class="notif-body text-sm theme-text leading-relaxed rounded-xl border p-4 break-words"
+                             [ngClass]="[tplM.borderClass, tplM.bannerClass]"
+                             [innerHTML]="selectedNotification.body | notifBody"></div>
                       </div>
                     </div>
                   } @else {
@@ -510,11 +548,21 @@
                     @if (!notificationsLoading) {
                       <div class="max-h-80 overflow-y-auto divide-y theme-border">
                         @for (notif of notifications; track notif.id) {
+                          @let tM = getTemplate(notif.type);
                           <div class="flex items-start gap-3 px-5 py-4 hover:bg-white/5 transition-colors group"
-                               [class.opacity-60]="notif.read">
-                            <div class="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0"
-                                 [class.bg-gold]="!notif.read" [class.bg-transparent]="notif.read"></div>
+                               [class.opacity-55]="notif.read">
+                            <div class="relative flex-shrink-0 mt-0.5">
+                              <div class="w-8 h-8 rounded-xl flex items-center justify-center" [ngClass]="tM.bgClass">
+                                <svg class="w-3.5 h-3.5" [ngClass]="tM.colorClass" fill="none" stroke="currentColor" [attr.viewBox]="tM.iconViewBox">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="tM.iconPath"/>
+                                </svg>
+                              </div>
+                              @if (!notif.read) {
+                                <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-gold border-2 border-[var(--surface)]"></span>
+                              }
+                            </div>
                             <button type="button" (click)="openNotification(notif)" class="flex-1 min-w-0 text-left">
+                              <p class="text-[10px] font-semibold uppercase tracking-wider mb-0.5" [ngClass]="tM.colorClass">{{ tM.label }}</p>
                               <p class="text-sm font-bold theme-text leading-snug truncate">{{ notif.subject }}</p>
                               <p class="text-xs theme-muted mt-1">{{ notif.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
                             </button>
@@ -717,293 +765,309 @@
 
 
 <!-- ══════════════════════════════════════════════════════
-     PANIER — MODALE PLEIN ÉCRAN
+     PANIER — DRAWER LATÉRAL DROIT
 ══════════════════════════════════════════════════════ -->
 @if (showCart) {
-  <!-- Backdrop — clic pour fermer -->
+  <!-- Backdrop -->
   <div class="fixed inset-0 z-40 animate-backdrop-in"
-       style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);"
+       style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);"
        (click)="showCart = false"></div>
 
-  <!-- Conteneur plein écran centré -->
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-10 pointer-events-none">
-    <div class="w-full max-w-5xl h-full max-h-[92vh] flex flex-col lg:flex-row rounded-3xl overflow-hidden pointer-events-auto animate-scale-in"
-         [style.background]="themeService.isDark ? '#0f0f0f' : '#faf8f3'"
-         style="box-shadow:0 40px 120px rgba(0,0,0,0.7)">
+  <!-- Drawer -->
+  <div class="fixed top-0 right-0 h-full w-full max-w-[440px] z-50 flex flex-col animate-drawer-in"
+       [style.background]="themeService.isDark ? '#111111' : '#faf8f3'"
+       style="box-shadow:-20px 0 60px rgba(0,0,0,0.5)">
 
-      <!-- ── COLONNE GAUCHE : articles ── -->
-      <div class="flex flex-col flex-1 min-w-0 overflow-hidden"
-           [style.border-right]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
-
-        <!-- Header -->
-        <div class="flex-shrink-0 flex items-center justify-between px-6 py-5"
-             [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
-          <div>
-            <h2 class="text-xl font-black tracking-tight"
-                [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Mon panier</h2>
-            @if (cartCount > 0) {
-              <p class="text-xs mt-0.5 font-medium" style="color:#d4af37">
-                {{ cartCount }} article{{ cartCount > 1 ? 's' : '' }}
-              </p>
-            } @else {
-              <p class="text-xs mt-0.5" style="color:#6b7280">Votre sélection est vide</p>
-            }
-          </div>
-          <div class="flex items-center gap-3">
-            @if (cartItems.length > 0) {
-              <button (click)="cartService.clearCart()"
-                appTooltip="Vider tout le panier" tooltipPosition="bottom"
-                class="text-xs font-semibold transition-colors text-gray-500 hover:text-red-400 px-3 py-1.5 rounded-xl hover:bg-red-500/8">
-                Vider
-              </button>
-            }
-            <button (click)="showCart = false"
-              appTooltip="Fermer le panier" tooltipPosition="bottom"
-              class="w-9 h-9 rounded-2xl flex items-center justify-center transition-all duration-150
-                     text-gray-500 hover:text-white hover:bg-white/8
-                     light:hover:text-black light:hover:bg-black/8">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
+    <!-- ── EN-TÊTE ── -->
+    <div class="flex-shrink-0 flex items-center justify-between px-5 py-4"
+         [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.07)'">
+      <div class="flex items-center gap-3">
+        <!-- Icône panier -->
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center"
+             style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.2)">
+          <svg class="w-4.5 h-4.5" style="color:#d4af37;width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
         </div>
-
-        <!-- Liste articles -->
-        <div class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
-          @if (cartItems.length === 0) {
-            <div class="flex flex-col items-center justify-center h-full py-16 text-center animate-fade-in">
-              <div class="w-24 h-24 rounded-3xl flex items-center justify-center mb-6"
-                   [style.background]="themeService.isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.10)'"
-                   style="border:1px solid rgba(212,175,55,0.15)">
-                <svg class="w-11 h-11 animate-float" style="color:rgba(212,175,55,0.5)"
-                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                </svg>
-              </div>
-              <p class="font-bold text-lg mb-2"
-                 [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Panier vide</p>
-              <p class="text-sm leading-relaxed max-w-[220px] mb-8" style="color:#6b7280">
-                Découvrez notre collection de montres et bijoux d'exception
-              </p>
-              <button (click)="showCart = false" routerLink="/products"
-                class="px-8 py-3 text-sm font-bold text-black bg-gold rounded-2xl
-                       hover:shadow-lg hover:shadow-yellow-600/20 hover:-translate-y-0.5 transition-all duration-200">
-                Explorer la boutique
-              </button>
-            </div>
-          }
-
-          @for (item of cartItems; track item.productId; let i = $index) {
-            <div class="group relative rounded-3xl p-5 transition-all duration-200 animate-fade-in"
-                 [style.background]="themeService.isDark ? 'rgba(255,255,255,0.03)' : '#ffffff'"
-                 [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)'"
-                 [style.animation-delay]="(i * 0.05) + 's'">
-              <div class="flex gap-5">
-                <!-- Image -->
-                <div class="flex-shrink-0 relative">
-                  <div class="w-24 h-24 rounded-2xl overflow-hidden"
-                       style="box-shadow:0 4px 20px rgba(0,0,0,0.25)">
-                    <img [src]="item.imageUrl || 'https://placehold.co/96x96/1a1a1a/d4af37?text=M'"
-                         [alt]="item.productName"
-                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                         (error)="$any($event.target).src='https://placehold.co/96x96/1a1a1a/d4af37?text=M'"/>
-                  </div>
-                </div>
-                <!-- Infos -->
-                <div class="flex-1 min-w-0">
-                  <p class="font-bold text-base leading-snug mb-1 pr-8"
-                     [style.color]="themeService.isDark ? '#f0f0f0' : '#111111'">{{ item.productName }}</p>
-                  <p class="text-sm font-semibold mb-4" style="color:#d4af37">
-                    {{ (item.price / 1000) | number:'1.0-0' }}&thinsp;000 FCFA / unité
-                  </p>
-                  <div class="flex items-center justify-between">
-                    <!-- Quantité -->
-                    <div class="flex items-center rounded-2xl overflow-hidden"
-                         [style.background]="themeService.isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'">
-                      <button (click)="cartService.updateQuantity(item.productId, item.quantity - 1)"
-                        appTooltip="Diminuer la quantité" tooltipPosition="top"
-                        class="w-9 h-9 flex items-center justify-center text-xl font-light transition-colors
-                               hover:bg-white/8 light:hover:bg-black/8"
-                        [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">−</button>
-                      <span class="w-9 text-center text-sm font-black"
-                            [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ item.quantity }}</span>
-                      <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1)"
-                        appTooltip="Augmenter la quantité" tooltipPosition="top"
-                        class="w-9 h-9 flex items-center justify-center text-xl font-light transition-colors
-                               hover:bg-white/8 light:hover:bg-black/8"
-                        [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">+</button>
-                    </div>
-                    <!-- Sous-total ligne -->
-                    <p class="text-base font-black" style="color:#d4af37">
-                      {{ ((item.price * item.quantity) / 1000) | number:'1.0-0' }}&thinsp;K FCFA
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <!-- Bouton supprimer -->
-              <button (click)="cartService.removeFromCart(item.productId)"
-                appTooltip="Retirer cet article" tooltipPosition="left"
-                class="absolute top-4 right-4 w-8 h-8 rounded-xl flex items-center justify-center
-                       opacity-0 group-hover:opacity-100 transition-all duration-150
-                       text-gray-500 hover:text-red-400 hover:bg-red-500/10">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </button>
-            </div>
-          }
+        <div>
+          <h2 class="text-base font-black tracking-tight leading-none"
+              [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Mon panier</h2>
+          <p class="text-xs mt-0.5 font-medium" style="color:#d4af37">
+            @if (cartCount > 0) { {{ cartCount }} article{{ cartCount > 1 ? 's' : '' }} }
+            @else { Vide }
+          </p>
         </div>
-
-        <!-- Lien continuer -->
-        @if (cartItems.length > 0) {
-          <div class="flex-shrink-0 px-6 py-3"
-               [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.05)'">
-            <button (click)="showCart = false" routerLink="/products"
-              class="text-sm font-semibold transition-colors text-gray-500 hover:text-gold flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-              </svg>
-              Continuer mes achats
-            </button>
-          </div>
-        }
       </div>
+      <div class="flex items-center gap-2">
+        @if (cartItems.length > 0) {
+          <button (click)="cartService.clearCart()"
+            class="text-xs font-semibold px-3 py-1.5 rounded-xl transition-colors text-gray-500 hover:text-red-400 hover:bg-red-500/8">
+            Vider
+          </button>
+        }
+        <button (click)="showCart = false"
+          class="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-150
+                 text-gray-500 hover:text-white hover:bg-white/10
+                 light:hover:text-black light:hover:bg-black/8">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
 
-      <!-- ── COLONNE DROITE : récapitulatif & commande ── -->
-      @if (cartItems.length > 0) {
-        <div class="flex-shrink-0 w-full lg:w-[340px] flex flex-col"
-             [style.background]="themeService.isDark ? '#0a0a0a' : '#f3f0e8'">
+    <!-- ── LISTE ARTICLES (flex-1 scrollable) ── -->
+    <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
 
-          <!-- Titre récap -->
-          <div class="flex-shrink-0 px-6 py-5"
-               [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
-            <h3 class="font-bold text-base"
-                [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Récapitulatif</h3>
+      @if (cartItems.length === 0) {
+        <div class="flex flex-col items-center justify-center h-full py-12 text-center animate-fade-in">
+          <div class="w-20 h-20 rounded-3xl flex items-center justify-center mb-5"
+               [style.background]="themeService.isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.10)'"
+               style="border:1px solid rgba(212,175,55,0.15)">
+            <svg class="w-9 h-9 animate-float" style="color:rgba(212,175,55,0.45)"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
           </div>
+          <p class="font-bold text-base mb-2"
+             [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Panier vide</p>
+          <p class="text-sm leading-relaxed max-w-[200px] mb-7" style="color:#6b7280">
+            Explorez la boutique et ajoutez vos articles préférés
+          </p>
+          <button (click)="showCart = false" routerLink="/products"
+            class="px-7 py-2.5 text-sm font-bold text-black bg-gold rounded-xl
+                   hover:shadow-lg hover:shadow-yellow-600/20 hover:-translate-y-0.5 transition-all duration-200">
+            Explorer la boutique
+          </button>
+        </div>
+      }
 
-          <div class="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
-
-            <!-- Totaux -->
-            <div class="space-y-3">
-              <div class="flex items-center justify-between text-sm">
-                <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
-                <span class="font-semibold"
-                      [style.color]="themeService.isDark ? '#d1d5db' : '#374151'">
-                  {{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K FCFA
-                </span>
-              </div>
-              <div class="flex items-center justify-between text-sm">
-                <span style="color:#6b7280">Livraison</span>
-                <span class="font-semibold text-green-400">Gratuite</span>
-              </div>
-              <div class="h-px" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.3),transparent)"></div>
+      @for (item of cartItems; track item.productId; let i = $index) {
+        <div class="group relative rounded-2xl p-4 transition-all duration-200 animate-fade-in"
+             [style.background]="themeService.isDark ? 'rgba(255,255,255,0.03)' : '#ffffff'"
+             [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)'"
+             [style.animation-delay]="(i * 0.05) + 's'">
+          <div class="flex gap-4">
+            <!-- Image -->
+            <div class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden"
+                 style="box-shadow:0 2px 12px rgba(0,0,0,0.2)">
+              <img [src]="item.imageUrl || 'https://placehold.co/80x80/1a1a1a/d4af37?text=SDM'"
+                   [alt]="item.productName"
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                   (error)="$any($event.target).src='https://placehold.co/80x80/1a1a1a/d4af37?text=SDM'"/>
+            </div>
+            <!-- Infos -->
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-sm leading-snug mb-1 pr-7 line-clamp-2"
+                 [style.color]="themeService.isDark ? '#f0f0f0' : '#111111'">{{ item.productName }}</p>
+              <p class="text-xs font-semibold mb-3" style="color:#d4af37">
+                {{ (item.price / 1000) | number:'1.0-0' }}&thinsp;000 FCFA / unité
+              </p>
               <div class="flex items-center justify-between">
-                <span class="font-bold"
-                      [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Total</span>
-                <div>
-                  <span class="text-3xl font-black gold-text">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K</span>
-                  <span class="text-sm ml-1" style="color:#6b7280">FCFA</span>
+                <!-- Contrôle quantité -->
+                <div class="flex items-center rounded-xl overflow-hidden"
+                     [style.background]="themeService.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'">
+                  <button (click)="cartService.updateQuantity(item.productId, item.quantity - 1)"
+                    class="w-8 h-8 flex items-center justify-center text-lg font-light transition-colors
+                           hover:bg-white/10 light:hover:bg-black/8"
+                    [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">−</button>
+                  <span class="w-8 text-center text-sm font-black"
+                        [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ item.quantity }}</span>
+                  <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1)"
+                    class="w-8 h-8 flex items-center justify-center text-lg font-light transition-colors
+                           hover:bg-white/10 light:hover:bg-black/8"
+                    [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">+</button>
                 </div>
-              </div>
-            </div>
-
-            <!-- Checkout -->
-            @if (!showCheckout) {
-              <button (click)="openCheckout()"
-                      class="w-full py-4 bg-gold text-black font-black rounded-2xl text-sm
-                             flex items-center justify-center gap-2
-                             hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all duration-200">
-                Commander maintenant
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                </svg>
-              </button>
-            } @else {
-              <div class="space-y-3">
-                @if (checkoutSuccess) {
-                  <div class="flex flex-col items-center gap-3 py-6 text-center">
-                    <div class="w-14 h-14 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center">
-                      <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                      </svg>
-                    </div>
-                    <p class="text-sm font-bold text-green-400">Commande passée avec succès !</p>
-                    <p class="text-xs" style="color:#6b7280">Redirection vers vos commandes…</p>
-                  </div>
-                } @else {
-                  <p class="text-xs font-bold uppercase tracking-wider" style="color:#6b7280">Adresse de livraison</p>
-                  <textarea
-                    [(ngModel)]="deliveryAddress"
-                    rows="3"
-                    placeholder="Ex: Cocody, Abidjan, Côte d'Ivoire"
-                    class="theme-input w-full px-4 py-3 rounded-xl text-sm resize-none transition-all">
-                  </textarea>
-                  @if (checkoutError) {
-                    <p class="text-xs text-red-400 flex items-center gap-1.5">
-                      <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                      </svg>
-                      {{ checkoutError }}
-                    </p>
-                  }
-                  <div class="flex gap-2">
-                    <button (click)="cancelCheckout()"
-                            class="flex-1 py-3 rounded-xl text-sm font-semibold theme-muted luxury-card transition-all hover:text-gold">
-                      Annuler
-                    </button>
-                    <button (click)="placeOrder()"
-                            [disabled]="checkoutLoading || !deliveryAddress.trim()"
-                            class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-black
-                                   flex items-center justify-center gap-1.5
-                                   disabled:opacity-50 disabled:cursor-not-allowed
-                                   hover:shadow-lg hover:shadow-yellow-600/25 transition-all">
-                      @if (checkoutLoading) {
-                        <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                        </svg>
-                        Envoi…
-                      } @else {
-                        Confirmer
-                      }
-                    </button>
-                  </div>
-                }
-              </div>
-            }
-
-            <!-- Garanties -->
-            <div class="mt-auto pt-4"
-                 [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
-              <div class="flex flex-col gap-2.5">
-                <div class="flex items-center gap-2.5 text-xs" style="color:#6b7280">
-                  <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                  </svg>
-                  Produits 100% authentiques
-                </div>
-                <div class="flex items-center gap-2.5 text-xs" style="color:#6b7280">
-                  <svg class="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                  </svg>
-                  Paiement sécurisé via Wave
-                </div>
-                <div class="flex items-center gap-2.5 text-xs" style="color:#6b7280">
-                  <svg class="w-4 h-4 flex-shrink-0" style="color:#d4af37" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                  </svg>
-                  Livraison sous 48h
-                </div>
+                <!-- Sous-total ligne -->
+                <p class="text-sm font-black" style="color:#d4af37">
+                  {{ ((item.price * item.quantity) / 1000) | number:'1.0-0' }}&thinsp;K FCFA
+                </p>
               </div>
             </div>
           </div>
+          <!-- Supprimer -->
+          <button (click)="cartService.removeFromCart(item.productId)"
+            class="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center
+                   opacity-0 group-hover:opacity-100 transition-all duration-150
+                   text-gray-500 hover:text-red-400 hover:bg-red-500/10">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
       }
     </div>
+
+    <!-- ── CONTINUER LES ACHATS ── -->
+    @if (cartItems.length > 0) {
+      <div class="flex-shrink-0 px-5 py-2"
+           [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.05)'">
+        <button (click)="showCart = false" routerLink="/products"
+          class="text-xs font-semibold transition-colors text-gray-500 hover:text-gold flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Continuer mes achats
+        </button>
+      </div>
+    }
+
+    <!-- ── RÉCAP + COMMANDE (fixé en bas) ── -->
+    @if (cartItems.length > 0) {
+      <div class="flex-shrink-0 px-5 py-5 space-y-4"
+           [style.background]="themeService.isDark ? '#0c0c0c' : '#f0ece0'"
+           [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.08)'">
+
+        <!-- Totaux -->
+        @if (!showCheckout) {
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-sm">
+              <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
+              <span class="font-semibold"
+                    [style.color]="themeService.isDark ? '#d1d5db' : '#374151'">
+                {{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K FCFA
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span style="color:#6b7280">Livraison</span>
+              <span class="font-semibold text-green-400">Gratuite</span>
+            </div>
+            <div class="h-px my-1" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.35),transparent)"></div>
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm" [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Total</span>
+              <div class="flex items-baseline gap-1">
+                <span class="text-2xl font-black gold-text">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K</span>
+                <span class="text-xs" style="color:#6b7280">FCFA</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton commander -->
+          <button (click)="openCheckout()"
+                  class="w-full py-3.5 bg-gold text-black font-black rounded-xl text-sm
+                         flex items-center justify-center gap-2
+                         hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all duration-200">
+            Commander maintenant
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </button>
+        }
+
+        <!-- Formulaire checkout -->
+        @if (showCheckout) {
+          @if (checkoutSuccess) {
+            <div class="flex flex-col items-center gap-3 py-4 text-center">
+              <div class="w-12 h-12 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center">
+                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+              <p class="text-sm font-bold text-green-400">Commande passée avec succès !</p>
+              <p class="text-xs" style="color:#6b7280">Redirection vers le paiement…</p>
+            </div>
+          } @else {
+            <div class="space-y-3">
+              <!-- Mini récap -->
+              <div class="rounded-xl overflow-hidden"
+                   [style.background]="themeService.isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)'"
+                   [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.07)'">
+                @for (item of cartItems; track item.productId) {
+                  <div class="flex items-center justify-between px-3 py-2 text-xs"
+                       [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.05)'">
+                    <span class="truncate max-w-[180px]"
+                          [style.color]="themeService.isDark ? '#d1d5db' : '#374151'">{{ item.productName }}</span>
+                    <span class="font-bold ml-2 flex-shrink-0" style="color:#d4af37">×{{ item.quantity }}</span>
+                  </div>
+                }
+                <div class="flex items-center justify-between px-3 py-2 text-xs font-black">
+                  <span [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Total</span>
+                  <span style="color:#d4af37">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K FCFA</span>
+                </div>
+              </div>
+
+              <!-- Téléphone -->
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider mb-1.5" style="color:#6b7280">
+                  Téléphone <span class="text-red-400">*</span>
+                </p>
+                <input type="tel" [(ngModel)]="deliveryPhone"
+                  placeholder="+225 07 00 00 00 00"
+                  class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
+              </div>
+
+              <!-- Adresse -->
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wider mb-1.5" style="color:#6b7280">
+                  Adresse de livraison <span class="text-red-400">*</span>
+                </p>
+                <textarea [(ngModel)]="deliveryAddress" rows="2"
+                  placeholder="Ex: Cocody, Abidjan"
+                  class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm resize-none transition-all">
+                </textarea>
+              </div>
+
+              @if (checkoutError) {
+                <p class="text-xs text-red-400 flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  {{ checkoutError }}
+                </p>
+              }
+
+              <div class="flex gap-2">
+                <button (click)="cancelCheckout()"
+                        class="flex-1 py-2.5 rounded-xl text-sm font-semibold theme-muted luxury-card transition-all hover:text-gold">
+                  Annuler
+                </button>
+                <button (click)="placeOrder()"
+                        [disabled]="checkoutLoading || !deliveryAddress.trim() || !deliveryPhone.trim()"
+                        class="flex-1 py-2.5 bg-gold text-black rounded-xl text-sm font-black
+                               flex items-center justify-center gap-1.5
+                               disabled:opacity-50 disabled:cursor-not-allowed
+                               hover:shadow-lg hover:shadow-yellow-600/25 transition-all">
+                  @if (checkoutLoading) {
+                    <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    Envoi…
+                  } @else {
+                    Confirmer
+                  }
+                </button>
+              </div>
+            </div>
+          }
+        }
+
+        <!-- Garanties -->
+        <div class="flex items-center justify-between pt-2"
+             [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
+          <div class="flex items-center gap-1.5 text-xs" style="color:#6b7280">
+            <svg class="w-3.5 h-3.5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            Vérifié
+          </div>
+          <div class="flex items-center gap-1.5 text-xs" style="color:#6b7280">
+            <svg class="w-3.5 h-3.5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            Wave sécurisé
+          </div>
+          <div class="flex items-center gap-1.5 text-xs" style="color:#6b7280">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" style="color:#d4af37" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+            24–48h
+          </div>
+        </div>
+
+      </div>
+    }
+
   </div>
 }

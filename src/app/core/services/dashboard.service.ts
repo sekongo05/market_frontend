@@ -5,14 +5,38 @@ import { ApiResponse } from '../models/common.models';
 import { ApiService } from './api.service';
 
 export interface DashboardStats {
+  // Commandes
   totalOrders: number;
-  totalUsers: number;
-  totalActiveProducts: number;
+  completedOrdersCount: number;
   pendingOrders: number;
-  lowStockCount: number;
+  pendingPaymentsCount: number;
+  newOrdersThisMonth: number;
+  // Revenu (basé sur les paiements validés)
   totalRevenue: number;
-  recentOrders: any[];
-  ordersByStatus: any[];
+  currentMonthRevenue: number;
+  previousMonthRevenue: number;
+  // Utilisateurs
+  totalUsers: number;
+  newUsersThisMonth: number;
+  // Produits & stock
+  totalActiveProducts: number;
+  lowStockCount: number;
+  // Détails
+  recentOrders: RecentOrder[];
+  ordersByStatus: OrderByStatus[];
+}
+
+export interface RecentOrder {
+  orderNumber: string;
+  customerName: string;
+  totalAmount: number;
+  orderStatus: string;
+  createdAt: string;
+}
+
+export interface OrderByStatus {
+  status: string;
+  count: number;
 }
 
 export interface RevenueResponse {

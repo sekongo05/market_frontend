@@ -8,11 +8,20 @@
           <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-1">Administration</p>
           <h1 class="text-3xl font-black theme-text">Tableau de bord</h1>
         </div>
-        <button (click)="loadStats()"
-          class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors duration-200">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          Actualiser
-        </button>
+        <div class="flex items-center gap-3">
+          @if (lastRefreshed) {
+            <span class="text-xs theme-muted">
+              Mis à jour à {{ lastRefreshed | date:'HH:mm:ss' }}
+            </span>
+          }
+          <button (click)="loadStats()" [disabled]="loading"
+            class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            <svg class="w-4 h-4" [class.animate-spin]="loading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Actualiser
+          </button>
+        </div>
       </div>
 
       <!-- Tabs -->
@@ -47,7 +56,9 @@
     <!-- Error -->
     @if (error) {
       <div class="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/25 rounded-2xl text-red-400 mb-6 animate-fade-in">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
         {{ error }}
       </div>
     }
@@ -72,188 +83,344 @@
 
     @if (!loading && stats) {
 
-      <!-- KPI Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-500/20 card-hover animate-fade-in-up delay-100">
-          <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+      <!-- ── Insights intelligents ─────────────────────────────────────── -->
+      @if (insights.length > 0) {
+        <div class="flex flex-col gap-2 mb-6 animate-fade-in-up">
+          @for (insight of insights; track insight.message) {
+            @let c = insightColors(insight.type);
+            <div class="flex items-start gap-3 px-4 py-3 rounded-2xl border"
+                 [ngClass]="[c.border, c.bg]">
+              <!-- Dot pulsant pour type action -->
+              <div class="mt-0.5 flex-shrink-0">
+                @if (insight.type === 'action') {
+                  <span class="relative flex h-2.5 w-2.5 mt-1">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [ngClass]="c.dot"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5" [ngClass]="c.dot"></span>
+                  </span>
+                } @else {
+                  <span class="inline-flex h-2.5 w-2.5 rounded-full mt-1" [ngClass]="c.dot"></span>
+                }
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold" [ngClass]="c.text">{{ insight.message }}</p>
+                @if (insight.detail) {
+                  <p class="text-xs theme-muted mt-0.5">{{ insight.detail }}</p>
+                }
+              </div>
             </div>
-            <span class="text-white/70 text-xs font-medium">+12% ce mois</span>
+          }
+        </div>
+      }
+
+      <!-- ── KPI Cards row 1 ────────────────────────────────────────────── -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+
+        <!-- Commandes totales -->
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-5 text-white shadow-xl shadow-indigo-500/20 card-hover animate-fade-in-up delay-100">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+            </div>
+            @if (stats.newOrdersThisMonth > 0) {
+              <span class="text-white/80 text-xs font-bold bg-white/15 px-2 py-0.5 rounded-lg">
+                +{{ stats.newOrdersThisMonth }} ce mois
+              </span>
+            }
           </div>
-          <p class="text-4xl font-black">{{ stats.totalOrders }}</p>
-          <p class="text-white/70 text-sm mt-1">Commandes totales</p>
+          <p class="text-3xl font-black leading-none">{{ stats.totalOrders }}</p>
+          <p class="text-white/70 text-xs mt-1.5 font-medium">Commandes totales</p>
         </div>
 
-        <div class="bg-gradient-to-br from-green-500 to-teal-500 rounded-3xl p-6 text-white shadow-xl shadow-green-500/20 card-hover animate-fade-in-up delay-200">
-          <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <!-- Utilisateurs -->
+        <div class="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-3xl p-5 text-white shadow-xl shadow-teal-500/20 card-hover animate-fade-in-up delay-150">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
             </div>
-            <span class="text-white/70 text-xs font-medium">+8% ce mois</span>
+            @if (stats.newUsersThisMonth > 0) {
+              <span class="text-white/80 text-xs font-bold bg-white/15 px-2 py-0.5 rounded-lg">
+                +{{ stats.newUsersThisMonth }} ce mois
+              </span>
+            }
           </div>
-          <p class="text-4xl font-black">{{ stats.totalUsers }}</p>
-          <p class="text-white/70 text-sm mt-1">Utilisateurs</p>
+          <p class="text-3xl font-black leading-none">{{ stats.totalUsers }}</p>
+          <p class="text-white/70 text-xs mt-1.5 font-medium">Utilisateurs inscrits</p>
         </div>
 
-        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-6 text-white shadow-xl shadow-purple-500/20 card-hover animate-fade-in-up delay-300">
-          <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        <!-- Produits actifs -->
+        <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-3xl p-5 text-white shadow-xl shadow-violet-500/20 card-hover animate-fade-in-up delay-200">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+              </svg>
             </div>
-            <span class="text-white/70 text-xs font-medium">En ligne</span>
+            <span class="text-white/80 text-xs font-bold bg-white/15 px-2 py-0.5 rounded-lg">En ligne</span>
           </div>
-          <p class="text-4xl font-black">{{ stats.totalActiveProducts }}</p>
-          <p class="text-white/70 text-sm mt-1">Produits actifs</p>
+          <p class="text-3xl font-black leading-none">{{ stats.totalActiveProducts }}</p>
+          <p class="text-white/70 text-xs mt-1.5 font-medium">Produits actifs</p>
         </div>
 
-        <div class="bg-gradient-to-br from-[#b8860b] to-[#d4af37] rounded-3xl p-6 text-black shadow-xl shadow-yellow-600/20 card-hover animate-fade-in-up delay-400">
-          <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 bg-black/15 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <!-- Taux de livraison -->
+        <div class="theme-surface border theme-border rounded-3xl p-5 card-hover animate-fade-in-up delay-250">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                 [ngClass]="completionRate >= 80 ? 'bg-emerald-500/15' : completionRate >= 50 ? 'bg-amber-500/15' : 'bg-red-500/15'">
+              <svg class="w-4 h-4" [ngClass]="completionRate >= 80 ? 'text-emerald-400' : completionRate >= 50 ? 'text-amber-400' : 'text-red-400'"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+              </svg>
             </div>
-            <span class="text-black/60 text-xs font-medium">À traiter</span>
+            <span class="text-xs font-bold px-2 py-0.5 rounded-lg"
+                  [ngClass]="completionRate >= 80 ? 'bg-emerald-500/15 text-emerald-400' : completionRate >= 50 ? 'bg-amber-500/15 text-amber-400' : 'bg-red-500/15 text-red-400'">
+              Livraison
+            </span>
           </div>
-          <p class="text-4xl font-black">{{ stats.pendingOrders }}</p>
-          <p class="text-black/60 text-sm mt-1">En attente</p>
+          <p class="text-3xl font-black theme-text leading-none">{{ completionRate }}<span class="text-lg theme-muted font-semibold">%</span></p>
+          <!-- Barre de progression -->
+          <div class="mt-3 h-1.5 bg-white/8 rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-700"
+                 [style.width.%]="completionRate"
+                 [ngClass]="completionRate >= 80 ? 'bg-emerald-400' : completionRate >= 50 ? 'bg-amber-400' : 'bg-red-400'">
+            </div>
+          </div>
+          <p class="text-xs theme-muted mt-1.5 font-medium">Taux de livraison</p>
         </div>
       </div>
 
-      <!-- KPI row 2 — Alertes -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+      <!-- ── Row 2 : CA + Commandes en attente + Stock ──────────────────── -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
 
-        <!-- Paiements à valider -->
-        <div class="theme-surface border theme-border rounded-3xl p-5 card-hover animate-fade-in-up delay-100"
-             [class.border-blue-500/30]="stats.pendingPaymentsCount > 0">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-                 [ngClass]="stats.pendingPaymentsCount > 0 ? 'bg-blue-500/15' : 'bg-white/5'">
-              <svg class="w-6 h-6" [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'"
-                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0zM6 7.5a.5.5 0 11-1 0 .5.5 0 011 0zm.5 8.5a.5.5 0 110-1 .5.5 0 010 1zm11-8a.5.5 0 110-1 .5.5 0 010 1z"/>
-              </svg>
-            </div>
-            <div>
-              <p class="text-3xl font-black"
-                 [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'">
-                {{ stats.pendingPaymentsCount }}
-              </p>
-              <p class="text-sm font-semibold theme-muted">Paiements à valider</p>
-              @if (stats.pendingPaymentsCount > 0) {
-                <p class="text-xs text-blue-400 font-medium mt-0.5">Action requise →</p>
-              }
-            </div>
-          </div>
-        </div>
-
-        <!-- Stock faible -->
-        <div class="theme-surface border theme-border rounded-3xl p-5 card-hover animate-fade-in-up delay-200"
-             [class.border-amber-500/30]="stats.lowStockCount > 0">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-                 [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/15' : 'bg-white/5'">
-              <svg class="w-6 h-6" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'"
-                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-              </svg>
-            </div>
-            <div>
-              <p class="text-3xl font-black"
-                 [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'">
-                {{ stats.lowStockCount }}
-              </p>
-              <p class="text-sm font-semibold theme-muted">Produits stock faible</p>
-              @if (stats.lowStockCount > 0) {
-                <p class="text-xs text-amber-400 font-medium mt-0.5">≤ 5 unités restantes</p>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Revenue + Status row -->
-      <div class="grid lg:grid-cols-3 gap-6 mb-6">
-
-        <!-- Revenue card -->
+        <!-- CA total + mois en cours -->
         <div class="lg:col-span-2 theme-surface border theme-border rounded-3xl p-6 card-hover animate-fade-in-up delay-200">
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex items-start justify-between mb-4">
             <div>
-              <h2 class="text-lg font-bold theme-text">Revenus totaux</h2>
-              <p class="text-xs theme-muted mt-0.5">Montant total des ventes</p>
+              <h2 class="text-base font-bold theme-text">Chiffre d'affaires</h2>
+              <p class="text-xs theme-muted mt-0.5">Paiements complétés</p>
             </div>
-            <span class="px-3 py-1.5 bg-green-500/15 text-green-400 text-xs font-bold rounded-xl">+18% ce mois</span>
+            <!-- Badge croissance M/M (calculé depuis l'API) -->
+            <span class="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-xl"
+                  [ngClass]="revenueGrowthPositive
+                    ? 'bg-emerald-500/15 text-emerald-400'
+                    : 'bg-red-500/15 text-red-400'">
+              @if (revenueGrowthPositive) {
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/>
+                </svg>
+              } @else {
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                </svg>
+              }
+              {{ revenueGrowthPct > 0 ? '+' : '' }}{{ revenueGrowthPct }}% vs mois dernier
+            </span>
           </div>
-          <p class="text-5xl font-black theme-text mb-2">
-            {{ (stats.totalRevenue / 1000000) | number:'1.0-2' }}<span class="text-2xl theme-muted font-semibold ml-1">M FCFA</span>
+
+          <!-- CA total -->
+          <p class="text-4xl font-black theme-text">
+            {{ formatAmount(stats.totalRevenue) }}
           </p>
-          <div class="mt-6 h-2 bg-white/8 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] rounded-full" style="width: 73%"></div>
-          </div>
-          <div class="flex justify-between text-xs theme-muted mt-2">
-            <span>Objectif mensuel</span>
-            <span class="font-bold text-gold">73%</span>
+
+          <!-- Comparaison ce mois vs mois dernier -->
+          <div class="mt-5 grid grid-cols-2 gap-4 pt-4 border-t theme-border">
+            <div>
+              <p class="text-xs theme-muted font-medium mb-1">Ce mois</p>
+              <p class="text-lg font-black text-gold">{{ formatAmount(stats.currentMonthRevenue) }}</p>
+            </div>
+            <div>
+              <p class="text-xs theme-muted font-medium mb-1">Mois précédent</p>
+              <p class="text-lg font-black theme-text">{{ formatAmount(stats.previousMonthRevenue) }}</p>
+            </div>
           </div>
         </div>
 
-        <!-- Orders by status -->
-        <div class="theme-surface border theme-border rounded-3xl p-6 card-hover animate-fade-in-up delay-300">
-          <h2 class="text-lg font-bold theme-text mb-5">Statut des commandes</h2>
-          @if (stats.ordersByStatus) {
-            <div class="space-y-3">
-              @for (item of stats.ordersByStatus; track item.status) {
-                <div class="flex items-center justify-between">
-                  <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold" [ngClass]="getStatusColor(item.status)">{{ item.status }}</span>
-                  <span class="text-lg font-black theme-text">{{ item.count }}</span>
+        <!-- Alertes opérationnelles -->
+        <div class="theme-surface border theme-border rounded-3xl p-6 animate-fade-in-up delay-250">
+          <h2 class="text-base font-bold theme-text mb-4">Alertes</h2>
+          <div class="space-y-4">
+
+            <!-- Paiements à valider -->
+            <div class="flex items-center justify-between p-3 rounded-2xl transition-colors"
+                 [ngClass]="stats.pendingPaymentsCount > 0 ? 'bg-blue-500/8 border border-blue-500/20' : 'bg-white/4'">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                     [ngClass]="stats.pendingPaymentsCount > 0 ? 'bg-blue-500/20' : 'bg-white/8'">
+                  <svg class="w-4 h-4" [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'"
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                  </svg>
                 </div>
+                <div>
+                  <p class="text-xs font-semibold" [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'">
+                    Paiements à valider
+                  </p>
+                  @if (stats.pendingPaymentsCount > 0) {
+                    <p class="text-[10px] text-blue-400/70">Action requise</p>
+                  }
+                </div>
+              </div>
+              <span class="text-xl font-black"
+                    [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'">
+                {{ stats.pendingPaymentsCount }}
+              </span>
+            </div>
+
+            <!-- Stock faible -->
+            <div class="flex items-center justify-between p-3 rounded-2xl transition-colors"
+                 [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/8 border border-amber-500/20' : 'bg-white/4'">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                     [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/20' : 'bg-white/8'">
+                  <svg class="w-4 h-4" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'"
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'">
+                    Stock faible
+                  </p>
+                  @if (stats.lowStockCount > 0) {
+                    <p class="text-[10px] text-amber-400/70">≤ 5 unités</p>
+                  }
+                </div>
+              </div>
+              <span class="text-xl font-black"
+                    [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'">
+                {{ stats.lowStockCount }}
+              </span>
+            </div>
+
+            <!-- Commandes en attente -->
+            <div class="flex items-center justify-between p-3 rounded-2xl bg-white/4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-white/8 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <p class="text-xs font-semibold theme-muted">En attente</p>
+              </div>
+              <span class="text-xl font-black theme-text">{{ stats.pendingOrders }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Row 3 : Statut commandes + Top produits ─────────────────────── -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+
+        <!-- Répartition par statut -->
+        <div class="theme-surface border theme-border rounded-3xl p-6 animate-fade-in-up delay-300">
+          <h2 class="text-base font-bold theme-text mb-4">Répartition des commandes</h2>
+          @if (stats.ordersByStatus) {
+            @let total = stats.totalOrders;
+            <div class="space-y-2.5">
+              @for (item of stats.ordersByStatus; track item.status) {
+                @if (item.count > 0) {
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="inline-flex px-2 py-0.5 rounded-lg text-xs font-bold" [ngClass]="statusColor(item.status)">
+                        {{ statusLabel(item.status) }}
+                      </span>
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs theme-muted">{{ total > 0 ? ((item.count / total) * 100 | number:'1.0-0') : 0 }}%</span>
+                        <span class="text-sm font-black theme-text w-6 text-right">{{ item.count }}</span>
+                      </div>
+                    </div>
+                    <div class="h-1.5 bg-white/8 rounded-full overflow-hidden">
+                      <div class="h-full rounded-full transition-all duration-700"
+                           [style.width.%]="total > 0 ? (item.count / total) * 100 : 0"
+                           [ngClass]="statusColor(item.status).includes('yellow') ? 'bg-yellow-400' :
+                                      statusColor(item.status).includes('blue')   ? 'bg-blue-400'   :
+                                      statusColor(item.status).includes('indigo') ? 'bg-indigo-400' :
+                                      statusColor(item.status).includes('emerald')? 'bg-emerald-400':
+                                                                                    'bg-red-400'">
+                      </div>
+                    </div>
+                  </div>
+                }
               }
             </div>
           }
         </div>
+
+        <!-- Top produits vendus -->
+        @if (topProducts.length > 0) {
+          <div class="theme-surface border theme-border rounded-3xl p-6 animate-fade-in-up delay-350">
+            <h2 class="text-base font-bold theme-text mb-4">Top produits</h2>
+            <div class="space-y-3">
+              @for (product of topProducts; track product.productId; let i = $index) {
+                <div class="flex items-center gap-3">
+                  <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0"
+                       [ngClass]="i === 0 ? 'bg-gold text-black' : i === 1 ? 'bg-gold/25 text-gold' : 'bg-white/8 theme-muted'">
+                    {{ i + 1 }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-0.5">
+                      <span class="text-xs font-semibold theme-text truncate">{{ product.productName }}</span>
+                      <span class="text-xs font-black theme-text ml-2 flex-shrink-0">{{ product.totalSold }}</span>
+                    </div>
+                    <div class="h-1 bg-white/8 rounded-full overflow-hidden">
+                      <div class="h-full rounded-full transition-all duration-700"
+                           [style.width.%]="(product.totalSold / maxTopProduct) * 100"
+                           [ngClass]="i === 0 ? 'bg-gradient-to-r from-[#b8860b] to-[#d4af37]' : i === 1 ? 'bg-gold/50' : 'bg-white/20'">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
       </div>
 
-      <!-- Recent orders table -->
-      @if (stats.recentOrders) {
-        <div class="theme-surface border theme-border rounded-3xl overflow-hidden animate-fade-in-up delay-400">
-          <div class="px-6 py-4 border-b theme-border flex items-center justify-between">
-            <div>
-              <h2 class="text-lg font-bold theme-text">Commandes récentes</h2>
-              <p class="text-xs theme-muted mt-0.5">Les dernières commandes passées</p>
-            </div>
+      <!-- ── Commandes récentes ──────────────────────────────────────────── -->
+      @if (stats.recentOrders.length > 0) {
+        <div class="theme-surface border theme-border rounded-3xl overflow-hidden animate-fade-in-up delay-400 mb-5">
+          <div class="px-6 py-4 border-b theme-border">
+            <h2 class="text-base font-bold theme-text">Dernières commandes</h2>
+            <p class="text-xs theme-muted mt-0.5">5 commandes les plus récentes</p>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead>
                 <tr class="theme-surface-2">
-                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Commande</th>
-                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Client</th>
-                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Montant</th>
-                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Statut</th>
+                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">N° commande</th>
+                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Client</th>
+                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden sm:table-cell">Montant</th>
+                  <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
+                  <th class="text-right text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Date</th>
                 </tr>
               </thead>
               <tbody>
                 @for (order of stats.recentOrders; track order.orderNumber) {
-                  <tr class="border-t theme-border hover:bg-white/3 transition-colors duration-150">
-                    <td class="px-6 py-4">
-                      <span class="font-semibold text-sm theme-text">{{ order.orderNumber }}</span>
+                  <tr class="border-t theme-border hover:bg-white/3 transition-colors">
+                    <td class="px-5 py-3.5">
+                      <span class="font-mono text-xs font-semibold theme-text">{{ order.orderNumber }}</span>
                     </td>
-                    <td class="px-6 py-4">
-                      <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-lg flex items-center justify-center text-white text-xs font-bold">
-                          {{ order.customerName?.[0] }}
+                    <td class="px-5 py-3.5">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg flex items-center justify-center text-white text-xs font-black flex-shrink-0">
+                          {{ order.customerName[0]?.toUpperCase() }}
                         </div>
-                        <span class="text-sm theme-muted font-medium">{{ order.customerName }}</span>
+                        <span class="text-sm theme-muted font-medium truncate max-w-[120px]">{{ order.customerName }}</span>
                       </div>
                     </td>
-                    <td class="px-6 py-4">
-                      <span class="font-bold text-gold">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K FCFA</span>
+                    <td class="px-5 py-3.5 hidden sm:table-cell">
+                      <span class="font-bold text-sm text-gold">{{ formatAmount(order.totalAmount) }}</span>
                     </td>
-                    <td class="px-6 py-4">
-                      <span class="inline-flex px-3 py-1.5 rounded-xl text-xs font-bold" [ngClass]="getStatusColor(order.orderStatus)">
-                        {{ order.orderStatus }}
+                    <td class="px-5 py-3.5">
+                      <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold" [ngClass]="statusColor(order.orderStatus)">
+                        {{ statusLabel(order.orderStatus) }}
                       </span>
+                    </td>
+                    <td class="px-5 py-3.5 text-right hidden md:table-cell">
+                      <span class="text-xs theme-muted">{{ timeAgo(order.createdAt) }}</span>
                     </td>
                   </tr>
                 }
@@ -263,39 +430,75 @@
         </div>
       }
 
-      <!-- ── Monthly Revenue Chart ────────────────────────────────────── -->
+      <!-- ── Graphique revenus mensuels ─────────────────────────────────── -->
       @if (monthlyRevenue.length > 0) {
-        <div class="theme-surface border theme-border rounded-3xl p-6 mt-6 animate-fade-in-up delay-500">
+        <div class="theme-surface border theme-border rounded-3xl p-6 animate-fade-in-up delay-500">
           <div class="flex items-center justify-between mb-6">
             <div>
-              <h2 class="text-lg font-bold theme-text">Revenus mensuels</h2>
-              <p class="text-xs theme-muted mt-0.5">Évolution sur l'année {{ selectedYear }}</p>
+              <h2 class="text-base font-bold theme-text">Revenus mensuels {{ selectedYear }}</h2>
+              <p class="text-xs theme-muted mt-0.5">
+                Meilleur mois :
+                @if (bestMonthIndex >= 0) {
+                  <span class="text-gold font-semibold">{{ monthlyRevenue[bestMonthIndex].monthName }}</span>
+                  ({{ formatAmount(monthlyRevenue[bestMonthIndex].revenue) }})
+                } @else {
+                  <span>aucune donnée</span>
+                }
+              </p>
             </div>
             <div class="flex items-center gap-2">
               <button (click)="changeYear(-1)" appTooltip="Année précédente" tooltipPosition="bottom"
                 class="w-8 h-8 rounded-xl bg-white/8 hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
               </button>
               <span class="text-sm font-bold theme-text w-12 text-center">{{ selectedYear }}</span>
               <button (click)="changeYear(1)" appTooltip="Année suivante" tooltipPosition="bottom"
                 class="w-8 h-8 rounded-xl bg-white/8 hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
               </button>
             </div>
           </div>
-          <div class="flex items-end gap-1 h-48">
-            @for (item of monthlyRevenue; track item.month) {
-              <div class="flex-1 flex flex-col items-center gap-1 group">
-                <span class="text-[10px] theme-muted font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  {{ (item.revenue / 1000) | number:'1.0-0' }}K
-                </span>
-                <div class="w-full rounded-t-lg transition-all duration-500 min-h-[4px]"
-                     [style.height.%]="(item.revenue / maxMonthlyRevenue) * 100"
-                     [ngClass]="item.revenue > 0 ? 'bg-gradient-to-t from-[#b8860b] to-[#d4af37]' : 'bg-white/8'">
+
+          <div class="relative">
+            <!-- Tooltip flottant -->
+            @if (hoveredMonthIndex !== null) {
+              @let hm = monthlyRevenue[hoveredMonthIndex];
+              <div class="absolute -top-8 left-0 right-0 flex justify-center pointer-events-none z-10">
+                <div class="bg-black/90 border border-white/10 rounded-lg px-3 py-1.5 text-xs font-bold text-white shadow-xl whitespace-nowrap">
+                  {{ hm.monthName }} — {{ formatAmount(hm.revenue) }}
+                  @if (hm.month === currentCalendarMonth && selectedYear === (selectedYear)) {
+                    <span class="text-gold ml-1">(mois actuel)</span>
+                  }
                 </div>
-                <span class="text-[10px] theme-muted font-medium">{{ item.monthName.slice(0,3) }}</span>
               </div>
             }
+
+            <!-- Barres -->
+            <div class="flex items-end gap-1 h-44">
+              @for (item of monthlyRevenue; track item.month; let idx = $index) {
+                <div class="flex-1 flex flex-col items-center gap-1 cursor-pointer group"
+                     (mouseenter)="hoveredMonthIndex = idx"
+                     (mouseleave)="hoveredMonthIndex = null">
+                  <div class="w-full rounded-t-md transition-all duration-500 min-h-[3px]"
+                       [style.height.%]="(item.revenue / maxMonthlyRevenue) * 100"
+                       [ngClass]="{
+                         'bg-gold shadow-lg shadow-yellow-600/30 scale-x-110': item.month === currentCalendarMonth && selectedYear === selectedYear,
+                         'bg-amber-500/60':   idx === bestMonthIndex && item.month !== currentCalendarMonth,
+                         'bg-white/20 group-hover:bg-white/35': item.revenue > 0 && idx !== bestMonthIndex && item.month !== currentCalendarMonth,
+                         'bg-white/8':        item.revenue === 0
+                       }">
+                  </div>
+                  <span class="text-[9px] font-medium transition-colors"
+                        [ngClass]="item.month === currentCalendarMonth ? 'text-gold font-bold' : 'theme-muted'">
+                    {{ item.monthName.slice(0,3) }}
+                  </span>
+                </div>
+              }
+            </div>
           </div>
         </div>
       }

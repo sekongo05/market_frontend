@@ -25,9 +25,8 @@ export enum UserRole {
 
 export enum OrderStatus {
   PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
   CONFIRMED = 'CONFIRMED',
-  PROCESSING = 'PROCESSING',
-  SHIPPED = 'SHIPPED',
   DELIVERED = 'DELIVERED',
   CANCELLED = 'CANCELLED',
 }
@@ -43,7 +42,6 @@ export enum PaymentStatus {
 
 export enum DeliveryStatus {
   PREPARING = 'PREPARING',
-  SHIPPED = 'SHIPPED',
   OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',
   DELIVERED = 'DELIVERED',
   FAILED = 'FAILED',

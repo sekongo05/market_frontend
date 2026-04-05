@@ -22,7 +22,7 @@ export class HelpComponent {
     },
     {
       q: 'Quel est le délai de livraison ?',
-      a: 'Les commandes sont livrées sous 24 à 48h dans Abidjan et ses environs. Pour l\'intérieur du pays, compter 2 à 5 jours ouvrés selon la zone.'
+      a: 'Les commandes sont livrées sous 24 à 48h dans Abidjan. Pour l\'intérieur du pays, compter au maximum 72h selon la zone.'
     },
     {
       q: 'Comment suivre ma commande ?',
@@ -30,11 +30,7 @@ export class HelpComponent {
     },
     {
       q: 'Puis-je retourner un article ?',
-      a: 'Oui, vous disposez de 30 jours pour retourner tout article non utilisé dans son emballage d\'origine. Contactez notre service client pour initier le retour.'
-    },
-    {
-      q: 'Les produits sont-ils authentiques ?',
-      a: 'Absolument. ChronoLux s\'engage à ne proposer que des produits 100 % authentiques. Chaque article est vérifié avant expédition et accompagné d\'un certificat d\'authenticité si applicable.'
+      a: 'Oui, vous disposez de 3 jours après la date de réception pour retourner tout article non utilisé dans son emballage d\'origine. Contactez notre service client pour initier le retour.'
     },
     {
       q: 'Comment créer un compte ?',

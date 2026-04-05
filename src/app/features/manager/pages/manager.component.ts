@@ -79,13 +79,15 @@ export class ManagerComponent implements OnInit, OnDestroy {
   statusFilter: OrderStatus | '' = '';
   statusUpdatingId: number | null = null;
   readonly orderStatuses = Object.values(OrderStatus);
+  // PENDING → APPROVED : manager valide la commande (via /validate)
+  // APPROVED → null    : attente du paiement client (passe à CONFIRMED via validation paiement)
+  // CONFIRMED → DELIVERED : paiement validé, prêt pour livraison
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
-    PENDING:    OrderStatus.CONFIRMED,
-    CONFIRMED:  OrderStatus.PROCESSING,
-    PROCESSING: OrderStatus.SHIPPED,
-    SHIPPED:    OrderStatus.DELIVERED,
-    DELIVERED:  null,
-    CANCELLED:  null,
+    PENDING:   OrderStatus.APPROVED,
+    APPROVED:  null,
+    CONFIRMED: OrderStatus.DELIVERED,
+    DELIVERED: null,
+    CANCELLED: null,
   };
 
   // ── Pending payments ──────────────────────────────────────────────────────
@@ -108,7 +110,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
   expandedDeliveryOrderId: number | null = null;
   selectedDelivery: DeliveryResponse | null = null;
   deliveryDetailLoading = false;
-  deliveryEventStatus: DeliveryStatus = DeliveryStatus.SHIPPED;
+  deliveryEventStatus: DeliveryStatus = DeliveryStatus.OUT_FOR_DELIVERY;
   deliveryEventDesc = '';
   deliveryEventLocation = '';
   deliveryEventSaving = false;
@@ -568,7 +570,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
   setPageTab(tab: 'products' | 'orders' | 'payments' | 'delivery' | 'dashboard'): void {
     this.pageTab = tab;
     if (tab === 'orders' && this.allOrders.length === 0) this.loadAllOrders();
-    if (tab === 'payments' && this.pendingPayments.length === 0) this.loadPendingPayments();
+    if (tab === 'payments') this.loadPendingPayments();
     if (tab === 'delivery' && this.deliveryOrders.length === 0) this.loadDeliveryOrders();
     if (tab === 'dashboard') this.loadManagerStats();
     if (this.drawerOpen) this.closeDrawer();
@@ -600,7 +602,11 @@ export class ManagerComponent implements OnInit, OnDestroy {
     const next = this.nextStatusMap[order.orderStatus];
     if (!next) return;
     this.statusUpdatingId = order.id;
-    this.orderService.updateOrderStatus(order.id, next).subscribe({
+    // PENDING → APPROVED : utiliser l'endpoint dédié /validate
+    const request$ = order.orderStatus === 'PENDING'
+      ? this.orderService.validateOrder(order.id)
+      : this.orderService.updateOrderStatus(order.id, next);
+    request$.subscribe({
       next: (r) => {
         if (r.success) {
           const idx = this.allOrders.findIndex(o => o.id === order.id);
@@ -610,7 +616,11 @@ export class ManagerComponent implements OnInit, OnDestroy {
         this.statusUpdatingId = null;
         this.cdr.detectChanges();
       },
-      error: () => { this.statusUpdatingId = null; this.toast('Erreur de mise à jour', 'error'); this.cdr.detectChanges(); },
+      error: (err) => {
+        this.statusUpdatingId = null;
+        this.toast(err?.error?.message || 'Erreur de mise à jour', 'error');
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -717,7 +727,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
         if (r.success) {
           const pg = r.data as PageResponse<OrderResponse>;
           this.deliveryOrders = pg.content.filter(o =>
-            ['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'].includes(o.orderStatus));
+            ['CONFIRMED', 'DELIVERED'].includes(o.orderStatus));
           this.deliveryOrdersTotalPages = pg.totalPages;
           this.deliveryOrdersPage = page;
         }
@@ -809,8 +819,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
 
   deliveryStatusLabel(s: string): string {
     const m: Record<string, string> = {
-      PREPARING:        'Préparation',
-      SHIPPED:          'Expédié',
+      PREPARING:        'En préparation',
       OUT_FOR_DELIVERY: 'En livraison',
       DELIVERED:        'Livré',
       FAILED:           'Échec',
@@ -820,9 +829,8 @@ export class ManagerComponent implements OnInit, OnDestroy {
 
   deliveryStatusClass(s: string): string {
     const m: Record<string, string> = {
-      PREPARING:        'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-      SHIPPED:          'bg-blue-500/15   text-blue-400   border border-blue-500/25',
-      OUT_FOR_DELIVERY: 'bg-purple-500/15 text-purple-400 border border-purple-500/25',
+      PREPARING:        'bg-blue-500/15   text-blue-400   border border-blue-500/25',
+      OUT_FOR_DELIVERY: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
       DELIVERED:        'bg-green-500/15  text-green-400  border border-green-500/25',
       FAILED:           'bg-red-500/15    text-red-400    border border-red-500/25',
     };
@@ -855,20 +863,22 @@ export class ManagerComponent implements OnInit, OnDestroy {
 
   orderStatusLabel(s: string): string {
     const m: Record<string, string> = {
-      PENDING: 'En attente', CONFIRMED: 'Confirmée', PROCESSING: 'En traitement',
-      SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée',
+      PENDING:   'En attente',
+      APPROVED:  'Approuvée',
+      CONFIRMED: 'Confirmée',
+      DELIVERED: 'Livrée',
+      CANCELLED: 'Annulée',
     };
     return m[s] ?? s;
   }
 
   orderStatusClass(s: string): string {
     const m: Record<string, string> = {
-      PENDING:    'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-      CONFIRMED:  'bg-blue-500/15   text-blue-400   border border-blue-500/25',
-      PROCESSING: 'bg-purple-500/15 text-purple-400 border border-purple-500/25',
-      SHIPPED:    'bg-indigo-500/15 text-indigo-400 border border-indigo-500/25',
-      DELIVERED:  'bg-green-500/15  text-green-400  border border-green-500/25',
-      CANCELLED:  'bg-red-500/15    text-red-400    border border-red-500/25',
+      PENDING:   'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
+      APPROVED:  'bg-indigo-500/15 text-indigo-400 border border-indigo-500/25',
+      CONFIRMED: 'bg-blue-500/15   text-blue-400   border border-blue-500/25',
+      DELIVERED: 'bg-green-500/15  text-green-400  border border-green-500/25',
+      CANCELLED: 'bg-red-500/15    text-red-400    border border-red-500/25',
     };
     return m[s] ?? 'bg-white/10 theme-muted border border-white/10';
   }

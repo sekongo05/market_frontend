@@ -5,7 +5,11 @@ import { RouterLink, RouterModule, RouterLinkActive, Router } from '@angular/rou
 import { TooltipDirective } from '../directives/tooltip.directive';
 import { AuthService, CurrentUser } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { NotificationTemplateService, NotifTemplate } from '../../core/services/notification-template.service';
+import { NotifBodyPipe } from '../pipes/notif-body.pipe';
 import { NotificationResponse } from '../../core/models/notification.models';
+import { NotificationType } from '../../core/models/common.models';
+import { AuthPromptService } from '../../core/services/auth-prompt.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { CartService, CartItem } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
@@ -15,7 +19,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, NotifBodyPipe],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
@@ -36,6 +40,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // Checkout flow
   showCheckout    = false;
   deliveryAddress = '';
+  deliveryPhone   = '';
   checkoutLoading = false;
   checkoutError: string | null = null;
   checkoutSuccess = false;
@@ -45,12 +50,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
+    readonly notifTemplate: NotificationTemplateService,
+    private authPromptService: AuthPromptService,
     private orderService: OrderService,
     private router: Router,
     readonly themeService: ThemeService,
     readonly cartService: CartService,
     private cdr: ChangeDetectorRef
   ) {}
+
+  getTemplate(type: NotificationType): NotifTemplate {
+    return this.notifTemplate.get(type);
+  }
 
   @HostListener('window:scroll')
   onScroll(): void {
@@ -240,8 +251,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // ── Checkout ────────────────────────────────────────────────────────────────
 
   openCheckout(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.showCart = false;
+      this.authPromptService.show();
+      return;
+    }
     this.showCheckout = true;
     this.deliveryAddress = '';
+    this.deliveryPhone   = '';
     this.checkoutError = null;
     this.checkoutSuccess = false;
     this.cdr.detectChanges();
@@ -254,6 +271,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   placeOrder(): void {
+    if (!this.deliveryPhone.trim()) {
+      this.checkoutError = 'Veuillez saisir votre numéro de téléphone';
+      this.cdr.detectChanges();
+      return;
+    }
     if (!this.deliveryAddress.trim()) {
       this.checkoutError = 'Veuillez saisir une adresse de livraison';
       this.cdr.detectChanges();
@@ -262,9 +284,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.checkoutLoading = true;
     this.checkoutError = null;
 
+    const fullAddress = `${this.deliveryAddress.trim()} | Tél: ${this.deliveryPhone.trim()}`;
     const payload = {
       items: this.cartItems.map(i => ({ productId: i.productId, quantity: i.quantity })),
-      deliveryAddress: this.deliveryAddress.trim(),
+      deliveryAddress: fullAddress,
     };
 
     this.orderService.createOrder(payload).subscribe({
@@ -294,6 +317,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private _resetCheckout(): void {
     this.showCheckout = false;
     this.deliveryAddress = '';
+    this.deliveryPhone   = '';
     this.checkoutLoading = false;
     this.checkoutError = null;
     this.checkoutSuccess = false;

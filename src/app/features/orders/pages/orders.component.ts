@@ -87,20 +87,20 @@ export class OrdersComponent implements OnInit {
 
   orderStatusLabel(s: string): string {
     const m: Record<string, string> = {
-      PENDING: 'En attente', CONFIRMED: 'Confirmée', PROCESSING: 'En traitement',
-      SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée',
+      PENDING:   'En attente',
+      CONFIRMED: 'Confirmée',
+      DELIVERED: 'Livrée',
+      CANCELLED: 'Annulée',
     };
     return m[s] ?? s;
   }
 
   orderStatusClass(s: string): string {
     const m: Record<string, string> = {
-      PENDING:    'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-      CONFIRMED:  'bg-blue-500/15   text-blue-400   border border-blue-500/25',
-      PROCESSING: 'bg-purple-500/15 text-purple-400 border border-purple-500/25',
-      SHIPPED:    'bg-indigo-500/15 text-indigo-400 border border-indigo-500/25',
-      DELIVERED:  'bg-green-500/15  text-green-400  border border-green-500/25',
-      CANCELLED:  'bg-red-500/15    text-red-400    border border-red-500/25',
+      PENDING:   'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
+      CONFIRMED: 'bg-blue-500/15   text-blue-400   border border-blue-500/25',
+      DELIVERED: 'bg-green-500/15  text-green-400  border border-green-500/25',
+      CANCELLED: 'bg-red-500/15    text-red-400    border border-red-500/25',
     };
     return m[s] ?? 'bg-white/10 theme-muted border border-white/10';
   }
@@ -125,8 +125,10 @@ export class OrdersComponent implements OnInit {
 
   deliveryLabel(s: string): string {
     const m: Record<string, string> = {
-      PREPARING: 'En préparation', SHIPPED: 'Expédiée',
-      OUT_FOR_DELIVERY: 'En cours de livraison', DELIVERED: 'Livrée', FAILED: 'Échec livraison',
+      PREPARING:        'En préparation',
+      OUT_FOR_DELIVERY: 'En cours de livraison',
+      DELIVERED:        'Livrée',
+      FAILED:           'Échec livraison',
     };
     return m[s] ?? s;
   }
@@ -142,7 +144,7 @@ export class OrdersComponent implements OnInit {
   }
 
   get stepStatuses(): string[] {
-    return ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
+    return ['PENDING', 'CONFIRMED', 'DELIVERED'];
   }
 
   stepIndex(status: string): number {

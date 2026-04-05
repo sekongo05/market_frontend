@@ -51,6 +51,10 @@
   from { opacity: 0; transform: translateX(40px); }
   to   { opacity: 1; transform: translateX(0); }
 }
+@keyframes drawerIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.92); }
   to   { opacity: 1; transform: scale(1); }
@@ -104,6 +108,7 @@
 .animate-fade-in      { animation: fadeIn     0.5s ease-out both; }
 .animate-slide-left   { animation: slideInLeft  0.6s ease-out both; }
 .animate-slide-right  { animation: slideInRight 0.6s ease-out both; }
+.animate-drawer-in    { animation: drawerIn 0.32s cubic-bezier(0.32,0,0.16,1) both; }
 .animate-scale-in     { animation: scaleIn    0.5s ease-out both; }
 .animate-float        { animation: float      3.5s ease-in-out infinite; }
 .animate-float-rev    { animation: floatReverse 4s ease-in-out infinite; }
@@ -377,6 +382,60 @@ html.light body { background: #faf8f4; color: #111111; }
 .light .dropdown-icon { background: rgba(0,0,0,.05); color: #6b7280; }
 .dropdown-item:hover .dropdown-icon { color: #d4af37; background: rgba(212,175,55,.12); }
 .light .dropdown-item:hover .dropdown-icon { color: #a0720a; background: rgba(160,114,10,.10); }
+
+/* ─── Notification body (HTML injected by backend) ──────────────────────── */
+/*
+ * The backend generates notification bodies as HTML tables with hardcoded
+ * light-mode inline styles. The NotifBodyPipe strips those inline styles and
+ * adds semantic class names. These rules apply theme-aware visual styling.
+ */
+
+.notif-body .notif-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Dark mode (default) */
+html:not(.light) .notif-body .notif-td {
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f1f1f1;
+  font-size: 0.8125rem;
+}
+html:not(.light) .notif-body .notif-td-label {
+  background: rgba(255, 255, 255, 0.04);
+  color: #9ca3af;
+  font-weight: 400;
+  width: 42%;
+}
+
+/* Light mode */
+html.light .notif-body .notif-td {
+  padding: 9px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  color: #111111;
+  font-size: 0.8125rem;
+}
+html.light .notif-body .notif-td-label {
+  background: #f9fafb;
+  color: #6b7280;
+  font-weight: 400;
+  width: 42%;
+}
+
+/* Muted paragraphs */
+html:not(.light) .notif-body .notif-p-muted { color: #9ca3af; }
+html.light       .notif-body .notif-p-muted { color: #6b7280; }
+
+/* Generic paragraph spacing inside notif body */
+.notif-body p { margin: 0 0 10px; line-height: 1.6; }
+.notif-body p:last-child { margin-bottom: 0; }
+
+/* Keep badge spans (semantic colors like green/red) as-is */
+.notif-body span[style] { border-radius: 4px; }
 
 /* ─── Footer / layout overrides ─────────────────────────────────────────── */
 .light footer {

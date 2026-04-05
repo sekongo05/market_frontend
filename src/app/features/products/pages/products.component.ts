@@ -7,6 +7,7 @@ import { ProductService } from '../../../core/services/product.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
+import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { ProductResponse, GetProductsParams } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
@@ -124,6 +125,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private categoryService: CategoryService,
     private authService: AuthService,
     private cartService: CartService,
+    private authPromptService: AuthPromptService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
   ) {}
@@ -159,6 +161,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   addToCartFromView(): void {
     if (!this.selectedProduct) return;
+    if (!this.authService.isAuthenticated()) {
+      this.authPromptService.show();
+      return;
+    }
     for (let i = 0; i < this.selectedProductQty; i++) {
       this.cartService.addToCart({
         productId: this.selectedProduct.id,
@@ -177,6 +183,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   addToCart(product: ProductResponse): void {
+    if (!this.authService.isAuthenticated()) {
+      this.authPromptService.show();
+      return;
+    }
     this.cartService.addToCart({
       productId: product.id,
       productName: product.name,
@@ -184,7 +194,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       quantity: 1,
       imageUrl: product.imageUrl,
     });
-    // Brief green feedback on the button
     this.addedIds.add(product.id);
     this.cdr.detectChanges();
     setTimeout(() => {

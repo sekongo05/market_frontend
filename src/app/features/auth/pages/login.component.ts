@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -23,10 +23,13 @@ export class LoginComponent implements OnInit {
   error: string | null = null;
   showPwd = false;
 
+  private returnUrl = '/products';
+
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -34,6 +37,11 @@ export class LoginComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
+
+    const param = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (param && param.startsWith('/')) {
+      this.returnUrl = param;
+    }
   }
 
   get f() {
@@ -53,7 +61,7 @@ export class LoginComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           localStorage.setItem('current_user', JSON.stringify(response.data));
-          this.router.navigate(['/products']);
+          this.router.navigateByUrl(this.returnUrl);
         }
       },
       error: (error) => {

@@ -10,6 +10,7 @@ import { takeUntil, switchMap } from 'rxjs/operators';
 import { ProductService } from '../../../core/services/product.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { ProductMediaItem, ProductResponse } from '../../../core/models/product.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
@@ -93,6 +94,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private productService: ProductService,
     private cartService: CartService,
     private authService: AuthService,
+    private authPromptService: AuthPromptService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -217,6 +219,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   addToCart(): void {
     if (!this.product || this.product.stock === 0) return;
+    if (!this.authService.isAuthenticated()) {
+      this.authPromptService.show();
+      return;
+    }
     this.cartService.addToCart({
       productId: this.product.id,
       productName: this.product.name,
@@ -249,6 +255,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   addRelatedToCart(product: ProductResponse): void {
+    if (!this.authService.isAuthenticated()) {
+      this.authPromptService.show();
+      return;
+    }
     this.cartService.addToCart({
       productId: product.id,
       productName: product.name,

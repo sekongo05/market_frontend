@@ -28,18 +28,18 @@
                       border-yellow-600/30 bg-yellow-600/8 text-yellow-500
                       dark:border-yellow-600/30 dark:bg-yellow-600/8 dark:text-yellow-400">
             <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
-            Nouvelle collection 2026
+            Nouveautés 2026 disponibles
           </div>
 
           <!-- Headline -->
           <h1 class="font-black leading-none mb-6 tracking-tight">
-            <span class="block text-5xl lg:text-7xl theme-text animate-fade-in-up delay-100">L'Art du</span>
-            <span class="block text-6xl lg:text-8xl gold-text animate-fade-in-up delay-200">Luxe</span>
-            <span class="block text-5xl lg:text-7xl theme-text animate-fade-in-up delay-300">Intemporel</span>
+            <span class="block text-5xl lg:text-7xl theme-text animate-fade-in-up delay-100">Tout ce que</span>
+            <span class="block text-6xl lg:text-8xl gold-text animate-fade-in-up delay-200">vous aimez</span>
+            <span class="block text-5xl lg:text-7xl theme-text animate-fade-in-up delay-300">en un seul endroit</span>
           </h1>
 
           <p class="text-base lg:text-lg theme-muted mb-10 max-w-md leading-relaxed animate-fade-in-up delay-400">
-            Montres de prestige et bijoux d'exception — sélectionnés pour les connaisseurs qui refusent le compromis.
+            Montres & bijoux d'exception, mode, beauté et bien plus — SDM STORE, votre boutique de confiance en Côte d'Ivoire.
           </p>
 
           <!-- CTAs -->
@@ -107,13 +107,17 @@
       @for (item of [1,2,3,4,5,6,7,8,9,10,11,12]; track item) {
         <span class="flex items-center gap-6 mx-10 text-sm font-semibold theme-muted uppercase tracking-widest whitespace-nowrap">
           <span class="w-1 h-1 bg-gold rounded-full"></span>
-          Montres de Luxe
+          Montres & Bijoux
           <span class="w-1 h-1 bg-gold rounded-full"></span>
-          Bijoux d'Exception
+          Mode & Accessoires
           <span class="w-1 h-1 bg-gold rounded-full"></span>
-          Authenticité Garantie
+          Beauté & Parfums
           <span class="w-1 h-1 bg-gold rounded-full"></span>
-          Swiss Made
+          Livraison 24–48h
+          <span class="w-1 h-1 bg-gold rounded-full"></span>
+          Paiement Sécurisé
+          <span class="w-1 h-1 bg-gold rounded-full"></span>
+          Service Client 6j/7
         </span>
       }
     </div>
@@ -158,56 +162,60 @@
       <!-- Section header -->
       <div class="text-center mb-14 scroll-reveal">
         <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-3">Nos univers</p>
-        <h2 class="text-4xl font-black theme-text">Explorez nos collections</h2>
+        <h2 class="text-4xl font-black theme-text">Explorez nos catégories</h2>
       </div>
 
-      <!-- 2+2 grid -->
+      <!-- Grid: 2 grandes + 2 petites -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
+        <!-- Montres — featured (double hauteur sur mobile) -->
         <a routerLink="/products"
-           class="group relative aspect-[3/4] overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-1">
+           class="group relative col-span-1 row-span-2 aspect-[3/4] lg:aspect-auto lg:row-span-1 overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-1">
           <img src="https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=600&q=80" alt="Montres"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+          <div class="absolute top-3 left-3">
+            <span class="px-2.5 py-1 bg-gold text-black text-[10px] font-black rounded-full uppercase tracking-wider">Phare</span>
+          </div>
           <div class="absolute bottom-0 left-0 right-0 p-5">
-            <p class="text-white font-black text-lg mb-0.5">Montres</p>
-            <p class="text-gray-300 text-xs">200+ références</p>
+            <p class="text-white font-black text-lg mb-0.5">Montres & Bijoux</p>
+            <p class="text-gray-300 text-xs">Notre spécialité · 300+ références</p>
             <div class="mt-3 h-0.5 bg-gold w-6 group-hover:w-14 transition-all duration-500"></div>
           </div>
         </a>
 
         <a routerLink="/products"
            class="group relative aspect-[3/4] overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-2">
-          <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80" alt="Bagues"
+          <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80" alt="Mode"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
           <div class="absolute bottom-0 left-0 right-0 p-5">
-            <p class="text-white font-black text-lg mb-0.5">Bagues</p>
-            <p class="text-gray-300 text-xs">150+ modèles</p>
+            <p class="text-white font-black text-lg mb-0.5">Mode & Prêt-à-Porter</p>
+            <p class="text-gray-300 text-xs">Femme · Homme · Enfant</p>
             <div class="mt-3 h-0.5 bg-gold w-6 group-hover:w-14 transition-all duration-500"></div>
           </div>
         </a>
 
         <a routerLink="/products"
            class="group relative aspect-[3/4] overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-3">
-          <img src="https://images.unsplash.com/photo-1599459183200-59c7687a0c70?w=600&q=80" alt="Colliers"
+          <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80" alt="Beauté"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
           <div class="absolute bottom-0 left-0 right-0 p-5">
-            <p class="text-white font-black text-lg mb-0.5">Colliers</p>
-            <p class="text-gray-300 text-xs">120+ créations</p>
+            <p class="text-white font-black text-lg mb-0.5">Beauté & Parfums</p>
+            <p class="text-gray-300 text-xs">Soins · Cosmétiques · Fragrances</p>
             <div class="mt-3 h-0.5 bg-gold w-6 group-hover:w-14 transition-all duration-500"></div>
           </div>
         </a>
 
         <a routerLink="/products"
            class="group relative aspect-[3/4] overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-4">
-          <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80" alt="Bracelets"
+          <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&q=80" alt="Accessoires"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
           <div class="absolute bottom-0 left-0 right-0 p-5">
-            <p class="text-white font-black text-lg mb-0.5">Bracelets</p>
-            <p class="text-gray-300 text-xs">80+ designs</p>
+            <p class="text-white font-black text-lg mb-0.5">Maison & Lifestyle</p>
+            <p class="text-gray-300 text-xs">Déco · Tech · Cadeaux</p>
             <div class="mt-3 h-0.5 bg-gold w-6 group-hover:w-14 transition-all duration-500"></div>
           </div>
         </a>
@@ -314,8 +322,8 @@
                 d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
           </div>
-          <h3 class="text-xl font-bold theme-text mb-3">Livraison Premium</h3>
-          <p class="theme-muted text-sm leading-relaxed">Vos bijoux et montres livrés dans un écrin de luxe, avec suivi en temps réel. Service discret et sécurisé partout en Côte d'Ivoire.</p>
+          <h3 class="text-xl font-bold theme-text mb-3">Livraison Rapide</h3>
+          <p class="theme-muted text-sm leading-relaxed">24–48h à Abidjan, 72h max pour l'intérieur du pays. Vos commandes emballées avec soin et livrées en toute sécurité.</p>
         </div>
 
         <div class="luxury-card rounded-3xl p-8 scroll-reveal stagger-3">
@@ -326,7 +334,7 @@
             </svg>
           </div>
           <h3 class="text-xl font-bold theme-text mb-3">Paiement Sécurisé</h3>
-          <p class="theme-muted text-sm leading-relaxed">Transactions protégées via Wave CI. Achetez en toute sérénité avec notre garantie de remboursement sous 30 jours.</p>
+          <p class="theme-muted text-sm leading-relaxed">Transactions protégées via Wave CI. Achetez en toute sérénité avec notre politique de retour sous 3 jours.</p>
         </div>
       </div>
     </div>
@@ -344,10 +352,10 @@
     <div class="relative max-w-3xl mx-auto px-4 text-center">
       <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-5">Rejoignez-nous</p>
       <h2 class="text-4xl lg:text-6xl font-black theme-text mb-6 leading-tight">
-        Votre prochaine pièce<br>
-        <span class="gold-text">d'exception vous attend</span>
+        Ce que vous cherchez<br>
+        <span class="gold-text">est ici</span>
       </h2>
-      <p class="theme-muted mb-10 text-lg">Explorez notre sélection exclusive de montres et bijoux de luxe — avec livraison premium partout en Côte d'Ivoire.</p>
+      <p class="theme-muted mb-10 text-lg">Montres, bijoux, mode, beauté et lifestyle — tout ce dont vous avez besoin, livré rapidement partout en Côte d'Ivoire.</p>
 
       <div class="flex flex-wrap justify-center gap-4">
         <a routerLink="/products"
