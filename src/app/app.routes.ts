@@ -12,6 +12,9 @@ import { HelpComponent } from './features/help/help.component';
 import { PrivacyComponent } from './features/privacy/privacy.component';
 import { AuthenticityComponent } from './features/authenticity/authenticity.component';
 import { ReturnsComponent } from './features/returns/returns.component';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { UserRole } from './core/models/common.models';
 
 export const APP_ROUTES: Routes = [
   {
@@ -24,22 +27,29 @@ export const APP_ROUTES: Routes = [
       {
         path: 'orders',
         component: OrdersComponent,
+        canActivate: [authGuard],
       },
       {
         path: 'profile',
         component: ProfileComponent,
+        canActivate: [authGuard],
       },
       {
         path: 'admin',
         component: AdminDashboardComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { roles: [UserRole.ADMIN] },
       },
       {
         path: 'manager',
         component: ManagerComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { roles: [UserRole.MANAGER, UserRole.ADMIN] },
       },
       {
         path: 'payment/:orderId',
         component: PaymentPageComponent,
+        canActivate: [authGuard],
       },
       { path: 'help', component: HelpComponent },
       { path: 'privacy', component: PrivacyComponent },

@@ -223,12 +223,24 @@
                 </div>
               }
 
-              <!-- Actions (PENDING order) -->
-              @if (order.orderStatus === 'PENDING') {
+              <!-- Actions (commande en cours : PENDING ou APPROVED) -->
+              @if (order.orderStatus === 'PENDING' || order.orderStatus === 'APPROVED') {
                 <div class="border-t theme-border pt-4 space-y-3">
 
-                  <!-- Paiement rejeté avec motif -->
-                  @if (order.paymentStatus === 'FAILED' && order.lastPaymentNote) {
+                  <!-- Commande en attente d'approbation -->
+                  @if (order.orderStatus === 'PENDING') {
+                    <div class="flex items-start gap-3 p-3 rounded-xl"
+                         style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2)">
+                      <svg class="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <p class="text-xs text-yellow-300 font-medium">En attente de validation de la commande par notre équipe. Le paiement sera disponible une fois la commande approuvée.</p>
+                    </div>
+                  }
+
+                  <!-- Paiement rejeté avec motif (APPROVED) -->
+                  @if (order.orderStatus === 'APPROVED' && order.paymentStatus === 'FAILED' && order.lastPaymentNote) {
                     <div class="flex items-start gap-2 p-3 rounded-xl"
                          style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">
                       <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,8 +254,8 @@
                     </div>
                   }
 
-                  <!-- Payer button (only when payment not yet submitted) -->
-                  @if (order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED') {
+                  <!-- Payer button (uniquement si commande APPROVED et paiement pas encore soumis) -->
+                  @if (order.orderStatus === 'APPROVED' && (order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED')) {
                     <button (click)="goToPayment(order.id)"
                       class="flex items-center gap-2 px-4 py-2.5 bg-gold text-black text-sm font-bold rounded-xl hover:brightness-110 transition-all">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,8 +266,8 @@
                     </button>
                   }
 
-                  <!-- Submitted notice -->
-                  @if (order.paymentStatus === 'SUBMITTED') {
+                  <!-- Paiement soumis, en attente de validation -->
+                  @if (order.orderStatus === 'APPROVED' && order.paymentStatus === 'SUBMITTED') {
                     <div class="flex items-start gap-3 p-3 rounded-xl"
                          style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)">
                       <svg class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,7 +286,7 @@
                     </div>
                   }
 
-                  <!-- Cancel -->
+                  <!-- Annuler -->
                   @if (cancelConfirmId === order.id) {
                     <div class="flex items-center gap-3 p-3 rounded-xl"
                          style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">

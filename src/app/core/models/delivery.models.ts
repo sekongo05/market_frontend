@@ -18,6 +18,8 @@ export interface DeliveryResponse {
   estimatedDate: string;
   actualDeliveryDate: string | null;
   notes: string;
+  carrierName: string | null;
+  carrierTrackingUrl: string | null;
   events: DeliveryEventResponse[];
   createdAt: string;
   updatedAt: string;
@@ -33,4 +35,6 @@ export interface UpdateDeliveryRequest {
   deliveryAgent?: string;
   estimatedDate?: string;
   notes?: string;
+  carrierName?: string;
+  carrierTrackingUrl?: string;
 }

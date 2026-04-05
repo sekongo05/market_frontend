@@ -8,6 +8,7 @@ export interface OrderItem {
 export interface CreateOrderRequest {
   items: OrderItem[];
   deliveryAddress: string;
+  promoCode?: string;
 }
 
 export interface OrderItemResponse {
@@ -31,6 +32,8 @@ export interface OrderResponse {
   lastPaymentNote: string | null;
   trackingNumber: string | null;
   customerName: string | null;
+  promoCode: string | null;
+  discountAmount: number | null;
   createdAt: string;
   updatedAt: string;
 }

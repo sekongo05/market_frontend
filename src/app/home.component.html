@@ -3,120 +3,160 @@
   <!-- ═══════════════════════════════════════════════════
        HERO
   ════════════════════════════════════════════════════ -->
-  <section class="relative min-h-screen flex flex-col justify-center overflow-hidden">
+  <section class="relative min-h-screen flex items-center overflow-hidden">
 
-    <!-- Dot grid -->
-    <div class="absolute inset-0 dot-grid pointer-events-none"></div>
+    <!-- Fond grille dorée -->
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
+         style="background-image: linear-gradient(rgba(184,148,30,1) 1px, transparent 1px),
+                                  linear-gradient(90deg, rgba(184,148,30,1) 1px, transparent 1px);
+                background-size: 60px 60px;"></div>
 
-    <!-- Ambient orbs -->
-    <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-yellow-500/8 blur-[120px] pointer-events-none"
-         style="animation: orb-drift 14s ease-in-out infinite;"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-amber-600/6 blur-[100px] pointer-events-none"
-         style="animation: orb-drift 18s ease-in-out infinite reverse;"></div>
+    <!-- Orbes lumineux dark -->
+    <div class="absolute top-0 right-0 w-[700px] h-[700px] rounded-full pointer-events-none"
+         style="background: radial-gradient(circle, rgba(184,148,30,0.07) 0%, transparent 70%); filter: blur(60px);"></div>
+    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none"
+         style="background: radial-gradient(circle, rgba(184,148,30,0.05) 0%, transparent 70%); filter: blur(80px);"></div>
 
-    <!-- Light-mode: warm peach orbs -->
-    <div class="hidden light:block absolute top-1/3 right-1/3 w-[600px] h-[600px] rounded-full bg-amber-100/60 blur-[100px] pointer-events-none "></div>
+    <!-- Orbes light mode -->
+    <div class="hidden light:block absolute top-0 right-0 w-[700px] h-[700px] rounded-full pointer-events-none"
+         style="background: radial-gradient(circle, rgba(251,191,36,0.12) 0%, transparent 70%); filter: blur(60px);"></div>
 
-    <!-- Content -->
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-24 pb-20 ">
-      <div class="grid lg:grid-cols-2 gap-16 items-center">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-28 pb-24">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
 
-        <!-- Left: text -->
-        <div>
+        <!-- Gauche : texte -->
+        <div class="space-y-8">
+
           <!-- Badge -->
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-semibold mb-8 animate-fade-in
-                      border-yellow-600/30 bg-yellow-600/8 text-yellow-500
-                      dark:border-yellow-600/30 dark:bg-yellow-600/8 dark:text-yellow-400">
-            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
-            Nouveautés 2026 disponibles
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold animate-fade-in"
+               style="background: rgba(184,148,30,0.1); border: 1px solid rgba(184,148,30,0.3); color: #b8941e;">
+            <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background:#b8941e;"></span>
+            Nouveautés 2026 · Livraison partout en CI
           </div>
 
-          <!-- Headline -->
-          <h1 class="font-black leading-none mb-6 tracking-tight">
-            <span class="block text-5xl lg:text-7xl theme-text animate-fade-in-up delay-100">Tout ce que</span>
-            <span class="block text-6xl lg:text-8xl gold-text animate-fade-in-up delay-200">vous aimez</span>
-            <span class="block text-5xl lg:text-7xl theme-text animate-fade-in-up delay-300">en un seul endroit</span>
-          </h1>
+          <!-- Titre -->
+          <div class="animate-fade-in-up delay-100">
+            <h1 class="font-black tracking-tight leading-[1.05]">
+              <span class="block text-5xl lg:text-6xl xl:text-7xl theme-text">Tout ce que</span>
+              <span class="block text-6xl lg:text-7xl xl:text-8xl" style="color:#b8941e;">vous aimez</span>
+              <span class="block text-5xl lg:text-6xl xl:text-7xl theme-text">en un seul endroit.</span>
+            </h1>
+          </div>
 
-          <p class="text-base lg:text-lg theme-muted mb-10 max-w-md leading-relaxed animate-fade-in-up delay-400">
-            Montres & bijoux d'exception, mode, beauté et bien plus — SDM STORE, votre boutique de confiance en Côte d'Ivoire.
+          <!-- Sous-titre -->
+          <p class="text-base lg:text-lg theme-muted max-w-lg leading-relaxed animate-fade-in-up delay-200">
+            Mode, montres, beauté et lifestyle — SDM STORE vous propose le meilleur des marques avec une livraison rapide en Côte d'Ivoire.
           </p>
 
           <!-- CTAs -->
-          <div class="flex flex-wrap gap-3 animate-fade-in-up delay-500">
+          <div class="flex flex-wrap gap-3 animate-fade-in-up delay-300">
             <a routerLink="/products"
-               class="group flex items-center gap-2.5 px-7 py-3.5 bg-gold text-black font-bold text-sm rounded-2xl
-                      hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-1 transition-all duration-300">
+               class="group flex items-center gap-2.5 px-8 py-4 rounded-2xl font-bold text-sm text-black
+                      hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+               style="background:#b8941e; box-shadow: 0 4px 20px rgba(184,148,30,0.3);">
               Explorer la boutique
               <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
               </svg>
             </a>
             @if (!(currentUser$ | async)) {
               <a routerLink="/auth/register"
-                 class="flex items-center gap-2 px-7 py-3.5 font-bold text-sm rounded-2xl border transition-all duration-300
+                 class="flex items-center gap-2 px-8 py-4 font-bold text-sm rounded-2xl border transition-all duration-300
                         border-white/15 text-white/80 hover:bg-white/8 backdrop-blur
-                        dark:border-white/15 dark:text-white/80 dark:hover:bg-white/8
                         light:border-black/15 light:text-black/70 light:hover:bg-black/5">
-                Créer un compte
+                Créer un compte gratuit
               </a>
             }
           </div>
-        </div>
 
-        <!-- Right: floating watch visual -->
-        <div class="hidden lg:flex items-center justify-center animate-fade-in delay-300">
-          <div class="relative w-80 h-80">
-            <!-- Outer ring spinning -->
-            <div class="absolute inset-0 rounded-full border border-yellow-600/15 animate-spin-slow"></div>
-            <!-- Middle ring floating -->
-            <div class="absolute inset-6 rounded-full border border-yellow-600/25 animate-float"></div>
-            <!-- Inner ring pulse -->
-            <div class="absolute inset-12 rounded-full border-2 border-yellow-600/40 animate-pulse-ring"></div>
-            <!-- Center watch face -->
-            <div class="absolute inset-20 rounded-full bg-gradient-to-br from-yellow-900/30 to-yellow-600/10
-                        border border-yellow-600/50 flex items-center justify-center
-                        light:from-amber-100 light:to-amber-50 light:border-yellow-500/40">
-              <svg class="w-16 h-16 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          <!-- Trust indicators -->
+          <div class="flex flex-wrap items-center gap-6 animate-fade-in-up delay-400">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" style="color:#b8941e;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
+              <span class="text-xs theme-muted font-semibold">100% Authentique</span>
             </div>
-            <!-- Orbiting dots -->
-            <div class="absolute top-4 left-1/2 -translate-x-1/2 w-2 h-2 bg-gold rounded-full animate-float"></div>
-            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-yellow-600/60 rounded-full animate-float-rev"></div>
-            <div class="absolute left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-gold/70 rounded-full animate-float delay-300"></div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" style="color:#b8941e;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              <span class="text-xs theme-muted font-semibold">Livraison 24–48h</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" style="color:#b8941e;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              <span class="text-xs theme-muted font-semibold">Retour sous 3 jours</span>
+            </div>
           </div>
         </div>
+
+        <!-- Droite : bento visuel flottant -->
+        <div class="hidden lg:grid grid-cols-2 gap-4 animate-fade-in delay-300">
+
+          <!-- Card 1 — grande -->
+          <div class="col-span-2 relative h-52 rounded-3xl overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Mode"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+            <div class="absolute bottom-4 left-5">
+              <p class="text-white font-black text-lg">Mode & Prêt-à-Porter</p>
+              <p class="text-white/60 text-xs mt-0.5">Femme · Homme · Enfant</p>
+            </div>
+            <div class="absolute top-4 right-4 px-3 py-1 rounded-full text-black text-[10px] font-black"
+                 style="background:#b8941e;">Nouveau</div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="relative h-44 rounded-3xl overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=600&q=80"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Montres"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+            <div class="absolute bottom-3 left-4">
+              <p class="text-white font-bold text-sm">Montres & Bijoux</p>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="relative h-44 rounded-3xl overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Beauté"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+            <div class="absolute bottom-3 left-4">
+              <p class="text-white font-bold text-sm">Beauté & Parfums</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
     <!-- Scroll hint -->
     <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in delay-800">
-      <span class="text-xs uppercase tracking-[0.25em] theme-muted">Défiler</span>
-      <div class="w-px h-10 bg-gradient-to-b from-yellow-600/60 to-transparent animate-float"></div>
+      <span class="text-[10px] uppercase tracking-[0.3em] theme-muted">Découvrir</span>
+      <div class="w-px h-8 bg-gradient-to-b animate-float" style="background: linear-gradient(to bottom, #b8941e60, transparent);"></div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════
-       MARQUEE BAND
+       MARQUEE
   ════════════════════════════════════════════════════ -->
-  <div class="border-y py-4 overflow-hidden theme-border"
-       style="border-top-width:1px; border-bottom-width:1px;">
+  <div class="border-y py-4 overflow-hidden theme-border" style="border-color: rgba(184,148,30,0.15);">
     <div class="marquee-track">
-      @for (item of [1,2,3,4,5,6,7,8,9,10,11,12]; track item) {
-        <span class="flex items-center gap-6 mx-10 text-sm font-semibold theme-muted uppercase tracking-widest whitespace-nowrap">
-          <span class="w-1 h-1 bg-gold rounded-full"></span>
-          Montres & Bijoux
-          <span class="w-1 h-1 bg-gold rounded-full"></span>
-          Mode & Accessoires
-          <span class="w-1 h-1 bg-gold rounded-full"></span>
-          Beauté & Parfums
-          <span class="w-1 h-1 bg-gold rounded-full"></span>
+      @for (item of [1,2,3,4,5,6,7,8,9,10]; track item) {
+        <span class="flex items-center gap-8 mx-8 text-xs font-bold uppercase tracking-[0.2em] theme-muted whitespace-nowrap">
+          <span class="w-1 h-1 rounded-full" style="background:#b8941e;"></span>
+          Montres &amp; Bijoux
+          <span class="w-1 h-1 rounded-full" style="background:#b8941e;"></span>
+          Mode &amp; Accessoires
+          <span class="w-1 h-1 rounded-full" style="background:#b8941e;"></span>
+          Beauté &amp; Parfums
+          <span class="w-1 h-1 rounded-full" style="background:#b8941e;"></span>
           Livraison 24–48h
-          <span class="w-1 h-1 bg-gold rounded-full"></span>
-          Paiement Sécurisé
-          <span class="w-1 h-1 bg-gold rounded-full"></span>
+          <span class="w-1 h-1 rounded-full" style="background:#b8941e;"></span>
+          Paiement Wave CI
+          <span class="w-1 h-1 rounded-full" style="background:#b8941e;"></span>
           Service Client 6j/7
         </span>
       }
@@ -124,218 +164,164 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════
-       STATS (counter animation)
+       STATS
   ════════════════════════════════════════════════════ -->
-  <section id="stats-row" class="py-20 scroll-reveal">
+  <section id="stats-row" class="py-16 scroll-reveal">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-        <div class="text-center p-6 rounded-3xl luxury-card stagger-1">
-          <div class="text-4xl font-black gold-text mb-1">{{ statProducts }}+</div>
-          <div class="text-xs theme-muted font-semibold uppercase tracking-wider">Références</div>
-        </div>
+        @for (stat of [
+          {value: statProducts, suffix: '+', label: 'Références'},
+          {value: statBrands,   suffix: '+', label: 'Marques'},
+          {value: statClients,  suffix: '+', label: 'Clients satisfaits'},
+          {value: 48,           suffix: 'h', label: 'Livraison max'}
+        ]; track stat.label) {
+          <div class="relative overflow-hidden rounded-3xl p-6 text-center luxury-card group hover:-translate-y-1 transition-transform duration-300">
+            <div class="absolute inset-x-0 bottom-0 h-[2px]" style="background: linear-gradient(90deg, transparent, #b8941e, transparent);"></div>
+            <p class="text-4xl font-black leading-none mb-2" style="color:#b8941e;">
+              {{ stat.value }}{{ stat.suffix }}
+            </p>
+            <p class="text-xs font-semibold uppercase tracking-wider theme-muted">{{ stat.label }}</p>
+          </div>
+        }
 
-        <div class="text-center p-6 rounded-3xl luxury-card stagger-2">
-          <div class="text-4xl font-black gold-text mb-1">{{ statBrands }}+</div>
-          <div class="text-xs theme-muted font-semibold uppercase tracking-wider">Marques</div>
-        </div>
-
-        <div class="text-center p-6 rounded-3xl luxury-card stagger-3">
-          <div class="text-4xl font-black gold-text mb-1">{{ statClients }}+</div>
-          <div class="text-xs theme-muted font-semibold uppercase tracking-wider">Clients</div>
-        </div>
-
-        <div class="text-center p-6 rounded-3xl luxury-card stagger-4">
-          <div class="text-4xl font-black gold-text mb-1">48h</div>
-          <div class="text-xs theme-muted font-semibold uppercase tracking-wider">Livraison</div>
-        </div>
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════
-       CATEGORIES
+       CATÉGORIES — bento grid
   ════════════════════════════════════════════════════ -->
   <section class="py-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Section header -->
       <div class="text-center mb-14 scroll-reveal">
-        <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-3">Nos univers</p>
+        <p class="text-xs font-bold uppercase tracking-[0.25em] mb-3" style="color:#b8941e;">Nos univers</p>
         <h2 class="text-4xl font-black theme-text">Explorez nos catégories</h2>
+        <p class="theme-muted text-sm mt-3 max-w-md mx-auto">Des milliers de références triées sur le volet, livrées directement chez vous.</p>
       </div>
 
-      <!-- Grid: 2 grandes + 2 petites -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Bento grid -->
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[220px]">
 
-        <!-- Montres — featured (double hauteur sur mobile) -->
+        <!-- Montres — grande -->
         <a routerLink="/products"
-           class="group relative col-span-1 row-span-2 aspect-[3/4] lg:aspect-auto lg:row-span-1 overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-1">
+           class="group relative col-span-1 lg:col-span-1 row-span-2 overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-1">
           <img src="https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=600&q=80" alt="Montres"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-          <div class="absolute top-3 left-3">
-            <span class="px-2.5 py-1 bg-gold text-black text-[10px] font-black rounded-full uppercase tracking-wider">Phare</span>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+          <div class="absolute top-4 left-4">
+            <span class="px-3 py-1 text-black text-[10px] font-black rounded-full uppercase tracking-wider"
+                  style="background:#b8941e;">Phare</span>
           </div>
-          <div class="absolute bottom-0 left-0 right-0 p-5">
-            <p class="text-white font-black text-lg mb-0.5">Montres & Bijoux</p>
-            <p class="text-gray-300 text-xs">Notre spécialité · 300+ références</p>
-            <div class="mt-3 h-0.5 bg-gold w-6 group-hover:w-14 transition-all duration-500"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-6">
+            <p class="text-white font-black text-xl mb-1">Montres & Bijoux</p>
+            <p class="text-white/60 text-xs">Notre spécialité · 300+ références</p>
+            <div class="mt-4 h-[2px] rounded-full transition-all duration-500 w-6 group-hover:w-16"
+                 style="background:#b8941e;"></div>
           </div>
         </a>
 
+        <!-- Mode -->
         <a routerLink="/products"
-           class="group relative aspect-[3/4] overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-2">
+           class="group relative overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-2">
           <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80" alt="Mode"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
           <div class="absolute bottom-0 left-0 right-0 p-5">
             <p class="text-white font-black text-lg mb-0.5">Mode & Prêt-à-Porter</p>
-            <p class="text-gray-300 text-xs">Femme · Homme · Enfant</p>
-            <div class="mt-3 h-0.5 bg-gold w-6 group-hover:w-14 transition-all duration-500"></div>
+            <p class="text-white/60 text-xs">Femme · Homme · Enfant</p>
+            <div class="mt-3 h-[2px] rounded-full transition-all duration-500 w-6 group-hover:w-14"
+                 style="background:#b8941e;"></div>
           </div>
         </a>
 
+        <!-- Beauté -->
         <a routerLink="/products"
-           class="group relative aspect-[3/4] overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-3">
+           class="group relative overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-3">
           <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80" alt="Beauté"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
           <div class="absolute bottom-0 left-0 right-0 p-5">
             <p class="text-white font-black text-lg mb-0.5">Beauté & Parfums</p>
-            <p class="text-gray-300 text-xs">Soins · Cosmétiques · Fragrances</p>
-            <div class="mt-3 h-0.5 bg-gold w-6 group-hover:w-14 transition-all duration-500"></div>
+            <p class="text-white/60 text-xs">Soins · Cosmétiques · Fragrances</p>
+            <div class="mt-3 h-[2px] rounded-full transition-all duration-500 w-6 group-hover:w-14"
+                 style="background:#b8941e;"></div>
           </div>
         </a>
 
+        <!-- Maison — large -->
         <a routerLink="/products"
-           class="group relative aspect-[3/4] overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-4">
-          <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&q=80" alt="Accessoires"
+           class="group relative col-span-2 overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-4">
+          <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1000&q=80" alt="Lifestyle"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-          <div class="absolute bottom-0 left-0 right-0 p-5">
-            <p class="text-white font-black text-lg mb-0.5">Maison & Lifestyle</p>
-            <p class="text-gray-300 text-xs">Déco · Tech · Cadeaux</p>
-            <div class="mt-3 h-0.5 bg-gold w-6 group-hover:w-14 transition-all duration-500"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 p-6">
+            <p class="text-white font-black text-xl mb-1">Maison & Lifestyle</p>
+            <p class="text-white/60 text-xs mb-4">Déco · Tech · Cadeaux · Art de vivre</p>
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-black text-xs font-bold transition-all duration-300
+                         group-hover:-translate-y-0.5" style="background:#b8941e;">
+              Voir la collection
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </span>
           </div>
         </a>
+
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════
-       FEATURED PRODUCT
+       PROMESSES — strip horizontal
   ════════════════════════════════════════════════════ -->
-  <section class="py-24">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid lg:grid-cols-2 gap-12 items-center">
-
-        <!-- Left: image with decorative frame -->
-        <div class="relative flex justify-center scroll-reveal from-left">
-          <div class="relative w-72 h-72 lg:w-96 lg:h-96">
-            <!-- Decorative rings -->
-            <div class="absolute -inset-6 rounded-full border border-yellow-600/10 animate-spin-slow"></div>
-            <div class="absolute -inset-3 rounded-full border border-yellow-600/20 animate-float"></div>
-            <!-- Image -->
-            <div class="w-full h-full rounded-full overflow-hidden border-2 border-yellow-600/30 shadow-2xl shadow-yellow-600/10">
-              <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&q=80"
-                   alt="Pièce vedette"
-                   class="w-full h-full object-cover"/>
-            </div>
-            <!-- Badge -->
-            <div class="absolute -top-3 -right-3 bg-gold text-black text-xs font-black px-4 py-2 rounded-2xl shadow-lg
-                        animate-pulse-ring">
-              ★ Coup de cœur
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: text -->
-        <div class="scroll-reveal from-right stagger-2">
-          <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-4">Pièce de la semaine</p>
-          <h2 class="text-4xl lg:text-5xl font-black theme-text leading-tight mb-5">
-            Chronographe<br>
-            <span class="gold-text">Or 18 carats</span>
-          </h2>
-          <p class="theme-muted leading-relaxed mb-8 text-sm">
-            Chef-d'œuvre horloger alliant tradition et modernité. Boîtier en or 18 carats, bracelet cuir de crocodile, mouvement automatique Swiss Made certifié COSC.
-          </p>
-
-          <!-- Price + stock row -->
-          <div class="flex items-center gap-6 mb-8 p-5 rounded-2xl luxury-card">
-            <div>
-              <p class="text-xs theme-muted uppercase tracking-wider mb-1">Prix</p>
-              <p class="text-3xl font-black gold-text">4 500K <span class="text-sm font-normal theme-muted">FCFA</span></p>
-            </div>
-            <div class="w-px h-12 theme-border" style="border-left-width:1px;"></div>
-            <div>
-              <p class="text-xs theme-muted uppercase tracking-wider mb-1">Stock</p>
-              <p class="text-sm font-bold" style="color:#22c55e">● En stock</p>
-            </div>
-            <div class="w-px h-12 theme-border" style="border-left-width:1px;"></div>
-            <div>
-              <p class="text-xs theme-muted uppercase tracking-wider mb-1">Garantie</p>
-              <p class="text-sm font-bold" style="color:#60a5fa">2 ans</p>
-            </div>
-          </div>
-
-          <a routerLink="/products"
-             class="group inline-flex items-center gap-2.5 bg-gold text-black px-8 py-4 rounded-2xl font-bold text-sm
-                    hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-1 transition-all duration-300">
-            Voir la collection
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════
-       FEATURES / PROMESSES
-  ════════════════════════════════════════════════════ -->
-  <section class="py-24">
+  <section class="py-20 scroll-reveal">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <div class="text-center mb-14 scroll-reveal">
-        <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-3">Notre promesse</p>
+      <div class="text-center mb-12">
+        <p class="text-xs font-bold uppercase tracking-[0.25em] mb-3" style="color:#b8941e;">Notre promesse</p>
         <h2 class="text-4xl font-black theme-text">L'excellence à chaque étape</h2>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="luxury-card rounded-3xl p-8 scroll-reveal stagger-1">
-          <div class="w-14 h-14 bg-gold rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-600/20">
-            <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold theme-text mb-3">100 % Authentique</h3>
-          <p class="theme-muted text-sm leading-relaxed">Chaque pièce est certifiée et livrée avec son certificat d'authenticité. Nous ne vendons que des produits originaux garantis.</p>
-        </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
-        <div class="luxury-card rounded-3xl p-8 scroll-reveal stagger-2">
-          <div class="w-14 h-14 bg-gold rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-600/20">
-            <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
+        @for (promise of [
+          {
+            icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+            title: '100% Authentique',
+            desc: 'Chaque produit est certifié original, avec garantie fabricant.'
+          },
+          {
+            icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+            title: 'Livraison Rapide',
+            desc: '24–48h à Abidjan, 72h max pour l\'intérieur du pays.'
+          },
+          {
+            icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+            title: 'Paiement Sécurisé',
+            desc: 'Transactions protégées via Wave CI. Achetez en toute sérénité.'
+          },
+          {
+            icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',
+            title: 'Retour Facile',
+            desc: '3 jours pour retourner un article. Remboursement garanti.'
+          }
+        ]; track promise.title) {
+          <div class="luxury-card rounded-3xl p-7 flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                 style="background: rgba(184,148,30,0.12);">
+              <svg class="w-6 h-6" style="color:#b8941e;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="promise.icon"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold theme-text text-base mb-1.5">{{ promise.title }}</h3>
+              <p class="theme-muted text-sm leading-relaxed">{{ promise.desc }}</p>
+            </div>
           </div>
-          <h3 class="text-xl font-bold theme-text mb-3">Livraison Rapide</h3>
-          <p class="theme-muted text-sm leading-relaxed">24–48h à Abidjan, 72h max pour l'intérieur du pays. Vos commandes emballées avec soin et livrées en toute sécurité.</p>
-        </div>
+        }
 
-        <div class="luxury-card rounded-3xl p-8 scroll-reveal stagger-3">
-          <div class="w-14 h-14 bg-gold rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-600/20">
-            <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold theme-text mb-3">Paiement Sécurisé</h3>
-          <p class="theme-muted text-sm leading-relaxed">Transactions protégées via Wave CI. Achetez en toute sérénité avec notre politique de retour sous 3 jours.</p>
-        </div>
       </div>
     </div>
   </section>
@@ -344,26 +330,43 @@
        CTA FINAL
   ════════════════════════════════════════════════════ -->
   <section class="relative py-32 overflow-hidden scroll-reveal">
-    <!-- Gold gradient bg -->
-    <div class="absolute inset-0 bg-gradient-to-br from-yellow-900/30 via-transparent to-amber-900/20 pointer-events-none
-                light:from-amber-50 light:via-yellow-50/80 light:to-amber-100/50"></div>
-    <div class="absolute inset-0 dot-grid opacity-50 pointer-events-none"></div>
+
+    <!-- Fond -->
+    <div class="absolute inset-0 pointer-events-none"
+         style="background: linear-gradient(135deg, rgba(184,148,30,0.08) 0%, transparent 50%, rgba(184,148,30,0.05) 100%);"></div>
+    <div class="absolute inset-0 dot-grid opacity-30 pointer-events-none"></div>
+    <!-- Ligne décorative -->
+    <div class="absolute top-0 inset-x-0 h-px"
+         style="background: linear-gradient(90deg, transparent, rgba(184,148,30,0.4), transparent);"></div>
+    <div class="absolute bottom-0 inset-x-0 h-px"
+         style="background: linear-gradient(90deg, transparent, rgba(184,148,30,0.4), transparent);"></div>
 
     <div class="relative max-w-3xl mx-auto px-4 text-center">
-      <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-5">Rejoignez-nous</p>
-      <h2 class="text-4xl lg:text-6xl font-black theme-text mb-6 leading-tight">
+
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold mb-8"
+           style="background: rgba(184,148,30,0.1); border: 1px solid rgba(184,148,30,0.25); color: #b8941e;">
+        <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background:#b8941e;"></span>
+        Rejoignez +1 200 clients satisfaits
+      </div>
+
+      <h2 class="text-5xl lg:text-6xl font-black theme-text mb-6 leading-tight">
         Ce que vous cherchez<br>
-        <span class="gold-text">est ici</span>
+        <span style="color:#b8941e;">est ici.</span>
       </h2>
-      <p class="theme-muted mb-10 text-lg">Montres, bijoux, mode, beauté et lifestyle — tout ce dont vous avez besoin, livré rapidement partout en Côte d'Ivoire.</p>
+
+      <p class="theme-muted mb-10 text-base max-w-xl mx-auto leading-relaxed">
+        Montres, bijoux, mode, beauté et lifestyle — tout ce dont vous avez besoin, livré rapidement partout en Côte d'Ivoire.
+      </p>
 
       <div class="flex flex-wrap justify-center gap-4">
         <a routerLink="/products"
-           class="group flex items-center gap-2.5 bg-gold text-black px-10 py-4 rounded-2xl font-bold text-sm
-                  hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-1 transition-all duration-300">
+           class="group flex items-center gap-2.5 px-10 py-4 rounded-2xl font-bold text-sm text-black
+                  hover:-translate-y-1 transition-all duration-300"
+           style="background:#b8941e; box-shadow: 0 8px 30px rgba(184,148,30,0.35);">
           Explorer la boutique
           <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
           </svg>
         </a>
         @if (!(currentUser$ | async)) {

@@ -38,9 +38,12 @@ export class PaymentPageComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.order = res.data;
-          // Rediriger seulement si déjà payé ou commande annulée/terminée
-          if (this.order.paymentStatus === 'COMPLETED') {
+          const s = this.order.orderStatus;
+          const p = this.order.paymentStatus;
+          // Rediriger si la commande n'est pas dans un état où le paiement est possible
+          if (s === 'CANCELLED' || s === 'DELIVERED' || p === 'COMPLETED') {
             this.router.navigate(['/orders']);
+            return;
           }
         } else {
           this.error = 'Commande introuvable';
@@ -58,7 +61,8 @@ export class PaymentPageComponent implements OnInit {
 
   /** Retourne true si le formulaire de paiement doit être affiché */
   get canPay(): boolean {
-    return this.order?.paymentStatus === 'PENDING' || this.order?.paymentStatus === 'FAILED';
+    return this.order?.orderStatus === 'APPROVED' &&
+      (this.order?.paymentStatus === 'PENDING' || this.order?.paymentStatus === 'FAILED');
   }
 
   /** Retourne true si en attente de validation manager */

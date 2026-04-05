@@ -104,6 +104,35 @@
     </div>
   }
 
+  <!-- ══ État : commande pas encore approuvée ══ -->
+  @if (!loading && order && order.orderStatus === 'PENDING' && !success) {
+    <div class="w-full max-w-lg text-center">
+      <button (click)="goToOrders()" class="flex items-center gap-2 text-sm theme-muted hover:theme-text transition-colors mb-6">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Mes commandes
+      </button>
+      <div class="luxury-card rounded-3xl p-8 flex flex-col items-center gap-6">
+        <div class="w-20 h-20 rounded-full flex items-center justify-center" style="background:rgba(234,179,8,0.12);border:2px solid rgba(234,179,8,0.25)">
+          <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold theme-text mb-2">Commande en attente</h2>
+          <p class="theme-muted text-sm leading-relaxed">
+            Votre commande est en cours de validation par notre équipe.<br>
+            Le paiement sera disponible une fois la commande approuvée.
+          </p>
+        </div>
+        <button (click)="goToOrders()" class="w-full py-3.5 rounded-xl font-bold text-sm transition-all luxury-card theme-text hover:text-gold border theme-border">
+          Voir mes commandes
+        </button>
+      </div>
+    </div>
+  }
+
   <!-- ══ Formulaire principal : PENDING ou FAILED ══ -->
   @if (!loading && order && canPay && !success) {
     <div class="w-full max-w-4xl">

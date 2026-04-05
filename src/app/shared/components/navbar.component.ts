@@ -13,13 +13,16 @@ import { AuthPromptService } from '../../core/services/auth-prompt.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { CartService, CartItem } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
+import { PromoService } from '../../core/services/promo.service';
+import { PromoCheckResponse, PublicPromoResponse } from '../../core/models/promo.models';
 import { Subject } from 'rxjs';
+import { LogoComponent } from './logo.component';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, NotifBodyPipe],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, NotifBodyPipe, LogoComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
@@ -41,8 +44,29 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showCheckout    = false;
   deliveryAddress = '';
   deliveryPhone   = '';
+  deliveryZone: 'abidjan' | 'interieur' | '' = '';
+  deliveryCity    = '';
   checkoutLoading = false;
   checkoutError: string | null = null;
+  promoCodeInput = '';
+  promoCheckResult: PromoCheckResponse | null = null;
+  promoChecking = false;
+  promoError: string | null = null;
+  activePromos: PublicPromoResponse[] = [];
+  promosLoaded = false;
+
+  readonly villesInterieur = [
+    'Abengourou', 'Aboisso', 'Adzopé', 'Agboville', 'Agnibilékrou',
+    'Bangolo', 'Biankouma', 'Bocanda', 'Bondoukou', 'Bongouanou',
+    'Bouaflé', 'Bouaké', 'Boundiali', 'Dabakala', 'Daloa',
+    'Danané', 'Daoukro', 'Dimbokro', 'Divo', 'Duékoué',
+    'Ferkessédougou', 'Gagnoa', 'Grand-Bassam', 'Grand-Lahou', 'Guiglo',
+    'Issia', 'Jacqueville', 'Katiola', 'Korhogo', 'Lakota',
+    'Man', 'Mankono', 'Mbahiakro', 'Odienné', 'Oumé',
+    'Sakassou', 'San-Pédro', 'Sassandra', 'Séguéla', 'Sinfra',
+    'Soubré', 'Tabou', 'Tiassalé', 'Tingrela', 'Touba',
+    'Toumodi', 'Vavoua', 'Yamoussoukro', 'Zuenoula',
+  ];
   checkoutSuccess = false;
 
   private destroy$ = new Subject<void>();
@@ -53,6 +77,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     readonly notifTemplate: NotificationTemplateService,
     private authPromptService: AuthPromptService,
     private orderService: OrderService,
+    private promoService: PromoService,
     private router: Router,
     readonly themeService: ThemeService,
     readonly cartService: CartService,
@@ -125,7 +150,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   toggleTheme():   void { this.themeService.toggle(); this.cdr.detectChanges(); }
-  toggleCart():    void { this.showCart = !this.showCart; this.showUserMenu = false; this.showNotifications = false; this.mobileOpen = false; }
+  toggleCart():    void {
+    this.showCart = !this.showCart;
+    this.showUserMenu = false;
+    this.showNotifications = false;
+    this.mobileOpen = false;
+    if (this.showCart && !this.promosLoaded) this._loadActivePromos();
+  }
   toggleUserMenu():void { this.showUserMenu = !this.showUserMenu; this.showCart = false; this.showNotifications = false; }
   toggleMobile():  void { this.mobileOpen = !this.mobileOpen; this.showCart = false; this.showUserMenu = false; this.showNotifications = false; }
   closeAll():      void { this.showCart = false; this.showUserMenu = false; this.showNotifications = false; this.mobileOpen = false; this._resetCheckout(); }
@@ -259,6 +290,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showCheckout = true;
     this.deliveryAddress = '';
     this.deliveryPhone   = '';
+    this.deliveryZone    = '';
+    this.deliveryCity    = '';
     this.checkoutError = null;
     this.checkoutSuccess = false;
     this.cdr.detectChanges();
@@ -276,19 +309,35 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
       return;
     }
-    if (!this.deliveryAddress.trim()) {
-      this.checkoutError = 'Veuillez saisir une adresse de livraison';
+    if (!this.deliveryZone) {
+      this.checkoutError = 'Veuillez sélectionner une zone de livraison';
+      this.cdr.detectChanges();
+      return;
+    }
+    if (this.deliveryZone === 'abidjan' && !this.deliveryAddress.trim()) {
+      this.checkoutError = 'Veuillez indiquer le lieu de livraison à Abidjan';
+      this.cdr.detectChanges();
+      return;
+    }
+    if (this.deliveryZone === 'interieur' && !this.deliveryCity) {
+      this.checkoutError = 'Veuillez sélectionner une ville';
       this.cdr.detectChanges();
       return;
     }
     this.checkoutLoading = true;
     this.checkoutError = null;
 
-    const fullAddress = `${this.deliveryAddress.trim()} | Tél: ${this.deliveryPhone.trim()}`;
-    const payload = {
+    const adresse = this.deliveryZone === 'abidjan'
+      ? `Abidjan — ${this.deliveryAddress.trim()}`
+      : `Intérieur du pays — ${this.deliveryCity}`;
+    const fullAddress = `${adresse} | Tél: ${this.deliveryPhone.trim()}`;
+    const payload: any = {
       items: this.cartItems.map(i => ({ productId: i.productId, quantity: i.quantity })),
       deliveryAddress: fullAddress,
     };
+    if (this.promoCheckResult?.valid && this.promoCheckResult.code) {
+      payload.promoCode = this.promoCheckResult.code;
+    }
 
     this.orderService.createOrder(payload).subscribe({
       next: (res) => {
@@ -314,13 +363,60 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
+  private _loadActivePromos(): void {
+    this.promoService.getActivePromos()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (r) => {
+          if (r.success) { this.activePromos = r.data; this.promosLoaded = true; }
+          this.cdr.detectChanges();
+        },
+        error: () => {},
+      });
+  }
+
+  applyPromoFromBadge(code: string): void {
+    this.promoCodeInput = code;
+    this.checkPromo();
+  }
+
+  checkPromo(): void {
+    if (!this.promoCodeInput.trim()) return;
+    this.promoChecking = true;
+    this.promoError = null;
+    this.promoCheckResult = null;
+    this.promoService.checkPromo(this.promoCodeInput.trim(), this.cartTotal).subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.promoCheckResult = r.data;
+          if (!r.data.valid) this.promoError = r.data.message;
+        }
+        this.promoChecking = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.promoError = 'Erreur de vérification'; this.promoChecking = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  removePromo(): void {
+    this.promoCodeInput = '';
+    this.promoCheckResult = null;
+    this.promoError = null;
+    this.cdr.detectChanges();
+  }
+
   private _resetCheckout(): void {
     this.showCheckout = false;
     this.deliveryAddress = '';
     this.deliveryPhone   = '';
+    this.deliveryZone    = '';
+    this.deliveryCity    = '';
     this.checkoutLoading = false;
     this.checkoutError = null;
     this.checkoutSuccess = false;
+    this.promoCodeInput = '';
+    this.promoCheckResult = null;
+    this.promoError = null;
   }
 
   // ── Getters ─────────────────────────────────────────────────────────────────

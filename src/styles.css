@@ -274,28 +274,45 @@ html.light body { background: #faf8f4; color: #111111; }
 
 /* ─── Navbar items (desktop) ─────────────────────────────────────────────── */
 .nav-item {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0.4rem 0.875rem;
+  padding: 0.45rem 0.9rem;
   font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
   color: #9ca3af;
-  transition: color .2s, background-color .2s;
+  transition: color .2s;
   text-decoration: none;
+  letter-spacing: 0.01em;
 }
-.nav-item:hover { color: #d4af37; background: rgba(255,255,255,.05); }
-.light .nav-item { color: #374151; }
-.light .nav-item:hover { color: #a0720a; background: rgba(0,0,0,.04); }
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 60%;
+  height: 2px;
+  background: #b8941e;
+  border-radius: 2px;
+  transition: transform .25s ease;
+}
+.nav-item:hover { color: #d4af37; }
+.nav-item:hover::after { transform: translateX(-50%) scaleX(1); }
+
+.light .nav-item { color: #4b5563; }
+.light .nav-item:hover { color: #92700c; }
 
 /* Active state (routerLinkActive) */
 .nav-active {
   color: #d4af37 !important;
-  background: rgba(212,175,55,.10) !important;
+}
+.nav-active::after {
+  transform: translateX(-50%) scaleX(1) !important;
 }
 .light .nav-active {
-  color: #a0720a !important;
-  background: rgba(160,114,10,.09) !important;
+  color: #92700c !important;
 }
 
 /* ─── Navbar icon buttons ────────────────────────────────────────────────── */
@@ -310,12 +327,12 @@ html.light body { background: #faf8f4; color: #111111; }
   transition: color .2s, background-color .2s;
   flex-shrink: 0;
 }
-.nav-icon-btn:hover { color: #d4af37; background: rgba(255,255,255,.07); }
+.nav-icon-btn:hover { color: #b8941e; background: rgba(184,148,30,.10); }
 .light .nav-icon-btn { color: #6b7280; }
-.light .nav-icon-btn:hover { color: #a0720a; background: rgba(0,0,0,.06); }
+.light .nav-icon-btn:hover { color: #92700c; background: rgba(146,112,12,.09); }
 
-.active-icon { color: #d4af37; background: rgba(212,175,55,.12); }
-.light .active-icon { color: #a0720a; background: rgba(160,114,10,.10); }
+.active-icon { color: #b8941e; background: rgba(184,148,30,.12); }
+.light .active-icon { color: #92700c; background: rgba(146,112,12,.10); }
 
 /* ─── Nav link (legacy) ──────────────────────────────────────────────────── */
 .nav-link {

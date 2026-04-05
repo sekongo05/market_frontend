@@ -22,6 +22,31 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
+export interface UserFullProfileResponse {
+  id: number;
+  nom: string;
+  prenom: string;
+  email: string;
+  phone: string;
+  role: UserRole;
+  enabled: boolean;
+  memberSince: string;
+  totalOrders: number;
+  completedOrders: number;
+  cancelledOrders: number;
+  pendingOrders: number;
+  totalSpent: number;
+  lastOrderDate: string | null;
+  recentOrders: {
+    id: number;
+    orderNumber: string;
+    amount: number;
+    orderStatus: string;
+    paymentStatus: string;
+    createdAt: string;
+  }[];
+}
+
 export interface AdminCreateUserRequest {
   nom: string;
   prenom: string;

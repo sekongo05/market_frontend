@@ -25,25 +25,26 @@
       </div>
 
       <!-- Tabs -->
-      <div class="flex gap-1">
-        <button (click)="setTab('stats')" class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2"
-          [ngClass]="activeTab === 'stats'
-            ? 'border-[#d4af37] text-gold bg-gold/8'
-            : 'border-transparent theme-muted hover:text-gold'">
-          Statistiques
-        </button>
-        <button (click)="setTab('users')" class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2"
-          [ngClass]="activeTab === 'users'
-            ? 'border-[#d4af37] text-gold bg-gold/8'
-            : 'border-transparent theme-muted hover:text-gold'">
-          Utilisateurs
-        </button>
-        <button (click)="setTab('categories')" class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2"
-          [ngClass]="activeTab === 'categories'
-            ? 'border-[#d4af37] text-gold bg-gold/8'
-            : 'border-transparent theme-muted hover:text-gold'">
-          Catégories
-        </button>
+      <div class="flex gap-1 overflow-x-auto pb-px">
+        @for (tab of [
+          {key:'stats',      label:'Statistiques'},
+          {key:'orders',     label:'Commandes'},
+          {key:'payments',   label:'Paiements'},
+          {key:'products',   label:'Produits'},
+          {key:'delivery',   label:'Livraisons'},
+          {key:'returns',    label:'Retours'},
+          {key:'reviews',    label:'Avis'},
+          {key:'promos',     label:'Codes promo'},
+          {key:'users',      label:'Utilisateurs'},
+          {key:'categories', label:'Catégories'}
+        ]; track tab.key) {
+          <button (click)="setTab($any(tab.key))" class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2 whitespace-nowrap"
+            [ngClass]="activeTab === tab.key
+              ? 'border-[#d4af37] text-gold bg-gold/8'
+              : 'border-transparent theme-muted hover:text-gold'">
+            {{ tab.label }}
+          </button>
+        }
       </div>
     </div>
   </div>
@@ -545,6 +546,59 @@
 
     }
 
+    <!-- Caisse journalière -->
+    @if (!loading && stats) {
+      <div class="mt-8 theme-surface border theme-border rounded-3xl p-6 animate-fade-in-up">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div>
+            <h3 class="font-bold theme-text">Caisse journalière</h3>
+            <p class="text-xs theme-muted mt-0.5">Synthèse par date</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <input [(ngModel)]="caisseDate" type="date" class="theme-input px-3 py-2 rounded-xl text-sm"/>
+            <button (click)="loadDailyCaisse()" [disabled]="dailyCaisseLoading"
+              class="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors disabled:opacity-50">
+              @if (dailyCaisseLoading) {
+                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+              } @else {
+                Voir
+              }
+            </button>
+          </div>
+        </div>
+        @if (dailyCaisse) {
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="p-4 bg-white/4 rounded-2xl text-center">
+              <p class="text-2xl font-black theme-text">{{ dailyCaisse.ordersCount }}</p>
+              <p class="text-xs theme-muted mt-1">Commandes</p>
+            </div>
+            <div class="p-4 bg-green-500/8 rounded-2xl text-center">
+              <p class="text-2xl font-black text-green-400">{{ dailyCaisse.paidOrdersCount }}</p>
+              <p class="text-xs theme-muted mt-1">Payées</p>
+            </div>
+            <div class="p-4 bg-yellow-500/8 rounded-2xl text-center">
+              <p class="text-2xl font-black text-yellow-400">{{ dailyCaisse.pendingPaymentsCount }}</p>
+              <p class="text-xs theme-muted mt-1">En attente</p>
+            </div>
+            <div class="p-4 bg-gold/8 border border-gold/15 rounded-2xl text-center">
+              <p class="text-xl font-black text-gold">{{ formatAmount(dailyCaisse.totalRevenue) }}</p>
+              <p class="text-xs theme-muted mt-1">CA validé</p>
+            </div>
+            <div class="p-4 bg-white/4 rounded-2xl text-center">
+              <p class="text-xl font-black theme-text">{{ formatAmount(dailyCaisse.pendingRevenue) }}</p>
+              <p class="text-xs theme-muted mt-1">CA en attente</p>
+            </div>
+            <div class="p-4 bg-violet-500/8 rounded-2xl text-center">
+              <p class="text-2xl font-black text-violet-400">{{ dailyCaisse.newCustomersCount }}</p>
+              <p class="text-xs theme-muted mt-1">Nouveaux clients</p>
+            </div>
+          </div>
+        } @else {
+          <p class="text-center text-sm theme-muted py-4">Sélectionnez une date et cliquez sur "Voir"</p>
+        }
+      </div>
+    }
+
   } <!-- /stats -->
 
   <!-- ══════════ ONGLET UTILISATEURS ══════════ -->
@@ -624,6 +678,11 @@
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                       </svg>
                     } @else {
+                      <div class="flex items-center gap-2">
+                        <button (click)="openUserProfile(user.id)" appTooltip="Voir fiche complète" tooltipPosition="left"
+                          class="w-7 h-7 flex items-center justify-center rounded-lg text-blue-400/60 hover:text-blue-400 hover:bg-blue-500/10 transition-colors">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </button>
                       <button type="button" (click)="toggleUser(user)"
                         [appTooltip]="user.enabled ? 'Désactiver ce compte' : 'Activer ce compte'" tooltipPosition="left"
                         class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
@@ -633,6 +692,7 @@
                               [class.translate-x-1]="!user.enabled">
                         </span>
                       </button>
+                      </div>
                     }
                   </td>
                 </tr>
@@ -829,7 +889,1225 @@
     </div>
   } <!-- /categories -->
 
+  <!-- ══════════ ONGLET CODES PROMO ══════════ -->
+  @if (activeTab === 'promos') {
+    <div class="animate-fade-in-up">
+
+      <!-- Header -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div>
+          <h2 class="text-xl font-bold theme-text">Codes promo</h2>
+          <p class="text-sm theme-muted mt-0.5">{{ promos.length }} code(s) au total</p>
+        </div>
+        <button (click)="openPromoForm()"
+          class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Nouveau code
+        </button>
+      </div>
+
+      @if (showPromoForm) {
+        <div class="theme-surface border theme-border rounded-3xl p-6 mb-6 animate-fade-in">
+          <h3 class="font-bold theme-text mb-4">Créer un code promo</h3>
+          @if (promoFormError) {
+            <div class="p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm mb-4">{{ promoFormError }}</div>
+          }
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Code *</label>
+              <input [(ngModel)]="promoForm.code" type="text" placeholder="EX: NOEL10" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm uppercase"/>
+            </div>
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Réduction (%) *</label>
+              <input [(ngModel)]="promoForm.discountPercent" type="number" min="1" max="100" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+            </div>
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Expire le</label>
+              <input [(ngModel)]="promoForm.expiresAt" type="date" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+            </div>
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Utilisations max</label>
+              <input [(ngModel)]="promoForm.maxUses" type="number" min="1" placeholder="Illimité" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Description</label>
+            <input [(ngModel)]="promoForm.description" type="text" placeholder="Ex: Promo de Noël" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+          </div>
+          <div class="flex items-center gap-3 mb-4 p-3 bg-gold/5 border border-gold/15 rounded-xl">
+            <input type="checkbox" [(ngModel)]="promoForm.publicVisible" id="publicVisible"
+              class="w-4 h-4 rounded accent-yellow-500 cursor-pointer"/>
+            <div class="flex-1">
+              <label for="publicVisible" class="text-sm font-bold theme-text cursor-pointer">Afficher dans la boutique</label>
+              <p class="text-xs theme-muted mt-0.5">Les clients verront ce code directement dans leur panier</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button (click)="closePromoForm()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors">Annuler</button>
+            <button (click)="submitPromo()" [disabled]="promoFormLoading || !promoForm.code"
+              class="flex-1 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg transition-all disabled:opacity-50">
+              Créer
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (promosLoading) {
+        <div class="flex justify-center py-12"><svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></div>
+      }
+
+      @if (!promosLoading) {
+        <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+          <table class="w-full">
+            <thead>
+              <tr class="theme-surface-2">
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Code</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Réduction</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Utilisations</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Expiration</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Boutique</th>
+                <th class="px-5 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (promo of promos; track promo.id) {
+                <tr class="border-t theme-border hover:bg-white/2 transition-colors">
+                  <td class="px-5 py-4">
+                    <span class="font-mono font-bold text-gold text-sm">{{ promo.code }}</span>
+                    @if (promo.description) {
+                      <p class="text-xs theme-muted mt-0.5">{{ promo.description }}</p>
+                    }
+                  </td>
+                  <td class="px-5 py-4"><span class="font-bold theme-text text-lg">{{ promo.discountPercent }}%</span></td>
+                  <td class="px-5 py-4 hidden md:table-cell">
+                    <span class="text-sm theme-text">{{ promo.usedCount }}</span>
+                    @if (promo.maxUses) { <span class="text-xs theme-muted"> / {{ promo.maxUses }}</span> }
+                    @else { <span class="text-xs theme-muted"> / ∞</span> }
+                  </td>
+                  <td class="px-5 py-4 hidden lg:table-cell">
+                    <span class="text-sm theme-muted">{{ promo.expiresAt ? (promo.expiresAt | date:'dd/MM/yyyy') : 'Pas de limite' }}</span>
+                  </td>
+                  <td class="px-5 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                      [ngClass]="promo.active ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'">
+                      <span class="w-1.5 h-1.5 rounded-full" [ngClass]="promo.active ? 'bg-green-400' : 'bg-red-400'"></span>
+                      {{ promo.active ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </td>
+                  <td class="px-5 py-4 hidden md:table-cell">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                      [ngClass]="promo.publicVisible ? 'bg-blue-500/15 text-blue-400' : 'bg-white/8 text-gray-500'">
+                      {{ promo.publicVisible ? 'Visible' : 'Masqué' }}
+                    </span>
+                  </td>
+                  <td class="px-5 py-4">
+                    <div class="flex items-center gap-2">
+                      <button (click)="togglePromo(promo)"
+                        class="text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors"
+                        [ngClass]="promo.active ? 'bg-orange-500/10 text-orange-400 hover:bg-orange-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'">
+                        {{ promo.active ? 'Désactiver' : 'Activer' }}
+                      </button>
+                      <button (click)="deletePromo(promo)" class="text-red-400/60 hover:text-red-400 transition-colors p-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if (promos.length === 0) {
+                <tr><td colspan="6" class="py-16 text-center theme-muted">Aucun code promo</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  } <!-- /promos -->
+
+  <!-- ══════════ ONGLET AVIS ══════════ -->
+  @if (activeTab === 'reviews') {
+    <div class="animate-fade-in-up">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold theme-text">Avis & notations</h2>
+          <p class="text-sm theme-muted mt-0.5">{{ reviews.length }} avis chargé(s)</p>
+        </div>
+        <button (click)="loadReviews(0)"
+          class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Actualiser
+        </button>
+      </div>
+
+      @if (reviewsLoading) {
+        <div class="flex justify-center py-12"><svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></div>
+      }
+
+      @if (!reviewsLoading) {
+        <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+          <table class="w-full">
+            <thead>
+              <tr class="theme-surface-2">
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Client</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Produit</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Note</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Commentaire</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Visible</th>
+                <th class="px-5 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (review of reviews; track review.id) {
+                <tr class="border-t theme-border hover:bg-white/2 transition-colors">
+                  <td class="px-5 py-4">
+                    <p class="font-semibold theme-text text-sm">{{ review.customerName }}</p>
+                    <p class="text-xs theme-muted">{{ review.createdAt | date:'dd/MM/yyyy' }}</p>
+                  </td>
+                  <td class="px-5 py-4">
+                    <p class="text-sm theme-text truncate max-w-[150px]">{{ review.productName }}</p>
+                  </td>
+                  <td class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                      @for (i of [1,2,3,4,5]; track i) {
+                        <span [ngClass]="i <= review.rating ? 'text-yellow-400' : 'text-white/20'" class="text-base">★</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 hidden lg:table-cell">
+                    <p class="text-sm theme-muted truncate max-w-[200px]">{{ review.comment ?? '—' }}</p>
+                  </td>
+                  <td class="px-5 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                      [ngClass]="review.visible ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'">
+                      {{ review.visible ? 'Oui' : 'Masqué' }}
+                    </span>
+                  </td>
+                  <td class="px-5 py-4">
+                    <div class="flex items-center gap-2">
+                      <button (click)="toggleReviewVisibility(review)"
+                        class="text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors"
+                        [ngClass]="review.visible ? 'bg-orange-500/10 text-orange-400 hover:bg-orange-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'">
+                        {{ review.visible ? 'Masquer' : 'Afficher' }}
+                      </button>
+                      <button (click)="adminDeleteReview(review)" class="text-red-400/60 hover:text-red-400 transition-colors p-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if (reviews.length === 0) {
+                <tr><td colspan="6" class="py-16 text-center theme-muted">Aucun avis</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (reviewsTotalPages > 1) {
+          <div class="flex justify-center gap-2 mt-4">
+            @for (p of reviewPages; track p) {
+              <button (click)="loadReviews(p)"
+                class="w-9 h-9 rounded-xl text-sm font-bold transition-colors"
+                [ngClass]="reviewsPage === p ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">
+                {{ p + 1 }}
+              </button>
+            }
+          </div>
+        }
+      }
+    </div>
+  } <!-- /reviews -->
+
+  <!-- ══════════ ONGLET RETOURS ══════════ -->
+  @if (activeTab === 'returns') {
+    <div class="animate-fade-in-up">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold theme-text">Demandes de retour</h2>
+          <p class="text-sm theme-muted mt-0.5">{{ returns.length }} demande(s) chargée(s)</p>
+        </div>
+        <button (click)="loadReturns(0)"
+          class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Actualiser
+        </button>
+      </div>
+
+      @if (returnsLoading) {
+        <div class="flex justify-center py-12"><svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></div>
+      }
+
+      @if (!returnsLoading) {
+        <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+          <table class="w-full">
+            <thead>
+              <tr class="theme-surface-2">
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Commande</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Client</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Motif</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Date</th>
+                <th class="px-5 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ret of returns; track ret.id) {
+                <tr class="border-t theme-border hover:bg-white/2 transition-colors">
+                  <td class="px-5 py-4">
+                    <span class="font-mono text-sm font-bold theme-text">{{ ret.orderNumber }}</span>
+                  </td>
+                  <td class="px-5 py-4">
+                    <p class="font-semibold theme-text text-sm">{{ ret.customerName }}</p>
+                  </td>
+                  <td class="px-5 py-4 hidden lg:table-cell">
+                    <p class="text-sm theme-muted truncate max-w-[200px]">{{ ret.reason }}</p>
+                  </td>
+                  <td class="px-5 py-4">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold"
+                      [ngClass]="returnStatusClass(ret.status)">
+                      {{ returnStatusLabel(ret.status) }}
+                    </span>
+                  </td>
+                  <td class="px-5 py-4 hidden md:table-cell">
+                    <span class="text-sm theme-muted">{{ ret.createdAt | date:'dd/MM/yyyy' }}</span>
+                  </td>
+                  <td class="px-5 py-4">
+                    @if (ret.status === 'PENDING' || ret.status === 'APPROVED') {
+                      <button (click)="openReturnDecisionModal(ret)"
+                        class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors">
+                        Statuer
+                      </button>
+                    } @else {
+                      <span class="text-xs theme-muted">{{ ret.processedBy ?? '—' }}</span>
+                    }
+                  </td>
+                </tr>
+              }
+              @if (returns.length === 0) {
+                <tr><td colspan="6" class="py-16 text-center theme-muted">Aucune demande de retour</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (returnsTotalPages > 1) {
+          <div class="flex justify-center gap-2 mt-4">
+            @for (p of returnPages; track p) {
+              <button (click)="loadReturns(p)"
+                class="w-9 h-9 rounded-xl text-sm font-bold transition-colors"
+                [ngClass]="returnsPage === p ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">
+                {{ p + 1 }}
+              </button>
+            }
+          </div>
+        }
+      }
+    </div>
+  } <!-- /returns -->
+
+  <!-- ══════════ ONGLET COMMANDES ══════════ -->
+  @if (activeTab === 'orders') {
+    <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+
+      <!-- Header -->
+      <div class="px-6 py-4 border-b theme-border flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold theme-text">Gestion des commandes</h2>
+          <p class="text-xs theme-muted mt-0.5">{{ allOrders.length }} commande(s) chargée(s)</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <select [(ngModel)]="statusFilter" (change)="loadAllOrders(0)"
+            class="theme-input px-3 py-2 rounded-xl text-sm">
+            <option value="">Tous les statuts</option>
+            @for (s of orderStatuses; track s) {
+              <option [value]="s">{{ orderStatusLabel(s) }}</option>
+            }
+          </select>
+          <button (click)="loadAllOrders(0)"
+            class="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Actualiser
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      @if (ordersLoading) {
+        <div class="p-8 flex justify-center">
+          <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </div>
+      }
+
+      <!-- Table -->
+      @if (!ordersLoading && allOrders.length > 0) {
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="theme-surface-2">
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">N° commande</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Client</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden sm:table-cell">Paiement</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Montant</th>
+                <th class="text-right text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of allOrders; track order.id) {
+                <tr class="border-t theme-border hover:bg-white/3 transition-colors">
+                  <td class="px-5 py-3.5">
+                    <div>
+                      <p class="font-mono text-xs font-semibold theme-text">{{ order.orderNumber }}</p>
+                      <p class="text-[10px] theme-muted mt-0.5">{{ order.createdAt | date:'dd/MM/yy HH:mm' }}</p>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 hidden md:table-cell">
+                    <p class="text-sm theme-text font-medium">{{ order.customerName }}</p>
+                  </td>
+                  <td class="px-5 py-3.5">
+                    <span class="inline-flex px-2 py-0.5 rounded-lg text-xs font-bold" [class]="orderStatusClass(order.orderStatus)">
+                      {{ orderStatusLabel(order.orderStatus) }}
+                    </span>
+                  </td>
+                  <td class="px-5 py-3.5 hidden sm:table-cell">
+                    <span class="text-xs theme-muted">{{ paymentLabel(order.paymentStatus) }}</span>
+                  </td>
+                  <td class="px-5 py-3.5 hidden lg:table-cell">
+                    <span class="font-bold text-sm text-gold">{{ formatCurrency(order.totalAmount) }} FCFA</span>
+                  </td>
+                  <td class="px-5 py-3.5 text-right">
+                    <div class="flex items-center justify-end gap-1.5">
+                      @if (statusUpdatingId === order.id) {
+                        <svg class="w-4 h-4 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                      } @else {
+                        @if (nextStatusMap[order.orderStatus]) {
+                          <button (click)="advanceOrderStatus(order)"
+                            class="px-2.5 py-1 bg-gold/10 border border-gold/25 text-gold text-xs font-bold rounded-lg hover:bg-gold/20 transition-colors">
+                            {{ nextStatusLabel(order.orderStatus) }}
+                          </button>
+                        }
+                        @if (order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'DELIVERED') {
+                          <button (click)="cancelOrderByManager(order)"
+                            class="px-2.5 py-1 bg-red-500/10 border border-red-500/25 text-red-400 text-xs font-bold rounded-lg hover:bg-red-500/20 transition-colors">
+                            Annuler
+                          </button>
+                        }
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (ordersTotalPages > 1) {
+          <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
+            <span class="text-xs theme-muted">Page {{ ordersPage + 1 }} / {{ ordersTotalPages }}</span>
+            <div class="flex gap-2">
+              <button (click)="loadAllOrders(ordersPage - 1)" [disabled]="ordersPage === 0"
+                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
+                ← Préc.
+              </button>
+              @for (page of orderPages; track page) {
+                <button (click)="loadAllOrders(page)"
+                  class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                  [ngClass]="page === ordersPage ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-gold/15 hover:text-gold'">
+                  {{ page + 1 }}
+                </button>
+              }
+              <button (click)="loadAllOrders(ordersPage + 1)" [disabled]="ordersPage >= ordersTotalPages - 1"
+                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
+                Suiv. →
+              </button>
+            </div>
+          </div>
+        }
+      }
+
+      @if (!ordersLoading && allOrders.length === 0) {
+        <div class="py-16 text-center"><p class="theme-muted font-semibold">Aucune commande trouvée</p></div>
+      }
+    </div>
+  } <!-- /orders -->
+
+  <!-- ══════════ ONGLET PAIEMENTS ══════════ -->
+  @if (activeTab === 'payments') {
+    <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+
+      <div class="px-6 py-4 border-b theme-border flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold theme-text">Paiements à valider</h2>
+          <p class="text-xs theme-muted mt-0.5">{{ pendingPayments.length }} en attente de validation</p>
+        </div>
+        <button (click)="loadPendingPayments()"
+          class="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Actualiser
+        </button>
+      </div>
+
+      @if (paymentsLoading) {
+        <div class="p-8 flex justify-center">
+          <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </div>
+      }
+
+      @if (!paymentsLoading && pendingPayments.length === 0) {
+        <div class="py-20 text-center">
+          <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <p class="theme-text font-bold">Aucun paiement en attente</p>
+          <p class="text-sm theme-muted mt-1">Tous les paiements ont été traités</p>
+        </div>
+      }
+
+      @if (!paymentsLoading && pendingPayments.length > 0) {
+        <div class="divide-y theme-border">
+          @for (order of pendingPayments; track order.id) {
+            <div class="px-6 py-5">
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="font-mono text-sm font-bold theme-text">{{ order.orderNumber }}</span>
+                    <span class="text-xs px-2 py-0.5 bg-blue-500/15 text-blue-400 border border-blue-500/25 rounded-lg font-bold">Soumis</span>
+                  </div>
+                  <p class="text-sm theme-muted">{{ order.customerName }}</p>
+                  @if (order.paymentReference) {
+                    <div class="mt-2 flex items-center gap-2">
+                      <span class="text-[10px] font-bold theme-muted uppercase tracking-wider">Réf. Wave :</span>
+                      <code class="text-xs font-mono font-bold theme-text bg-white/6 px-2 py-0.5 rounded-lg">{{ order.paymentReference }}</code>
+                    </div>
+                  }
+                  <p class="text-xs theme-muted mt-1">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                  <p class="text-xl font-black text-gold">{{ formatCurrency(order.totalAmount) }} FCFA</p>
+                  @if (paymentActionId === order.id) {
+                    <svg class="w-5 h-5 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                  } @else {
+                    <div class="flex gap-2">
+                      <button (click)="validatePayment(order)"
+                        class="flex items-center gap-1.5 px-4 py-2 bg-green-500/10 border border-green-500/25 text-green-400 text-sm font-bold rounded-xl hover:bg-green-500/20 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Valider
+                      </button>
+                      <button (click)="openRejectModal(order)"
+                        class="flex items-center gap-1.5 px-4 py-2 bg-red-500/10 border border-red-500/25 text-red-400 text-sm font-bold rounded-xl hover:bg-red-500/20 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Rejeter
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (paymentsTotalPages > 1) {
+          <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
+            <span class="text-xs theme-muted">Page {{ paymentsPage + 1 }} / {{ paymentsTotalPages }}</span>
+            <div class="flex gap-2">
+              <button (click)="loadPendingPayments(paymentsPage - 1)" [disabled]="paymentsPage === 0"
+                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">← Préc.</button>
+              @for (page of paymentPages; track page) {
+                <button (click)="loadPendingPayments(page)"
+                  class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                  [ngClass]="page === paymentsPage ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-gold/15 hover:text-gold'">
+                  {{ page + 1 }}
+                </button>
+              }
+              <button (click)="loadPendingPayments(paymentsPage + 1)" [disabled]="paymentsPage >= paymentsTotalPages - 1"
+                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">Suiv. →</button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  } <!-- /payments -->
+
+  <!-- ══════════ ONGLET PRODUITS ══════════ -->
+  @if (activeTab === 'products') {
+    <div>
+      <!-- Header -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+        <div class="flex items-center gap-3 flex-1 min-w-0">
+          <input [ngModel]="productSearchQuery" (ngModelChange)="onProductSearchChange($event)"
+            type="text" placeholder="Rechercher un produit…"
+            class="theme-input px-4 py-2.5 rounded-xl text-sm flex-1 max-w-sm"/>
+        </div>
+        <button (click)="openCreateDrawer()"
+          class="flex items-center gap-2 px-4 py-2.5 bg-gold text-black font-bold text-sm rounded-xl hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Nouveau produit
+        </button>
+      </div>
+
+      <!-- Loading -->
+      @if (productsLoading) {
+        <div class="flex justify-center py-16">
+          <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </div>
+      }
+
+      <!-- Grid -->
+      @if (!productsLoading) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          @for (product of products; track product.id) {
+            <div class="luxury-card rounded-2xl overflow-hidden flex flex-col">
+              <!-- Image -->
+              <div class="relative h-40 bg-gradient-to-br from-white/4 to-white/2 overflow-hidden flex-shrink-0">
+                @if (product.imageUrl) {
+                  <img [src]="product.imageUrl" [alt]="product.name" class="w-full h-full object-cover"/>
+                } @else {
+                  <div class="w-full h-full flex items-center justify-center">
+                    <svg class="w-12 h-12 text-gold/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                  </div>
+                }
+                @if (!product.active) {
+                  <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <span class="text-xs font-bold text-white bg-red-500/80 px-2 py-1 rounded-lg">Inactif</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Info -->
+              <div class="p-4 flex flex-col flex-1">
+                <p class="font-bold theme-text text-sm truncate mb-0.5">{{ product.name }}</p>
+                <p class="text-xs theme-muted mb-3 truncate">{{ product.category.name }}</p>
+
+                <div class="flex items-center justify-between mb-3">
+                  <span class="font-black text-gold text-base">{{ formatCurrency(product.price) }} FCFA</span>
+                  <!-- Stock inline edit -->
+                  @if (editingStockId === product.id) {
+                    <div class="flex items-center gap-1">
+                      <button (click)="adjustStock(-1)" class="w-6 h-6 bg-white/8 rounded-lg flex items-center justify-center theme-muted hover:bg-white/15 text-xs font-bold">−</button>
+                      <input [(ngModel)]="editingStockValue" type="number" min="0"
+                        class="w-12 text-center theme-input rounded-lg text-xs py-1 font-bold"/>
+                      <button (click)="adjustStock(1)" class="w-6 h-6 bg-white/8 rounded-lg flex items-center justify-center theme-muted hover:bg-white/15 text-xs font-bold">+</button>
+                      <button (click)="confirmEditStock(product)" class="w-6 h-6 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400 hover:bg-green-500/30">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                      </button>
+                      <button (click)="cancelEditStock()" class="w-6 h-6 bg-white/8 rounded-lg flex items-center justify-center theme-muted hover:bg-white/15">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                  } @else {
+                    <button (click)="startEditStock(product)"
+                      class="text-xs font-bold px-2 py-1 rounded-lg transition-colors"
+                      [ngClass]="stockClass(product.stock) + ' bg-white/6 hover:bg-white/10'">
+                      @if (stockSavingId === product.id) {
+                        <svg class="w-3 h-3 animate-spin inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                      } @else {
+                        {{ product.stock }} en stock
+                      }
+                    </button>
+                  }
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-2 mt-auto">
+                  <button (click)="openEditDrawer(product)"
+                    class="flex-1 py-2 text-xs font-bold rounded-xl bg-white/6 theme-muted hover:bg-gold/10 hover:text-gold transition-colors">
+                    Modifier
+                  </button>
+                  @if (confirmDeleteId === product.id) {
+                    <button (click)="doDelete(product)"
+                      class="flex-1 py-2 text-xs font-bold rounded-xl bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors">
+                      Confirmer
+                    </button>
+                    <button (click)="cancelDelete()"
+                      class="py-2 px-3 text-xs font-bold rounded-xl bg-white/6 theme-muted hover:bg-white/12 transition-colors">
+                      ✕
+                    </button>
+                  } @else {
+                    <button (click)="startDelete(product.id)"
+                      class="py-2 px-3 text-xs font-bold rounded-xl bg-white/6 text-red-400/60 hover:bg-red-500/15 hover:text-red-400 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (products.length === 0) {
+          <div class="py-20 text-center">
+            <svg class="w-12 h-12 text-gold/20 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+            <p class="theme-muted font-semibold">Aucun produit trouvé</p>
+          </div>
+        }
+
+        <!-- Pagination produits -->
+        @if (productsTotalPages > 1) {
+          <div class="flex justify-center items-center gap-2 mt-6">
+            <button (click)="loadProducts(productsPage - 1)" [disabled]="productsPage === 0"
+              class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">← Préc.</button>
+            @for (page of productPages; track page) {
+              <button (click)="loadProducts(page)"
+                class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                [ngClass]="page === productsPage ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-gold/15 hover:text-gold'">
+                {{ page + 1 }}
+              </button>
+            }
+            <button (click)="loadProducts(productsPage + 1)" [disabled]="productsPage >= productsTotalPages - 1"
+              class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">Suiv. →</button>
+          </div>
+        }
+      }
+    </div>
+  } <!-- /products -->
+
+  <!-- ══════════ ONGLET LIVRAISONS ══════════ -->
+  @if (activeTab === 'delivery') {
+    <div class="space-y-3">
+
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold theme-text">Suivi des livraisons</h2>
+        <button (click)="loadDeliveryOrders()"
+          class="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Actualiser
+        </button>
+      </div>
+
+      @if (deliveryOrdersLoading) {
+        <div class="flex justify-center py-16">
+          <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </div>
+      }
+
+      @if (!deliveryOrdersLoading && deliveryOrders.length === 0) {
+        <div class="py-20 text-center theme-surface border theme-border rounded-3xl">
+          <p class="theme-muted font-semibold">Aucune livraison active</p>
+        </div>
+      }
+
+      @for (order of deliveryOrders; track order.id) {
+        <div class="luxury-card rounded-2xl overflow-hidden">
+          <!-- Row résumé -->
+          <button class="w-full px-5 py-4 flex items-center justify-between gap-4 hover:bg-white/3 transition-colors text-left"
+                  (click)="toggleDeliveryOrder(order.id)">
+            <div class="flex items-center gap-4 min-w-0 flex-1">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <span class="font-mono text-sm font-bold theme-text">{{ order.orderNumber }}</span>
+                  <span class="inline-flex px-2 py-0.5 rounded-lg text-xs font-bold" [class]="orderStatusClass(order.orderStatus)">
+                    {{ orderStatusLabel(order.orderStatus) }}
+                  </span>
+                </div>
+                <p class="text-xs theme-muted">{{ order.customerName }} · {{ order.deliveryAddress }}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-bold text-sm text-gold hidden sm:block">{{ formatCurrency(order.totalAmount) }} FCFA</span>
+              <svg class="w-4 h-4 theme-muted transition-transform duration-300 flex-shrink-0"
+                   [class.rotate-180]="expandedDeliveryOrderId === order.id"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </button>
+
+          <!-- Détails étendus -->
+          @if (expandedDeliveryOrderId === order.id) {
+            <div class="border-t theme-border px-5 py-4">
+
+              @if (deliveryDetailLoading) {
+                <div class="flex justify-center py-8">
+                  <svg class="w-6 h-6 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                  </svg>
+                </div>
+              }
+
+              @if (!deliveryDetailLoading && selectedDelivery) {
+                <!-- Sous-onglets -->
+                <div class="flex gap-1 mb-4">
+                  <button (click)="deliverySubTab = 'events'"
+                    class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors"
+                    [ngClass]="deliverySubTab === 'events' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">
+                    Événements
+                  </button>
+                  <button (click)="deliverySubTab = 'update'"
+                    class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors"
+                    [ngClass]="deliverySubTab === 'update' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">
+                    Modifier
+                  </button>
+                </div>
+
+                @if (deliverySubTab === 'events') {
+                  <!-- Historique -->
+                  @if (selectedDelivery.events.length) {
+                    <div class="space-y-2 mb-4 max-h-48 overflow-y-auto">
+                      @for (ev of selectedDelivery.events; track ev.id) {
+                        <div class="flex gap-3 text-xs">
+                          <span class="inline-flex px-2 py-0.5 rounded-lg font-bold flex-shrink-0" [class]="deliveryStatusClass(ev.status)">
+                            {{ deliveryStatusLabel(ev.status) }}
+                          </span>
+                          <span class="theme-text">{{ ev.description }}</span>
+                          @if (ev.location) { <span class="theme-muted">· {{ ev.location }}</span> }
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="text-xs theme-muted mb-4">Aucun événement enregistré</p>
+                  }
+
+                  <!-- Ajouter événement -->
+                  <div class="space-y-2 pt-3 border-t theme-border">
+                    <p class="text-xs font-bold theme-muted uppercase tracking-wider">Ajouter un événement</p>
+                    <select [(ngModel)]="deliveryEventStatus" class="theme-input px-3 py-2 rounded-xl text-sm w-full">
+                      @for (s of deliveryStatuses; track s) {
+                        <option [value]="s">{{ deliveryStatusLabel(s) }}</option>
+                      }
+                    </select>
+                    <input [(ngModel)]="deliveryEventDesc" type="text" placeholder="Description *"
+                      class="theme-input px-3 py-2 rounded-xl text-sm w-full"/>
+                    <input [(ngModel)]="deliveryEventLocation" type="text" placeholder="Lieu (optionnel)"
+                      class="theme-input px-3 py-2 rounded-xl text-sm w-full"/>
+                    <button (click)="submitDeliveryEvent()" [disabled]="deliveryEventSaving || !deliveryEventDesc.trim()"
+                      class="w-full py-2 bg-gold text-black text-xs font-bold rounded-xl hover:brightness-110 disabled:opacity-50 transition-all">
+                      @if (deliveryEventSaving) { Enregistrement… } @else { Ajouter l'événement }
+                    </button>
+                  </div>
+                }
+
+                @if (deliverySubTab === 'update') {
+                  <div class="space-y-3">
+                    <div>
+                      <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Agent de livraison</label>
+                      <input [(ngModel)]="deliveryUpdateAgent" type="text" placeholder="Nom de l'agent"
+                        class="theme-input px-3 py-2 rounded-xl text-sm w-full"/>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Date estimée</label>
+                      <input [(ngModel)]="deliveryUpdateDate" type="date" class="theme-input px-3 py-2 rounded-xl text-sm w-full"/>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Notes</label>
+                      <input [(ngModel)]="deliveryUpdateNotes" type="text" placeholder="Informations complémentaires"
+                        class="theme-input px-3 py-2 rounded-xl text-sm w-full"/>
+                    </div>
+                    <div class="border-t theme-border pt-3 mt-1">
+                      <p class="text-xs font-bold text-gold uppercase tracking-wider mb-2">Transporteur</p>
+                      <div class="space-y-2">
+                        <div>
+                          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1">Nom du transporteur</label>
+                          <input [(ngModel)]="deliveryUpdateCarrier" type="text" placeholder="Ex: Yango Livraison, DHL…"
+                            class="theme-input px-3 py-2 rounded-xl text-sm w-full"/>
+                        </div>
+                        <div>
+                          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1">Lien de suivi</label>
+                          <input [(ngModel)]="deliveryUpdateCarrierUrl" type="url" placeholder="https://…"
+                            class="theme-input px-3 py-2 rounded-xl text-sm w-full"/>
+                        </div>
+                        @if (selectedDelivery && selectedDelivery.carrierName) {
+                          <div class="text-xs text-green-400">
+                            Transporteur actuel : <strong>{{ selectedDelivery.carrierName }}</strong>
+                            @if (selectedDelivery.carrierTrackingUrl) {
+                              — <a [href]="selectedDelivery.carrierTrackingUrl" target="_blank" class="underline">Voir suivi</a>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <button (click)="submitDeliveryUpdate()" [disabled]="deliveryUpdateSaving"
+                      class="w-full py-2 bg-gold text-black text-xs font-bold rounded-xl hover:brightness-110 disabled:opacity-50 transition-all">
+                      @if (deliveryUpdateSaving) { Enregistrement… } @else { Mettre à jour }
+                    </button>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  } <!-- /delivery -->
+
   </div>
+</div>
+
+<!-- ══════════ DRAWER PRODUIT ══════════ -->
+@if (drawerOpen) {
+  <div class="fixed inset-0 z-50 flex animate-fade-in">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="closeDrawer()"></div>
+    <div class="relative ml-auto w-full max-w-xl theme-surface border-l theme-border shadow-2xl flex flex-col overflow-y-auto animate-slide-in-right">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-5 border-b theme-border flex-shrink-0">
+        <div>
+          <h3 class="text-lg font-bold theme-text">{{ editingProduct ? 'Modifier' : 'Nouveau' }} produit</h3>
+          <p class="text-xs theme-muted mt-0.5">{{ editingProduct ? editingProduct.name : 'Remplissez les informations' }}</p>
+        </div>
+        <button (click)="closeDrawer()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/8 theme-muted hover:bg-white/12 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Sous-onglets -->
+      @if (editingProduct) {
+        <div class="flex gap-1 px-6 pt-4 flex-shrink-0">
+          <button (click)="drawerTab = 'info'" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
+            [ngClass]="drawerTab === 'info' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">Informations</button>
+          <button (click)="drawerTab = 'media'" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
+            [ngClass]="drawerTab === 'media' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">Médias ({{ productMedia.length }})</button>
+        </div>
+      }
+
+      <!-- Body -->
+      <div class="flex-1 px-6 py-4 overflow-y-auto">
+
+        @if (drawerError) {
+          <div class="mb-4 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">{{ drawerError }}</div>
+        }
+
+        <!-- Tab info -->
+        @if (drawerTab === 'info') {
+          <form [formGroup]="productForm" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Nom *</label>
+              <input formControlName="name" type="text" placeholder="Nom du produit" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+            </div>
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Description *</label>
+              <textarea formControlName="description" rows="3" placeholder="Description…" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm resize-none"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix (FCFA) *</label>
+                <input formControlName="price" type="number" min="1" placeholder="0" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+              </div>
+              <div>
+                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Stock *</label>
+                <input formControlName="stock" type="number" min="0" placeholder="0" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Genre *</label>
+                <select formControlName="gender" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm">
+                  @for (g of genders; track g.value) { <option [value]="g.value" class="theme-option">{{ g.label }}</option> }
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Catégorie *</label>
+                <select formControlName="categoryId" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm">
+                  <option [value]="null">Sélectionner…</option>
+                  @for (cat of productCategories; track cat.id) { <option [value]="cat.id" class="theme-option">{{ cat.name }}</option> }
+                </select>
+              </div>
+            </div>
+
+            <!-- Upload image -->
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">
+                {{ editingProduct ? 'Image principale' : 'Images (max 4)' }}
+              </label>
+              @if (!editingProduct && imagePreviews.length > 0) {
+                <div class="grid grid-cols-4 gap-2 mb-2">
+                  @for (preview of imagePreviews; track $index; let i = $index) {
+                    <div class="relative aspect-square rounded-xl overflow-hidden bg-white/5">
+                      <img [src]="preview" class="w-full h-full object-cover"/>
+                      <button type="button" (click)="removeImage(i)"
+                        class="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+              @if (editingProduct && imagePreview) {
+                <div class="relative w-24 h-24 rounded-xl overflow-hidden mb-2 bg-white/5">
+                  <img [src]="imagePreview" class="w-full h-full object-cover"/>
+                  <button type="button" (click)="clearImage()"
+                    class="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+              }
+              @if (uploadError) {
+                <p class="text-xs text-red-400 mb-2">{{ uploadError }}</p>
+              }
+              <label class="flex items-center gap-2 px-4 py-2.5 border border-dashed theme-border rounded-xl text-sm theme-muted cursor-pointer hover:border-gold/40 hover:text-gold transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Choisir une image
+                <input type="file" accept="image/*" class="hidden" [multiple]="!editingProduct" (change)="onFileSelected($event)"/>
+              </label>
+            </div>
+          </form>
+        }
+
+        <!-- Tab media -->
+        @if (drawerTab === 'media' && editingProduct) {
+          <div class="space-y-3">
+            @if (mediaLoading) {
+              <div class="flex justify-center py-8">
+                <svg class="w-6 h-6 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+              </div>
+            }
+            @if (!mediaLoading) {
+              @for (media of productMedia; track media.id; let i = $index) {
+                <div class="flex items-center gap-3 p-2 bg-white/4 rounded-xl">
+                  @if (media.mediaType === 'IMAGE') {
+                    <img [src]="media.url" class="w-12 h-12 rounded-lg object-cover flex-shrink-0"/>
+                  } @else {
+                    <video [src]="media.url" class="w-12 h-12 rounded-lg object-cover flex-shrink-0"></video>
+                  }
+                  <span class="text-xs theme-muted flex-1 truncate">{{ media.mediaType }} #{{ i + 1 }}</span>
+                  <button (click)="deleteMedia(media.id)" class="text-red-400/60 hover:text-red-400 transition-colors p-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              }
+              @if (productMedia.length === 0) {
+                <p class="text-center text-sm theme-muted py-4">Aucun média supplémentaire</p>
+              }
+              <label class="flex items-center justify-center gap-2 px-4 py-2.5 border border-dashed theme-border rounded-xl text-sm theme-muted cursor-pointer hover:border-gold/40 hover:text-gold transition-colors">
+                @if (mediaUploading) {
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                  Envoi en cours…
+                } @else {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  Ajouter un média
+                }
+                <input type="file" accept="image/*,video/*" class="hidden" (change)="onMediaSelected($event)"/>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Footer -->
+      @if (drawerTab === 'info') {
+        <div class="flex gap-3 px-6 py-5 border-t theme-border flex-shrink-0">
+          <button (click)="closeDrawer()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors">
+            Annuler
+          </button>
+          <button (click)="saveProduct()" [disabled]="drawerLoading || productForm.invalid"
+            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-yellow-600/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            @if (drawerLoading) {
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            }
+            {{ editingProduct ? 'Enregistrer' : 'Créer le produit' }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- ══════════ MODAL REJETER PAIEMENT ══════════ -->
+@if (rejectModalOpen) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeRejectModal()"></div>
+    <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl p-6 animate-scale-in">
+      <h3 class="text-lg font-bold theme-text mb-1">Rejeter le paiement</h3>
+      <p class="text-xs theme-muted mb-4">{{ rejectingOrder?.orderNumber }} — {{ rejectingOrder ? formatCurrency(rejectingOrder.totalAmount) : '' }} FCFA</p>
+      <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Motif du rejet *</label>
+      <textarea [(ngModel)]="rejectReason" rows="3" placeholder="Ex : Référence Wave introuvable, montant incorrect…"
+        class="theme-input w-full px-3 py-2.5 rounded-xl text-sm resize-none mb-4"></textarea>
+      <div class="flex gap-3">
+        <button (click)="closeRejectModal()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors">Annuler</button>
+        <button (click)="confirmRejectPayment()" [disabled]="!rejectReason.trim()"
+          class="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          Confirmer le rejet
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════ MODAL DÉCISION RETOUR ══════════ -->
+@if (returnDecisionModal && returnDecisionItem) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeReturnDecisionModal()"></div>
+    <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl p-6 animate-scale-in">
+      <h3 class="text-lg font-bold theme-text mb-1">Statuer sur la demande</h3>
+      <p class="text-xs theme-muted mb-4">{{ returnDecisionItem.orderNumber }} — {{ returnDecisionItem.customerName }}</p>
+      <p class="text-sm theme-muted mb-4 p-3 bg-white/4 rounded-xl">{{ returnDecisionItem.reason }}</p>
+      <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Décision *</label>
+      <select [(ngModel)]="returnDecision" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm mb-4">
+        <option value="APPROVED">Accepter le retour</option>
+        <option value="REJECTED">Refuser le retour</option>
+        <option value="COMPLETED">Marquer comme traité</option>
+      </select>
+      <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Note (optionnel)</label>
+      <textarea [(ngModel)]="returnDecisionNote" rows="3" placeholder="Explication pour le client…"
+        class="theme-input w-full px-3 py-2.5 rounded-xl text-sm resize-none mb-4"></textarea>
+      <div class="flex gap-3">
+        <button (click)="closeReturnDecisionModal()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors">Annuler</button>
+        <button (click)="submitReturnDecision()" [disabled]="returnDecisionLoading"
+          class="flex-1 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg transition-all disabled:opacity-50">
+          Confirmer
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════ MODAL FICHE CLIENT ══════════ -->
+@if (showUserProfile) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeUserProfile()"></div>
+    <div class="relative w-full max-w-lg theme-surface border theme-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh] animate-scale-in">
+
+      <div class="flex items-center justify-between px-6 py-5 border-b theme-border sticky top-0 theme-surface">
+        <h3 class="text-lg font-bold theme-text">Fiche client</h3>
+        <button (click)="closeUserProfile()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/8 theme-muted hover:bg-white/12 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      @if (userFullProfileLoading) {
+        <div class="flex justify-center py-12"><svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></div>
+      }
+
+      @if (userFullProfile && !userFullProfileLoading) {
+        <div class="p-6 space-y-5">
+
+          <!-- Identité -->
+          <div class="p-4 bg-white/4 rounded-2xl">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 rounded-2xl bg-gold/15 flex items-center justify-center text-gold font-black text-lg">
+                {{ userFullProfile.prenom[0] }}{{ userFullProfile.nom[0] }}
+              </div>
+              <div>
+                <p class="font-bold theme-text">{{ userFullProfile.prenom }} {{ userFullProfile.nom }}</p>
+                <p class="text-xs theme-muted">{{ userFullProfile.email }}</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div><span class="theme-muted">Tél : </span><span class="theme-text">{{ userFullProfile.phone }}</span></div>
+              <div><span class="theme-muted">Rôle : </span><span class="theme-text">{{ userFullProfile.role }}</span></div>
+              <div><span class="theme-muted">Membre depuis : </span><span class="theme-text">{{ userFullProfile.memberSince | date:'dd/MM/yyyy' }}</span></div>
+              <div><span class="theme-muted">Statut : </span>
+                <span [ngClass]="userFullProfile.enabled ? 'text-green-400' : 'text-red-400'">{{ userFullProfile.enabled ? 'Actif' : 'Suspendu' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats commandes -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3 bg-white/4 rounded-xl text-center">
+              <p class="text-2xl font-black theme-text">{{ userFullProfile.totalOrders }}</p>
+              <p class="text-xs theme-muted mt-0.5">Total cmd</p>
+            </div>
+            <div class="p-3 bg-green-500/8 rounded-xl text-center">
+              <p class="text-2xl font-black text-green-400">{{ userFullProfile.completedOrders }}</p>
+              <p class="text-xs theme-muted mt-0.5">Payées</p>
+            </div>
+            <div class="p-3 bg-yellow-500/8 rounded-xl text-center">
+              <p class="text-2xl font-black text-yellow-400">{{ userFullProfile.pendingOrders }}</p>
+              <p class="text-xs theme-muted mt-0.5">En attente</p>
+            </div>
+            <div class="p-3 bg-red-500/8 rounded-xl text-center">
+              <p class="text-2xl font-black text-red-400">{{ userFullProfile.cancelledOrders }}</p>
+              <p class="text-xs theme-muted mt-0.5">Annulées</p>
+            </div>
+          </div>
+
+          <!-- Total dépensé -->
+          <div class="p-4 bg-gold/8 border border-gold/20 rounded-2xl flex items-center justify-between">
+            <p class="font-semibold theme-muted text-sm">Total dépensé</p>
+            <p class="text-2xl font-black text-gold">{{ formatAmount(userFullProfile.totalSpent) }}</p>
+          </div>
+
+          <!-- Dernières commandes -->
+          @if (userFullProfile.recentOrders.length > 0) {
+            <div>
+              <p class="text-xs font-bold theme-muted uppercase tracking-wider mb-2">Dernières commandes</p>
+              <div class="space-y-2">
+                @for (order of userFullProfile.recentOrders; track order.id) {
+                  <div class="flex items-center justify-between p-3 bg-white/4 rounded-xl">
+                    <div>
+                      <p class="font-mono font-bold text-sm theme-text">{{ order.orderNumber }}</p>
+                      <p class="text-xs theme-muted">{{ order.createdAt | date:'dd/MM/yyyy' }}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="font-bold text-gold text-sm">{{ formatAmount(order.amount) }}</p>
+                      <p class="text-xs" [ngClass]="order.paymentStatus === 'COMPLETED' ? 'text-green-400' : 'text-yellow-400'">{{ order.paymentStatus }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- ══════════ TOASTS ══════════ -->
+<div class="fixed bottom-6 right-6 z-[60] flex flex-col gap-2 pointer-events-none">
+  @for (t of toasts; track t.id) {
+    <div class="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold animate-fade-in pointer-events-auto"
+         [ngClass]="t.type === 'success'
+           ? 'bg-green-500/95 text-white backdrop-blur-sm'
+           : 'bg-red-500/95 text-white backdrop-blur-sm'">
+      @if (t.type === 'success') {
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+        </svg>
+      } @else {
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      }
+      {{ t.msg }}
+    </div>
+  }
 </div>
 
 <!-- ══════════ MODAL CRÉER UTILISATEUR ══════════ -->

@@ -19,6 +19,6 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, _state: 
     return true;
   }
 
-  router.navigate(['/error/403']);
+  router.navigate(['/']);
   return false;
 };

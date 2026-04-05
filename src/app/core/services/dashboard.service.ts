@@ -57,6 +57,16 @@ export interface TopProductItem {
   totalSold: number;
 }
 
+export interface DailyCaisseResponse {
+  date: string;
+  ordersCount: number;
+  paidOrdersCount: number;
+  pendingPaymentsCount: number;
+  totalRevenue: number;
+  pendingRevenue: number;
+  newCustomersCount: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -84,5 +94,10 @@ export class DashboardService {
 
   getManagerStats(): Observable<ApiResponse<any>> {
     return this.apiService.get('/dashboard/manager-stats');
+  }
+
+  getDailyCaisse(date?: string): Observable<ApiResponse<DailyCaisseResponse>> {
+    const params = date ? { date } : {};
+    return this.apiService.get('/dashboard/caisse-journaliere', params);
   }
 }
