@@ -290,9 +290,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.authPromptService.show();
       return;
     }
+    const user = this.authService.getCurrentUser();
     this.showCheckout = true;
     this.deliveryAddress = '';
-    this.deliveryPhone   = '';
+    this.deliveryPhone   = user?.phone || '';
     this.deliveryZone    = '';
     this.deliveryCity    = '';
     this.checkoutError = null;
