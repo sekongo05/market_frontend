@@ -35,10 +35,10 @@
         </button>
       </div>
 
-      <div class="luxury-card rounded-3xl p-8 flex flex-col items-center gap-6">
+      <div class="luxury-card rounded-3xl p-5 sm:p-8 flex flex-col items-center gap-5 sm:gap-6">
 
         <!-- Icône horloge -->
-        <div class="w-20 h-20 rounded-full flex items-center justify-center" style="background:rgba(59,130,246,0.12);border:2px solid rgba(59,130,246,0.25)">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center" style="background:rgba(59,130,246,0.12);border:2px solid rgba(59,130,246,0.25)">
           <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
@@ -113,8 +113,8 @@
         </svg>
         Mes commandes
       </button>
-      <div class="luxury-card rounded-3xl p-8 flex flex-col items-center gap-6">
-        <div class="w-20 h-20 rounded-full flex items-center justify-center" style="background:rgba(234,179,8,0.12);border:2px solid rgba(234,179,8,0.25)">
+      <div class="luxury-card rounded-3xl p-5 sm:p-8 flex flex-col items-center gap-5 sm:gap-6">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center" style="background:rgba(234,179,8,0.12);border:2px solid rgba(234,179,8,0.25)">
           <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
@@ -185,7 +185,7 @@
       <div class="grid lg:grid-cols-2 gap-6">
 
         <!-- ── Colonne gauche : QR Code ── -->
-        <div class="luxury-card rounded-3xl p-6 flex flex-col items-center gap-5">
+        <div class="luxury-card rounded-3xl p-4 sm:p-6 flex flex-col items-center gap-4 sm:gap-5">
 
           <!-- Badge Wave -->
           <div class="flex items-center gap-3">
@@ -228,10 +228,10 @@
         <div class="flex flex-col gap-4">
 
           <!-- Montant -->
-          <div class="luxury-card rounded-3xl p-6 text-center">
+          <div class="luxury-card rounded-3xl p-4 sm:p-6 text-center">
             <p class="text-xs font-bold theme-muted uppercase tracking-widest mb-3">Montant à envoyer via Wave</p>
-            <p class="text-6xl font-black text-gold leading-none">{{ order.totalAmount | number:'1.0-0' }}</p>
-            <p class="text-xl font-semibold theme-muted mt-2">FCFA</p>
+            <p class="text-4xl sm:text-6xl font-black text-gold leading-none">{{ order.totalAmount | number:'1.0-0' }}</p>
+            <p class="text-lg sm:text-xl font-semibold theme-muted mt-2">FCFA</p>
             <div class="mt-4 pt-4 border-t theme-border flex items-center justify-between text-xs theme-muted">
               <span>Commande</span>
               <span class="font-bold text-gold">{{ order.orderNumber }}</span>
@@ -239,7 +239,7 @@
           </div>
 
           <!-- Formulaire confirmation -->
-          <div class="luxury-card rounded-3xl p-6 flex flex-col gap-5 flex-1">
+          <div class="luxury-card rounded-3xl p-4 sm:p-6 flex flex-col gap-4 sm:gap-5 flex-1">
 
             <div>
               <p class="text-base font-bold theme-text mb-1">Confirmer le paiement</p>

@@ -63,9 +63,9 @@
         }
       </div>
       <!-- Page tabs -->
-      <div class="flex gap-1">
+      <div class="flex gap-0 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
         <button type="button" (click)="setPageTab('products')"
-          class="px-5 py-3 text-sm font-bold border-b-2 transition-colors"
+          class="px-3 sm:px-5 py-3 text-xs sm:text-sm font-bold border-b-2 transition-colors whitespace-nowrap flex-shrink-0"
           [class.border-gold]="pageTab === 'products'"
           [class.text-gold]="pageTab === 'products'"
           [class.border-transparent]="pageTab !== 'products'"
@@ -73,7 +73,7 @@
           Catalogue
         </button>
         <button type="button" (click)="setPageTab('orders')"
-          class="px-5 py-3 text-sm font-bold border-b-2 transition-colors"
+          class="px-3 sm:px-5 py-3 text-xs sm:text-sm font-bold border-b-2 transition-colors whitespace-nowrap flex-shrink-0"
           [class.border-gold]="pageTab === 'orders'"
           [class.text-gold]="pageTab === 'orders'"
           [class.border-transparent]="pageTab !== 'orders'"
@@ -81,18 +81,18 @@
           Commandes
         </button>
         <button type="button" (click)="setPageTab('payments')"
-          class="px-5 py-3 text-sm font-bold border-b-2 transition-colors relative"
+          class="px-3 sm:px-5 py-3 text-xs sm:text-sm font-bold border-b-2 transition-colors whitespace-nowrap flex-shrink-0 relative"
           [class.border-gold]="pageTab === 'payments'"
           [class.text-gold]="pageTab === 'payments'"
           [class.border-transparent]="pageTab !== 'payments'"
           [class.theme-muted]="pageTab !== 'payments'">
           Paiements
           @if (pendingPayments.length > 0 && pageTab !== 'payments') {
-            <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-gold rounded-full"></span>
+            <span class="absolute top-1.5 right-0.5 w-2 h-2 bg-gold rounded-full"></span>
           }
         </button>
         <button type="button" (click)="setPageTab('delivery')"
-          class="px-5 py-3 text-sm font-bold border-b-2 transition-colors"
+          class="px-3 sm:px-5 py-3 text-xs sm:text-sm font-bold border-b-2 transition-colors whitespace-nowrap flex-shrink-0"
           [class.border-gold]="pageTab === 'delivery'"
           [class.text-gold]="pageTab === 'delivery'"
           [class.border-transparent]="pageTab !== 'delivery'"
@@ -100,7 +100,7 @@
           Livraison
         </button>
         <button type="button" (click)="setPageTab('dashboard')"
-          class="px-5 py-3 text-sm font-bold border-b-2 transition-colors"
+          class="px-3 sm:px-5 py-3 text-xs sm:text-sm font-bold border-b-2 transition-colors whitespace-nowrap flex-shrink-0"
           [class.border-gold]="pageTab === 'dashboard'"
           [class.text-gold]="pageTab === 'dashboard'"
           [class.border-transparent]="pageTab !== 'dashboard'"

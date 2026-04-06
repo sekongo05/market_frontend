@@ -215,7 +215,7 @@
 
           <!-- Title -->
           <div>
-            <h1 class="text-3xl lg:text-4xl font-black theme-text leading-tight mb-3">{{ product.name }}</h1>
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black theme-text leading-tight mb-3">{{ product.name }}</h1>
             <!-- Gold divider -->
             <div class="h-0.5 w-16 bg-gold rounded-full"></div>
           </div>
@@ -336,7 +336,8 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
-                    Ajouter au panier · {{ formattedPrice }} FCFA
+                    <span class="hidden sm:inline">Ajouter au panier · {{ formattedPrice }} FCFA</span>
+                    <span class="sm:hidden">Ajouter · {{ formattedPrice }} FCFA</span>
                   }
                 </button>
                 <button (click)="goBack()"
@@ -378,7 +379,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
               </svg>
-              <p class="text-[10px] theme-muted font-semibold leading-tight">Retour<br>30 jours</p>
+              <p class="text-[10px] theme-muted font-semibold leading-tight">Retour<br>3 jours</p>
             </div>
           </div>
         </div>
