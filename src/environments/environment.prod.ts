@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://market-api.onrender.com/api',
+  apiUrl: 'https://market-app-backend-sx0s.onrender.com/api',
 };
