@@ -566,16 +566,14 @@
                    light:text-gray-600 light:hover:text-black light:hover:bg-black/5">
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
                   [style.background]="themeService.isDark ? '#9ca3af' : '#6b7280'"
-                  [class.rotate-45]="mobileOpen"
-                  [class.translate-y-[6.5px]]="mobileOpen"></span>
+                  [style.transform]="mobileOpen ? 'translateY(6.5px) rotate(45deg)' : 'none'"></span>
             <span class="block h-[1.5px] rounded-full transition-all duration-300"
                   [style.background]="themeService.isDark ? '#9ca3af' : '#6b7280'"
                   [style.width]="mobileOpen ? '0' : '14px'"
                   [style.opacity]="mobileOpen ? '0' : '1'"></span>
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
                   [style.background]="themeService.isDark ? '#9ca3af' : '#6b7280'"
-                  [class.-rotate-45]="mobileOpen"
-                  [class.-translate-y-[6.5px]]="mobileOpen"></span>
+                  [style.transform]="mobileOpen ? 'translateY(-6.5px) rotate(-45deg)' : 'none'"></span>
           </button>
         </div>
 

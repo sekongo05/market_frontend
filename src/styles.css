@@ -257,6 +257,9 @@ html.light .dot-grid {
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
 ::-webkit-scrollbar { width: 5px; }
 html:not(.light) ::-webkit-scrollbar-track { background: #0d0d0d; }
 html:not(.light) ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
