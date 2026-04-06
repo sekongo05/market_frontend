@@ -22,7 +22,7 @@
          style="background: radial-gradient(circle, rgba(251,191,36,0.12) 0%, transparent 70%); filter: blur(60px);"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20 pb-16 lg:pt-28 lg:pb-24">
-      <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
 
         <!-- Gauche : texte -->
         <div class="space-y-8">
@@ -37,9 +37,9 @@
           <!-- Titre -->
           <div class="animate-fade-in-up delay-100">
             <h1 class="font-black tracking-tight leading-[1.05]">
-              <span class="block text-3xl sm:text-4xl lg:text-5xl xl:text-6xl theme-text">Tout ce que</span>
-              <span class="block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl" style="color:#b8941e;">vous aimez</span>
-              <span class="block text-3xl sm:text-4xl lg:text-5xl xl:text-6xl theme-text">en un seul endroit.</span>
+              <span class="block text-3xl sm:text-4xl md:text-3xl lg:text-5xl xl:text-6xl theme-text">Tout ce que</span>
+              <span class="block text-4xl sm:text-5xl md:text-4xl lg:text-6xl xl:text-7xl" style="color:#b8941e;">vous aimez</span>
+              <span class="block text-3xl sm:text-4xl md:text-3xl lg:text-5xl xl:text-6xl theme-text">en un seul endroit.</span>
             </h1>
           </div>
 
@@ -93,7 +93,7 @@
         </div>
 
         <!-- Droite : bento visuel flottant -->
-        <div class="hidden lg:grid grid-cols-2 gap-4 animate-fade-in delay-300">
+        <div class="hidden md:grid grid-cols-2 gap-4 animate-fade-in delay-300">
 
           <!-- Card 1 — grande -->
           <div class="col-span-2 relative h-52 rounded-3xl overflow-hidden group">
@@ -168,7 +168,7 @@
   ════════════════════════════════════════════════════ -->
   <section id="stats-row" class="py-16 scroll-reveal">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
 
         @for (stat of [
           {value: statProducts, suffix: '+', label: 'Références'},
@@ -202,7 +202,7 @@
       </div>
 
       <!-- Bento grid -->
-      <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-[160px] sm:auto-rows-[200px] lg:auto-rows-[220px]">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 auto-rows-[160px] sm:auto-rows-[190px] md:auto-rows-[220px]">
 
         <!-- Montres — grande -->
         <a routerLink="/products"
@@ -284,7 +284,7 @@
         <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black theme-text">L'excellence à chaque étape</h2>
       </div>
 
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
 
         @for (promise of [
           {
@@ -308,7 +308,7 @@
             desc: '3 jours pour retourner un article. Remboursement garanti.'
           }
         ]; track promise.title) {
-          <div class="luxury-card rounded-3xl p-7 flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300">
+          <div class="luxury-card rounded-3xl p-4 sm:p-7 flex flex-col gap-3 sm:gap-4 hover:-translate-y-1 transition-transform duration-300">
             <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
                  style="background: rgba(184,148,30,0.12);">
               <svg class="w-6 h-6" style="color:#b8941e;" fill="none" stroke="currentColor" viewBox="0 0 24 24">

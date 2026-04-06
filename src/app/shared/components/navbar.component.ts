@@ -17,8 +17,8 @@ import { OrderService } from '../../core/services/order.service';
 import { PromoService } from '../../core/services/promo.service';
 import { PromoCheckResponse, PublicPromoResponse } from '../../core/models/promo.models';
 import { Subject } from 'rxjs';
+import { takeUntil, timeout } from 'rxjs/operators';
 import { LogoComponent } from './logo.component';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
@@ -349,7 +349,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
       payload.promoCode = this.promoCheckResult.code;
     }
 
-    this.orderService.createOrder(payload).subscribe({
+    this.orderService.createOrder(payload).pipe(
+      timeout(30000)
+    ).subscribe({
       next: (res) => {
         if (res.success) {
           this.checkoutSuccess = true;
@@ -366,7 +368,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.checkoutError = err?.error?.message || 'Erreur lors de la commande';
+        if (err?.name === 'TimeoutError') {
+          this.checkoutError = 'Le serveur met trop de temps à répondre. Veuillez réessayer dans quelques instants.';
+        } else {
+          this.checkoutError = err?.error?.message || 'Erreur lors de la commande, veuillez réessayer';
+        }
         this.checkoutLoading = false;
         this.cdr.detectChanges();
       },
