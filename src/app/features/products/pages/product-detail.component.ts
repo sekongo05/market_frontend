@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
+import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 import { Subject } from 'rxjs';
 import { takeUntil, switchMap } from 'rxjs/operators';
 
@@ -64,7 +65,7 @@ const DEFAULT_GALLERY = [
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, TooltipDirective],
+  imports: [CommonModule, RouterLink, TooltipDirective, MediaUrlPipe],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css'],
 })

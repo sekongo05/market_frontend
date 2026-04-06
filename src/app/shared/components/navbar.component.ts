@@ -7,6 +7,7 @@ import { AuthService, CurrentUser } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { NotificationTemplateService, NotifTemplate } from '../../core/services/notification-template.service';
 import { NotifBodyPipe } from '../pipes/notif-body.pipe';
+import { MediaUrlPipe } from '../pipes/media-url.pipe';
 import { NotificationResponse } from '../../core/models/notification.models';
 import { NotificationType } from '../../core/models/common.models';
 import { AuthPromptService } from '../../core/services/auth-prompt.service';
@@ -22,7 +23,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, NotifBodyPipe, LogoComponent],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, NotifBodyPipe, MediaUrlPipe, LogoComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })

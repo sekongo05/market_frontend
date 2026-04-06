@@ -135,7 +135,7 @@
             <!-- Image -->
             @if (activeItem.type === 'IMAGE') {
               <div class="w-full h-full overflow-hidden">
-                <img [src]="activeItem.url"
+                <img [src]="activeItem.url | mediaUrl"
                      [alt]="product.name"
                      class="gallery-img w-full h-full object-cover transition-all duration-500"
                      [class.zoomed]="zoomed"
@@ -147,7 +147,7 @@
             <!-- Video -->
             @if (activeItem.type === 'VIDEO') {
               <div class="w-full h-full flex items-center justify-center bg-black">
-                <video [src]="activeItem.url"
+                <video [src]="activeItem.url | mediaUrl"
                        controls
                        playsinline
                        preload="metadata"
@@ -169,7 +169,7 @@
 
                   <!-- Image thumbnail -->
                   @if (item.type === 'IMAGE') {
-                    <img [src]="item.url" [alt]="'Photo ' + (i+1)"
+                    <img [src]="item.url | mediaUrl" [alt]="'Photo ' + (i+1)"
                          class="w-full h-full object-cover"
                          (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
                   }
@@ -400,7 +400,7 @@
                 [style.box-shadow]="activeIndex === i ? '0 0 0 2px #d4af37' : ''">
 
                 @if (item.type === 'IMAGE') {
-                  <img [src]="item.url" [alt]="product.name + ' - photo ' + (i+1)"
+                  <img [src]="item.url | mediaUrl" [alt]="product.name + ' - photo ' + (i+1)"
                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                        (error)="$any($event.target).src='https://placehold.co/400x400/1a1a1a/d4af37?text=?'"/>
                   <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
@@ -454,7 +454,7 @@
               <a [routerLink]="['/products', related.id]"
                  class="group luxury-card rounded-3xl overflow-hidden cursor-pointer stagger-{{i+1}} scroll-reveal">
                 <div class="relative overflow-hidden h-44">
-                  <img [src]="related.imageUrl" [alt]="related.name"
+                  <img [src]="related.imageUrl | mediaUrl" [alt]="related.name"
                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                        (error)="$any($event.target).src='https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'"/>
                   <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>

@@ -12,11 +12,12 @@ import { ProductResponse, GetProductsParams } from '../../../core/models/product
 import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
+import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TooltipDirective],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TooltipDirective, MediaUrlPipe],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })

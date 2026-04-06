@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
+import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService } from '../../../core/services/category.service';
@@ -23,7 +24,7 @@ interface Toast { id: number; msg: string; type: 'success' | 'error'; }
 @Component({
   selector: 'app-manager',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule, MediaUrlPipe],
   templateUrl: './manager.component.html',
   styleUrls: ['./manager.component.css'],
 })
