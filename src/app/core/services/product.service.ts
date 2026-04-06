@@ -35,6 +35,13 @@ export class ProductService {
     return this.apiService.put(`/products/${id}`, formData);
   }
 
+  setDiscount(id: number, discountPercent: number | null): Observable<ApiResponse<ProductResponse>> {
+    const param = discountPercent !== null && discountPercent > 0
+      ? `?discountPercent=${discountPercent}`
+      : '';
+    return this.apiService.patch(`/products/${id}/discount${param}`);
+  }
+
   deleteProduct(id: number): Observable<ApiResponse<null>> {
     return this.apiService.delete(`/products/${id}`);
   }

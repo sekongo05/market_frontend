@@ -130,6 +130,11 @@ export class ManagerComponent implements OnInit, OnDestroy {
   editingStockValue = 0;
   stockSavingId: number | null = null;
 
+  // ── Inline discount edit ──────────────────────────────────────────────────
+  discountEditingId: number | null = null;
+  discountEditValue = 0;
+  discountSavingId: number | null = null;
+
   // ── Inline delete confirm ─────────────────────────────────────────────────
   confirmDeleteId: number | null = null;
 
@@ -181,6 +186,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
   onEscape(): void {
     if (this.drawerOpen) this.closeDrawer();
     else if (this.editingStockId !== null) this.cancelEditStock();
+    else if (this.discountEditingId !== null) this.cancelEditDiscount();
     else if (this.confirmDeleteId !== null) this.cancelDelete();
   }
 
@@ -406,6 +412,45 @@ export class ManagerComponent implements OnInit, OnDestroy {
   }
 
   cancelEditStock(): void { this.editingStockId = null; this.cdr.detectChanges(); }
+
+  // ── Inline discount ───────────────────────────────────────────────────────
+
+  startEditDiscount(product: ProductResponse): void {
+    this.editingStockId = null;
+    this.confirmDeleteId = null;
+    this.discountEditingId = product.id;
+    this.discountEditValue = product.discountPercent ?? 0;
+    this.cdr.detectChanges();
+  }
+
+  confirmEditDiscount(product: ProductResponse): void {
+    const pct = Math.max(0, Math.min(100, Math.round(+this.discountEditValue || 0)));
+    this.discountEditingId = null;
+    const unchanged = (product.discountPercent ?? 0) === pct;
+    if (unchanged) { this.cdr.detectChanges(); return; }
+    this.discountSavingId = product.id;
+    const apply = (updated?: ProductResponse) => {
+      const idx = this.products.findIndex(p => p.id === product.id);
+      if (idx !== -1) {
+        this.products = [...this.products];
+        const dp = pct > 0 ? pct : undefined;
+        const sp = pct > 0 ? Math.round(product.price * (1 - pct / 100)) : undefined;
+        this.products[idx] = updated
+          ? { ...this.products[idx], discountPercent: updated.discountPercent, salePrice: updated.salePrice }
+          : { ...this.products[idx], discountPercent: dp, salePrice: sp };
+      }
+      const msg = pct > 0 ? `Remise ${pct}% appliquée` : 'Remise supprimée';
+      this.toast(msg);
+      this.discountSavingId = null;
+      this.cdr.detectChanges();
+    };
+    this.productService.setDiscount(product.id, pct > 0 ? pct : null).subscribe({
+      next: (r) => apply(r.data ?? undefined),
+      error: () => apply(),
+    });
+  }
+
+  cancelEditDiscount(): void { this.discountEditingId = null; this.cdr.detectChanges(); }
 
   // ── Inline delete ─────────────────────────────────────────────────────────
 

@@ -225,7 +225,15 @@
             <div class="flex items-end gap-4 flex-wrap">
               <div>
                 <p class="text-xs theme-muted uppercase tracking-wider mb-1">Prix</p>
-                <p class="text-4xl font-black gold-text leading-none">{{ formattedPrice }}</p>
+                @if (hasDiscount) {
+                  <div class="flex items-baseline gap-2 flex-wrap">
+                    <p class="text-4xl font-black leading-none" style="color: #f97316">{{ formattedPrice }}</p>
+                    <span class="text-xl theme-muted line-through leading-none">{{ formattedOriginalPrice }}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-sm font-black">-{{ product!.discountPercent }}%</span>
+                  </div>
+                } @else {
+                  <p class="text-4xl font-black gold-text leading-none">{{ formattedPrice }}</p>
+                }
                 <p class="text-sm theme-muted mt-1">FCFA · TTC</p>
               </div>
               <div class="flex-1 min-w-[120px]">

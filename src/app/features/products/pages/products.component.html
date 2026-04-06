@@ -159,7 +159,12 @@
                     } @else {
                       <span class="absolute top-3 left-3 bg-red-900/80 text-red-300 text-xs font-bold px-2.5 py-1 rounded-full">Épuisé</span>
                     }
-                    @if (isNew(product)) {
+                    @if (product.discountPercent && product.discountPercent > 0) {
+                      <span class="absolute top-3 right-3 bg-orange-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg shadow-orange-900/40">
+                        -{{ product.discountPercent }}%
+                      </span>
+                    }
+                    @if (isNew(product) && !(product.discountPercent && product.discountPercent > 0)) {
                       <span class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-violet-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-violet-900/40">
                         <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                         NOUVEAU
@@ -187,8 +192,16 @@
                   </div>
                   <div class="px-4 pb-4 flex items-center justify-between">
                     <div>
-                      <span class="text-xl font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
-                      <span class="text-xs theme-muted ml-1">FCFA</span>
+                      @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
+                        <div class="flex items-baseline gap-1.5">
+                          <span class="text-xl font-black text-orange-400">{{ (product.salePrice / 1000) | number:'1.0-0' }}K</span>
+                          <span class="text-xs theme-muted line-through">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+                          <span class="text-xs theme-muted">FCFA</span>
+                        </div>
+                      } @else {
+                        <span class="text-xl font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+                        <span class="text-xs theme-muted ml-1">FCFA</span>
+                      }
                     </div>
                     @if (!isManager) {
                       <button (click)="addToCart(product)" [disabled]="product.stock === 0"
@@ -445,9 +458,16 @@
           </div>
 
           <!-- Prix -->
-          <div class="flex items-baseline gap-2">
-            <span class="text-4xl font-black text-gold">{{ (selectedProduct.price / 1000) | number:'1.0-0' }}K</span>
-            <span class="text-base theme-muted">FCFA · TTC</span>
+          <div class="flex items-baseline gap-2 flex-wrap">
+            @if (selectedProduct.discountPercent && selectedProduct.discountPercent > 0 && selectedProduct.salePrice) {
+              <span class="text-4xl font-black text-orange-400">{{ (selectedProduct.salePrice / 1000) | number:'1.0-0' }}K</span>
+              <span class="text-xl theme-muted line-through">{{ (selectedProduct.price / 1000) | number:'1.0-0' }}K</span>
+              <span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-sm font-black">-{{ selectedProduct.discountPercent }}%</span>
+              <span class="text-base theme-muted">FCFA · TTC</span>
+            } @else {
+              <span class="text-4xl font-black text-gold">{{ (selectedProduct.price / 1000) | number:'1.0-0' }}K</span>
+              <span class="text-base theme-muted">FCFA · TTC</span>
+            }
           </div>
 
           <!-- Stock -->

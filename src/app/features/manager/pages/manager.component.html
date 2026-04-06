@@ -257,8 +257,30 @@
 
                   <!-- Price -->
                   <td class="px-4 py-4 text-right">
-                    <span class="font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
-                    <span class="text-xs theme-muted ml-1">FCFA</span>
+                    @if (discountEditingId === product.id) {
+                      <div class="flex items-center justify-end gap-1">
+                        <input type="number" min="0" max="100"
+                               [(ngModel)]="discountEditValue"
+                               (keydown.enter)="confirmEditDiscount(product)"
+                               (keydown.escape)="cancelEditDiscount()"
+                               class="w-16 text-center theme-input px-1 py-1 rounded-lg text-sm font-bold"/>
+                        <span class="text-xs theme-muted">%</span>
+                      </div>
+                    } @else if (discountSavingId === product.id) {
+                      <svg class="w-4 h-4 text-gold animate-spin ml-auto" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      </svg>
+                    } @else if (product.discountPercent && product.discountPercent > 0) {
+                      <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-400 mb-0.5">-{{ product.discountPercent }}%</span>
+                      <br/>
+                      <span class="text-xs theme-muted line-through mr-1">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+                      <span class="font-black text-orange-400">{{ (product.salePrice! / 1000) | number:'1.0-0' }}K</span>
+                      <span class="text-xs theme-muted ml-1">FCFA</span>
+                    } @else {
+                      <span class="font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+                      <span class="text-xs theme-muted ml-1">FCFA</span>
+                    }
                   </td>
 
                   <!-- Stock — inline editable -->
@@ -316,6 +338,18 @@
                           Non
                         </button>
                       </div>
+                    } @else if (discountEditingId === product.id) {
+                      <div class="flex items-center justify-end gap-2">
+                        <span class="text-xs text-orange-400 font-semibold hidden sm:inline">Remise ?</span>
+                        <button type="button" (click)="confirmEditDiscount(product)" title="Valider"
+                          class="w-8 h-8 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 flex items-center justify-center transition-colors">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </button>
+                        <button type="button" (click)="cancelEditDiscount()" title="Annuler"
+                          class="w-8 h-8 rounded-lg bg-white/5 theme-muted hover:text-gold flex items-center justify-center transition-colors">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                      </div>
                     } @else {
                       <div class="flex items-center justify-end gap-2">
                         <a [routerLink]="['/products', product.id]"
@@ -326,6 +360,12 @@
                               d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                           </svg>
                         </a>
+                        <button (click)="startEditDiscount(product)"
+                          class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-xs font-black"
+                          [class]="(product.discountPercent && product.discountPercent > 0) ? 'bg-orange-500/20 border border-orange-500/40 text-orange-400 hover:bg-orange-500/30' : 'luxury-card theme-muted hover:text-orange-400'"
+                          title="Définir une remise">
+                          %
+                        </button>
                         <button (click)="openEditDrawer(product)"
                           class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-600/30 text-yellow-400
                                  flex items-center justify-center hover:bg-yellow-600/20 transition-colors" title="Modifier">

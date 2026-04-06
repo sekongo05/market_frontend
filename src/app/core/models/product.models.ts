@@ -16,6 +16,8 @@ export interface ProductResponse {
   slug: string;
   description: string;
   price: number;
+  discountPercent?: number;
+  salePrice?: number;
   stock: number;
   gender: Gender;
   imageUrl: string;

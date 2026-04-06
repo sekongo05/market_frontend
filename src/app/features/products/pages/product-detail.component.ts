@@ -272,7 +272,17 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get formattedPrice(): string {
     if (!this.product) return '';
+    const p = (this.product.salePrice ?? this.product.price);
+    return new Intl.NumberFormat('fr-FR').format(p);
+  }
+
+  get formattedOriginalPrice(): string {
+    if (!this.product || !this.product.discountPercent) return '';
     return new Intl.NumberFormat('fr-FR').format(this.product.price);
+  }
+
+  get hasDiscount(): boolean {
+    return !!this.product?.discountPercent && this.product.discountPercent > 0;
   }
 
   get stockLabel(): string {
