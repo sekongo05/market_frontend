@@ -146,6 +146,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    document.body.style.overflow = '';
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -156,11 +157,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showUserMenu = false;
     this.showNotifications = false;
     this.mobileOpen = false;
+    document.body.style.overflow = this.showCart ? 'hidden' : '';
     if (this.showCart && !this.promosLoaded) this._loadActivePromos();
   }
   toggleUserMenu():void { this.showUserMenu = !this.showUserMenu; this.showCart = false; this.showNotifications = false; }
   toggleMobile():  void { this.mobileOpen = !this.mobileOpen; this.showCart = false; this.showUserMenu = false; this.showNotifications = false; }
-  closeAll():      void { this.showCart = false; this.showUserMenu = false; this.showNotifications = false; this.mobileOpen = false; this._resetCheckout(); }
+  closeAll():      void { this.showCart = false; this.showUserMenu = false; this.showNotifications = false; this.mobileOpen = false; document.body.style.overflow = ''; this._resetCheckout(); }
 
   toggleNotifications(): void {
     this.showNotifications = !this.showNotifications;

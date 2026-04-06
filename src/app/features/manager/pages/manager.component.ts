@@ -208,6 +208,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    document.body.style.overflow = '';
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -275,6 +276,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.productMedia = [];
     this.initForm();
     this.drawerOpen = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
@@ -292,12 +294,14 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.productMedia = product.media ?? [];
     this.initForm(product);
     this.drawerOpen = true;
+    document.body.style.overflow = 'hidden';
     this.loadMedia(product.id);
     this.cdr.detectChanges();
   }
 
   closeDrawer(): void {
     this.drawerOpen = false;
+    document.body.style.overflow = '';
     this.editingProduct = null;
     this.drawerError = null;
     this.selectedImages = [];
