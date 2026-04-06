@@ -150,7 +150,7 @@
                 <div class="group luxury-card rounded-3xl overflow-hidden animate-fade-in-up"
                      [style.animation-delay]="(i % 8 * 0.07) + 's'">
                   <div (click)="openProductView(product)" class="cursor-pointer block relative overflow-hidden h-52">
-                    <img [src]="product.imageUrl | mediaUrl || 'https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'" [alt]="product.name"
+                    <img [src]="product.imageUrl | mediaUrl" [alt]="product.name"
                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                          (error)="$any($event.target).src='https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'"/>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
@@ -232,7 +232,7 @@
           <div class="group luxury-card rounded-3xl overflow-hidden animate-fade-in-up"
                [style.animation-delay]="(i % 8 * 0.07) + 's'">
             <div (click)="openProductView(product)" class="cursor-pointer block relative overflow-hidden h-52">
-              <img [src]="product.imageUrl | mediaUrl || 'https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'" [alt]="product.name"
+              <img [src]="product.imageUrl | mediaUrl" [alt]="product.name"
                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                    (error)="$any($event.target).src='https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'"/>
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
@@ -385,7 +385,7 @@
 
             <!-- Image active -->
             @if (viewActiveItem.type === 'IMAGE') {
-              <img [src]="viewActiveItem.url | mediaUrl || 'https://placehold.co/600x600/1a1a1a/d4af37?text=Luxe'"
+              <img [src]="viewActiveItem.url | mediaUrl"
                    [alt]="selectedProduct.name"
                    class="w-full h-full object-cover transition-all duration-500"
                    (error)="$any($event.target).src='https://placehold.co/600x600/1a1a1a/d4af37?text=Luxe'"/>

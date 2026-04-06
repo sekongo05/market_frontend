@@ -10,8 +10,8 @@ const MEDIA_BASE = environment.apiUrl.replace(/\/api$/, '');
  */
 @Pipe({ name: 'mediaUrl', standalone: true })
 export class MediaUrlPipe implements PipeTransform {
-  transform(url: string | null | undefined): string {
-    if (!url) return '';
+  transform(url: string | null | undefined, fallback = ''): string {
+    if (!url) return fallback;
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     return MEDIA_BASE + url;
   }
