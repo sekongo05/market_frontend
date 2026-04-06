@@ -293,7 +293,7 @@
                       <p class="flex-1 text-sm text-red-400 font-medium">Confirmer l'annulation ?</p>
                       <button (click)="doCancel(order)"
                         [disabled]="cancellingId === order.id"
-                        class="px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors">
+                        class="px-4 py-2.5 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors">
                         @if (cancellingId === order.id) {
                           <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                         } @else {
@@ -301,7 +301,7 @@
                         }
                       </button>
                       <button (click)="cancelConfirmCancel()"
-                        class="px-3 py-1.5 luxury-card theme-muted text-xs font-bold rounded-lg hover:theme-text transition-colors">
+                        class="px-4 py-2.5 luxury-card theme-muted text-xs font-bold rounded-lg hover:theme-text transition-colors">
                         Garder
                       </button>
                     </div>

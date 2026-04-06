@@ -21,7 +21,7 @@
     <div class="hidden light:block absolute top-0 right-0 w-[700px] h-[700px] rounded-full pointer-events-none"
          style="background: radial-gradient(circle, rgba(251,191,36,0.12) 0%, transparent 70%); filter: blur(60px);"></div>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-28 pb-24">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20 pb-16 lg:pt-28 lg:pb-24">
       <div class="grid lg:grid-cols-2 gap-12 items-center">
 
         <!-- Gauche : texte -->
@@ -37,9 +37,9 @@
           <!-- Titre -->
           <div class="animate-fade-in-up delay-100">
             <h1 class="font-black tracking-tight leading-[1.05]">
-              <span class="block text-5xl lg:text-6xl xl:text-7xl theme-text">Tout ce que</span>
-              <span class="block text-6xl lg:text-7xl xl:text-8xl" style="color:#b8941e;">vous aimez</span>
-              <span class="block text-5xl lg:text-6xl xl:text-7xl theme-text">en un seul endroit.</span>
+              <span class="block text-3xl sm:text-4xl lg:text-5xl xl:text-6xl theme-text">Tout ce que</span>
+              <span class="block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl" style="color:#b8941e;">vous aimez</span>
+              <span class="block text-3xl sm:text-4xl lg:text-5xl xl:text-6xl theme-text">en un seul endroit.</span>
             </h1>
           </div>
 
@@ -49,9 +49,9 @@
           </p>
 
           <!-- CTAs -->
-          <div class="flex flex-wrap gap-3 animate-fade-in-up delay-300">
+          <div class="flex flex-col sm:flex-row flex-wrap gap-3 animate-fade-in-up delay-300">
             <a routerLink="/products"
-               class="group flex items-center gap-2.5 px-8 py-4 rounded-2xl font-bold text-sm text-black
+               class="group flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-bold text-sm text-black
                       hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
                style="background:#b8941e; box-shadow: 0 4px 20px rgba(184,148,30,0.3);">
               Explorer la boutique
@@ -61,7 +61,7 @@
             </a>
             @if (!(currentUser$ | async)) {
               <a routerLink="/auth/register"
-                 class="flex items-center gap-2 px-8 py-4 font-bold text-sm rounded-2xl border transition-all duration-300
+                 class="flex items-center justify-center gap-2 px-6 py-4 font-bold text-sm rounded-2xl border transition-all duration-300
                         border-white/15 text-white/80 hover:bg-white/8 backdrop-blur
                         light:border-black/15 light:text-black/70 light:hover:bg-black/5">
                 Créer un compte gratuit
@@ -178,7 +178,7 @@
         ]; track stat.label) {
           <div class="relative overflow-hidden rounded-3xl p-6 text-center luxury-card group hover:-translate-y-1 transition-transform duration-300">
             <div class="absolute inset-x-0 bottom-0 h-[2px]" style="background: linear-gradient(90deg, transparent, #b8941e, transparent);"></div>
-            <p class="text-4xl font-black leading-none mb-2" style="color:#b8941e;">
+            <p class="text-3xl sm:text-4xl font-black leading-none mb-2" style="color:#b8941e;">
               {{ stat.value }}{{ stat.suffix }}
             </p>
             <p class="text-xs font-semibold uppercase tracking-wider theme-muted">{{ stat.label }}</p>
@@ -197,12 +197,12 @@
 
       <div class="text-center mb-14 scroll-reveal">
         <p class="text-xs font-bold uppercase tracking-[0.25em] mb-3" style="color:#b8941e;">Nos univers</p>
-        <h2 class="text-4xl font-black theme-text">Explorez nos catégories</h2>
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black theme-text">Explorez nos catégories</h2>
         <p class="theme-muted text-sm mt-3 max-w-md mx-auto">Des milliers de références triées sur le volet, livrées directement chez vous.</p>
       </div>
 
       <!-- Bento grid -->
-      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[220px]">
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-[160px] sm:auto-rows-[200px] lg:auto-rows-[220px]">
 
         <!-- Montres — grande -->
         <a routerLink="/products"
@@ -214,9 +214,9 @@
             <span class="px-3 py-1 text-black text-[10px] font-black rounded-full uppercase tracking-wider"
                   style="background:#b8941e;">Phare</span>
           </div>
-          <div class="absolute bottom-0 left-0 right-0 p-6">
-            <p class="text-white font-black text-xl mb-1">Montres & Bijoux</p>
-            <p class="text-white/60 text-xs">Notre spécialité · 300+ références</p>
+          <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-6">
+            <p class="text-white font-black text-sm sm:text-xl mb-1">Montres & Bijoux</p>
+            <p class="text-white/60 text-[10px] sm:text-xs hidden sm:block">Notre spécialité · 300+ références</p>
             <div class="mt-4 h-[2px] rounded-full transition-all duration-500 w-6 group-hover:w-16"
                  style="background:#b8941e;"></div>
           </div>
@@ -228,9 +228,9 @@
           <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80" alt="Mode"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-          <div class="absolute bottom-0 left-0 right-0 p-5">
-            <p class="text-white font-black text-lg mb-0.5">Mode & Prêt-à-Porter</p>
-            <p class="text-white/60 text-xs">Femme · Homme · Enfant</p>
+          <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
+            <p class="text-white font-black text-sm sm:text-lg mb-0.5">Mode & Prêt-à-Porter</p>
+            <p class="text-white/60 text-[10px] sm:text-xs hidden sm:block">Femme · Homme · Enfant</p>
             <div class="mt-3 h-[2px] rounded-full transition-all duration-500 w-6 group-hover:w-14"
                  style="background:#b8941e;"></div>
           </div>
@@ -242,9 +242,9 @@
           <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80" alt="Beauté"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-          <div class="absolute bottom-0 left-0 right-0 p-5">
-            <p class="text-white font-black text-lg mb-0.5">Beauté & Parfums</p>
-            <p class="text-white/60 text-xs">Soins · Cosmétiques · Fragrances</p>
+          <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
+            <p class="text-white font-black text-sm sm:text-lg mb-0.5">Beauté & Parfums</p>
+            <p class="text-white/60 text-[10px] sm:text-xs hidden sm:block">Soins · Cosmétiques · Fragrances</p>
             <div class="mt-3 h-[2px] rounded-full transition-all duration-500 w-6 group-hover:w-14"
                  style="background:#b8941e;"></div>
           </div>
@@ -256,13 +256,13 @@
           <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1000&q=80" alt="Lifestyle"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
-          <div class="absolute bottom-0 left-0 p-6">
-            <p class="text-white font-black text-xl mb-1">Maison & Lifestyle</p>
-            <p class="text-white/60 text-xs mb-4">Déco · Tech · Cadeaux · Art de vivre</p>
-            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-black text-xs font-bold transition-all duration-300
+          <div class="absolute bottom-0 left-0 p-3 sm:p-6">
+            <p class="text-white font-black text-sm sm:text-xl mb-1">Maison & Lifestyle</p>
+            <p class="text-white/60 text-[10px] sm:text-xs mb-2 sm:mb-4 hidden sm:block">Déco · Tech · Cadeaux · Art de vivre</p>
+            <span class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-black text-[10px] sm:text-xs font-bold transition-all duration-300
                          group-hover:-translate-y-0.5" style="background:#b8941e;">
               Voir la collection
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
               </svg>
             </span>
@@ -281,7 +281,7 @@
 
       <div class="text-center mb-12">
         <p class="text-xs font-bold uppercase tracking-[0.25em] mb-3" style="color:#b8941e;">Notre promesse</p>
-        <h2 class="text-4xl font-black theme-text">L'excellence à chaque étape</h2>
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black theme-text">L'excellence à chaque étape</h2>
       </div>
 
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -329,7 +329,7 @@
   <!-- ═══════════════════════════════════════════════════
        CTA FINAL
   ════════════════════════════════════════════════════ -->
-  <section class="relative py-32 overflow-hidden scroll-reveal">
+  <section class="relative py-16 sm:py-24 lg:py-32 overflow-hidden scroll-reveal">
 
     <!-- Fond -->
     <div class="absolute inset-0 pointer-events-none"
@@ -350,7 +350,7 @@
         Rejoignez +1 200 clients satisfaits
       </div>
 
-      <h2 class="text-5xl lg:text-6xl font-black theme-text mb-6 leading-tight">
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black theme-text mb-6 leading-tight">
         Ce que vous cherchez<br>
         <span style="color:#b8941e;">est ici.</span>
       </h2>
@@ -359,9 +359,9 @@
         Montres, bijoux, mode, beauté et lifestyle — tout ce dont vous avez besoin, livré rapidement partout en Côte d'Ivoire.
       </p>
 
-      <div class="flex flex-wrap justify-center gap-4">
+      <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
         <a routerLink="/products"
-           class="group flex items-center gap-2.5 px-10 py-4 rounded-2xl font-bold text-sm text-black
+           class="group flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl font-bold text-sm text-black
                   hover:-translate-y-1 transition-all duration-300"
            style="background:#b8941e; box-shadow: 0 8px 30px rgba(184,148,30,0.35);">
           Explorer la boutique
@@ -371,7 +371,7 @@
         </a>
         @if (!(currentUser$ | async)) {
           <a routerLink="/auth/register"
-             class="flex items-center gap-2 px-10 py-4 rounded-2xl font-bold text-sm border transition-all duration-300
+             class="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-sm border transition-all duration-300
                     border-white/20 text-white/80 hover:bg-white/8
                     light:border-black/15 light:text-black/70 light:hover:bg-black/5">
             Créer mon compte
