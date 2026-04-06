@@ -129,12 +129,12 @@ export class AuthPromptComponent implements OnInit, OnDestroy {
   goToLogin(): void {
     this.close();
     const returnUrl = this.router.url;
-    this.router.navigate(['/login'], { queryParams: { returnUrl } });
+    this.router.navigate(['/auth/login'], { queryParams: { returnUrl } });
   }
 
   goToRegister(): void {
     this.close();
-    this.router.navigate(['/register']);
+    this.router.navigate(['/auth/register']);
   }
 
   setHover(event: Event, on: boolean): void {

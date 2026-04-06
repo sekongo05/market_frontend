@@ -66,13 +66,15 @@ export class RegisterComponent implements OnInit {
     const { confirmPassword, ...data } = this.registerForm.value;
     this.authService.register(data).subscribe({
       next: (response) => {
+        this.loading = false;
         if (response.success) {
-          localStorage.setItem('current_user', JSON.stringify(response.data));
-          this.router.navigate(['/products']);
+          this.router.navigate(['/']);
+        } else {
+          this.error = response.message || 'Erreur lors de l\'inscription';
         }
       },
       error: (error) => {
-        this.error = error?.error?.message || 'Erreur d\'inscription';
+        this.error = error?.error?.message || 'Erreur lors de l\'inscription';
         this.loading = false;
       },
     });
