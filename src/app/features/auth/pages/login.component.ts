@@ -60,9 +60,12 @@ export class LoginComponent implements OnInit {
     this.loading = true;
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
+        this.loading = false;
         if (response.success) {
           localStorage.setItem('current_user', JSON.stringify(response.data));
           this.router.navigateByUrl(this.returnUrl);
+        } else {
+          this.error = response.message || 'Identifiants incorrects';
         }
       },
       error: (error) => {

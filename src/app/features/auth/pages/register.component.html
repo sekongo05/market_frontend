@@ -157,8 +157,8 @@
             <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Nom</label>
             <input type="text" formControlName="nom" placeholder="Diallo"
               class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="submitted && f['nom'].errors"/>
-            @if (submitted && f['nom'].errors?.['required']) {
+              [class.!border-red-500]="(submitted || f['nom'].touched) && f['nom'].errors"/>
+            @if ((submitted || f['nom'].touched) && f['nom'].errors?.['required']) {
               <p class="mt-1 text-xs text-red-400">Requis</p>
             }
           </div>
@@ -166,8 +166,8 @@
             <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Prénom</label>
             <input type="text" formControlName="prenom" placeholder="Mamadou"
               class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="submitted && f['prenom'].errors"/>
-            @if (submitted && f['prenom'].errors?.['required']) {
+              [class.!border-red-500]="(submitted || f['prenom'].touched) && f['prenom'].errors"/>
+            @if ((submitted || f['prenom'].touched) && f['prenom'].errors?.['required']) {
               <p class="mt-1 text-xs text-red-400">Requis</p>
             }
           </div>
@@ -184,9 +184,9 @@
             </svg>
             <input type="email" formControlName="email" autocomplete="email" placeholder="vous@exemple.com"
               class="theme-input w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="submitted && f['email'].errors"/>
+              [class.!border-red-500]="(submitted || f['email'].touched) && f['email'].errors"/>
           </div>
-          @if (submitted && f['email'].errors) {
+          @if ((submitted || f['email'].touched) && f['email'].errors) {
             <p class="mt-1 text-xs text-red-400">
               @if (f['email'].errors['required']) { Email requis }
               @if (f['email'].errors['email']) { Email invalide }
@@ -205,10 +205,13 @@
             </svg>
             <input type="tel" formControlName="phone" placeholder="+225 07 00 00 00 00"
               class="theme-input w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="submitted && f['phone'].errors"/>
+              [class.!border-red-500]="(submitted || f['phone'].touched) && f['phone'].errors"/>
           </div>
-          @if (submitted && f['phone'].errors?.['required']) {
-            <p class="mt-1 text-xs text-red-400">Téléphone requis</p>
+          @if ((submitted || f['phone'].touched) && f['phone'].errors) {
+            <p class="mt-1 text-xs text-red-400">
+              @if (f['phone'].errors['required']) { Téléphone requis }
+              @else { 10 chiffres requis après +225 (ex: 0700000000) }
+            </p>
           }
         </div>
 
@@ -224,7 +227,7 @@
             <input [type]="showPwd ? 'text' : 'password'" formControlName="password"
               autocomplete="new-password" placeholder="••••••••"
               class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="submitted && f['password'].errors"/>
+              [class.!border-red-500]="(submitted || f['password'].touched) && f['password'].errors"/>
             <button type="button" (click)="showPwd = !showPwd"
               class="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors hover:text-gold"
               style="color:#6b7280">
@@ -243,10 +246,10 @@
               }
             </button>
           </div>
-          @if (submitted && f['password'].errors) {
+          @if ((submitted || f['password'].touched) && f['password'].errors) {
             <p class="mt-1 text-xs text-red-400">
               @if (f['password'].errors['required']) { Mot de passe requis }
-              @if (f['password'].errors['minlength']) { Minimum 6 caractères }
+              @else if (f['password'].errors['minlength']) { Minimum 6 caractères }
             </p>
           }
         </div>
@@ -263,7 +266,7 @@
             <input [type]="showConfirmPwd ? 'text' : 'password'" formControlName="confirmPassword"
               autocomplete="new-password" placeholder="••••••••"
               class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="submitted && f['confirmPassword'].errors"/>
+              [class.!border-red-500]="(submitted || f['confirmPassword'].touched) && f['confirmPassword'].errors"/>
             <button type="button" (click)="showConfirmPwd = !showConfirmPwd"
               class="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors hover:text-gold"
               style="color:#6b7280">
@@ -282,7 +285,7 @@
               }
             </button>
           </div>
-          @if (submitted && f['confirmPassword'].errors?.['required']) {
+          @if ((submitted || f['confirmPassword'].touched) && f['confirmPassword'].errors?.['required']) {
             <p class="mt-1 text-xs text-red-400">Confirmation requise</p>
           }
         </div>

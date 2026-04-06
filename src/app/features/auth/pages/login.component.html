@@ -93,10 +93,10 @@
               class="w-full pl-10 pr-4 py-3.5 rounded-xl text-sm theme-text theme-surface theme-border border
                      transition-all duration-200 focus:outline-none placeholder:theme-muted
                      focus:border-yellow-500/60 focus:ring-2 focus:ring-yellow-500/20"
-              [class.border-red-500!]="submitted && f['email'].errors"
+              [class.border-red-500!]="(submitted || f['email'].touched) && f['email'].errors"
             />
           </div>
-          @if (submitted && f['email'].errors) {
+          @if ((submitted || f['email'].touched) && f['email'].errors) {
             <p class="mt-1.5 text-xs font-medium" style="color:#f87171;">
               @if (f['email'].errors['required']) { Email requis }
               @else if (f['email'].errors['email']) { Email invalide }
@@ -119,7 +119,7 @@
               class="w-full pl-10 pr-12 py-3.5 rounded-xl text-sm theme-text theme-surface theme-border border
                      transition-all duration-200 focus:outline-none placeholder:theme-muted
                      focus:border-yellow-500/60 focus:ring-2 focus:ring-yellow-500/20"
-              [class.border-red-500!]="submitted && f['password'].errors"
+              [class.border-red-500!]="(submitted || f['password'].touched) && f['password'].errors"
             />
             <button type="button" (click)="showPwd = !showPwd"
                     class="absolute right-3.5 top-1/2 -translate-y-1/2 theme-muted hover:text-gold transition-colors">
@@ -138,7 +138,7 @@
               }
             </button>
           </div>
-          @if (submitted && f['password'].errors) {
+          @if ((submitted || f['password'].touched) && f['password'].errors) {
             <p class="mt-1.5 text-xs font-medium" style="color:#f87171;">
               @if (f['password'].errors['required']) { Mot de passe requis }
               @else if (f['password'].errors['minlength']) { Minimum 6 caractères }

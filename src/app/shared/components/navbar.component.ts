@@ -313,6 +313,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
       return;
     }
+    const phoneDigits = this.deliveryPhone.trim().replace(/^\+225/, '');
+    if (!/^[0-9]{10}$/.test(phoneDigits)) {
+      this.checkoutError = 'Numéro invalide — 10 chiffres requis après +225 (ex: 0700000000)';
+      this.cdr.detectChanges();
+      return;
+    }
     if (!this.deliveryZone) {
       this.checkoutError = 'Veuillez sélectionner une zone de livraison';
       this.cdr.detectChanges();

@@ -20,6 +20,7 @@ export interface AuthResponse {
   nom: string;
   prenom: string;
   role: UserRole;
+  phone?: string;
 }
 
 export interface ForgotPasswordRequest {
