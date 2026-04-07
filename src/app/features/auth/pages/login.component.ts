@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { LogoComponent } from '../../../shared/components/logo.component';
 
 @Component({
@@ -29,6 +30,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -63,6 +65,7 @@ export class LoginComponent implements OnInit {
         this.loading = false;
         if (response.success) {
           localStorage.setItem('current_user', JSON.stringify(response.data));
+          this.toastService.success(`Bienvenue ${response.data.prenom} !`);
           this.router.navigateByUrl(this.returnUrl);
         } else {
           this.error = response.message || 'Identifiants incorrects';

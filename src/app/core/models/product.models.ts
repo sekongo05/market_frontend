@@ -40,10 +40,15 @@ export interface CreateProductRequest {
 
 export interface UpdateProductRequest extends CreateProductRequest {}
 
+export type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'name_asc';
+
 export interface GetProductsParams {
   page?: number;
   size?: number;
   categoryId?: number;
   gender?: Gender;
   search?: string;
+  sort?: SortOption;
+  minPrice?: number;
+  maxPrice?: number;
 }

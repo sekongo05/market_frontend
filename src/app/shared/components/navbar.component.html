@@ -823,6 +823,7 @@
                  style="box-shadow:0 2px 12px rgba(0,0,0,0.2)">
               <img [src]="item.imageUrl | mediaUrl"
                    [alt]="item.productName"
+                   loading="lazy"
                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                    (error)="$any($event.target).src='https://placehold.co/80x80/1a1a1a/d4af37?text=SDM'"/>
             </div>

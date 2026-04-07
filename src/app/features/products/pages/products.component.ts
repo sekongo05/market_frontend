@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { ProductService } from '../../../core/services/product.service';
@@ -8,7 +9,7 @@ import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
-import { ProductResponse, GetProductsParams } from '../../../core/models/product.models';
+import { ProductResponse, GetProductsParams, SortOption } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
@@ -44,6 +45,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // Category filter
   selectedCategoryId: number | null = null;
+  private pendingCategorySlug: string | null = null;
+
+  // Sort & price filter
+  sortOption: SortOption = 'newest';
+  minPriceInput: string = '';
+  maxPriceInput: string = '';
+  showFilters = false;
 
   // Tracks product ids that were just added (for button feedback)
   addedIds = new Set<number>();
@@ -128,7 +136,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private authPromptService: AuthPromptService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {}
 
   openProductView(product: ProductResponse): void {
@@ -205,7 +214,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initForm();
-    this.loadProducts();
+    const slugParam = this.route.snapshot.queryParamMap.get('categorie');
+    if (slugParam) {
+      this.pendingCategorySlug = slugParam;
+      // loadProducts sera déclenché par loadCategories une fois le slug résolu
+      this.loading = true;
+    } else {
+      this.loadProducts();
+    }
     this.loadCategories();
     this.searchSubject.pipe(
       debounceTime(400),
@@ -456,6 +472,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const params: GetProductsParams = { page, size: this.pageSize };
     if (this.searchQuery) params.search = this.searchQuery;
     if (this.selectedCategoryId) params.categoryId = this.selectedCategoryId;
+    if (this.sortOption !== 'newest') params.sort = this.sortOption;
+    const min = parseFloat(this.minPriceInput);
+    const max = parseFloat(this.maxPriceInput);
+    if (!isNaN(min) && min > 0) params.minPrice = min;
+    if (!isNaN(max) && max > 0) params.maxPrice = max;
 
     this.productService.getProducts(params).subscribe({
       next: (response) => {
@@ -484,10 +505,27 @@ export class ProductsComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.success && Array.isArray(response.data)) {
           this.categories = response.data;
+          if (this.pendingCategorySlug) {
+            const slug = this.pendingCategorySlug.toLowerCase();
+            const cat = this.categories.find(c => c.slug.toLowerCase().includes(slug));
+            if (cat) this.selectedCategoryId = cat.id;
+            this.pendingCategorySlug = null;
+            this.loadProducts(0);
+          }
+        } else if (this.pendingCategorySlug) {
+          // catégories indisponibles — charger sans filtre quand même
+          this.pendingCategorySlug = null;
+          this.loadProducts(0);
         }
         this.cdr.detectChanges();
       },
-      error: () => { this.cdr.detectChanges(); },
+      error: () => {
+        if (this.pendingCategorySlug) {
+          this.pendingCategorySlug = null;
+          this.loadProducts(0);
+        }
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -516,7 +554,28 @@ export class ProductsComponent implements OnInit, OnDestroy {
     return Array.from(map.values());
   }
 
-  search(): void { this.loadProducts(0); } // gardé pour la compatibilité Enter
+  search(): void { this.loadProducts(0); }
+
+  onSortChange(sort: string): void {
+    this.sortOption = sort as SortOption;
+    this.loadProducts(0);
+  }
+
+  applyPriceFilter(): void {
+    this.loadProducts(0);
+  }
+
+  clearFilters(): void {
+    this.sortOption = 'newest';
+    this.minPriceInput = '';
+    this.maxPriceInput = '';
+    this.loadProducts(0);
+    this.cdr.detectChanges();
+  }
+
+  get hasActiveFilters(): boolean {
+    return this.sortOption !== 'newest' || !!this.minPriceInput || !!this.maxPriceInput;
+  }
 
   previousPage(): void {
     if (this.currentPage > 0) this.loadProducts(this.currentPage - 1);
@@ -528,5 +587,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   get pages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+  get selectedCategoryName(): string | null {
+    if (this.selectedCategoryId === null) return null;
+    return this.categories.find(c => c.id === this.selectedCategoryId)?.name ?? null;
   }
 }

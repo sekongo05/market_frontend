@@ -2,7 +2,7 @@ import {
   Component, OnInit, OnDestroy, ChangeDetectorRef,
   AfterViewInit, HostListener
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 import { Subject } from 'rxjs';
@@ -92,12 +92,21 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private productService: ProductService,
     private cartService: CartService,
     private authService: AuthService,
     private authPromptService: AuthPromptService,
     private cdr: ChangeDetectorRef
   ) {}
+
+  goBack(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/products']);
+    }
+  }
 
   get isManager(): boolean {
     const role = this.authService.getCurrentUser()?.role;
@@ -300,7 +309,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     return '#4ade80';
   }
 
-  goBack(): void { this.router.navigate(['/products']); }
 
   /** Fall back to mock data when API is unavailable */
   private _tryMock(): void {

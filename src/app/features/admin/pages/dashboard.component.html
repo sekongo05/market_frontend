@@ -818,7 +818,7 @@
               <!-- Image -->
               @if (cat.imageUrl) {
                 <div class="h-32 overflow-hidden">
-                  <img [src]="cat.imageUrl" [alt]="cat.name" class="w-full h-full object-cover"/>
+                  <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy" class="w-full h-full object-cover"/>
                 </div>
               } @else {
                 <div class="h-32 bg-gradient-to-br from-[#b8860b]/10 to-[#d4af37]/5 flex items-center justify-center">
@@ -1489,7 +1489,7 @@
               <!-- Image -->
               <div class="relative h-40 bg-gradient-to-br from-white/4 to-white/2 overflow-hidden flex-shrink-0">
                 @if (product.imageUrl) {
-                  <img [src]="product.imageUrl" [alt]="product.name" class="w-full h-full object-cover"/>
+                  <img [src]="product.imageUrl" [alt]="product.name" loading="lazy" class="w-full h-full object-cover"/>
                 } @else {
                   <div class="w-full h-full flex items-center justify-center">
                     <svg class="w-12 h-12 text-gold/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">

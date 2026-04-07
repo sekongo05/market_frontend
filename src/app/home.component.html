@@ -205,9 +205,10 @@
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 auto-rows-[160px] sm:auto-rows-[190px] md:auto-rows-[220px]">
 
         <!-- Montres — grande -->
-        <a routerLink="/products"
+        <a routerLink="/products" [queryParams]="{categorie: 'montres'}"
            class="group relative col-span-1 lg:col-span-1 row-span-2 overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-1">
           <img src="https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=600&q=80" alt="Montres"
+               loading="lazy"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
           <div class="absolute top-4 left-4">
@@ -223,9 +224,10 @@
         </a>
 
         <!-- Mode -->
-        <a routerLink="/products"
+        <a routerLink="/products" [queryParams]="{categorie: 'mode'}"
            class="group relative overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-2">
           <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80" alt="Mode"
+               loading="lazy"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
           <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
@@ -237,9 +239,10 @@
         </a>
 
         <!-- Beauté -->
-        <a routerLink="/products"
+        <a routerLink="/products" [queryParams]="{categorie: 'beaute'}"
            class="group relative overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-3">
           <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80" alt="Beauté"
+               loading="lazy"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
           <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
@@ -251,9 +254,10 @@
         </a>
 
         <!-- Maison — large -->
-        <a routerLink="/products"
+        <a routerLink="/products" [queryParams]="{categorie: 'maison'}"
            class="group relative col-span-2 overflow-hidden rounded-3xl cursor-pointer scroll-reveal stagger-4">
           <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1000&q=80" alt="Lifestyle"
+               loading="lazy"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
           <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
           <div class="absolute bottom-0 left-0 p-3 sm:p-6">

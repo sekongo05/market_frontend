@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { LogoComponent } from '../../../shared/components/logo.component';
 
 @Component({
@@ -28,6 +29,7 @@ export class RegisterComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private toastService: ToastService,
     private router: Router
   ) {}
 
@@ -68,6 +70,7 @@ export class RegisterComponent implements OnInit {
       next: (response) => {
         this.loading = false;
         if (response.success) {
+          this.toastService.success('Compte créé avec succès ! Bienvenue 🎉');
           this.router.navigate(['/']);
         } else {
           this.error = response.message || 'Erreur lors de l\'inscription';

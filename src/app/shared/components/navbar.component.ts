@@ -15,6 +15,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { CartService, CartItem } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
 import { PromoService } from '../../core/services/promo.service';
+import { ToastService } from '../../core/services/toast.service';
 import { PromoCheckResponse, PublicPromoResponse } from '../../core/models/promo.models';
 import { Subject } from 'rxjs';
 import { takeUntil, timeout } from 'rxjs/operators';
@@ -79,6 +80,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private authPromptService: AuthPromptService,
     private orderService: OrderService,
     private promoService: PromoService,
+    private toastService: ToastService,
     private router: Router,
     readonly themeService: ThemeService,
     readonly cartService: CartService,
@@ -271,9 +273,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
+    const name = this.currentUser?.prenom ?? '';
     this.orderService.clearPendingCount();
     this.authService.logout();
     this.closeAll();
+    this.toastService.info(`À bientôt${name ? ' ' + name : ''} !`);
   }
 
   loadUnreadCount(): void {
