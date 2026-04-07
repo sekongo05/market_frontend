@@ -212,10 +212,21 @@ html.light .theme-text     { color: #111111; }
 html.light .theme-muted    { color: #6b7280; }
 
 /* ─── Typography ─────────────────────────────────────────────────────────── */
-html, body {
+html {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* propagated to the viewport — blocks horizontal scroll in all browsers incl. Safari iOS */
+  /* viewport-fit=cover: extend behind iPhone notch/Dynamic Island */
+  padding-top: env(safe-area-inset-top);
+}
+body {
+  overflow-x: clip; /* clip without creating a scroll container — position:sticky remains intact */
+  max-width: 100vw;
+}
+app-root {
+  display: block;
+  overflow-x: clip; /* extra safety layer */
 }
 
 /* ─── Body base ──────────────────────────────────────────────────────────── */
@@ -361,12 +372,12 @@ html.light body { background: #faf8f4; color: #111111; }
 .mobile-nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.875rem;
   width: 100%;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.9375rem;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
   font-weight: 500;
-  border-radius: 0.75rem;
+  border-radius: 0.875rem;
   color: #9ca3af;
   transition: color .2s, background-color .2s;
   text-decoration: none;
