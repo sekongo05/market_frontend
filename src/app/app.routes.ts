@@ -56,8 +56,8 @@ export const APP_ROUTES: Routes = [
       { path: 'privacy', component: PrivacyComponent },
       { path: 'authenticity', component: AuthenticityComponent },
       { path: 'returns', component: ReturnsComponent },
-      { path: '**', component: NotFoundComponent },
-    ],
+/*       { path: '**', component: NotFoundComponent },
+ */    ],
   },
   {
     path: 'auth',
