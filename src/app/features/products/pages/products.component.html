@@ -13,9 +13,9 @@
           </h1>
         </div>
 
-        <div class="flex gap-2 w-full md:w-auto">
-          <!-- Search -->
-          <div class="relative flex-1 md:w-80">
+        <div class="flex flex-col gap-2 w-full md:flex-row md:w-auto md:items-center">
+          <!-- Search — pleine largeur sur mobile -->
+          <div class="relative w-full md:w-80">
             <!-- Icône loupe -->
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 theme-muted pointer-events-none transition-colors duration-200"
                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,37 +50,40 @@
             }
           </div>
 
-          <!-- Sort -->
+          <!-- Tri + Filtre sur la même ligne en mobile, inline sur desktop -->
           @if (!isManager) {
-            <div class="relative flex-shrink-0">
-              <select [ngModel]="sortOption" (ngModelChange)="onSortChange($event)"
-                class="theme-input appearance-none pl-3 pr-8 py-3 rounded-xl text-sm cursor-pointer">
-                <option value="newest">Nouveautés</option>
-                <option value="price_asc">Prix ↑</option>
-                <option value="price_desc">Prix ↓</option>
-                <option value="name_asc">Nom A-Z</option>
-              </select>
-              <svg class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 theme-muted"
-                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
-            </div>
+            <div class="flex gap-2">
+              <!-- Sort -->
+              <div class="relative flex-1 md:flex-none">
+                <select [ngModel]="sortOption" (ngModelChange)="onSortChange($event)"
+                  class="theme-input appearance-none w-full pl-3 pr-8 py-3 rounded-xl text-sm cursor-pointer">
+                  <option value="newest">Nouveautés</option>
+                  <option value="price_asc">Prix ↑</option>
+                  <option value="price_desc">Prix ↓</option>
+                  <option value="name_asc">Nom A-Z</option>
+                </select>
+                <svg class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 theme-muted"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </div>
 
-            <!-- Filter toggle -->
-            <button (click)="showFilters = !showFilters"
-              class="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold border transition-all duration-200 flex-shrink-0"
-              [class]="hasActiveFilters
-                ? 'border-[#b8941e] bg-[#b8941e]/10 text-[#b8941e]'
-                : 'theme-border theme-muted hover:text-gold hover:border-gold/40'">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
-              </svg>
-              Filtres
-              @if (hasActiveFilters) {
-                <span class="w-1.5 h-1.5 rounded-full bg-[#b8941e]"></span>
-              }
-            </button>
+              <!-- Filter toggle -->
+              <button (click)="showFilters = !showFilters"
+                class="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold border transition-all duration-200 flex-shrink-0"
+                [class]="hasActiveFilters
+                  ? 'border-[#b8941e] bg-[#b8941e]/10 text-[#b8941e]'
+                  : 'theme-border theme-muted hover:text-gold hover:border-gold/40'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                Filtres
+                @if (hasActiveFilters) {
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#b8941e]"></span>
+                }
+              </button>
+            </div>
           }
 
           <!-- Add button (MANAGER / ADMIN only) -->
@@ -246,7 +249,7 @@
                       </span>
                     }
                     @if (isManager) {
-                      <div class="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div class="absolute top-3 right-3 flex gap-1.5 transition-opacity duration-200 lg:opacity-0 lg:group-hover:opacity-100">
                         <button (click)="$event.stopPropagation(); openEditModal(product)"
                           appTooltip="Modifier ce produit" tooltipPosition="bottom"
                           class="w-8 h-8 bg-black/70 border border-yellow-600/40 text-yellow-400 rounded-lg flex items-center justify-center hover:bg-yellow-600/20 transition-colors">
@@ -421,7 +424,7 @@
 <!-- ===== PANNEAU PLEINE PAGE — DÉTAIL PRODUIT ===== -->
 @if (selectedProduct) {
   <div class="fixed left-0 right-0 bottom-0 z-40 overflow-y-auto theme-bg animate-fade-in"
-       style="top: 70px">
+       style="top: 75px">
 
     <!-- Barre de navigation interne -->
     <div class="sticky top-0 z-10 theme-surface border-b theme-border backdrop-blur-xl">

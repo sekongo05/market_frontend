@@ -21,7 +21,7 @@
     <div class="hidden light:block absolute top-0 right-0 w-[700px] h-[700px] rounded-full pointer-events-none"
          style="background: radial-gradient(circle, rgba(251,191,36,0.12) 0%, transparent 70%); filter: blur(60px);"></div>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20 pb-16 lg:pt-28 lg:pb-24">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-14 pb-8 sm:pt-20 sm:pb-16 lg:pt-28 lg:pb-24">
       <div class="grid md:grid-cols-2 gap-12 items-center">
 
         <!-- Gauche : texte -->
@@ -67,6 +67,56 @@
                 Créer un compte gratuit
               </a>
             }
+          </div>
+
+          <!-- Strip catégories mobile — caché sur desktop où le bento grid prend le relai -->
+          <div class="md:hidden overflow-x-auto -mx-4 px-4 scrollbar-none animate-fade-in-up delay-400">
+            <div class="flex gap-3 pb-2" style="width: max-content;">
+              <a routerLink="/products" [queryParams]="{categorie: 'montres'}"
+                 class="relative flex-shrink-0 w-36 h-48 rounded-2xl overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=400&q=80" alt="Montres"
+                     loading="lazy"
+                     class="w-full h-full object-cover group-active:scale-105 transition-transform duration-500"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-3">
+                  <p class="text-white font-black text-sm leading-tight">Montres & Bijoux</p>
+                  <p class="text-white/60 text-[10px] mt-0.5">Notre spécialité</p>
+                </div>
+              </a>
+              <a routerLink="/products" [queryParams]="{categorie: 'mode'}"
+                 class="relative flex-shrink-0 w-36 h-48 rounded-2xl overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80" alt="Mode"
+                     loading="lazy"
+                     class="w-full h-full object-cover group-active:scale-105 transition-transform duration-500"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-3">
+                  <p class="text-white font-black text-sm leading-tight">Mode & Prêt-à-Porter</p>
+                  <p class="text-white/60 text-[10px] mt-0.5">Femme · Homme · Enfant</p>
+                </div>
+              </a>
+              <a routerLink="/products" [queryParams]="{categorie: 'beaute'}"
+                 class="relative flex-shrink-0 w-36 h-48 rounded-2xl overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&q=80" alt="Beauté"
+                     loading="lazy"
+                     class="w-full h-full object-cover group-active:scale-105 transition-transform duration-500"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-3">
+                  <p class="text-white font-black text-sm leading-tight">Beauté & Parfums</p>
+                  <p class="text-white/60 text-[10px] mt-0.5">Soins · Cosmétiques</p>
+                </div>
+              </a>
+              <a routerLink="/products" [queryParams]="{categorie: 'maison'}"
+                 class="relative flex-shrink-0 w-36 h-48 rounded-2xl overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&q=80" alt="Maison"
+                     loading="lazy"
+                     class="w-full h-full object-cover group-active:scale-105 transition-transform duration-500"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-3">
+                  <p class="text-white font-black text-sm leading-tight">Maison & Lifestyle</p>
+                  <p class="text-white/60 text-[10px] mt-0.5">Déco · Tech · Cadeaux</p>
+                </div>
+              </a>
+            </div>
           </div>
 
           <!-- Trust indicators -->
