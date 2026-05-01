@@ -732,6 +732,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.rejectingOrder = order;
     this.rejectReason = '';
     this.rejectModalOpen = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
@@ -739,6 +740,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.rejectModalOpen = false;
     this.rejectingOrder = null;
     this.rejectReason = '';
+    document.body.style.overflow = '';
     this.cdr.detectChanges();
   }
 
@@ -750,6 +752,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.rejectModalOpen = false;
     this.rejectingOrder = null;
     this.rejectReason = '';
+    document.body.style.overflow = '';
     this.cdr.detectChanges();
     this.paymentService.rejectPayment(order.id, reason).subscribe({
       next: (r) => {

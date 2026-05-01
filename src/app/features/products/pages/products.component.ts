@@ -145,6 +145,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.selectedProductQty = 1;
     this.viewGalleryIndex = 0;
     this._buildViewGallery(product);
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
@@ -166,6 +167,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   closeProductView(): void {
     this.selectedProduct = null;
+    document.body.style.overflow = '';
     this.cdr.detectChanges();
   }
 

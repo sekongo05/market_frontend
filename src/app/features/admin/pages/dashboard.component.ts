@@ -439,6 +439,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.rejectingOrder = order;
     this.rejectReason = '';
     this.rejectModalOpen = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
@@ -446,6 +447,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.rejectModalOpen = false;
     this.rejectingOrder = null;
     this.rejectReason = '';
+    document.body.style.overflow = '';
     this.cdr.detectChanges();
   }
 
@@ -526,6 +528,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this._resetDrawer();
     this.initProductForm();
     this.drawerOpen = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
@@ -536,6 +539,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.productMedia = product.media ?? [];
     this.initProductForm(product);
     this.drawerOpen = true;
+    document.body.style.overflow = 'hidden';
     this.loadMedia(product.id);
     this.cdr.detectChanges();
   }
@@ -544,6 +548,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.drawerOpen = false;
     this.editingProduct = null;
     this._resetDrawer();
+    document.body.style.overflow = '';
     this.cdr.detectChanges();
   }
 
@@ -929,6 +934,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.categoryForm = { name: '', description: '', imageUrl: '' };
     this.categoryFormError = null;
     this.showCategoryForm = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
@@ -937,10 +943,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.categoryForm = { name: cat.name, description: cat.description ?? '', imageUrl: cat.imageUrl ?? '' };
     this.categoryFormError = null;
     this.showCategoryForm = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
-  closeCategoryForm(): void { this.showCategoryForm = false; this.editingCategory = null; this.categoryFormError = null; this.cdr.detectChanges(); }
+  closeCategoryForm(): void { this.showCategoryForm = false; this.editingCategory = null; this.categoryFormError = null; document.body.style.overflow = ''; this.cdr.detectChanges(); }
 
   submitCategory(): void {
     if (!this.categoryForm.name.trim()) { this.categoryFormError = 'Le nom est obligatoire'; return; }
@@ -993,6 +1000,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.userFullProfile = null;
     this.userFullProfileLoading = true;
     this.showUserProfile = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
     this.userService.getFullProfile(userId).subscribe({
       next: (r) => { if (r.success) this.userFullProfile = r.data; this.userFullProfileLoading = false; this.cdr.detectChanges(); },
@@ -1000,7 +1008,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  closeUserProfile(): void { this.showUserProfile = false; this.userFullProfile = null; this.cdr.detectChanges(); }
+  closeUserProfile(): void { this.showUserProfile = false; this.userFullProfile = null; document.body.style.overflow = ''; this.cdr.detectChanges(); }
 
   // ── Caisse journalière ─────────────────────────────────────────────────────
 
@@ -1130,10 +1138,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.returnDecision = 'APPROVED';
     this.returnDecisionNote = '';
     this.returnDecisionModal = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
-  closeReturnDecisionModal(): void { this.returnDecisionModal = false; this.returnDecisionItem = null; this.cdr.detectChanges(); }
+  closeReturnDecisionModal(): void { this.returnDecisionModal = false; this.returnDecisionItem = null; document.body.style.overflow = ''; this.cdr.detectChanges(); }
 
   submitReturnDecision(): void {
     if (!this.returnDecisionItem) return;

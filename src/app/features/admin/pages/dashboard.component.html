@@ -755,46 +755,70 @@
         </button>
       </div>
 
-      <!-- Formulaire création / édition -->
+      <!-- Formulaire création / édition — modal overlay -->
       @if (showCategoryForm) {
-        <div class="theme-surface border border-gold/20 rounded-2xl p-6 mb-6 animate-fade-in shadow-lg shadow-yellow-600/5">
-          <h3 class="text-base font-bold theme-text mb-4">
-            {{ editingCategory ? 'Modifier' : 'Créer' }} une catégorie
-          </h3>
-          @if (categoryFormError) {
-            <div class="mb-4 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">
-              {{ categoryFormError }}
-            </div>
-          }
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Nom *</label>
-              <input [(ngModel)]="categoryForm.name" type="text" placeholder="ex: Montres" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Description</label>
-              <input [(ngModel)]="categoryForm.description" type="text" placeholder="Courte description..." class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">URL de l'image</label>
-              <input [(ngModel)]="categoryForm.imageUrl" type="text" placeholder="https://..." class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
-            </div>
-          </div>
-          <div class="flex gap-3 mt-5">
-            <button (click)="submitCategory()" [disabled]="categoryFormLoading"
-              class="flex items-center gap-2 px-5 py-2.5 bg-gold text-black font-bold text-sm rounded-xl hover:shadow-lg hover:shadow-yellow-600/25 disabled:opacity-50 transition-all">
-              @if (categoryFormLoading) {
-                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeCategoryForm()"></div>
+          <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl animate-scale-in">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-5 border-b theme-border">
+              <div>
+                <h3 class="text-lg font-bold theme-text">
+                  {{ editingCategory ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}
+                </h3>
+                <p class="text-xs theme-muted mt-0.5">{{ editingCategory ? editingCategory.name : 'Remplissez les informations' }}</p>
+              </div>
+              <button (click)="closeCategoryForm()"
+                class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/8 theme-muted hover:bg-white/12 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
+              </button>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-5 space-y-4">
+              @if (categoryFormError) {
+                <div class="p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">
+                  {{ categoryFormError }}
+                </div>
               }
-              {{ editingCategory ? 'Enregistrer' : 'Créer' }}
-            </button>
-            <button (click)="closeCategoryForm()"
-              class="px-5 py-2.5 bg-white/8 theme-muted font-semibold text-sm rounded-xl hover:bg-white/12 transition-colors">
-              Annuler
-            </button>
+              <div>
+                <label class="block text-xs font-semibold theme-muted mb-1.5">Nom <span class="text-red-400">*</span></label>
+                <input [(ngModel)]="categoryForm.name" type="text" placeholder="ex: Montres"
+                  class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold theme-muted mb-1.5">Description</label>
+                <input [(ngModel)]="categoryForm.description" type="text" placeholder="Courte description…"
+                  class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold theme-muted mb-1.5">URL de l'image</label>
+                <input [(ngModel)]="categoryForm.imageUrl" type="text" placeholder="https://…"
+                  class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex gap-3 px-6 py-4 border-t theme-border">
+              <button (click)="submitCategory()" [disabled]="categoryFormLoading"
+                class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gold text-black font-bold text-sm rounded-xl
+                       hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 disabled:opacity-50 disabled:translate-y-0 transition-all">
+                @if (categoryFormLoading) {
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                  </svg>
+                }
+                {{ editingCategory ? 'Enregistrer' : 'Créer la catégorie' }}
+              </button>
+              <button (click)="closeCategoryForm()"
+                class="px-5 py-2.5 bg-white/8 theme-muted font-semibold text-sm rounded-xl hover:bg-white/12 transition-colors">
+                Annuler
+              </button>
+            </div>
           </div>
         </div>
       }
@@ -1777,7 +1801,7 @@
 @if (drawerOpen) {
   <div class="fixed inset-0 z-50 flex animate-fade-in">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="closeDrawer()"></div>
-    <div class="relative ml-auto w-full max-w-xl theme-surface border-l theme-border shadow-2xl flex flex-col overflow-y-auto animate-slide-in-right">
+    <div class="relative ml-auto w-full max-w-xl theme-surface border-l theme-border shadow-2xl flex flex-col overflow-y-auto overscroll-contain animate-slide-in-right">
 
       <!-- Header -->
       <div class="flex items-center justify-between px-6 py-5 border-b theme-border flex-shrink-0">
