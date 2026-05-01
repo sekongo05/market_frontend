@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
   imports: [CommonModule],
   template: `
     @if (isCustomer) {
-      <div class="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+      <div class="fixed bottom-6 right-6 z-30 flex items-center gap-3">
 
         <!-- Label tooltip -->
         <span class="px-3 py-1.5 rounded-xl text-xs font-semibold text-white shadow-lg whitespace-nowrap"

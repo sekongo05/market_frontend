@@ -120,7 +120,7 @@
                 @for (step of stepStatuses; track step; let si = $index) {
                   <div class="flex items-center" [class.flex-1]="si < stepStatuses.length - 1">
                     <!-- Cercle -->
-                    <div class="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-black transition-all"
+                    <div class="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-black transition-all"
                          [class]="si <= stepIndex(order.orderStatus)
                            ? 'bg-gold text-black shadow-md'
                            : 'bg-white/10 theme-muted'">
@@ -145,7 +145,7 @@
             <!-- Total + bouton détails -->
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-[10px] theme-muted uppercase tracking-wider font-semibold mb-0.5">Total</p>
+                <p class="text-xs theme-muted font-semibold mb-0.5">Total</p>
                 <p class="text-xl font-black text-gold">
                   {{ (order.totalAmount / 1000) | number:'1.0-0' }}<span class="text-sm font-bold">K</span>
                   <span class="text-xs theme-muted font-semibold ml-1">FCFA</span>
@@ -172,7 +172,7 @@
 
               <!-- Articles détaillés -->
               <div>
-                <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-2">Articles commandés</p>
+                <p class="text-xs font-bold theme-muted mb-2">Articles commandés</p>
                 <div class="rounded-xl overflow-hidden" style="background:rgba(255,255,255,0.04)">
                   @for (item of order.items; track item.productId; let li = $index) {
                     <div class="flex items-center justify-between px-4 py-2.5 text-sm"
@@ -198,13 +198,13 @@
               <!-- Statuts paiement + livraison -->
               <div class="grid grid-cols-2 gap-3">
                 <div class="rounded-xl px-4 py-3" style="background:rgba(255,255,255,0.04)">
-                  <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1.5">Paiement</p>
+                  <p class="text-xs font-bold theme-muted mb-1.5">Paiement</p>
                   <p class="text-sm font-bold" [class]="paymentClass(order.paymentStatus)">
                     {{ paymentLabel(order.paymentStatus) }}
                   </p>
                 </div>
                 <div class="rounded-xl px-4 py-3" style="background:rgba(255,255,255,0.04)">
-                  <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1.5">Livraison</p>
+                  <p class="text-xs font-bold theme-muted mb-1.5">Livraison</p>
                   <p class="text-sm font-bold theme-text">{{ deliveryLabel(order.deliveryStatus) }}</p>
                 </div>
               </div>
@@ -217,7 +217,7 @@
                       d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                   </svg>
                   <div class="flex-1 min-w-0">
-                    <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">N° de suivi</p>
+                    <p class="text-xs font-bold text-indigo-400">N° de suivi</p>
                     <p class="text-sm font-mono font-bold theme-text">{{ order.trackingNumber }}</p>
                   </div>
                 </div>

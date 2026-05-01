@@ -109,14 +109,14 @@
         <div class="flex flex-wrap items-end gap-3">
           <div class="flex items-center gap-2 flex-1 min-w-[220px]">
             <div class="flex-1">
-              <p class="text-[10px] font-bold uppercase tracking-wider theme-muted mb-1">Prix min (FCFA)</p>
+              <p class="text-xs font-bold theme-muted mb-1">Prix min (FCFA)</p>
               <input type="number" [(ngModel)]="minPriceInput" placeholder="0"
                 min="0" (keyup.enter)="applyPriceFilter()"
                 class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
             </div>
             <span class="theme-muted text-sm mt-4">—</span>
             <div class="flex-1">
-              <p class="text-[10px] font-bold uppercase tracking-wider theme-muted mb-1">Prix max (FCFA)</p>
+              <p class="text-xs font-bold theme-muted mb-1">Prix max (FCFA)</p>
               <input type="number" [(ngModel)]="maxPriceInput" placeholder="∞"
                 min="0" (keyup.enter)="applyPriceFilter()"
                 class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
@@ -730,14 +730,14 @@
                   <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                   </svg>
-                  <span class="text-[9px] theme-muted font-semibold">
+                  <span class="text-[10px] theme-muted font-semibold">
                     {{ selectedImages.length === 0 ? 'Principale' : 'Photo ' + (selectedImages.length + 1) }}
                   </span>
                   <input type="file" accept="image/*,.heic,.heif" multiple class="hidden" (change)="onFileSelected($event)"/>
                 </label>
               }
             </div>
-            <p class="text-[10px] theme-muted mb-3">JPEG · PNG · WEBP · AVIF · HEIC · max 20 Mo · compression auto</p>
+            <p class="text-xs theme-muted mb-3">JPEG · PNG · WEBP · AVIF · HEIC · max 20 Mo · compression auto</p>
             <!-- Vidéo -->
             @if (videoPreview) {
               <div class="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 mb-1">
