@@ -147,6 +147,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this._buildViewGallery(product);
     document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
+    setTimeout(() => document.getElementById('product-view-panel')?.scrollTo(0, 0), 0);
   }
 
   private _buildViewGallery(product: ProductResponse): void {

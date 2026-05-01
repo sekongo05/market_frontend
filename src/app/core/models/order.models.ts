@@ -1,4 +1,4 @@
-import { OrderStatus, PaymentStatus, DeliveryStatus } from './common.models';
+import { OrderStatus, DeliveryStatus } from './common.models';
 
 export interface OrderItem {
   productId: number;
@@ -25,11 +25,8 @@ export interface OrderResponse {
   items: OrderItemResponse[];
   totalAmount: number;
   orderStatus: OrderStatus;
-  paymentStatus: PaymentStatus;
   deliveryStatus: DeliveryStatus;
   deliveryAddress: string;
-  paymentReference: string | null;
-  lastPaymentNote: string | null;
   trackingNumber: string | null;
   customerName: string | null;
   promoCode: string | null;

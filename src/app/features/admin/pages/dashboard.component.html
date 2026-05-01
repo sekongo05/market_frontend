@@ -29,7 +29,6 @@
         @for (tab of [
           {key:'stats',      label:'Statistiques'},
           {key:'orders',     label:'Commandes'},
-          {key:'payments',   label:'Paiements'},
           {key:'products',   label:'Produits'},
           {key:'delivery',   label:'Livraisons'},
           {key:'returns',    label:'Retours'},
@@ -243,32 +242,6 @@
         <div class="theme-surface border theme-border rounded-3xl p-6 animate-fade-in-up delay-250">
           <h2 class="text-base font-bold theme-text mb-4">Alertes</h2>
           <div class="space-y-4">
-
-            <!-- Paiements à valider -->
-            <div class="flex items-center justify-between p-3 rounded-2xl transition-colors"
-                 [ngClass]="stats.pendingPaymentsCount > 0 ? 'bg-blue-500/8 border border-blue-500/20' : 'bg-white/4'">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                     [ngClass]="stats.pendingPaymentsCount > 0 ? 'bg-blue-500/20' : 'bg-white/8'">
-                  <svg class="w-4 h-4" [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'"
-                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                  </svg>
-                </div>
-                <div>
-                  <p class="text-xs font-semibold" [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'">
-                    Paiements à valider
-                  </p>
-                  @if (stats.pendingPaymentsCount > 0) {
-                    <p class="text-[10px] text-blue-400/70">Action requise</p>
-                  }
-                </div>
-              </div>
-              <span class="text-xl font-black"
-                    [ngClass]="stats.pendingPaymentsCount > 0 ? 'text-blue-400' : 'theme-muted'">
-                {{ stats.pendingPaymentsCount }}
-              </span>
-            </div>
 
             <!-- Stock faible -->
             <div class="flex items-center justify-between p-3 rounded-2xl transition-colors"
@@ -575,10 +548,6 @@
             <div class="p-4 bg-green-500/8 rounded-2xl text-center">
               <p class="text-2xl font-black text-green-400">{{ dailyCaisse.paidOrdersCount }}</p>
               <p class="text-xs theme-muted mt-1">Payées</p>
-            </div>
-            <div class="p-4 bg-yellow-500/8 rounded-2xl text-center">
-              <p class="text-2xl font-black text-yellow-400">{{ dailyCaisse.pendingPaymentsCount }}</p>
-              <p class="text-xs theme-muted mt-1">En attente</p>
             </div>
             <div class="p-4 bg-gold/8 border border-gold/15 rounded-2xl text-center">
               <p class="text-xl font-black text-gold">{{ formatAmount(dailyCaisse.totalRevenue) }}</p>
@@ -1277,7 +1246,6 @@
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">N° commande</th>
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Client</th>
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
-                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden sm:table-cell">Paiement</th>
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Montant</th>
                 <th class="text-right text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Actions</th>
               </tr>
@@ -1298,9 +1266,6 @@
                     <span class="inline-flex px-2 py-0.5 rounded-lg text-xs font-bold" [class]="orderStatusClass(order.orderStatus)">
                       {{ orderStatusLabel(order.orderStatus) }}
                     </span>
-                  </td>
-                  <td class="px-5 py-3.5 hidden sm:table-cell">
-                    <span class="text-xs theme-muted">{{ paymentLabel(order.paymentStatus) }}</span>
                   </td>
                   <td class="px-5 py-3.5 hidden lg:table-cell">
                     <span class="font-bold text-sm text-gold">{{ formatCurrency(order.totalAmount) }} FCFA</span>
@@ -1364,117 +1329,6 @@
       }
     </div>
   } <!-- /orders -->
-
-  <!-- ══════════ ONGLET PAIEMENTS ══════════ -->
-  @if (activeTab === 'payments') {
-    <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
-
-      <div class="px-6 py-4 border-b theme-border flex items-center justify-between">
-        <div>
-          <h2 class="text-lg font-bold theme-text">Paiements à valider</h2>
-          <p class="text-xs theme-muted mt-0.5">{{ pendingPayments.length }} en attente de validation</p>
-        </div>
-        <button (click)="loadPendingPayments()"
-          class="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
-          Actualiser
-        </button>
-      </div>
-
-      @if (paymentsLoading) {
-        <div class="p-8 flex justify-center">
-          <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-          </svg>
-        </div>
-      }
-
-      @if (!paymentsLoading && pendingPayments.length === 0) {
-        <div class="py-20 text-center">
-          <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-          </div>
-          <p class="theme-text font-bold">Aucun paiement en attente</p>
-          <p class="text-sm theme-muted mt-1">Tous les paiements ont été traités</p>
-        </div>
-      }
-
-      @if (!paymentsLoading && pendingPayments.length > 0) {
-        <div class="divide-y theme-border">
-          @for (order of pendingPayments; track order.id) {
-            <div class="px-6 py-5">
-              <div class="flex flex-wrap items-start justify-between gap-4">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="font-mono text-sm font-bold theme-text">{{ order.orderNumber }}</span>
-                    <span class="text-xs px-2 py-0.5 bg-blue-500/15 text-blue-400 border border-blue-500/25 rounded-lg font-bold">Soumis</span>
-                  </div>
-                  <p class="text-sm theme-muted">{{ order.customerName }}</p>
-                  @if (order.paymentReference) {
-                    <div class="mt-2 flex items-center gap-2">
-                      <span class="text-[10px] font-bold theme-muted uppercase tracking-wider">Réf. Wave :</span>
-                      <code class="text-xs font-mono font-bold theme-text bg-white/6 px-2 py-0.5 rounded-lg">{{ order.paymentReference }}</code>
-                    </div>
-                  }
-                  <p class="text-xs theme-muted mt-1">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                  <p class="text-xl font-black text-gold">{{ formatCurrency(order.totalAmount) }} FCFA</p>
-                  @if (paymentActionId === order.id) {
-                    <svg class="w-5 h-5 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                  } @else {
-                    <div class="flex gap-2">
-                      <button (click)="validatePayment(order)"
-                        class="flex items-center gap-1.5 px-4 py-2 bg-green-500/10 border border-green-500/25 text-green-400 text-sm font-bold rounded-xl hover:bg-green-500/20 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        Valider
-                      </button>
-                      <button (click)="openRejectModal(order)"
-                        class="flex items-center gap-1.5 px-4 py-2 bg-red-500/10 border border-red-500/25 text-red-400 text-sm font-bold rounded-xl hover:bg-red-500/20 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                        Rejeter
-                      </button>
-                    </div>
-                  }
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-
-        @if (paymentsTotalPages > 1) {
-          <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
-            <span class="text-xs theme-muted">Page {{ paymentsPage + 1 }} / {{ paymentsTotalPages }}</span>
-            <div class="flex gap-2">
-              <button (click)="loadPendingPayments(paymentsPage - 1)" [disabled]="paymentsPage === 0"
-                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">← Préc.</button>
-              @for (page of paymentPages; track page) {
-                <button (click)="loadPendingPayments(page)"
-                  class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
-                  [ngClass]="page === paymentsPage ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-gold/15 hover:text-gold'">
-                  {{ page + 1 }}
-                </button>
-              }
-              <button (click)="loadPendingPayments(paymentsPage + 1)" [disabled]="paymentsPage >= paymentsTotalPages - 1"
-                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">Suiv. →</button>
-            </div>
-          </div>
-        }
-      }
-    </div>
-  } <!-- /payments -->
 
   <!-- ══════════ ONGLET PRODUITS ══════════ -->
   @if (activeTab === 'products') {
@@ -1801,7 +1655,7 @@
 @if (drawerOpen) {
   <div class="fixed inset-0 z-50 flex animate-fade-in">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="closeDrawer()"></div>
-    <div class="relative ml-auto w-full max-w-xl theme-surface border-l theme-border shadow-2xl flex flex-col overflow-y-auto overscroll-contain animate-slide-in-right">
+    <div id="admin-drawer-panel" class="relative ml-auto w-full max-w-xl theme-surface border-l theme-border shadow-2xl flex flex-col overflow-y-auto overscroll-contain animate-slide-in-right">
 
       <!-- Header -->
       <div class="flex items-center justify-between px-6 py-5 border-b theme-border flex-shrink-0">
@@ -1817,9 +1671,9 @@
       <!-- Sous-onglets -->
       @if (editingProduct) {
         <div class="flex gap-1 px-6 pt-4 flex-shrink-0">
-          <button (click)="drawerTab = 'info'" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
+          <button (click)="setDrawerTab('info')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
             [ngClass]="drawerTab === 'info' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">Informations</button>
-          <button (click)="drawerTab = 'media'" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
+          <button (click)="setDrawerTab('media')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
             [ngClass]="drawerTab === 'media' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">Médias ({{ productMedia.length }})</button>
         </div>
       }
@@ -1971,27 +1825,6 @@
   </div>
 }
 
-<!-- ══════════ MODAL REJETER PAIEMENT ══════════ -->
-@if (rejectModalOpen) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeRejectModal()"></div>
-    <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl p-6 animate-scale-in">
-      <h3 class="text-lg font-bold theme-text mb-1">Rejeter le paiement</h3>
-      <p class="text-xs theme-muted mb-4">{{ rejectingOrder?.orderNumber }} — {{ rejectingOrder ? formatCurrency(rejectingOrder.totalAmount) : '' }} FCFA</p>
-      <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Motif du rejet *</label>
-      <textarea [(ngModel)]="rejectReason" rows="3" placeholder="Ex : Référence Wave introuvable, montant incorrect…"
-        class="theme-input w-full px-3 py-2.5 rounded-xl text-sm resize-none mb-4"></textarea>
-      <div class="flex gap-3">
-        <button (click)="closeRejectModal()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors">Annuler</button>
-        <button (click)="confirmRejectPayment()" [disabled]="!rejectReason.trim()"
-          class="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-          Confirmer le rejet
-        </button>
-      </div>
-    </div>
-  </div>
-}
-
 <!-- ══════════ MODAL DÉCISION RETOUR ══════════ -->
 @if (returnDecisionModal && returnDecisionItem) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
@@ -2100,7 +1933,6 @@
                     </div>
                     <div class="text-right">
                       <p class="font-bold text-gold text-sm">{{ formatAmount(order.amount) }}</p>
-                      <p class="text-xs" [ngClass]="order.paymentStatus === 'COMPLETED' ? 'text-green-400' : 'text-yellow-400'">{{ order.paymentStatus }}</p>
                     </div>
                   </div>
                 }

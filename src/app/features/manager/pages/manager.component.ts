@@ -10,7 +10,6 @@ import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ProductMediaService } from '../../../core/services/product-media.service';
 import { OrderService } from '../../../core/services/order.service';
-import { PaymentService } from '../../../core/services/payment.service';
 import { DeliveryService } from '../../../core/services/delivery.service';
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { ProductResponse, GetProductsParams, ProductMediaItem, Gender } from '../../../core/models/product.models';
@@ -31,7 +30,7 @@ interface Toast { id: number; msg: string; type: 'success' | 'error'; }
 export class ManagerComponent implements OnInit, OnDestroy {
 
   // ── Page tab ──────────────────────────────────────────────────────────────
-  pageTab: 'products' | 'orders' | 'payments' | 'delivery' | 'dashboard' = 'products';
+  pageTab: 'products' | 'orders' | 'delivery' | 'dashboard' = 'products';
 
   // ── Data ──────────────────────────────────────────────────────────────────
   products: ProductResponse[] = [];
@@ -90,18 +89,6 @@ export class ManagerComponent implements OnInit, OnDestroy {
     DELIVERED: null,
     CANCELLED: null,
   };
-
-  // ── Pending payments ──────────────────────────────────────────────────────
-  pendingPayments: OrderResponse[] = [];
-  paymentsLoading = false;
-  paymentsPage = 0;
-  paymentsTotalPages = 0;
-  paymentActionId: number | null = null;
-
-  // ── Rejection modal ───────────────────────────────────────────────────────
-  rejectModalOpen = false;
-  rejectingOrder: OrderResponse | null = null;
-  rejectReason = '';
 
   // ── Delivery tab ──────────────────────────────────────────────────────────
   deliveryOrders: OrderResponse[] = [];
@@ -175,7 +162,6 @@ export class ManagerComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private productMediaService: ProductMediaService,
     private orderService: OrderService,
-    private paymentService: PaymentService,
     private deliveryService: DeliveryService,
     private dashboardService: DashboardService,
     private fb: FormBuilder,
@@ -278,6 +264,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.drawerOpen = true;
     document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
+    setTimeout(() => document.getElementById('manager-drawer-body')?.scrollTo(0, 0), 0);
   }
 
   openEditDrawer(product: ProductResponse): void {
@@ -297,6 +284,12 @@ export class ManagerComponent implements OnInit, OnDestroy {
     document.body.style.overflow = 'hidden';
     this.loadMedia(product.id);
     this.cdr.detectChanges();
+    setTimeout(() => document.getElementById('manager-drawer-body')?.scrollTo(0, 0), 0);
+  }
+
+  setDrawerTab(tab: 'info' | 'media'): void {
+    this.drawerTab = tab;
+    document.getElementById('manager-drawer-body')?.scrollTo(0, 0);
   }
 
   closeDrawer(): void {
@@ -617,10 +610,9 @@ export class ManagerComponent implements OnInit, OnDestroy {
   nextPage(): void { if (this.currentPage < this.totalPages - 1) this.loadProducts(this.currentPage + 1); }
   get pages(): number[] { return Array.from({ length: this.totalPages }, (_, i) => i); }
 
-  setPageTab(tab: 'products' | 'orders' | 'payments' | 'delivery' | 'dashboard'): void {
+  setPageTab(tab: 'products' | 'orders' | 'delivery' | 'dashboard'): void {
     this.pageTab = tab;
     if (tab === 'orders' && this.allOrders.length === 0) this.loadAllOrders();
-    if (tab === 'payments') this.loadPendingPayments();
     if (tab === 'delivery' && this.deliveryOrders.length === 0) this.loadDeliveryOrders();
     if (tab === 'dashboard') this.loadManagerStats();
     if (this.drawerOpen) this.closeDrawer();
@@ -687,87 +679,6 @@ export class ManagerComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: () => { this.statusUpdatingId = null; this.toast('Erreur d\'annulation', 'error'); this.cdr.detectChanges(); },
-    });
-  }
-
-  // ── Pending payment management ─────────────────────────────────────────────
-
-  loadPendingPayments(page = 0): void {
-    this.paymentsLoading = true;
-    this.paymentService.getPendingValidationOrders(page, 15).subscribe({
-      next: (r) => {
-        if (r.success) {
-          const pg = r.data as PageResponse<OrderResponse>;
-          this.pendingPayments = pg.content;
-          this.paymentsTotalPages = pg.totalPages;
-          this.paymentsPage = page;
-        }
-        this.paymentsLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => { this.paymentsLoading = false; this.cdr.detectChanges(); },
-    });
-  }
-
-  validatePayment(order: OrderResponse): void {
-    this.paymentActionId = order.id;
-    this.paymentService.validatePayment(order.id).subscribe({
-      next: (r) => {
-        if (r.success) {
-          this.pendingPayments = this.pendingPayments.filter(o => o.id !== order.id);
-          this.toast(`Paiement validé — Commande ${order.orderNumber} confirmée ✓`);
-        }
-        this.paymentActionId = null;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.paymentActionId = null;
-        this.toast(err?.error?.message || 'Erreur lors de la validation', 'error');
-        this.cdr.detectChanges();
-      },
-    });
-  }
-
-  openRejectModal(order: OrderResponse): void {
-    this.rejectingOrder = order;
-    this.rejectReason = '';
-    this.rejectModalOpen = true;
-    document.body.style.overflow = 'hidden';
-    this.cdr.detectChanges();
-  }
-
-  closeRejectModal(): void {
-    this.rejectModalOpen = false;
-    this.rejectingOrder = null;
-    this.rejectReason = '';
-    document.body.style.overflow = '';
-    this.cdr.detectChanges();
-  }
-
-  confirmRejectPayment(): void {
-    if (!this.rejectingOrder || !this.rejectReason.trim()) return;
-    const order = this.rejectingOrder;
-    const reason = this.rejectReason.trim();
-    this.paymentActionId = order.id;
-    this.rejectModalOpen = false;
-    this.rejectingOrder = null;
-    this.rejectReason = '';
-    document.body.style.overflow = '';
-    this.cdr.detectChanges();
-    this.paymentService.rejectPayment(order.id, reason).subscribe({
-      next: (r) => {
-        if (r.success) {
-          this.pendingPayments = this.pendingPayments.filter(o => o.id !== order.id);
-          this.toast(`Paiement rejeté — Commande ${order.orderNumber}`);
-        }
-        this.paymentActionId = null;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.paymentActionId = null;
-        this.toast(err?.error?.message || 'Erreur lors du rejet', 'error');
-        this.cdr.detectChanges();
-      },
     });
   }
 
@@ -911,8 +822,6 @@ export class ManagerComponent implements OnInit, OnDestroy {
     if (amount >= 1_000) return Math.round(amount / 1_000) + 'K';
     return amount.toString();
   }
-
-  get paymentPages(): number[] { return Array.from({ length: this.paymentsTotalPages }, (_, i) => i); }
 
   orderStatusLabel(s: string): string {
     const m: Record<string, string> = {

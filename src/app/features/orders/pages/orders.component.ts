@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { OrderResponse } from '../../../core/models/order.models';
 import { PageResponse } from '../../../core/models/common.models';
@@ -26,7 +26,7 @@ export class OrdersComponent implements OnInit {
   cancelConfirmId: number | null = null;
   cancellingId: number | null = null;
 
-  constructor(private orderService: OrderService, private cdr: ChangeDetectorRef, private router: Router) {}
+  constructor(private orderService: OrderService, private cdr: ChangeDetectorRef) {}
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
@@ -107,24 +107,6 @@ export class OrdersComponent implements OnInit {
     return m[s] ?? 'bg-white/10 theme-muted border border-white/10';
   }
 
-  paymentLabel(s: string): string {
-    const m: Record<string, string> = {
-      PENDING: 'Paiement en attente', SUBMITTED: 'En attente de validation',
-      COMPLETED: 'Payé', FAILED: 'Échec paiement',
-      EXPIRED: 'Expiré', REFUNDED: 'Remboursé',
-    };
-    return m[s] ?? s;
-  }
-
-  paymentClass(s: string): string {
-    const m: Record<string, string> = {
-      PENDING:    'text-yellow-400', SUBMITTED: 'text-blue-400',
-      COMPLETED:  'text-green-400',  FAILED:    'text-red-400',
-      EXPIRED:    'text-orange-400', REFUNDED:  'text-blue-400',
-    };
-    return m[s] ?? 'theme-muted';
-  }
-
   deliveryLabel(s: string): string {
     const m: Record<string, string> = {
       PREPARING:        'En préparation',
@@ -133,10 +115,6 @@ export class OrdersComponent implements OnInit {
       FAILED:           'Échec livraison',
     };
     return m[s] ?? s;
-  }
-
-  goToPayment(orderId: number): void {
-    this.router.navigate(['/payment', orderId]);
   }
 
   itemsPreview(order: OrderResponse): string {

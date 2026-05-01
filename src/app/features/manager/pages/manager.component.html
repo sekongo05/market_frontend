@@ -12,7 +12,7 @@
           </div>
           <h1 class="text-2xl font-black theme-text">Espace Gestion</h1>
           <p class="text-sm theme-muted mt-0.5">
-            {{ pageTab === 'products' ? 'Gérez votre catalogue produits' : pageTab === 'orders' ? 'Suivez et validez les commandes clients' : pageTab === 'payments' ? 'Validez les paiements Wave déclarés' : pageTab === 'delivery' ? 'Suivez les livraisons en cours' : 'Vos statistiques personnelles' }}
+            {{ pageTab === 'products' ? 'Gérez votre catalogue produits' : pageTab === 'orders' ? 'Suivez et validez les commandes clients' : pageTab === 'delivery' ? 'Suivez les livraisons en cours' : 'Vos statistiques personnelles' }}
           </p>
         </div>
         @if (pageTab === 'products') {
@@ -27,15 +27,6 @@
         }
         @if (pageTab === 'orders') {
           <button (click)="loadAllOrders(0)"
-            class="flex items-center gap-2 px-5 py-3 luxury-card theme-muted rounded-xl font-bold text-sm hover:text-gold transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            Actualiser
-          </button>
-        }
-        @if (pageTab === 'payments') {
-          <button (click)="loadPendingPayments(0)"
             class="flex items-center gap-2 px-5 py-3 luxury-card theme-muted rounded-xl font-bold text-sm hover:text-gold transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -79,17 +70,6 @@
           [class.border-transparent]="pageTab !== 'orders'"
           [class.theme-muted]="pageTab !== 'orders'">
           Commandes
-        </button>
-        <button type="button" (click)="setPageTab('payments')"
-          class="px-3 sm:px-5 py-3 text-xs sm:text-sm font-bold border-b-2 transition-colors whitespace-nowrap flex-shrink-0 relative"
-          [class.border-gold]="pageTab === 'payments'"
-          [class.text-gold]="pageTab === 'payments'"
-          [class.border-transparent]="pageTab !== 'payments'"
-          [class.theme-muted]="pageTab !== 'payments'">
-          Paiements
-          @if (pendingPayments.length > 0 && pageTab !== 'payments') {
-            <span class="absolute top-1.5 right-0.5 w-2 h-2 bg-gold rounded-full"></span>
-          }
         </button>
         <button type="button" (click)="setPageTab('delivery')"
           class="px-3 sm:px-5 py-3 text-xs sm:text-sm font-bold border-b-2 transition-colors whitespace-nowrap flex-shrink-0"
@@ -585,123 +565,6 @@
 
   } <!-- /pageTab === 'orders' -->
 
-  <!-- ════════ ONGLET PAIEMENTS ════════ -->
-  @if (pageTab === 'payments') {
-
-    @if (paymentsLoading) {
-      <div class="flex justify-center py-16">
-        <svg class="w-8 h-8 animate-spin text-gold" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-        </svg>
-      </div>
-    } @else if (pendingPayments.length === 0) {
-      <div class="luxury-card rounded-2xl p-12 text-center">
-        <svg class="w-12 h-12 text-green-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <p class="font-bold theme-text">Aucun paiement à valider</p>
-        <p class="text-sm theme-muted mt-1">Tous les paiements déclarés ont été traités.</p>
-      </div>
-    } @else {
-      <div class="space-y-4">
-        @for (order of pendingPayments; track order.id) {
-          <div class="luxury-card rounded-2xl p-5">
-            <div class="flex flex-col sm:flex-row sm:items-start gap-4">
-
-              <!-- Order info -->
-              <div class="flex-1 space-y-2">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-sm font-bold text-gold">{{ order.orderNumber }}</span>
-                  <span class="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/25">
-                    Paiement à valider
-                  </span>
-                </div>
-                <div class="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Montant</p>
-                    <p class="font-bold theme-text">{{ order.totalAmount | number:'1.0-0' }} FCFA</p>
-                  </div>
-                  <div>
-                    <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Référence Wave</p>
-                    <p class="font-semibold" [class]="order.paymentReference ? 'theme-text' : 'theme-muted italic'">
-                      {{ order.paymentReference || 'Non renseignée' }}
-                    </p>
-                  </div>
-                  <div>
-                    <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Livraison</p>
-                    <p class="text-xs theme-text truncate">{{ order.deliveryAddress }}</p>
-                  </div>
-                  <div>
-                    <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Date commande</p>
-                    <p class="text-xs theme-muted">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
-                  </div>
-                </div>
-                <!-- Items preview -->
-                <div class="text-xs theme-muted">
-                  @for (item of order.items; track item.productId; let last = $last) {
-                    <span>{{ item.productName }} ×{{ item.quantity }}{{ !last ? ', ' : '' }}</span>
-                  }
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex sm:flex-col gap-2 shrink-0">
-                <button (click)="validatePayment(order)"
-                  [disabled]="paymentActionId === order.id"
-                  class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-green-500/15 text-green-400
-                         border border-green-500/30 rounded-xl text-sm font-bold hover:bg-green-500/25 disabled:opacity-50 transition-all">
-                  @if (paymentActionId === order.id) {
-                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                  } @else {
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                  }
-                  Valider
-                </button>
-                <button (click)="openRejectModal(order)"
-                  [disabled]="paymentActionId === order.id"
-                  class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-500/10 text-red-400
-                         border border-red-500/25 rounded-xl text-sm font-bold hover:bg-red-500/20 disabled:opacity-50 transition-all">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                  </svg>
-                  Rejeter
-                </button>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-
-      <!-- Pagination -->
-      @if (paymentsTotalPages > 1) {
-        <div class="flex justify-center items-center gap-2 pt-4">
-          <button (click)="loadPendingPayments(paymentsPage - 1)" [disabled]="paymentsPage === 0"
-            class="px-4 py-2 luxury-card rounded-xl text-sm font-semibold theme-muted hover:text-gold disabled:opacity-30 transition-all">
-            ← Préc.
-          </button>
-          @for (p of paymentPages; track p) {
-            <button (click)="loadPendingPayments(p)"
-              class="w-9 h-9 rounded-xl text-sm font-bold transition-all"
-              [class]="paymentsPage === p ? 'bg-gold text-black' : 'luxury-card theme-muted hover:text-gold'">
-              {{ p + 1 }}
-            </button>
-          }
-          <button (click)="loadPendingPayments(paymentsPage + 1)" [disabled]="paymentsPage >= paymentsTotalPages - 1"
-            class="px-4 py-2 luxury-card rounded-xl text-sm font-semibold theme-muted hover:text-gold disabled:opacity-30 transition-all">
-            Suiv. →
-          </button>
-        </div>
-      }
-    }
-
-  } <!-- /pageTab === 'payments' -->
-
   <!-- ════════ ONGLET LIVRAISON ════════ -->
   @if (pageTab === 'delivery') {
 
@@ -930,43 +793,7 @@
 
     @if (!managerStatsLoading && managerStats) {
       <!-- KPI Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-
-        <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
-          <div class="w-11 h-11 bg-yellow-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <div>
-            <p class="text-2xl font-black theme-text">{{ managerStats.pendingPaymentsToValidate }}</p>
-            <p class="text-xs theme-muted font-semibold">En attente</p>
-          </div>
-        </div>
-
-        <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
-          <div class="w-11 h-11 bg-green-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <div>
-            <p class="text-2xl font-black theme-text">{{ managerStats.validatedPayments }}</p>
-            <p class="text-xs theme-muted font-semibold">Validés par moi</p>
-          </div>
-        </div>
-
-        <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
-          <div class="w-11 h-11 bg-red-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <div>
-            <p class="text-2xl font-black theme-text">{{ managerStats.rejectedPayments }}</p>
-            <p class="text-xs theme-muted font-semibold">Rejetés par moi</p>
-          </div>
-        </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
 
         <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
           <div class="w-11 h-11 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -980,19 +807,24 @@
           </div>
         </div>
 
+        <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
+          <div class="w-11 h-11 bg-blue-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-2xl font-black theme-text">{{ managerStats.totalOrders ?? '—' }}</p>
+            <p class="text-xs theme-muted font-semibold">Commandes</p>
+          </div>
+        </div>
+
       </div>
 
       <!-- Quick access -->
       <div class="luxury-card rounded-2xl p-6">
         <h3 class="text-sm font-bold theme-muted uppercase tracking-wider mb-4">Accès rapide</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <button (click)="setPageTab('payments')"
-            class="flex flex-col items-center gap-2 p-4 luxury-card rounded-xl hover:border-gold/50 transition-all border border-transparent">
-            <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-            </svg>
-            <span class="text-xs font-bold theme-text">Paiements</span>
-          </button>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <button (click)="setPageTab('orders')"
             class="flex flex-col items-center gap-2 p-4 luxury-card rounded-xl hover:border-gold/50 transition-all border border-transparent">
             <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1030,61 +862,6 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════
-     MODAL — MOTIF DE REJET
-════════════════════════════════════════════════════════ -->
-@if (rejectModalOpen) {
-  <div class="fixed inset-0 z-[55] flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="closeRejectModal()"></div>
-    <div class="relative w-full max-w-md luxury-card border theme-border rounded-2xl shadow-2xl p-6 space-y-5">
-
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-red-500/15 rounded-xl flex items-center justify-center">
-            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-black theme-text">Rejeter le paiement</h3>
-            <p class="text-xs theme-muted">{{ rejectingOrder?.orderNumber }}</p>
-          </div>
-        </div>
-        <button (click)="closeRejectModal()"
-          class="w-8 h-8 rounded-lg luxury-card theme-muted hover:theme-text flex items-center justify-center transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">
-          Motif de rejet <span class="text-red-400">*</span>
-        </label>
-        <textarea [(ngModel)]="rejectReason" rows="3"
-          placeholder="Ex: Référence Wave invalide, montant incorrect, paiement non reçu…"
-          class="theme-input w-full px-4 py-3 rounded-xl text-sm resize-none"></textarea>
-        <p class="text-xs theme-muted mt-1">Ce motif sera communiqué au client par email et notification.</p>
-      </div>
-
-      <div class="flex gap-3">
-        <button (click)="closeRejectModal()"
-          class="flex-1 py-2.5 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
-          Annuler
-        </button>
-        <button (click)="confirmRejectPayment()"
-          [disabled]="!rejectReason.trim()"
-          class="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-bold
-                 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 transition-all">
-          Confirmer le rejet
-        </button>
-      </div>
-
-    </div>
-  </div>
-}
-
-<!-- ═══════════════════════════════════════════════════════
      DRAWER — AJOUT / MODIFICATION
 ════════════════════════════════════════════════════════ -->
 @if (drawerOpen) {
@@ -1117,7 +894,7 @@
         <!-- Tabs (edit only) -->
         @if (editingProduct) {
           <div class="flex border-b theme-border px-6">
-            <button type="button" (click)="drawerTab = 'info'"
+            <button type="button" (click)="setDrawerTab('info')"
               class="py-3 px-1 mr-6 text-sm font-bold border-b-2 transition-colors"
               [class.border-gold]="drawerTab === 'info'"
               [class.text-gold]="drawerTab === 'info'"
@@ -1125,7 +902,7 @@
               [class.theme-muted]="drawerTab !== 'info'">
               Informations
             </button>
-            <button type="button" (click)="drawerTab = 'media'"
+            <button type="button" (click)="setDrawerTab('media')"
               class="py-3 px-1 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
               [class.border-gold]="drawerTab === 'media'"
               [class.text-gold]="drawerTab === 'media'"
@@ -1141,7 +918,7 @@
       </div>
 
       <!-- Scrollable form body -->
-      <div class="flex-1 overflow-y-auto overscroll-contain">
+      <div id="manager-drawer-body" class="flex-1 overflow-y-auto overscroll-contain">
 
         <!-- ── Onglet Médias ──────────────────────────────────────────────── -->
         @if (drawerTab === 'media' && editingProduct) {

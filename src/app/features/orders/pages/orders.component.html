@@ -195,14 +195,8 @@
                 </div>
               </div>
 
-              <!-- Statuts paiement + livraison -->
-              <div class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl px-4 py-3" style="background:rgba(255,255,255,0.04)">
-                  <p class="text-xs font-bold theme-muted mb-1.5">Paiement</p>
-                  <p class="text-sm font-bold" [class]="paymentClass(order.paymentStatus)">
-                    {{ paymentLabel(order.paymentStatus) }}
-                  </p>
-                </div>
+              <!-- Statut livraison -->
+              <div>
                 <div class="rounded-xl px-4 py-3" style="background:rgba(255,255,255,0.04)">
                   <p class="text-xs font-bold theme-muted mb-1.5">Livraison</p>
                   <p class="text-sm font-bold theme-text">{{ deliveryLabel(order.deliveryStatus) }}</p>
@@ -236,53 +230,6 @@
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
                       <p class="text-xs text-yellow-300 font-medium">En attente de validation de la commande par notre équipe. Le paiement sera disponible une fois la commande approuvée.</p>
-                    </div>
-                  }
-
-                  <!-- Paiement rejeté avec motif (APPROVED) -->
-                  @if (order.orderStatus === 'APPROVED' && order.paymentStatus === 'FAILED' && order.lastPaymentNote) {
-                    <div class="flex items-start gap-2 p-3 rounded-xl"
-                         style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">
-                      <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                      </svg>
-                      <div>
-                        <p class="text-xs font-bold text-red-400 mb-0.5">Paiement rejeté</p>
-                        <p class="text-xs text-red-300">{{ order.lastPaymentNote }}</p>
-                      </div>
-                    </div>
-                  }
-
-                  <!-- Payer button (uniquement si commande APPROVED et paiement pas encore soumis) -->
-                  @if (order.orderStatus === 'APPROVED' && (order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED')) {
-                    <button (click)="goToPayment(order.id)"
-                      class="flex items-center gap-2 px-4 py-2.5 bg-gold text-black text-sm font-bold rounded-xl hover:brightness-110 transition-all">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0zM6 7.5a.5.5 0 11-1 0 .5.5 0 011 0zm.5 8.5a.5.5 0 110-1 .5.5 0 010 1zm11-8a.5.5 0 110-1 .5.5 0 010 1z"/>
-                      </svg>
-                      {{ order.paymentStatus === 'FAILED' ? 'Soumettre à nouveau' : 'Payer via Wave' }}
-                    </button>
-                  }
-
-                  <!-- Paiement soumis, en attente de validation -->
-                  @if (order.orderStatus === 'APPROVED' && order.paymentStatus === 'SUBMITTED') {
-                    <div class="flex items-start gap-3 p-3 rounded-xl"
-                         style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)">
-                      <svg class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                      </svg>
-                      <div>
-                        <p class="text-xs text-blue-300 font-bold mb-0.5">En attente de validation</p>
-                        @if (order.paymentReference) {
-                          <p class="text-xs theme-muted">Référence : <span class="font-mono theme-text">{{ order.paymentReference }}</span></p>
-                        }
-                        <button (click)="goToPayment(order.id)" class="text-xs text-blue-400 underline mt-1 hover:text-blue-300 transition-colors">
-                          Voir le détail
-                        </button>
-                      </div>
                     </div>
                   }
 

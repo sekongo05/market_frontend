@@ -4,7 +4,6 @@ export * from './user.service';
 export * from './category.service';
 export * from './product.service';
 export * from './order.service';
-export * from './payment.service';
 export * from './delivery.service';
 export * from './notification.service';
 export * from './stock.service';

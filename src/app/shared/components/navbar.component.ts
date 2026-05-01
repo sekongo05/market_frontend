@@ -37,7 +37,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   mobileOpen         = false;
   scrolled           = false;
   cartItems: CartItem[] = [];
-  pendingPaymentCount = 0;
   notifications: NotificationResponse[] = [];
   notificationsLoading = false;
   selectedNotification: NotificationResponse | null = null;
@@ -127,23 +126,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(items => { this.cartItems = items; this.cdr.detectChanges(); });
 
-    this.authService.currentUser$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        if (user && user.role === 'CUSTOMER') {
-          this.orderService.refreshPendingCount();
-        } else {
-          this.orderService.clearPendingCount();
-        }
-      });
-
-    this.orderService.pendingPaymentCount$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(count => {
-        this.pendingPaymentCount = count;
-        this.cdr.detectChanges();
-      });
-
     if (this.currentUser) this.loadUnreadCount();
   }
 
@@ -161,6 +143,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.mobileOpen = false;
     document.body.style.overflow = this.showCart ? 'hidden' : '';
     if (this.showCart && !this.promosLoaded) this._loadActivePromos();
+    if (this.showCart) setTimeout(() => document.getElementById('cart-drawer-body')?.scrollTo(0, 0), 0);
   }
   toggleUserMenu():void { this.showUserMenu = !this.showUserMenu; this.showCart = false; this.showNotifications = false; }
   toggleMobile():  void { this.mobileOpen = !this.mobileOpen; this.showCart = false; this.showUserMenu = false; this.showNotifications = false; }
@@ -274,7 +257,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   logout(): void {
     const name = this.currentUser?.prenom ?? '';
-    this.orderService.clearPendingCount();
     this.authService.logout();
     this.closeAll();
     this.toastService.info(`À bientôt${name ? ' ' + name : ''} !`);
@@ -363,7 +345,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           setTimeout(() => {
             this.closeAll();
-            this.router.navigate(['/payment', res.data.id]);
+            this.router.navigate(['/orders']);
           }, 1200);
         } else {
           this.checkoutError = 'Erreur lors de la commande, veuillez réessayer';

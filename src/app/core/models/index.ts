@@ -3,7 +3,6 @@ export * from './user.models';
 export * from './product.models';
 export * from './category.models';
 export * from './order.models';
-export * from './payment.models';
 export * from './delivery.models';
 export * from './notification.models';
 export * from './stock.models';

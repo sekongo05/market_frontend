@@ -9,7 +9,6 @@ import {
 import { UserService } from '../../../core/services/user.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { OrderService } from '../../../core/services/order.service';
-import { PaymentService } from '../../../core/services/payment.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ProductMediaService } from '../../../core/services/product-media.service';
 import { DeliveryService } from '../../../core/services/delivery.service';
@@ -46,7 +45,7 @@ interface Toast { id: number; msg: string; type: 'success' | 'error'; }
 export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   // ── Tabs ───────────────────────────────────────────────────────────────────
-  activeTab: 'stats' | 'orders' | 'payments' | 'products' | 'delivery' | 'users' | 'categories' | 'promos' | 'reviews' | 'returns' = 'stats';
+  activeTab: 'stats' | 'orders' | 'products' | 'delivery' | 'users' | 'categories' | 'promos' | 'reviews' | 'returns' = 'stats';
 
   // ── Stats ──────────────────────────────────────────────────────────────────
   stats: DashboardStats | null = null;
@@ -79,16 +78,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     DELIVERED: null,
     CANCELLED: null,
   };
-
-  // ── Payments ───────────────────────────────────────────────────────────────
-  pendingPayments: OrderResponse[] = [];
-  paymentsLoading = false;
-  paymentsPage = 0;
-  paymentsTotalPages = 0;
-  paymentActionId: number | null = null;
-  rejectModalOpen = false;
-  rejectingOrder: OrderResponse | null = null;
-  rejectReason = '';
 
   // ── Products ───────────────────────────────────────────────────────────────
   products: ProductResponse[] = [];
@@ -213,7 +202,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private categoryService: CategoryService,
     private orderService: OrderService,
-    private paymentService: PaymentService,
     private productService: ProductService,
     private productMediaService: ProductMediaService,
     private deliveryService: DeliveryService,
@@ -244,7 +232,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   setTab(tab: typeof this.activeTab): void {
     this.activeTab = tab;
     if (tab === 'orders'   && this.allOrders.length === 0)      this.loadAllOrders();
-    if (tab === 'payments')                                       this.loadPendingPayments();
     if (tab === 'products' && this.products.length === 0)        { this.loadProducts(); this.loadProductCategories(); }
     if (tab === 'delivery' && this.deliveryOrders.length === 0)  this.loadDeliveryOrders();
     if (tab === 'users'    && this.users.length === 0)           this.loadUsers();
@@ -386,98 +373,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     return next ? `→ ${this.orderStatusLabel(next)}` : '';
   }
 
-  paymentLabel(s: string): string {
-    const m: Record<string, string> = {
-      PENDING: 'En attente', SUBMITTED: 'Soumis', COMPLETED: 'Payé',
-      FAILED: 'Échoué', EXPIRED: 'Expiré', REFUNDED: 'Remboursé',
-    };
-    return m[s] ?? s;
-  }
-
   get orderPages(): number[] { return Array.from({ length: this.ordersTotalPages }, (_, i) => i); }
-
-  // ── Payments ───────────────────────────────────────────────────────────────
-
-  loadPendingPayments(page = 0): void {
-    this.paymentsLoading = true;
-    this.paymentService.getPendingValidationOrders(page, 15).subscribe({
-      next: (r) => {
-        if (r.success) {
-          const pg = r.data as PageResponse<OrderResponse>;
-          this.pendingPayments = pg.content;
-          this.paymentsTotalPages = pg.totalPages;
-          this.paymentsPage = page;
-        }
-        this.paymentsLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => { this.paymentsLoading = false; this.cdr.detectChanges(); },
-    });
-  }
-
-  validatePayment(order: OrderResponse): void {
-    this.paymentActionId = order.id;
-    this.paymentService.validatePayment(order.id).subscribe({
-      next: (r) => {
-        if (r.success) {
-          this.pendingPayments = this.pendingPayments.filter(o => o.id !== order.id);
-          this.toast(`Paiement validé — Commande ${order.orderNumber} confirmée ✓`);
-          if (this.stats) this.loadStats();
-        }
-        this.paymentActionId = null;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.paymentActionId = null;
-        this.toast(err?.error?.message || 'Erreur lors de la validation', 'error');
-        this.cdr.detectChanges();
-      },
-    });
-  }
-
-  openRejectModal(order: OrderResponse): void {
-    this.rejectingOrder = order;
-    this.rejectReason = '';
-    this.rejectModalOpen = true;
-    document.body.style.overflow = 'hidden';
-    this.cdr.detectChanges();
-  }
-
-  closeRejectModal(): void {
-    this.rejectModalOpen = false;
-    this.rejectingOrder = null;
-    this.rejectReason = '';
-    document.body.style.overflow = '';
-    this.cdr.detectChanges();
-  }
-
-  confirmRejectPayment(): void {
-    if (!this.rejectingOrder || !this.rejectReason.trim()) return;
-    const order = this.rejectingOrder;
-    const reason = this.rejectReason.trim();
-    this.paymentActionId = order.id;
-    this.rejectModalOpen = false;
-    this.rejectingOrder = null;
-    this.rejectReason = '';
-    this.cdr.detectChanges();
-    this.paymentService.rejectPayment(order.id, reason).subscribe({
-      next: (r) => {
-        if (r.success) {
-          this.pendingPayments = this.pendingPayments.filter(o => o.id !== order.id);
-          this.toast(`Paiement rejeté — Commande ${order.orderNumber}`);
-        }
-        this.paymentActionId = null;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.paymentActionId = null;
-        this.toast(err?.error?.message || 'Erreur lors du rejet', 'error');
-        this.cdr.detectChanges();
-      },
-    });
-  }
-
-  get paymentPages(): number[] { return Array.from({ length: this.paymentsTotalPages }, (_, i) => i); }
 
   // ── Products ───────────────────────────────────────────────────────────────
 
@@ -530,6 +426,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.drawerOpen = true;
     document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
+    setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
   }
 
   openEditDrawer(product: ProductResponse): void {
@@ -542,6 +439,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     document.body.style.overflow = 'hidden';
     this.loadMedia(product.id);
     this.cdr.detectChanges();
+    setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
+  }
+
+  setDrawerTab(tab: 'info' | 'media'): void {
+    this.drawerTab = tab;
+    document.getElementById('admin-drawer-panel')?.scrollTo(0, 0);
   }
 
   closeDrawer(): void {
@@ -1208,7 +1111,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const growth = this.revenueGrowthPct;
     if (growth > 0) list.push({ type: 'success', icon: 'trending-up', message: `CA en hausse de +${growth}% ce mois`, detail: `vs ${this.formatAmount(this.stats.previousMonthRevenue)} le mois dernier` });
     else if (growth < 0) list.push({ type: 'warning', icon: 'trending-down', message: `CA en baisse de ${growth}% ce mois`, detail: `vs ${this.formatAmount(this.stats.previousMonthRevenue)} le mois dernier` });
-    if (this.stats.pendingPaymentsCount > 0) list.push({ type: 'action', icon: 'credit-card', message: `${this.stats.pendingPaymentsCount} paiement${this.stats.pendingPaymentsCount > 1 ? 's' : ''} à valider`, detail: 'Action requise — vérifier les références Wave' });
     if (this.stats.lowStockCount > 0) list.push({ type: 'warning', icon: 'alert', message: `${this.stats.lowStockCount} produit${this.stats.lowStockCount > 1 ? 's' : ''} en stock faible`, detail: 'Seuil critique : ≤ 5 unités restantes' });
     if (this.stats.newUsersThisMonth > 0) list.push({ type: 'info', icon: 'users', message: `${this.stats.newUsersThisMonth} nouvel${this.stats.newUsersThisMonth > 1 ? 'aux' : ''} utilisateur${this.stats.newUsersThisMonth > 1 ? 's' : ''} ce mois` });
     if (this.completionRate >= 80) list.push({ type: 'success', icon: 'check-circle', message: `Excellent taux de livraison : ${this.completionRate}%` });

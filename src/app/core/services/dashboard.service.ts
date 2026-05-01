@@ -9,7 +9,6 @@ export interface DashboardStats {
   totalOrders: number;
   completedOrdersCount: number;
   pendingOrders: number;
-  pendingPaymentsCount: number;
   newOrdersThisMonth: number;
   // Revenu (basé sur les paiements validés)
   totalRevenue: number;
@@ -61,7 +60,6 @@ export interface DailyCaisseResponse {
   date: string;
   ordersCount: number;
   paidOrdersCount: number;
-  pendingPaymentsCount: number;
   totalRevenue: number;
   pendingRevenue: number;
   newCustomersCount: number;

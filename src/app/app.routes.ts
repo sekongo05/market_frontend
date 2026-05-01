@@ -7,7 +7,6 @@ import { OrdersComponent } from './features/orders/pages';
 import { ProfileComponent } from './features/profile/pages';
 import { AdminDashboardComponent } from './features/admin/pages';
 import { ManagerComponent } from './features/manager/pages';
-import { PaymentPageComponent } from './features/payment/payment-page.component';
 import { HelpComponent } from './features/help/help.component';
 import { PrivacyComponent } from './features/privacy/privacy.component';
 import { AuthenticityComponent } from './features/authenticity/authenticity.component';
@@ -47,12 +46,7 @@ export const APP_ROUTES: Routes = [
         canActivate: [authGuard, roleGuard],
         data: { roles: [UserRole.MANAGER, UserRole.ADMIN] },
       },
-      {
-        path: 'payment/:orderId',
-        component: PaymentPageComponent,
-        canActivate: [authGuard],
-      },
-      { path: 'help', component: HelpComponent },
+{ path: 'help', component: HelpComponent },
       { path: 'privacy', component: PrivacyComponent },
       { path: 'authenticity', component: AuthenticityComponent },
       { path: 'returns', component: ReturnsComponent },
