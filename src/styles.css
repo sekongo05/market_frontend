@@ -1,9 +1,6 @@
 @import 'tailwindcss';
 @config '../tailwind.config.js';
 
-/* ─── Light variant (class-based, mirrors dark) ──────────────────────────── */
-@custom-variant light (&:where(.light, .light *));
-
 /* ─── Theme transition ────────────────────────────────────────────────────── */
 *, *::before, *::after {
   transition-property: background-color, border-color, color;
@@ -88,10 +85,6 @@
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-@keyframes drawerIn {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
-}
 @keyframes backdropIn {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -141,11 +134,6 @@
   animation: shimmer 1.5s infinite;
   border-radius: 6px;
 }
-html.light .skeleton {
-  background: linear-gradient(90deg, #ede9e3 25%, #e0dbd2 50%, #ede9e3 75%);
-  background-size: 800px 100%;
-  animation: shimmer 1.5s infinite;
-}
 
 /* ─── Gold text shine ────────────────────────────────────────────────────── */
 .gold-text {
@@ -161,17 +149,13 @@ html.light .skeleton {
 .bg-gold      { background: linear-gradient(135deg,#b8860b 0%,#d4af37 50%,#f0c93a 100%); }
 .bg-gold-dark { background: linear-gradient(135deg,#7a5c00 0%,#b8860b 50%,#d4af37 100%); }
 .border-gold  { border-color: #d4af37; }
-.text-gold               { color: #d4af37; }
-html.light .text-gold   { color: #a0720a; }
+.text-gold    { color: #d4af37; }
 
 /* ─── Luxury card ─────────────────────────────────────────────────────────── */
 .luxury-card {
+  background: linear-gradient(135deg,#191919 0%,#0f0f0f 100%);
   border: 1px solid rgba(212,175,55,.18);
   transition: border-color .3s, box-shadow .3s, transform .3s !important;
-}
-/* Dark explicit */
-html:not(.light) .luxury-card {
-  background: linear-gradient(135deg,#191919 0%,#0f0f0f 100%);
 }
 .luxury-card:hover {
   border-color: rgba(212,175,55,.55);
@@ -179,37 +163,17 @@ html:not(.light) .luxury-card {
   transform: translateY(-4px);
 }
 
-/* Light explicit */
-html.light .luxury-card {
-  background: #ffffff;
-  border: 1px solid rgba(168,128,30,.14);
-  box-shadow: 0 2px 20px rgba(0,0,0,.06);
-}
-html.light .luxury-card:hover {
-  border-color: rgba(184,134,11,.35);
-  box-shadow: 0 16px 40px rgba(168,128,30,.12);
-  transform: translateY(-4px);
-}
-
 /* ─── Card hover ─────────────────────────────────────────────────────────── */
 .card-hover { transition: transform .3s, box-shadow .3s !important; }
 .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,.18); }
-html.light .card-hover:hover { box-shadow: 0 20px 40px rgba(0,0,0,.10); }
 
 /* ─── Theme backgrounds ──────────────────────────────────────────────────── */
-html:not(.light) .theme-bg       { background: #0a0a0a; }
-html:not(.light) .theme-surface  { background: #131313; }
-html:not(.light) .theme-surface-2{ background: #1c1c1c; }
-html:not(.light) .theme-border   { border-color: rgba(255,255,255,.07); }
-html:not(.light) .theme-text     { color: #f1f1f1; }
-html:not(.light) .theme-muted    { color: #9ca3af; }
-
-html.light .theme-bg       { background: #faf8f4; }
-html.light .theme-surface  { background: #ffffff; }
-html.light .theme-surface-2{ background: #f3f0eb; }
-html.light .theme-border   { border-color: rgba(0,0,0,.08); }
-html.light .theme-text     { color: #111111; }
-html.light .theme-muted    { color: #6b7280; }
+.theme-bg        { background: #0a0a0a; }
+.theme-surface   { background: #131313; }
+.theme-surface-2 { background: #1c1c1c; }
+.theme-border    { border-color: rgba(255,255,255,.07); }
+.theme-text      { color: #f1f1f1; }
+.theme-muted     { color: #9ca3af; }
 
 /* ─── CSS custom properties ───────────────────────────────────────────────── */
 :root {
@@ -223,17 +187,16 @@ html {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden; /* propagated to the viewport — blocks horizontal scroll in all browsers incl. Safari iOS */
-  /* viewport-fit=cover: extend behind iPhone notch/Dynamic Island */
+  overflow-x: hidden;
   padding-top: env(safe-area-inset-top);
 }
 body {
-  overflow-x: clip; /* clip without creating a scroll container — position:sticky remains intact */
+  overflow-x: clip;
   max-width: 100vw;
 }
 app-root {
   display: block;
-  overflow-x: clip; /* extra safety layer */
+  overflow-x: clip;
 }
 
 /* ─── Touch action ────────────────────────────────────────────────────────── */
@@ -255,48 +218,32 @@ select {
 }
 
 /* ─── Body base ──────────────────────────────────────────────────────────── */
-html:not(.light) body { background: #0a0a0a; color: #f1f1f1; }
-html.light       body { background: #faf8f4; color: #111111; }
+html   { background: #0a0a0a; scroll-behavior: smooth; }
+body   { background: #0a0a0a; color: #f1f1f1; }
 
 /* ─── Theme input ────────────────────────────────────────────────────────── */
-html:not(.light) .theme-input {
+.theme-input {
   background: rgba(255,255,255,.06);
   border: 1px solid rgba(255,255,255,.10);
   color: #f1f1f1;
 }
-html:not(.light) .theme-input::placeholder { color: #6b7280; }
-html:not(.light) .theme-input:focus {
+.theme-input::placeholder { color: #6b7280; }
+.theme-input:focus {
   border-color: rgba(212,175,55,.50);
   box-shadow: 0 0 0 3px rgba(212,175,55,.12);
   outline: none;
 }
-html.light .theme-input {
-  background: #ffffff;
-  border: 1px solid rgba(0,0,0,.10);
-  color: #111111;
-}
-html.light .theme-input::placeholder { color: #9ca3af; }
-html.light .theme-input:focus {
-  border-color: rgba(168,128,30,.50);
-  box-shadow: 0 0 0 3px rgba(168,128,30,.10);
-  outline: none;
-}
 
 /* ─── Drop zone dashed border ────────────────────────────────────────────── */
-html:not(.light) .theme-drop-border { border-color: rgba(255,255,255,.15); }
-html.light       .theme-drop-border { border-color: rgba(0,0,0,.15); }
+.theme-drop-border { border-color: rgba(255,255,255,.15); }
 
 /* ─── Select option background ───────────────────────────────────────────── */
 .theme-option { background: #1a1a1a; color: #f1f1f1; }
-.light .theme-option { background: #ffffff; color: #111111; }
 
 /* ─── Dot grid ───────────────────────────────────────────────────────────── */
 .dot-grid {
   background-image: radial-gradient(circle, rgba(255,255,255,.07) 1px, transparent 1px);
   background-size: 28px 28px;
-}
-html.light .dot-grid {
-  background-image: radial-gradient(circle, rgba(0,0,0,.06) 1px, transparent 1px);
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────────── */
@@ -304,19 +251,8 @@ html.light .dot-grid {
 .scrollbar-none::-webkit-scrollbar { display: none; }
 
 ::-webkit-scrollbar { width: 5px; }
-html:not(.light) ::-webkit-scrollbar-track { background: #0d0d0d; }
-html:not(.light) ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
-html.light ::-webkit-scrollbar-track { background: #ede9e3; }
-html.light ::-webkit-scrollbar-thumb { background: #b8860b; border-radius: 3px; }
-
-/* ─── Smooth scroll ──────────────────────────────────────────────────────── */
-html { scroll-behavior: smooth; }
-
-/* ─── Body / html backgrounds ───────────────────────────────────────────── */
-body          { background: #0a0a0a; color: #f1f1f1; }
-html.dark     { background: #0a0a0a; }
-html.light    { background: #faf8f4; }
-html.light body { background: #faf8f4; color: #111111; }
+::-webkit-scrollbar-track { background: #0d0d0d; }
+::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
 
 /* ─── Navbar items (desktop) ─────────────────────────────────────────────── */
 .nav-item {
@@ -347,19 +283,9 @@ html.light body { background: #faf8f4; color: #111111; }
 .nav-item:hover { color: #d4af37; }
 .nav-item:hover::after { transform: translateX(-50%) scaleX(1); }
 
-.light .nav-item { color: #4b5563; }
-.light .nav-item:hover { color: #92700c; }
-
 /* Active state (routerLinkActive) */
-.nav-active {
-  color: #d4af37 !important;
-}
-.nav-active::after {
-  transform: translateX(-50%) scaleX(1) !important;
-}
-.light .nav-active {
-  color: #92700c !important;
-}
+.nav-active { color: #d4af37 !important; }
+.nav-active::after { transform: translateX(-50%) scaleX(1) !important; }
 
 /* ─── Navbar icon buttons ────────────────────────────────────────────────── */
 .nav-icon-btn {
@@ -374,11 +300,8 @@ html.light body { background: #faf8f4; color: #111111; }
   flex-shrink: 0;
 }
 .nav-icon-btn:hover { color: #b8941e; background: rgba(184,148,30,.10); }
-.light .nav-icon-btn { color: #6b7280; }
-.light .nav-icon-btn:hover { color: #92700c; background: rgba(146,112,12,.09); }
 
 .active-icon { color: #b8941e; background: rgba(184,148,30,.12); }
-.light .active-icon { color: #92700c; background: rgba(146,112,12,.10); }
 
 /* ─── Nav link (legacy) ──────────────────────────────────────────────────── */
 .nav-link {
@@ -390,8 +313,6 @@ html.light body { background: #faf8f4; color: #111111; }
   color: #9ca3af;
 }
 .nav-link:hover { color: #d4af37; background: rgba(255,255,255,.05); }
-.light .nav-link { color: #374151; }
-.light .nav-link:hover { color: #a0720a; background: rgba(0,0,0,.04); }
 
 /* ─── Mobile nav items ───────────────────────────────────────────────────── */
 .mobile-nav-item {
@@ -408,11 +329,8 @@ html.light body { background: #faf8f4; color: #111111; }
   text-decoration: none;
 }
 .mobile-nav-item:hover { color: #d4af37; background: rgba(255,255,255,.05); }
-.light .mobile-nav-item { color: #374151; }
-.light .mobile-nav-item:hover { color: #a0720a; background: rgba(0,0,0,.04); }
 
 .mobile-nav-active { color: #d4af37 !important; background: rgba(212,175,55,.10) !important; }
-.light .mobile-nav-active { color: #a0720a !important; background: rgba(160,114,10,.09) !important; }
 
 /* ─── Dropdown items ─────────────────────────────────────────────────────── */
 .dropdown-item {
@@ -429,8 +347,6 @@ html.light body { background: #faf8f4; color: #111111; }
   text-decoration: none;
 }
 .dropdown-item:hover { color: #e5e7eb; background: rgba(255,255,255,.06); }
-.light .dropdown-item { color: #374151; }
-.light .dropdown-item:hover { color: #111111; background: rgba(0,0,0,.04); }
 
 .dropdown-icon {
   display: flex;
@@ -443,17 +359,9 @@ html.light body { background: #faf8f4; color: #111111; }
   flex-shrink: 0;
   color: #9ca3af;
 }
-.light .dropdown-icon { background: rgba(0,0,0,.05); color: #6b7280; }
 .dropdown-item:hover .dropdown-icon { color: #d4af37; background: rgba(212,175,55,.12); }
-.light .dropdown-item:hover .dropdown-icon { color: #a0720a; background: rgba(160,114,10,.10); }
 
 /* ─── Notification body (HTML injected by backend) ──────────────────────── */
-/*
- * The backend generates notification bodies as HTML tables with hardcoded
- * light-mode inline styles. The NotifBodyPipe strips those inline styles and
- * adds semantic class names. These rules apply theme-aware visual styling.
- */
-
 .notif-body .notif-table {
   width: 100%;
   border-collapse: collapse;
@@ -462,48 +370,22 @@ html.light body { background: #faf8f4; color: #111111; }
   overflow: hidden;
 }
 
-/* Dark mode (default) */
-html:not(.light) .notif-body .notif-td {
+.notif-body .notif-td {
   padding: 9px 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #f1f1f1;
   font-size: 0.8125rem;
 }
-html:not(.light) .notif-body .notif-td-label {
+.notif-body .notif-td-label {
   background: rgba(255, 255, 255, 0.04);
   color: #9ca3af;
   font-weight: 400;
   width: 42%;
 }
 
-/* Light mode */
-html.light .notif-body .notif-td {
-  padding: 9px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.09);
-  color: #111111;
-  font-size: 0.8125rem;
-}
-html.light .notif-body .notif-td-label {
-  background: #f9fafb;
-  color: #6b7280;
-  font-weight: 400;
-  width: 42%;
-}
+.notif-body .notif-p-muted { color: #9ca3af; }
 
-/* Muted paragraphs */
-html:not(.light) .notif-body .notif-p-muted { color: #9ca3af; }
-html.light       .notif-body .notif-p-muted { color: #6b7280; }
-
-/* Generic paragraph spacing inside notif body */
 .notif-body p { margin: 0 0 10px; line-height: 1.6; }
 .notif-body p:last-child { margin-bottom: 0; }
 
-/* Keep badge spans (semantic colors like green/red) as-is */
 .notif-body span[style] { border-radius: 4px; }
-
-/* ─── Footer / layout overrides ─────────────────────────────────────────── */
-.light footer {
-  background: #f0ece4;
-  border-color: rgba(0,0,0,.07);
-  color: #6b7280;
-}

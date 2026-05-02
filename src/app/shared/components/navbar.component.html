@@ -9,12 +9,8 @@
 
   <nav class="backdrop-blur-xl transition-all duration-300"
        [ngClass]="scrolled
-         ? (themeService.isDark
-             ? 'bg-[#0a0a0a]/97 border-b border-white/8 shadow-[0_4px_24px_rgba(0,0,0,0.5)]'
-             : 'bg-white/97 border-b border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.07)]')
-         : (themeService.isDark
-             ? 'bg-[#0a0a0a]/85 border-b border-white/5'
-             : 'bg-white/90 border-b border-neutral-100')">
+         ? 'bg-[#0a0a0a]/97 border-b border-white/8 shadow-[0_4px_24px_rgba(0,0,0,0.5)]'
+         : 'bg-[#0a0a0a]/85 border-b border-white/5'">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-[72px] gap-6">
@@ -55,21 +51,6 @@
         <!-- ── ACTIONS (desktop) ── -->
         <div class="hidden lg:flex items-center gap-2">
 
-          <!-- Theme toggle -->
-          <button (click)="toggleTheme()" appTooltip="Changer le thème" tooltipPosition="bottom" class="nav-icon-btn">
-            @if (themeService.isDark) {
-              <svg class="w-[18px] h-[18px] no-transition animate-fade-in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-              </svg>
-            } @else {
-              <svg class="w-[18px] h-[18px] no-transition animate-fade-in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-              </svg>
-            }
-          </button>
-
           <!-- Cart (customers only) -->
           @if (!isManager) {
             <button (click)="toggleCart()" appTooltip="Mon panier" tooltipPosition="bottom" class="nav-icon-btn relative" [class.active-icon]="showCart">
@@ -88,8 +69,7 @@
           }
 
           <!-- Divider -->
-          <div class="w-px h-5 mx-1"
-               [style.background]="themeService.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)'"></div>
+          <div class="w-px h-5 mx-1" style="background:rgba(255,255,255,0.1)"></div>
 
           <!-- Guest -->
           @if (!currentUser) {
@@ -277,8 +257,7 @@
             <div class="relative" data-user-menu>
               <button (click)="toggleUserMenu()" appTooltip="Mon compte" tooltipPosition="bottom"
                 class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl border transition-all duration-200
-                       border-transparent hover:border-white/12 hover:bg-white/5
-                       light:hover:border-black/10 light:hover:bg-black/4"
+                       border-transparent hover:border-white/12 hover:bg-white/5"
                 [class.border-white/12]="showUserMenu"
                 [class.bg-white/5]="showUserMenu">
                 <!-- Avatar ring -->
@@ -288,11 +267,10 @@
                     {{ initials }}
                   </div>
                   <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full
-                               border-2 border-black light:border-white"></span>
+                               border-2 border-black"></span>
                 </div>
                 <div class="hidden xl:block text-left">
-                  <p class="text-xs font-bold leading-none mb-0.5
-                             text-white light:text-black">{{ fullName }}</p>
+                  <p class="text-xs font-bold leading-none mb-0.5 text-white">{{ fullName }}</p>
                   @if (currentUser.role !== 'CUSTOMER') {
                     <p class="text-xs leading-none" style="color:#d4af37">{{ currentUser.role }}</p>
                   }
@@ -308,20 +286,17 @@
               @if (showUserMenu) {
                 <div class="absolute right-0 mt-3 w-60 rounded-2xl overflow-hidden shadow-2xl animate-scale-in
                             border z-50"
-                     [style.background]="themeService.isDark ? '#111111' : '#ffffff'"
-                     [style.border-color]="themeService.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'">
+                     style="background:#111111;border-color:rgba(255,255,255,0.08)">
 
                   <!-- Profile card header -->
                   <div class="px-4 py-4 flex items-center gap-3"
-                       [style.background]="themeService.isDark ? 'rgba(212,175,55,0.05)' : 'rgba(212,175,55,0.06)'"
-                       [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)'">
+                       style="background:rgba(212,175,55,0.05);border-bottom:1px solid rgba(255,255,255,0.06)">
                     <div class="w-10 h-10 bg-gold rounded-xl flex items-center justify-center
                                 text-black font-black text-sm shadow-md shadow-yellow-600/20 flex-shrink-0">
                       {{ initials }}
                     </div>
                     <div class="min-w-0">
-                      <p class="font-bold text-sm truncate"
-                         [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ fullName }}</p>
+                      <p class="font-bold text-sm truncate" style="color:#ffffff">{{ fullName }}</p>
                       @if (currentUser.role !== 'CUSTOMER') {
                         <p class="text-[11px] font-semibold mt-0.5" style="color:#d4af37">{{ currentUser.role }}</p>
                       }
@@ -338,8 +313,7 @@
                         </svg>
                       </div>
                       <div>
-                        <p class="text-sm font-semibold"
-                           [style.color]="themeService.isDark ? '#e5e7eb' : '#111111'">Mon profil</p>
+                        <p class="text-sm font-semibold" style="color:#e5e7eb">Mon profil</p>
                         <p class="text-[11px]" style="color:#6b7280">Modifier mes informations</p>
                       </div>
                     </a>
@@ -353,8 +327,7 @@
                           </svg>
                         </div>
                         <div>
-                          <p class="text-sm font-semibold flex items-center gap-2"
-                             [style.color]="themeService.isDark ? '#e5e7eb' : '#111111'">
+                          <p class="text-sm font-semibold flex items-center gap-2" style="color:#e5e7eb">
   Mes commandes
 </p>
                           <p class="text-[11px]" style="color:#6b7280">Historique & suivi</p>
@@ -371,15 +344,13 @@
                           </svg>
                         </div>
                         <div>
-                          <p class="text-sm font-semibold"
-                             [style.color]="themeService.isDark ? '#e5e7eb' : '#111111'">Espace Gestion</p>
+                          <p class="text-sm font-semibold" style="color:#e5e7eb">Espace Gestion</p>
                           <p class="text-[11px]" style="color:#6b7280">Catalogue & stocks</p>
                         </div>
                       </a>
                     }
 
-                    <div class="h-px my-1 mx-2"
-                         [style.background]="themeService.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'"></div>
+                    <div class="h-px my-1 mx-2" style="background:rgba(255,255,255,0.06)"></div>
 
                     <button (click)="logout()"
                       class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm
@@ -552,17 +523,16 @@
           <!-- Hamburger -->
           <button (click)="toggleMobile()" appTooltip="Menu" tooltipPosition="bottom"
             class="w-11 h-11 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
-                   text-gray-400 hover:text-white hover:bg-white/5
-                   light:text-gray-600 light:hover:text-black light:hover:bg-black/5">
+                   text-gray-400 hover:text-white hover:bg-white/5">
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
-                  [style.background]="themeService.isDark ? '#9ca3af' : '#6b7280'"
+                  style="background:#9ca3af"
                   [style.transform]="mobileOpen ? 'translateY(6.5px) rotate(45deg)' : 'none'"></span>
             <span class="block h-[1.5px] rounded-full transition-all duration-300"
-                  [style.background]="themeService.isDark ? '#9ca3af' : '#6b7280'"
+                  style="background:#9ca3af"
                   [style.width]="mobileOpen ? '0' : '14px'"
                   [style.opacity]="mobileOpen ? '0' : '1'"></span>
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
-                  [style.background]="themeService.isDark ? '#9ca3af' : '#6b7280'"
+                  style="background:#9ca3af"
                   [style.transform]="mobileOpen ? 'translateY(-6.5px) rotate(-45deg)' : 'none'"></span>
           </button>
         </div>
@@ -578,17 +548,15 @@
 ══════════════════════════════════════════════════════ -->
 @if (mobileOpen) {
   <div class="fixed left-0 right-0 bottom-0 z-40 flex flex-col lg:hidden overflow-y-auto overscroll-contain"
-       [style.background]="themeService.isDark ? '#0a0a0a' : '#faf8f3'"
-       style="top: calc(env(safe-area-inset-top, 0px) + var(--navbar-h)); padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); animation: drawerIn .22s cubic-bezier(.22,1,.36,1);">
+       style="background:#0a0a0a;top: calc(env(safe-area-inset-top, 0px) + var(--navbar-h)); padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); animation: drawerIn .22s cubic-bezier(.22,1,.36,1);">
 
     <!-- Barre de séparation + bouton fermer -->
     <div class="flex items-center justify-between px-5 py-3 border-b"
-         [style.border-color]="themeService.isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'">
+         style="border-color:rgba(255,255,255,0.07)">
       <p class="text-xs font-bold uppercase tracking-widest" style="color:#b8941e;">Menu</p>
       <button (click)="closeAll()"
         class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-        [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'"
-        [style.background]="themeService.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'">
+        style="color:#9ca3af;background:rgba(255,255,255,0.05)">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
         </svg>
@@ -600,17 +568,14 @@
     @if (currentUser) {
       <div class="px-5 pt-6 pb-4">
         <div class="flex items-center gap-4 px-4 py-4 rounded-2xl"
-             [style.background]="themeService.isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.08)'"
-             style="border:1px solid rgba(212,175,55,0.18)">
+             style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.18)">
           <div class="w-12 h-12 bg-gold rounded-2xl flex items-center justify-center
                       text-black font-black text-base shadow-md shadow-yellow-600/20 flex-shrink-0">
             {{ initials }}
           </div>
           <div class="flex-1 min-w-0">
-            <p class="font-bold truncate"
-               [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ fullName }}</p>
-            <p class="text-xs mt-0.5"
-               [style.color]="themeService.isDark ? '#6b7280' : '#9ca3af'">
+            <p class="font-bold truncate" style="color:#ffffff">{{ fullName }}</p>
+            <p class="text-xs mt-0.5" style="color:#6b7280">
               @if (currentUser.role !== 'CUSTOMER') {
                 <span style="color:#d4af37">{{ currentUser.role }}</span>
               } @else {
@@ -691,33 +656,14 @@
       }
 
       <!-- Divider -->
-      <div class="h-px my-4"
-           [style.background]="themeService.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'"></div>
-
-      <!-- Theme toggle -->
-      <button (click)="toggleTheme()" class="mobile-nav-item w-full text-left">
-        @if (themeService.isDark) {
-          <svg class="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-          </svg>
-          Thème clair
-        } @else {
-          <svg class="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-          </svg>
-          Thème sombre
-        }
-      </button>
+      <div class="h-px my-4" style="background:rgba(255,255,255,0.06)"></div>
 
       <!-- Auth buttons (non connecté) -->
       @if (!currentUser) {
         <div class="pt-4 flex flex-col gap-3">
           <a routerLink="/auth/login" (click)="closeAll()"
              class="flex items-center justify-center py-3.5 rounded-2xl text-sm font-semibold border transition-colors
-                    border-white/10 text-gray-300 hover:bg-white/5
-                    light:border-black/10 light:text-gray-700 light:hover:bg-black/5">
+                    border-white/10 text-gray-300 hover:bg-white/5">
             Connexion
           </a>
           <a routerLink="/auth/register" (click)="closeAll()"
@@ -758,12 +704,11 @@
 
   <!-- Drawer -->
   <div class="fixed top-0 right-0 h-full w-full max-w-[440px] z-50 flex flex-col animate-drawer-in"
-       [style.background]="themeService.isDark ? '#111111' : '#faf8f3'"
-       style="box-shadow:-20px 0 60px rgba(0,0,0,0.5)">
+       style="background:#111111;box-shadow:-20px 0 60px rgba(0,0,0,0.5)">
 
     <!-- ── EN-TÊTE ── -->
     <div class="flex-shrink-0 flex items-center justify-between px-5 py-4"
-         [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.07)'">
+         style="border-bottom:1px solid rgba(255,255,255,0.06)">
       <div class="flex items-center gap-3">
         <!-- Icône panier -->
         <div class="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -773,8 +718,7 @@
           </svg>
         </div>
         <div>
-          <h2 class="text-base font-black tracking-tight leading-none"
-              [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Mon panier</h2>
+          <h2 class="text-base font-black tracking-tight leading-none" style="color:#ffffff">Mon panier</h2>
           <p class="text-xs mt-0.5 font-medium" style="color:#d4af37">
             @if (cartCount > 0) { {{ cartCount }} article{{ cartCount > 1 ? 's' : '' }} }
             @else { Vide }
@@ -790,8 +734,7 @@
         }
         <button (click)="showCart = false"
           class="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-150
-                 text-gray-500 hover:text-white hover:bg-white/10
-                 light:hover:text-black light:hover:bg-black/8">
+                 text-gray-500 hover:text-white hover:bg-white/10">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -805,16 +748,14 @@
       @if (cartItems.length === 0) {
         <div class="flex flex-col items-center justify-center h-full py-12 text-center animate-fade-in">
           <div class="w-20 h-20 rounded-3xl flex items-center justify-center mb-5"
-               [style.background]="themeService.isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.10)'"
-               style="border:1px solid rgba(212,175,55,0.15)">
+               style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.15)">
             <svg class="w-9 h-9 animate-float" style="color:rgba(212,175,55,0.45)"
                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
           </div>
-          <p class="font-bold text-base mb-2"
-             [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Panier vide</p>
+          <p class="font-bold text-base mb-2" style="color:#ffffff">Panier vide</p>
           <p class="text-sm leading-relaxed max-w-[200px] mb-7" style="color:#6b7280">
             Explorez la boutique et ajoutez vos articles préférés
           </p>
@@ -828,8 +769,7 @@
 
       @for (item of cartItems; track item.productId; let i = $index) {
         <div class="group relative rounded-2xl p-4 transition-all duration-200 animate-fade-in"
-             [style.background]="themeService.isDark ? 'rgba(255,255,255,0.03)' : '#ffffff'"
-             [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)'">
+             style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
           <div class="flex gap-4">
             <!-- Image -->
             <div class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden"
@@ -842,25 +782,23 @@
             </div>
             <!-- Infos -->
             <div class="flex-1 min-w-0">
-              <p class="font-bold text-sm leading-snug mb-1 pr-7 line-clamp-2"
-                 [style.color]="themeService.isDark ? '#f0f0f0' : '#111111'">{{ item.productName }}</p>
+              <p class="font-bold text-sm leading-snug mb-1 pr-7 line-clamp-2" style="color:#f0f0f0">{{ item.productName }}</p>
               <p class="text-xs font-semibold mb-3" style="color:#d4af37">
                 {{ (item.price / 1000) | number:'1.0-0' }}&thinsp;000 FCFA / unité
               </p>
               <div class="flex items-center justify-between">
                 <!-- Contrôle quantité -->
                 <div class="flex items-center rounded-xl overflow-hidden"
-                     [style.background]="themeService.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'">
+                     style="background:rgba(255,255,255,0.08)">
                   <button (click)="cartService.updateQuantity(item.productId, item.quantity - 1)"
                     class="w-11 h-11 flex items-center justify-center text-lg font-light transition-colors
-                           hover:bg-white/10 light:hover:bg-black/8"
-                    [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">−</button>
-                  <span class="w-8 text-center text-sm font-black"
-                        [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ item.quantity }}</span>
+                           hover:bg-white/10"
+                    style="color:#9ca3af">−</button>
+                  <span class="w-8 text-center text-sm font-black" style="color:#ffffff">{{ item.quantity }}</span>
                   <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1)"
                     class="w-11 h-11 flex items-center justify-center text-lg font-light transition-colors
-                           hover:bg-white/10 light:hover:bg-black/8"
-                    [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">+</button>
+                           hover:bg-white/10"
+                    style="color:#9ca3af">+</button>
                 </div>
                 <!-- Sous-total ligne -->
                 <p class="text-sm font-black" style="color:#d4af37">
@@ -884,8 +822,7 @@
 
     <!-- ── CONTINUER LES ACHATS ── -->
     @if (cartItems.length > 0) {
-      <div class="flex-shrink-0 px-5 py-2"
-           [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.05)'">
+      <div class="flex-shrink-0 px-5 py-2" style="border-top:1px solid rgba(255,255,255,0.04)">
         <button (click)="showCart = false" routerLink="/products"
           class="text-xs font-semibold transition-colors text-gray-500 hover:text-gold flex items-center gap-1.5">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -899,17 +836,14 @@
     <!-- ── RÉCAP + COMMANDE (fixé en bas) ── -->
     @if (cartItems.length > 0) {
       <div class="flex-shrink-0 px-5 pt-5 space-y-4"
-           style="padding-bottom: max(1.25rem, env(safe-area-inset-bottom))"
-           [style.background]="themeService.isDark ? '#0c0c0c' : '#f0ece0'"
-           [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.08)'">
+           style="padding-bottom: max(1.25rem, env(safe-area-inset-bottom));background:#0c0c0c;border-top:1px solid rgba(255,255,255,0.07)">
 
         <!-- Totaux -->
         @if (!showCheckout) {
           <div class="space-y-2">
             <div class="flex items-center justify-between text-sm">
               <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
-              <span class="font-semibold"
-                    [style.color]="themeService.isDark ? '#d1d5db' : '#374151'">
+              <span class="font-semibold" style="color:#d1d5db">
                 {{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K FCFA
               </span>
             </div>
@@ -919,7 +853,7 @@
             </div>
             <div class="h-px my-1" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.35),transparent)"></div>
             <div class="flex items-center justify-between">
-              <span class="font-bold text-sm" [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Total</span>
+              <span class="font-bold text-sm" style="color:#ffffff">Total</span>
               <div class="flex items-baseline gap-1">
                 <span class="text-2xl font-black gold-text">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K</span>
                 <span class="text-xs" style="color:#6b7280">FCFA</span>
@@ -987,18 +921,16 @@
             <div class="space-y-3">
               <!-- Mini récap -->
               <div class="rounded-xl overflow-hidden"
-                   [style.background]="themeService.isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)'"
-                   [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.07)'">
+                   style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
                 @for (item of cartItems; track item.productId) {
                   <div class="flex items-center justify-between px-3 py-2 text-xs"
-                       [style.border-bottom]="themeService.isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.05)'">
-                    <span class="truncate max-w-[180px]"
-                          [style.color]="themeService.isDark ? '#d1d5db' : '#374151'">{{ item.productName }}</span>
+                       style="border-bottom:1px solid rgba(255,255,255,0.04)">
+                    <span class="truncate max-w-[180px]" style="color:#d1d5db">{{ item.productName }}</span>
                     <span class="font-bold ml-2 flex-shrink-0" style="color:#d4af37">×{{ item.quantity }}</span>
                   </div>
                 }
                 <div class="flex items-center justify-between px-3 py-2 text-xs font-black">
-                  <span [style.color]="themeService.isDark ? '#ffffff' : '#111111'">Total</span>
+                  <span style="color:#ffffff">Total</span>
                   <span style="color:#d4af37">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K FCFA</span>
                 </div>
               </div>
@@ -1132,8 +1064,7 @@
         }
 
         <!-- Garanties -->
-        <div class="flex items-center justify-between pt-2"
-             [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.06)'">
+        <div class="flex items-center justify-between pt-2" style="border-top:1px solid rgba(255,255,255,0.05)">
           <div class="flex items-center gap-1.5 text-xs" style="color:#6b7280">
             <svg class="w-3.5 h-3.5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>

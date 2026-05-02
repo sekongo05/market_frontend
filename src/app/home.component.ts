@@ -44,7 +44,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     {
       n: '03',
       title: 'Recevez chez vous',
-      desc: '24–48h à Abidjan, 72h max partout en Côte d\'Ivoire. Paiement à la livraison.',
+      desc: '24–48h à Abidjan, 72h max partout en Côte d\'Ivoire. Paiement à la livraison à Abidjan. Pour l’intérieur du pays, 50% à payer avant expédition.',
       icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
     },
   ];

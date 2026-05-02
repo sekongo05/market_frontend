@@ -138,7 +138,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  toggleTheme():   void { this.themeService.toggle(); this.cdr.detectChanges(); }
   toggleCart():    void {
     this.showCart = !this.showCart;
     this.showUserMenu = false;
