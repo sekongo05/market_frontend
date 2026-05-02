@@ -170,7 +170,7 @@
                         </span>
                       </div>
                       <!-- Corps de la notification -->
-                      <div class="max-h-[420px] overflow-y-auto p-5">
+                      <div class="max-h-[420px] overflow-y-auto overscroll-contain p-5">
                         <div class="notif-body rounded-xl border p-4 break-words text-sm theme-text leading-relaxed"
                              [ngClass]="[tpl.borderClass, tpl.bannerClass]"
                              [innerHTML]="selectedNotification.body | notifBody">
@@ -577,7 +577,7 @@
      MOBILE MENU — FULL-SCREEN OVERLAY (below navbar)
 ══════════════════════════════════════════════════════ -->
 @if (mobileOpen) {
-  <div class="fixed left-0 right-0 bottom-0 z-40 flex flex-col lg:hidden overflow-y-auto"
+  <div class="fixed left-0 right-0 bottom-0 z-40 flex flex-col lg:hidden overflow-y-auto overscroll-contain"
        [style.background]="themeService.isDark ? '#0a0a0a' : '#faf8f3'"
        style="top: calc(env(safe-area-inset-top, 0px) + var(--navbar-h)); padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); animation: drawerIn .22s cubic-bezier(.22,1,.36,1);">
 
@@ -800,7 +800,7 @@
     </div>
 
     <!-- ── LISTE ARTICLES (flex-1 scrollable) ── -->
-    <div id="cart-drawer-body" class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+    <div id="cart-drawer-body" class="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-3">
 
       @if (cartItems.length === 0) {
         <div class="flex flex-col items-center justify-center h-full py-12 text-center animate-fade-in">
