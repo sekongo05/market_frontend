@@ -109,6 +109,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.showNotifications && !target.closest('[data-notif-panel]')) {
       this.showNotifications = false;
       this.selectedNotification = null;
+      this._syncBodyScroll();
       this.cdr.detectChanges();
     }
     if (this.showUserMenu && !target.closest('[data-user-menu]')) {
@@ -146,8 +147,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.showCart) setTimeout(() => document.getElementById('cart-drawer-body')?.scrollTo(0, 0), 0);
   }
   toggleUserMenu():void { this.showUserMenu = !this.showUserMenu; this.showCart = false; this.showNotifications = false; }
-  toggleMobile():  void { this.mobileOpen = !this.mobileOpen; this.showCart = false; this.showUserMenu = false; this.showNotifications = false; }
-  closeAll():      void { this.showCart = false; this.showUserMenu = false; this.showNotifications = false; this.mobileOpen = false; document.body.style.overflow = ''; this._resetCheckout(); }
+  toggleMobile():  void {
+    this.mobileOpen = !this.mobileOpen;
+    this.showCart = false; this.showUserMenu = false; this.showNotifications = false;
+    this._syncBodyScroll();
+  }
+  closeAll():      void {
+    this.showCart = false; this.showUserMenu = false;
+    this.showNotifications = false; this.mobileOpen = false;
+    document.body.style.overflow = '';
+    this._resetCheckout();
+  }
 
   toggleNotifications(): void {
     this.showNotifications = !this.showNotifications;
@@ -157,7 +167,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.showNotifications && this.notifications.length === 0) {
       this.loadNotifications();
     }
+    this._syncBodyScroll();
     this.cdr.detectChanges();
+  }
+
+  private _syncBodyScroll(): void {
+    const locked = this.showCart || this.mobileOpen || this.showNotifications;
+    document.body.style.overflow = locked ? 'hidden' : '';
   }
 
   loadNotifications(): void {

@@ -234,6 +234,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    document.body.style.overflow = '';
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -274,6 +275,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.uploadError = null;
     this.initForm();
     this.showModal = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
@@ -290,11 +292,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.uploadError = null;
     this.initForm(product);
     this.showModal = true;
+    document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
 
   closeModal(): void {
     this.showModal = false;
+    document.body.style.overflow = '';
     this.editingProduct = null;
     this.modalError = null;
     this.modalSuccess = null;
