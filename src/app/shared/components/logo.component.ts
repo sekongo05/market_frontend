@@ -14,8 +14,8 @@ import { CommonModule } from '@angular/common';
         </div>
         <span class="font-black tracking-tight leading-none ml-[0.22em]" style="color:#111111">STORE</span>
       </div>
-      <!-- Séparateur + Slogan -->
-      <div class="flex flex-col justify-center border-l border-[#b8941e]/40 pl-3">
+      <!-- Séparateur + Slogan — masqué sur mobile -->
+      <div class="hidden sm:flex flex-col justify-center border-l border-[#b8941e]/40 pl-3">
         <span class="text-[10px] font-semibold tracking-widest uppercase leading-none"
               style="color:#b8941e">L'excellence</span>
         <span class="text-[10px] font-semibold tracking-widest uppercase leading-none mt-0.5" style="color:#6b7280">à prix juste</span>

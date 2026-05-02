@@ -184,11 +184,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initForm();
-    const slugParam = this.route.snapshot.queryParamMap.get('categorie');
+    const slugParam   = this.route.snapshot.queryParamMap.get('categorie');
+    const searchParam = this.route.snapshot.queryParamMap.get('search');
     if (slugParam) {
       this.pendingCategorySlug = slugParam;
-      // loadProducts sera déclenché par loadCategories une fois le slug résolu
       this.loading = true;
+    } else if (searchParam) {
+      this.searchQuery = searchParam;
+      this.loadProducts();
     } else {
       this.loadProducts();
     }

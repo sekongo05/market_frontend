@@ -35,8 +35,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showUserMenu       = false;
   showCart           = false;
   showNotifications  = false;
-  mobileOpen         = false;
-  scrolled           = false;
+  mobileOpen          = false;
+  mobileSearchOpen    = false;
+  mobileSearchQuery   = '';
+  scrolled            = false;
   cartItems: CartItem[] = [];
   notifications: NotificationResponse[] = [];
   notificationsLoading = false;
@@ -100,6 +102,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.mobileSearchOpen) { this.mobileSearchOpen = false; this.mobileSearchQuery = ''; return; }
     if (this.showCart || this.showUserMenu || this.showNotifications || this.mobileOpen) {
       this.closeAll();
     }
@@ -156,8 +159,24 @@ export class NavbarComponent implements OnInit, OnDestroy {
   closeAll():      void {
     this.showCart = false; this.showUserMenu = false;
     this.showNotifications = false; this.mobileOpen = false;
+    this.mobileSearchOpen = false; this.mobileSearchQuery = '';
     this.scrollLock.forceUnlock();
     this._resetCheckout();
+  }
+
+  toggleMobileSearch(): void {
+    this.mobileSearchOpen = !this.mobileSearchOpen;
+    if (!this.mobileSearchOpen) { this.mobileSearchQuery = ''; return; }
+    this.showCart = false; this.showNotifications = false; this.mobileOpen = false;
+    this._syncBodyScroll();
+  }
+
+  submitMobileSearch(): void {
+    const q = this.mobileSearchQuery.trim();
+    this.mobileSearchOpen = false;
+    this.mobileSearchQuery = '';
+    if (q) this.router.navigate(['/products'], { queryParams: { search: q } });
+    else   this.router.navigate(['/products']);
   }
 
   toggleNotifications(): void {

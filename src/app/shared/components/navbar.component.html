@@ -13,7 +13,7 @@
          : 'bg-white/90 border-b border-neutral-100'">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-[72px] gap-6">
+      <div class="flex items-center justify-between h-[72px] gap-0 sm:gap-6">
 
         <!-- ── LOGO ── -->
         <a href="/"
@@ -372,19 +372,35 @@
         </div>
 
         <!-- ── MOBILE ACTIONS ── -->
-        <div class="flex lg:hidden items-center gap-1.5">
+        <div class="flex lg:hidden items-center gap-0.5">
+
+          <!-- Bouton recherche -->
+          <button (click)="toggleMobileSearch()"
+            class="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0"
+            [class]="mobileSearchOpen ? 'text-[#92700c] bg-[rgba(146,112,12,.10)]' : 'text-gray-500 hover:text-[#92700c] hover:bg-[rgba(146,112,12,.09)]'">
+            @if (mobileSearchOpen) {
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            } @else {
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+              </svg>
+            }
+          </button>
+
           <!-- Cart (customers only) -->
           @if (!isManager) {
-            <button (click)="toggleCart()" appTooltip="Mon panier" tooltipPosition="bottom" class="nav-icon-btn relative">
+            <button (click)="toggleCart()" class="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 relative text-gray-500 hover:text-[#92700c] hover:bg-[rgba(146,112,12,.09)]">
               <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
               </svg>
               @if (cartCount > 0) {
-                <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
-                             bg-gold text-black text-[10px] font-black rounded-full
+                <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-0.5
+                             bg-gold text-black text-[9px] font-black rounded-full
                              flex items-center justify-center leading-none">
-                  {{ cartCount }}
+                  {{ cartCount > 9 ? '9+' : cartCount }}
                 </span>
               }
             </button>
@@ -393,7 +409,7 @@
           <!-- Notifications (mobile, logged-in only) -->
           @if (currentUser) {
             <div class="relative" data-notif-panel>
-              <button (click)="toggleNotifications()" appTooltip="Notifications" tooltipPosition="bottom" class="nav-icon-btn relative">
+              <button (click)="toggleNotifications()" class="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 relative text-gray-500 hover:text-[#92700c] hover:bg-[rgba(146,112,12,.09)]">
                 <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -521,9 +537,9 @@
           }
 
           <!-- Hamburger -->
-          <button (click)="toggleMobile()" appTooltip="Menu" tooltipPosition="bottom"
-            class="w-11 h-11 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
-                   text-gray-500 hover:text-gray-700 hover:bg-black/5">
+          <button (click)="toggleMobile()"
+            class="w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
+                   text-gray-500 hover:text-gray-700 hover:bg-black/5 flex-shrink-0">
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
                   style="background:#6b7280"
                   [style.transform]="mobileOpen ? 'translateY(6.5px) rotate(45deg)' : 'none'"></span>
@@ -539,6 +555,45 @@
 
       </div>
     </div>
+
+    <!-- ── Barre de recherche mobile (expandable) ── -->
+    @if (mobileSearchOpen) {
+      <div class="lg:hidden border-t theme-border animate-fade-in-down">
+        <div class="max-w-7xl mx-auto px-4 py-2.5">
+          <div class="relative flex items-center gap-2">
+            <div class="relative flex-1">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+                   style="color:#9ca3af" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+              </svg>
+              <input
+                autofocus
+                type="search"
+                [(ngModel)]="mobileSearchQuery"
+                (keyup.enter)="submitMobileSearch()"
+                placeholder="Rechercher un article…"
+                class="theme-input w-full pl-10 pr-10 py-2.5 rounded-xl text-sm transition-all duration-200 focus:ring-2 focus:ring-gold/40"/>
+              @if (mobileSearchQuery) {
+                <button (click)="mobileSearchQuery = ''"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center
+                         rounded-full bg-black/[.07] hover:bg-black/[.12] text-gray-500 transition-all">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              }
+            </div>
+            <button (click)="submitMobileSearch()" [disabled]="!mobileSearchQuery.trim()"
+              class="flex-shrink-0 px-4 py-2.5 rounded-xl text-sm font-bold text-black transition-all
+                     disabled:opacity-40 disabled:cursor-not-allowed"
+              style="background:#d4af37">
+              Chercher
+            </button>
+          </div>
+        </div>
+      </div>
+    }
 
   </nav>
 </header>
