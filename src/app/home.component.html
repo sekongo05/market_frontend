@@ -6,7 +6,7 @@
   <section class="relative h-[100dvh] flex flex-col justify-end overflow-hidden">
 
     <!-- Image de fond -->
-    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&q=85"
+    <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=1600&q=85"
          alt="Hero"
          class="absolute inset-0 w-full h-full object-cover object-center"
          fetchpriority="high"/>
@@ -25,14 +25,14 @@
       </p>
 
       <h1 class="font-black leading-[0.9] tracking-tight text-white mb-5 sm:mb-7">
-        <span class="block text-[15vw] sm:text-[10vw] lg:text-[8vw] xl:text-[7vw]">STYLE</span>
+        <span class="block text-[15vw] sm:text-[10vw] lg:text-[8vw] xl:text-[7vw]">L'ART</span>
         <span class="block text-[15vw] sm:text-[10vw] lg:text-[8vw] xl:text-[7vw]"
-              style="color:#d4af37;">SANS</span>
-        <span class="block text-[15vw] sm:text-[10vw] lg:text-[8vw] xl:text-[7vw]">LIMITES.</span>
+              style="color:#d4af37;">DU</span>
+        <span class="block text-[15vw] sm:text-[10vw] lg:text-[8vw] xl:text-[7vw]">TEMPS.</span>
       </h1>
 
       <p class="text-white/65 text-sm sm:text-base mb-8 sm:mb-10 max-w-xs sm:max-w-sm leading-relaxed">
-        Mode, montres, beauté &amp; lifestyle — livraison rapide partout en Côte d'Ivoire.
+        Montres &amp; bijoux de prestige — livraison rapide partout en Côte d'Ivoire.
       </p>
 
       <div class="flex flex-col sm:flex-row gap-3">
@@ -97,10 +97,10 @@
     <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-0.5 px-0.5">
 
       @for (cat of [
-        { slug: 'mode',     label: 'Mode',            sub: 'Femme · Homme',       img: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&q=80' },
         { slug: 'montres',  label: 'Montres',          sub: 'Notre spécialité',    img: 'https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=700&q=80' },
-        { slug: 'beaute',   label: 'Beauté',           sub: 'Soins · Parfums',     img: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80' },
-        { slug: 'maison',   label: 'Maison',           sub: 'Déco · Lifestyle',    img: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=700&q=80' }
+        { slug: 'bijoux',   label: 'Bijoux',           sub: 'Or · Argent · Luxe',  img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=700&q=80' },
+        { slug: 'mode',     label: 'Mode',             sub: 'Femme · Homme',       img: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&q=80' },
+        { slug: 'beaute',   label: 'Beauté',           sub: 'Soins · Parfums',     img: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80' }
       ]; track cat.slug) {
         <a (click)="goToCategory(cat.slug)"
            class="group relative overflow-hidden cursor-pointer block"
@@ -231,10 +231,10 @@
        BANNIÈRE ÉDITORIALE — image large style magazine
   ════════════════════════════════════════════════════ -->
   <section class="relative overflow-hidden scroll-reveal" style="height: clamp(400px, 65vw, 640px);">
-    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600&q=85"
+    <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1600&q=85"
          alt="Editorial"
          loading="lazy"
-         class="absolute inset-0 w-full h-full object-cover object-[center_25%]"/>
+         class="absolute inset-0 w-full h-full object-cover object-[center_40%]"/>
     <div class="absolute inset-0"
          style="background: linear-gradient(105deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);">
     </div>
@@ -243,7 +243,7 @@
          style="color:rgba(212,175,55,0.85);">Édition limitée</p>
       <h2 class="text-white font-black leading-[0.9] tracking-tight mb-6
                  text-[11vw] sm:text-[7vw] lg:text-[6vw] max-w-lg">
-        LA MODE<br>VOUS ATTEND.
+        L'ÉLÉGANCE<br>EST UN CHOIX.
       </h2>
       <a routerLink="/products"
          class="self-start inline-flex items-center gap-3 px-6 py-3.5 font-black text-xs uppercase tracking-widest text-black transition-all hover:-translate-y-0.5"

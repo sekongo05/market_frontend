@@ -215,7 +215,7 @@
     <ng-template #productCard let-product="product" let-i="i">
       <div class="group luxury-card rounded-3xl overflow-hidden animate-fade-in-up"
            [style.animation-delay]="(i % 8 * 0.07) + 's'">
-        <div (click)="openProductView(product)" class="cursor-pointer relative overflow-hidden aspect-[3/4]">
+        <div (click)="openProductView(product)" class="cursor-pointer relative overflow-hidden aspect-square">
           <img [src]="product.imageUrl | mediaUrl" [alt]="product.name"
                loading="lazy"
                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -253,7 +253,6 @@
         <div (click)="openProductView(product)" class="cursor-pointer p-3 sm:p-4 pb-0">
           <p class="text-[10px] sm:text-xs text-gold font-semibold uppercase tracking-wider mb-0.5 truncate">{{ product.category.name }}</p>
           <h3 class="font-bold theme-text text-xs sm:text-sm leading-tight truncate mb-1">{{ product.name }}</h3>
-          <p class="hidden sm:block text-xs theme-muted line-clamp-2 mb-2">{{ product.description }}</p>
         </div>
         <div class="px-3 sm:px-4 pb-3 sm:pb-4 flex items-center justify-between mt-1 sm:mt-0">
           <div>
