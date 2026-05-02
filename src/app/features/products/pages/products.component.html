@@ -107,7 +107,7 @@
     <div class="theme-surface border-b theme-border animate-fade-in-down">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex flex-wrap items-end gap-3">
-          <div class="flex items-center gap-2 flex-1 min-w-[220px]">
+          <div class="flex items-center gap-2 flex-1 min-w-0">
             <div class="flex-1">
               <p class="text-xs font-bold theme-muted mb-1">Prix min (FCFA)</p>
               <input type="number" [(ngModel)]="minPriceInput" placeholder="0"
@@ -327,7 +327,7 @@
                 </span>
               }
               @if (isManager) {
-                <div class="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div class="absolute top-3 right-3 flex gap-1.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">
                   <button (click)="$event.stopPropagation(); openEditModal(product)"
                     appTooltip="Modifier ce produit" tooltipPosition="bottom"
                     class="w-8 h-8 bg-black/70 border border-yellow-600/40 text-yellow-400 rounded-lg flex items-center justify-center hover:bg-yellow-600/20 transition-colors">
@@ -425,7 +425,7 @@
 <!-- ===== PANNEAU PLEINE PAGE — DÉTAIL PRODUIT ===== -->
 @if (selectedProduct) {
   <div id="product-view-panel" class="fixed left-0 right-0 bottom-0 z-40 overflow-y-auto overscroll-contain theme-bg animate-fade-in"
-       style="top: 75px">
+       style="top: var(--navbar-h); padding-bottom: max(2rem, env(safe-area-inset-bottom))">
 
     <!-- Barre de navigation interne -->
     <div class="sticky top-0 z-10 theme-surface border-b theme-border backdrop-blur-xl">
@@ -450,7 +450,7 @@
         <!-- Galerie images -->
         <div>
           <!-- Visionneuse principale -->
-          <div class="relative rounded-3xl overflow-hidden aspect-square max-h-[520px] mb-4">
+          <div class="relative rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square max-h-[520px] mb-4">
 
             <!-- Flèche gauche -->
             @if (viewGallery.length > 1) {
@@ -571,13 +571,13 @@
               <div class="flex items-center border theme-border rounded-xl overflow-hidden">
                 <button (click)="selectedProductQty = selectedProductQty > 1 ? selectedProductQty - 1 : 1"
                   appTooltip="Diminuer la quantité" tooltipPosition="top"
-                  class="w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-gold/5 transition-colors">
+                  class="w-11 h-11 flex items-center justify-center theme-muted hover:text-gold hover:bg-gold/5 transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
                 </button>
                 <span class="w-10 text-center font-bold theme-text text-sm">{{ selectedProductQty }}</span>
                 <button (click)="selectedProductQty = selectedProductQty < selectedProduct.stock ? selectedProductQty + 1 : selectedProductQty"
                   appTooltip="Augmenter la quantité" tooltipPosition="top"
-                  class="w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-gold/5 transition-colors"
+                  class="w-11 h-11 flex items-center justify-center theme-muted hover:text-gold hover:bg-gold/5 transition-colors"
                   [disabled]="selectedProductQty >= selectedProduct.stock">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 </button>

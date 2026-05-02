@@ -438,7 +438,7 @@
               <!-- Notification panel (mobile — fixed to viewport, never overflows) -->
               @if (showNotifications) {
                 <div class="fixed right-4 w-[calc(100vw-2rem)] max-w-[420px] theme-surface border theme-border rounded-2xl shadow-2xl z-[55] overflow-hidden"
-                     style="top: 80px;">
+                     style="top: calc(var(--navbar-h) + 8px); max-height: calc(100dvh - var(--navbar-h) - 1.5rem)">
                   <!-- réutilise le même contenu que desktop -->
                   @if (selectedNotification) {
                     @let tplM = getTemplate(selectedNotification.type);
@@ -579,7 +579,7 @@
 @if (mobileOpen) {
   <div class="fixed left-0 right-0 bottom-0 z-40 flex flex-col lg:hidden overflow-y-auto"
        [style.background]="themeService.isDark ? '#0a0a0a' : '#faf8f3'"
-       style="top: calc(env(safe-area-inset-top, 0px) + 75px); padding-bottom: env(safe-area-inset-bottom, 0px); animation: drawerIn .22s cubic-bezier(.22,1,.36,1);">
+       style="top: calc(env(safe-area-inset-top, 0px) + var(--navbar-h)); padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); animation: drawerIn .22s cubic-bezier(.22,1,.36,1);">
 
     <!-- Barre de séparation + bouton fermer -->
     <div class="flex items-center justify-between px-5 py-3 border-b"
@@ -829,8 +829,7 @@
       @for (item of cartItems; track item.productId; let i = $index) {
         <div class="group relative rounded-2xl p-4 transition-all duration-200 animate-fade-in"
              [style.background]="themeService.isDark ? 'rgba(255,255,255,0.03)' : '#ffffff'"
-             [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)'"
-             [style.animation-delay]="(i * 0.05) + 's'">
+             [style.border]="themeService.isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)'">
           <div class="flex gap-4">
             <!-- Image -->
             <div class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden"
@@ -853,13 +852,13 @@
                 <div class="flex items-center rounded-xl overflow-hidden"
                      [style.background]="themeService.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'">
                   <button (click)="cartService.updateQuantity(item.productId, item.quantity - 1)"
-                    class="w-8 h-8 flex items-center justify-center text-lg font-light transition-colors
+                    class="w-11 h-11 flex items-center justify-center text-lg font-light transition-colors
                            hover:bg-white/10 light:hover:bg-black/8"
                     [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">−</button>
                   <span class="w-8 text-center text-sm font-black"
                         [style.color]="themeService.isDark ? '#ffffff' : '#111111'">{{ item.quantity }}</span>
                   <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1)"
-                    class="w-8 h-8 flex items-center justify-center text-lg font-light transition-colors
+                    class="w-11 h-11 flex items-center justify-center text-lg font-light transition-colors
                            hover:bg-white/10 light:hover:bg-black/8"
                     [style.color]="themeService.isDark ? '#9ca3af' : '#6b7280'">+</button>
                 </div>
@@ -899,7 +898,8 @@
 
     <!-- ── RÉCAP + COMMANDE (fixé en bas) ── -->
     @if (cartItems.length > 0) {
-      <div class="flex-shrink-0 px-5 py-5 space-y-4"
+      <div class="flex-shrink-0 px-5 pt-5 space-y-4"
+           style="padding-bottom: max(1.25rem, env(safe-area-inset-bottom))"
            [style.background]="themeService.isDark ? '#0c0c0c' : '#f0ece0'"
            [style.border-top]="themeService.isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.08)'">
 

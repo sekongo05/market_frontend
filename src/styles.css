@@ -211,6 +211,13 @@ html.light .theme-border   { border-color: rgba(0,0,0,.08); }
 html.light .theme-text     { color: #111111; }
 html.light .theme-muted    { color: #6b7280; }
 
+/* ─── CSS custom properties ───────────────────────────────────────────────── */
+:root {
+  --navbar-h: 75px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* ─── Typography ─────────────────────────────────────────────────────────── */
 html {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -227,6 +234,24 @@ body {
 app-root {
   display: block;
   overflow-x: clip; /* extra safety layer */
+}
+
+/* ─── Touch action ────────────────────────────────────────────────────────── */
+button, a, [role="button"],
+input[type="checkbox"], input[type="radio"],
+select {
+  touch-action: manipulation;
+}
+
+/* ─── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scroll-reveal { opacity: 1; transform: none; }
+  .marquee-track { animation: none; }
 }
 
 /* ─── Body base ──────────────────────────────────────────────────────────── */
