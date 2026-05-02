@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { ProductService } from '../../../core/services/product.service';
@@ -19,7 +19,7 @@ import { ScrollLockService } from '../../../core/services/scroll-lock.service';
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, NgTemplateOutlet, FormsModule, ReactiveFormsModule, TooltipDirective, MediaUrlPipe],
+  imports: [CommonModule, NgTemplateOutlet, FormsModule, ReactiveFormsModule, RouterLink, TooltipDirective, MediaUrlPipe],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })
