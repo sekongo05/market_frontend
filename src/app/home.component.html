@@ -1,151 +1,205 @@
 <div class="theme-bg">
 
   <!-- ════════════════════════════════════════════════════
-       HERO — plein écran, image de fond, texte en bas
+       HERO — texte gauche / image droite (desktop)
+             image plein écran + texte bas (mobile)
   ════════════════════════════════════════════════════ -->
-  <section class="relative h-[100dvh] flex flex-col justify-end overflow-hidden">
+  <section class="relative min-h-screen overflow-hidden">
 
-    <!-- Image de fond -->
-    <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=1600&q=85"
-         alt="Hero"
-         class="absolute inset-0 w-full h-full object-cover object-center"
+    <!-- Image de fond (mobile = full bg / desktop = moitié droite) -->
+    <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1600&q=90"
+         alt="Montre de prestige SDM Store"
+         class="absolute inset-0 w-full h-full object-cover object-center lg:object-right lg:left-[42%] lg:right-0 lg:w-auto"
+         style="object-position: center center;"
          fetchpriority="high"/>
 
-    <!-- Dégradé -->
-    <div class="absolute inset-0"
-         style="background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.15) 100%);">
-    </div>
+    <!-- Mobile : dégradé bas vers noir -->
+    <div class="absolute inset-0 lg:hidden"
+         style="background:linear-gradient(to top,rgba(5,5,5,0.98) 0%,rgba(5,5,5,0.6) 40%,rgba(5,5,5,0.05) 100%)"></div>
+
+    <!-- Desktop : panneau noir gauche 42% + fondu de liaison -->
+    <div class="hidden lg:block absolute inset-0"
+         style="background:linear-gradient(to right,#080808 0%,#080808 40%,rgba(8,8,8,0.85) 48%,transparent 58%)"></div>
 
     <!-- Contenu -->
-    <div class="relative px-5 sm:px-10 lg:px-16 pb-14 sm:pb-20 lg:pb-24 animate-fade-in-up">
+    <div class="relative z-10 min-h-screen flex flex-col justify-end lg:justify-center
+                px-7 sm:px-12 lg:px-16 xl:px-24
+                pb-16 pt-28 sm:pt-36 lg:pb-0 lg:pt-0 lg:max-w-[50%]
+                animate-fade-in-up">
 
-      <p class="text-[10px] sm:text-xs uppercase tracking-[0.45em] font-bold mb-4 sm:mb-5"
-         style="color: rgba(212,175,55,0.9);">
-        Collection 2026 · Côte d'Ivoire
+      <!-- Filet doré (desktop uniquement) -->
+      <div class="hidden lg:block w-8 h-[1px] mb-14" style="background:#d4af37;"></div>
+
+      <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-6 sm:mb-8"
+         style="color:rgba(212,175,55,0.7);">
+        Maison de la montre · Abidjan, Côte d'Ivoire
       </p>
 
-      <h1 class="font-black leading-[0.9] tracking-tight text-white mb-5 sm:mb-7">
-        <span class="block text-[15vw] sm:text-[10vw] lg:text-[8vw] xl:text-[7vw]">L'ART</span>
-        <span class="block text-[15vw] sm:text-[10vw] lg:text-[8vw] xl:text-[7vw]"
-              style="color:#d4af37;">DU</span>
-        <span class="block text-[15vw] sm:text-[10vw] lg:text-[8vw] xl:text-[7vw]">TEMPS.</span>
+      <h1 class="font-black leading-[0.85] tracking-tight text-white mb-8 sm:mb-10">
+        <span class="block" style="font-size:clamp(3.8rem,13vw,7rem);">L'HEURE</span>
+        <span class="block" style="font-size:clamp(3.8rem,13vw,7rem);color:#d4af37;">DU</span>
+        <span class="block" style="font-size:clamp(3.8rem,13vw,7rem);">PRESTIGE.</span>
       </h1>
 
-      <p class="text-white/65 text-sm sm:text-base mb-8 sm:mb-10 max-w-xs sm:max-w-sm leading-relaxed">
-        Montres &amp; bijoux de prestige — livraison rapide partout en Côte d'Ivoire.
+      <p class="max-w-xs leading-relaxed mb-10 sm:mb-12"
+         style="color:rgba(255,255,255,0.42);font-size:0.875rem;">
+        Montres &amp; bijoux d'exception, sélectionnés pour vous et livrés partout en Côte d'Ivoire.
       </p>
 
       <div class="flex flex-col sm:flex-row gap-3">
         <a routerLink="/products"
-           class="inline-flex items-center justify-center gap-3 px-7 py-4 font-black text-xs sm:text-sm uppercase tracking-widest text-black transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
-           style="background:#d4af37; box-shadow: 0 8px 32px rgba(212,175,55,0.35);">
-          Découvrir la boutique
+           class="inline-flex items-center gap-3 px-7 py-4 text-xs uppercase tracking-[0.2em] font-black text-black
+                  hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
+           style="background:#d4af37;">
+          Découvrir la collection
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
           </svg>
         </a>
         @if (!(currentUser$ | async)) {
           <a routerLink="/auth/register"
-             class="inline-flex items-center justify-center px-7 py-4 font-bold text-xs sm:text-sm uppercase tracking-widest text-white border border-white/30 hover:bg-white/10 transition-all duration-300">
+             class="inline-flex items-center justify-center px-7 py-4 text-xs uppercase tracking-[0.2em] font-bold
+                    border hover:border-white/30 hover:text-white/80 transition-all duration-300"
+             style="color:rgba(255,255,255,0.5);border-color:rgba(255,255,255,0.15);">
             Créer un compte
           </a>
         }
       </div>
+
+      <!-- Signature (desktop) -->
+      <div class="hidden lg:flex items-center gap-5 mt-auto pt-20"
+           style="color:rgba(255,255,255,0.18);">
+        <span class="text-[8px] uppercase tracking-[0.5em]">Est. 2020</span>
+        <div class="w-6 h-[1px]" style="background:rgba(255,255,255,0.12)"></div>
+        <span class="text-[8px] uppercase tracking-[0.5em]">Abidjan · CI</span>
+      </div>
+
     </div>
 
     <!-- Indicateur scroll -->
-    <div class="absolute bottom-7 right-6 flex flex-col items-center gap-2">
-      <div class="w-[1px] h-10 bg-gradient-to-b from-white/50 to-transparent animate-float"></div>
+    <div class="absolute bottom-7 right-6 hidden lg:flex flex-col items-center gap-1.5">
+      <div class="w-[1px] h-10 bg-gradient-to-b from-white/40 to-transparent animate-float"></div>
     </div>
   </section>
 
 
   <!-- ════════════════════════════════════════════════════
-       TICKER
+       BANDE SIGNATURE
   ════════════════════════════════════════════════════ -->
-  <div class="border-y overflow-hidden py-3.5" style="border-color: rgba(212,175,55,0.2);">
-    <div class="marquee-track">
-      @for (i of [1,2,3,4,5,6,7,8]; track i) {
-        <span class="flex items-center gap-8 mx-10 text-[10px] font-black uppercase tracking-[0.25em] theme-muted whitespace-nowrap">
-          <span class="w-1 h-1 rounded-full flex-shrink-0" style="background:#d4af37;"></span>
-          Montres &amp; Bijoux
-          <span class="w-1 h-1 rounded-full flex-shrink-0" style="background:#d4af37;"></span>
-          Mode &amp; Accessoires
-          <span class="w-1 h-1 rounded-full flex-shrink-0" style="background:#d4af37;"></span>
-          Beauté &amp; Parfums
-          <span class="w-1 h-1 rounded-full flex-shrink-0" style="background:#d4af37;"></span>
-          Livraison 24–48h
-          <span class="w-1 h-1 rounded-full flex-shrink-0" style="background:#d4af37;"></span>
-          Paiement à la livraison
-        </span>
-      }
-    </div>
+  <div class="border-y flex items-center justify-center gap-5 sm:gap-10 py-4 px-6 overflow-hidden"
+       style="border-color:rgba(212,175,55,0.12);">
+    @for (item of ['Montres de prestige', 'Bijoux & Or', 'Livraison 24–48h', 'Paiement à la livraison']; track item) {
+      <span class="flex items-center gap-5 sm:gap-10 text-[9px] sm:text-[10px] uppercase tracking-[0.35em] font-bold whitespace-nowrap"
+            style="color:rgba(212,175,55,0.45);">
+        {{ item }}
+        <span class="w-1 h-1 rounded-full flex-shrink-0 last:hidden" style="background:rgba(212,175,55,0.3)"></span>
+      </span>
+    }
   </div>
 
 
   <!-- ════════════════════════════════════════════════════
-       CATÉGORIES — tuiles plein-largeur, empilées mobile
+       NOS COLLECTIONS — layout éditorial asymétrique
   ════════════════════════════════════════════════════ -->
-  <section class="py-16 sm:py-24 scroll-reveal">
+  <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;">
 
-    <div class="px-5 sm:px-8 lg:px-12 mb-8 sm:mb-12">
-      <p class="text-[10px] uppercase tracking-[0.4em] font-bold mb-2" style="color:#d4af37;">Nos univers</p>
-      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black theme-text tracking-tight">Explorer</h2>
+    <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14">
+      <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-3"
+         style="color:rgba(212,175,55,0.65);">Explorer nos univers</p>
+      <h2 class="font-black theme-text tracking-tight leading-none"
+          style="font-size:clamp(2.4rem,7vw,5.5rem);">NOS COLLECTIONS</h2>
     </div>
 
-    <!-- 2 colonnes mobile, 2×2 desktop -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-0.5 px-0.5">
+    <!-- Grille : Montres (grande) | Bijoux + Mode (empilées) -->
+    <div class="flex flex-col lg:flex-row gap-1 px-1">
 
-      @for (cat of [
-        { slug: 'montres',  label: 'Montres',          sub: 'Notre spécialité',    img: 'https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=700&q=80' },
-        { slug: 'bijoux',   label: 'Bijoux',           sub: 'Or · Argent · Luxe',  img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=700&q=80' },
-        { slug: 'mode',     label: 'Mode',             sub: 'Femme · Homme',       img: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&q=80' },
-        { slug: 'beaute',   label: 'Beauté',           sub: 'Soins · Parfums',     img: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80' }
-      ]; track cat.slug) {
-        <a (click)="goToCategory(cat.slug)"
-           class="group relative overflow-hidden cursor-pointer block"
-           style="aspect-ratio: 3/4">
-          <img [src]="cat.img" [alt]="cat.label"
-               loading="lazy"
-               class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent
-                      group-hover:from-black/70 transition-all duration-500"></div>
-          <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-            <p class="text-white font-black text-base sm:text-xl uppercase tracking-tight leading-tight">{{ cat.label }}</p>
-            <p class="text-white/55 text-[10px] sm:text-xs mt-0.5 font-medium">{{ cat.sub }}</p>
-            <div class="mt-3 h-[1.5px] transition-all duration-500 w-4 group-hover:w-10"
+      <!-- Montres — héro large -->
+      <a (click)="goToCategory('montres')"
+         class="group relative overflow-hidden cursor-pointer block lg:flex-[58]"
+         style="height:clamp(260px,58vw,680px);">
+        <img src="https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=900&q=85"
+             alt="Montres" loading="lazy"
+             class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-1000 ease-out"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-9">
+          <p class="text-[8px] uppercase tracking-[0.55em] font-bold mb-3"
+             style="color:rgba(212,175,55,0.75);">Notre spécialité</p>
+          <h3 class="text-white font-black tracking-tight leading-none mb-4"
+              style="font-size:clamp(2rem,5vw,4rem);">MONTRES</h3>
+          <div class="flex items-center gap-4">
+            <div class="h-[1px] w-8 transition-all duration-700 group-hover:w-20"
+                 style="background:#d4af37;"></div>
+            <span class="text-[9px] uppercase tracking-[0.4em] transition-opacity duration-500 opacity-50 group-hover:opacity-100"
+                  style="color:#d4af37;">Explorer →</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Colonne droite : Bijoux + Mode -->
+      <div class="flex flex-row lg:flex-col gap-1 lg:flex-[42]">
+
+        <a (click)="goToCategory('bijoux')"
+           class="group relative overflow-hidden cursor-pointer block flex-1 h-[42vw] lg:h-0 lg:flex-1">
+          <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=700&q=85"
+               alt="Bijoux" loading="lazy"
+               class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-1000 ease-out"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+            <p class="text-[8px] uppercase tracking-[0.5em] font-bold mb-1.5"
+               style="color:rgba(212,175,55,0.7);">Or · Argent · Luxe</p>
+            <h3 class="text-white font-black tracking-tight leading-none mb-2.5"
+                style="font-size:clamp(1.4rem,3.5vw,2.2rem);">BIJOUX</h3>
+            <div class="h-[1px] w-5 transition-all duration-700 group-hover:w-12"
                  style="background:#d4af37;"></div>
           </div>
         </a>
-      }
 
+        <a (click)="goToCategory('mode')"
+           class="group relative overflow-hidden cursor-pointer block flex-1 h-[42vw] lg:h-0 lg:flex-1">
+          <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&q=85"
+               alt="Mode" loading="lazy"
+               class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-1000 ease-out"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+            <p class="text-[8px] uppercase tracking-[0.5em] font-bold mb-1.5"
+               style="color:rgba(212,175,55,0.7);">Femme · Homme</p>
+            <h3 class="text-white font-black tracking-tight leading-none mb-2.5"
+                style="font-size:clamp(1.4rem,3.5vw,2.2rem);">MODE</h3>
+            <div class="h-[1px] w-5 transition-all duration-700 group-hover:w-12"
+                 style="background:#d4af37;"></div>
+          </div>
+        </a>
+
+      </div>
     </div>
   </section>
 
 
   <!-- ════════════════════════════════════════════════════
-       NOUVEAUTÉS — produits depuis l'API
+       NOUVELLES PIÈCES
   ════════════════════════════════════════════════════ -->
-  <section class="pb-16 sm:pb-24 scroll-reveal">
+  <section class="scroll-reveal" style="padding-bottom:clamp(60px,8vw,110px);">
 
-    <!-- En-tête -->
-    <div class="px-5 sm:px-8 lg:px-12 mb-8 flex items-end justify-between">
+    <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
       <div>
-        <p class="text-[10px] uppercase tracking-[0.4em] font-bold mb-2" style="color:#d4af37;">Vient d'arriver</p>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black theme-text tracking-tight">Nouveautés</h2>
+        <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-3"
+           style="color:rgba(212,175,55,0.65);">Vient d'arriver</p>
+        <h2 class="font-black theme-text tracking-tight leading-none"
+            style="font-size:clamp(2.4rem,7vw,5.5rem);">NOUVEAUTÉS</h2>
       </div>
       <a routerLink="/products"
-         class="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] theme-muted hover:text-gold transition-colors pb-0.5 border-b border-current">
+         class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
+         style="color:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.2);">
         Tout voir
       </a>
     </div>
 
-    <!-- Skeleton chargement -->
+    <!-- Skeleton -->
     @if (newProductsLoading) {
-      <div class="flex gap-3 overflow-x-auto px-5 sm:px-8 scrollbar-none sm:grid sm:grid-cols-4 lg:grid-cols-4">
+      <div class="flex gap-3 overflow-x-auto px-5 sm:px-8 scrollbar-none sm:grid sm:grid-cols-4">
         @for (i of [1,2,3,4]; track i) {
-          <div class="flex-shrink-0 w-[58vw] sm:w-auto">
-            <div class="skeleton aspect-[3/4] mb-3"></div>
+          <div class="flex-shrink-0 w-[60vw] sm:w-auto">
+            <div class="skeleton aspect-[3/4] mb-3 rounded"></div>
             <div class="skeleton h-3 w-3/4 mb-2 rounded"></div>
             <div class="skeleton h-3 w-1/2 rounded"></div>
           </div>
@@ -153,70 +207,55 @@
       </div>
     }
 
-    <!-- Grille produits -->
+    <!-- Produits -->
     @if (!newProductsLoading && newProducts.length > 0) {
-      <!-- Mobile: scroll horizontal / Desktop: grid 4 colonnes -->
       <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
                   sm:grid sm:grid-cols-3 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
         @for (product of newProducts; track product.id) {
           <a [routerLink]="['/products']" [queryParams]="{categorie: product.category?.slug}"
-             class="group flex-shrink-0 w-[58vw] sm:w-auto cursor-pointer">
+             class="group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block">
 
-            <!-- Image -->
-            <div class="relative overflow-hidden mb-3" style="aspect-ratio: 3/4">
-              <img [src]="product.imageUrl | mediaUrl"
-                   [alt]="product.name"
-                   loading="lazy"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-600 ease-out"
-                   (error)="$any($event.target).src='https://placehold.co/400x533/1a1a1a/d4af37?text=SDM'"/>
-              <!-- Badge réduction -->
+            <div class="relative overflow-hidden mb-3 rounded" style="aspect-ratio:3/4;">
+              <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+                   class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+                   (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
               @if (product.discountPercent && product.discountPercent > 0) {
-                <span class="absolute top-3 left-3 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 tracking-wider uppercase">
+                <span class="absolute top-2.5 left-2.5 bg-orange-500 text-white text-[9px] font-black px-2 py-0.5 tracking-wider uppercase">
                   −{{ product.discountPercent }}%
                 </span>
               }
-              <!-- Badge épuisé -->
               @if (product.stock === 0) {
-                <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <span class="text-white/80 text-[10px] font-black uppercase tracking-widest">Épuisé</span>
+                <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                  <span class="text-white/70 text-[10px] font-black uppercase tracking-widest">Épuisé</span>
                 </div>
               }
             </div>
 
-            <!-- Infos -->
-            <p class="text-[9px] sm:text-[10px] uppercase tracking-[0.25em] font-bold mb-1"
-               style="color:#d4af37;">
-              {{ product.category?.name }}
-            </p>
-            <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-1.5 line-clamp-2">
+            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1"
+               style="color:rgba(212,175,55,0.7);">{{ product.category?.name }}</p>
+            <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">
               {{ product.name }}
             </p>
-            <div class="flex items-baseline gap-2">
+            <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                <span class="font-black text-sm sm:text-base" style="color:#d4af37;">
-                  {{ (product.salePrice / 1000) | number:'1.0-0' }}K
-                </span>
-                <span class="text-xs theme-muted line-through">
-                  {{ (product.price / 1000) | number:'1.0-0' }}K
-                </span>
+                <span class="font-black text-sm sm:text-base text-orange-400">{{ (product.salePrice / 1000) | number:'1.0-0' }}K</span>
+                <span class="text-xs theme-muted line-through">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
               } @else {
-                <span class="font-black text-sm sm:text-base theme-text">
-                  {{ (product.price / 1000) | number:'1.0-0' }}K
-                </span>
+                <span class="font-black text-sm sm:text-base theme-text">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
               }
-              <span class="text-[9px] theme-muted font-medium">FCFA</span>
+              <span class="text-[9px] theme-muted">FCFA</span>
             </div>
-
           </a>
         }
       </div>
     }
 
-    <!-- CTA si pas de produits -->
     @if (!newProductsLoading && newProducts.length === 0) {
       <div class="px-5 sm:px-8">
         <a routerLink="/products"
-           class="inline-flex items-center gap-3 px-6 py-3.5 border theme-border theme-muted font-bold text-xs uppercase tracking-widest hover:text-gold hover:border-gold/40 transition-all">
+           class="inline-flex items-center gap-3 px-6 py-3.5 border font-bold text-xs uppercase tracking-[0.2em] transition-all hover:text-gold"
+           style="color:rgba(255,255,255,0.35);border-color:rgba(255,255,255,0.1);">
           Voir le catalogue
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -228,25 +267,56 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       BANNIÈRE ÉDITORIALE — image large style magazine
+       CITATION — pleine largeur, atmosphère maison de luxe
   ════════════════════════════════════════════════════ -->
-  <section class="relative overflow-hidden scroll-reveal" style="height: clamp(400px, 65vw, 640px);">
-    <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1600&q=85"
-         alt="Editorial"
-         loading="lazy"
-         class="absolute inset-0 w-full h-full object-cover object-[center_40%]"/>
-    <div class="absolute inset-0"
-         style="background: linear-gradient(105deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);">
+  <section class="scroll-reveal border-t border-b"
+           style="border-color:rgba(212,175,55,0.1);padding:clamp(70px,10vw,130px) 1.5rem;">
+    <div class="max-w-3xl mx-auto text-center">
+      <div class="w-8 h-[1px] mx-auto mb-10" style="background:#d4af37;"></div>
+      <blockquote class="font-black theme-text leading-[0.9] tracking-tight mb-10"
+                  style="font-size:clamp(2rem,6vw,4.5rem);">
+        "LE TEMPS EST<br>LA SEULE VRAIE<br>
+        <span style="color:#d4af37;">RICHESSE.</span>"
+      </blockquote>
+      <p class="text-[9px] uppercase tracking-[0.55em] font-bold"
+         style="color:rgba(212,175,55,0.5);">SDM Store · Abidjan, Côte d'Ivoire</p>
+      <div class="w-8 h-[1px] mx-auto mt-10" style="background:#d4af37;"></div>
     </div>
-    <div class="absolute inset-0 flex flex-col justify-center px-7 sm:px-14 lg:px-20">
-      <p class="text-[10px] uppercase tracking-[0.45em] font-bold mb-4"
-         style="color:rgba(212,175,55,0.85);">Édition limitée</p>
-      <h2 class="text-white font-black leading-[0.9] tracking-tight mb-6
-                 text-[11vw] sm:text-[7vw] lg:text-[6vw] max-w-lg">
-        L'ÉLÉGANCE<br>EST UN CHOIX.
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════
+       ÉDITORIAL — image gauche | texte droite
+  ════════════════════════════════════════════════════ -->
+  <section class="scroll-reveal flex flex-col lg:flex-row overflow-hidden"
+           style="min-height:clamp(420px,55vw,680px);">
+
+    <!-- Image -->
+    <div class="relative lg:flex-[55] h-[60vw] lg:h-auto overflow-hidden">
+      <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200&q=90"
+           alt="Éditorial SDM Store" loading="lazy"
+           class="w-full h-full object-cover object-center hover:scale-[1.03] transition-transform duration-1000 ease-out"/>
+      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/60 hidden lg:block"></div>
+    </div>
+
+    <!-- Texte -->
+    <div class="lg:flex-[45] flex flex-col justify-center px-8 sm:px-12 lg:px-14 xl:px-20
+                py-14 lg:py-0"
+         style="background:#080808;">
+      <div class="w-6 h-[1px] mb-10" style="background:#d4af37;"></div>
+      <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-6"
+         style="color:rgba(212,175,55,0.65);">Édition limitée</p>
+      <h2 class="font-black text-white leading-[0.88] tracking-tight mb-8"
+          style="font-size:clamp(2.4rem,5.5vw,4rem);">
+        L'ÉLÉGANCE<br>EST UN<br>
+        <span style="color:#d4af37;">CHOIX.</span>
       </h2>
+      <p class="leading-relaxed mb-10 text-sm max-w-xs"
+         style="color:rgba(255,255,255,0.4);">
+        Chaque pièce est choisie pour son caractère, sa rareté et son savoir-faire. Rien de banal, tout de l'exception.
+      </p>
       <a routerLink="/products"
-         class="self-start inline-flex items-center gap-3 px-6 py-3.5 font-black text-xs uppercase tracking-widest text-black transition-all hover:-translate-y-0.5"
+         class="self-start inline-flex items-center gap-3 px-6 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-black transition-all duration-300 hover:-translate-y-0.5"
          style="background:#d4af37;">
         Explorer
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -260,45 +330,44 @@
   <!-- ════════════════════════════════════════════════════
        COMMENT ÇA MARCHE
   ════════════════════════════════════════════════════ -->
-  <section class="py-20 sm:py-28 border-t theme-border scroll-reveal">
+  <section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
     <div class="max-w-5xl mx-auto px-5 sm:px-8 lg:px-12">
 
-      <!-- Titre -->
-      <div class="mb-14 sm:mb-16">
-        <p class="text-[10px] uppercase tracking-[0.4em] font-bold mb-3" style="color:#d4af37;">Simple &amp; rapide</p>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black theme-text tracking-tight">Comment ça marche</h2>
+      <div class="mb-14 sm:mb-18">
+        <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-3"
+           style="color:rgba(212,175,55,0.65);">Simple &amp; rapide</p>
+        <h2 class="font-black theme-text tracking-tight leading-none"
+            style="font-size:clamp(2.4rem,7vw,5.5rem);">COMMENT ÇA MARCHE</h2>
       </div>
 
-      <!-- Étapes -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-0">
         @for (step of steps; track step.n; let last = $last) {
-          <div class="flex sm:flex-col gap-6 sm:gap-0 pb-10 sm:pb-0 sm:pr-8"
+          <div class="pb-10 sm:pb-0 sm:pr-10 lg:pr-16"
                [class.border-b]="!last"
-               [class.sm:border-b-0]="true"
-               [class.sm:border-r]="!last"
-               [class.border-gold]="false"
-               style="border-color: rgba(212,175,55,0.15)">
+               [class.sm\:border-b-0]="!last"
+               [class.sm\:border-r]="!last"
+               style="border-color:rgba(212,175,55,0.1);">
 
-            <!-- Numéro + icône -->
-            <div class="flex-shrink-0 sm:mb-8">
-              <div class="w-14 h-14 sm:w-16 sm:h-16 border flex items-center justify-center relative"
-                   style="border-color: rgba(212,175,55,0.3);">
-                <svg class="w-6 h-6 sm:w-7 sm:h-7" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  @for (d of step.icon.split(' M'); track $index; let fi = $first) {
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                          [attr.d]="fi ? step.icon.split(' M')[0] : 'M' + d"/>
-                  }
-                </svg>
-                <span class="absolute -top-3 -right-3 w-6 h-6 flex items-center justify-center text-[9px] font-black text-black"
-                      style="background:#d4af37;">{{ step.n }}</span>
+            <div class="flex sm:flex-col gap-7 sm:gap-0 sm:items-start" [class.mb-10]="!last">
+              <div class="flex-shrink-0 sm:mb-9">
+                <div class="w-14 h-14 border flex items-center justify-center relative"
+                     style="border-color:rgba(212,175,55,0.25);">
+                  <svg class="w-6 h-6" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @for (d of step.icon.split(' M'); track $index; let fi = $first) {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            [attr.d]="fi ? step.icon.split(' M')[0] : 'M' + d"/>
+                    }
+                  </svg>
+                  <span class="absolute -top-3 -right-3 w-6 h-6 flex items-center justify-center text-[9px] font-black text-black"
+                        style="background:#d4af37;">{{ step.n }}</span>
+                </div>
+              </div>
+              <div class="sm:mt-0">
+                <h3 class="font-black theme-text text-base sm:text-lg mb-2 tracking-tight">{{ step.title }}</h3>
+                <p class="theme-muted text-sm leading-relaxed">{{ step.desc }}</p>
               </div>
             </div>
 
-            <!-- Texte -->
-            <div class="sm:pt-0 sm:pl-0 flex-1 sm:flex-none">
-              <h3 class="font-black theme-text text-base sm:text-lg mb-2 tracking-tight">{{ step.title }}</h3>
-              <p class="theme-muted text-sm leading-relaxed">{{ step.desc }}</p>
-            </div>
           </div>
         }
       </div>
@@ -308,24 +377,25 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       STATS — chiffres clés
+       STATS
   ════════════════════════════════════════════════════ -->
-  <section id="stats-row" class="py-16 sm:py-20 border-t theme-border scroll-reveal">
+  <section id="stats-row" class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);">
     <div class="max-w-5xl mx-auto px-5 sm:px-8">
-      <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0"
-           style="--tw-divide-opacity:0.12; border-color: rgba(212,175,55,0.12);">
+      <div class="grid grid-cols-2 sm:grid-cols-4"
+           style="border-color:rgba(212,175,55,0.08);">
         @for (stat of [
           { value: statProducts, suffix: '+', label: 'Références' },
           { value: statBrands,   suffix: '+', label: 'Marques' },
           { value: statClients,  suffix: '+', label: 'Clients satisfaits' },
           { value: 48,           suffix: 'h', label: 'Livraison max' }
         ]; track stat.label) {
-          <div class="flex flex-col items-center justify-center py-10 px-4 text-center">
-            <p class="text-4xl sm:text-5xl lg:text-6xl font-black leading-none mb-2 tabular-nums"
-               style="color:#d4af37;">
+          <div class="flex flex-col items-center justify-center py-12 px-4 text-center border-r border-b sm:border-b-0 last:border-r-0"
+               style="border-color:rgba(212,175,55,0.08);">
+            <p class="font-black leading-none mb-2 tabular-nums"
+               style="color:#d4af37;font-size:clamp(2.5rem,6vw,4rem);">
               {{ stat.value }}{{ stat.suffix }}
             </p>
-            <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] theme-muted">{{ stat.label }}</p>
+            <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.3em] theme-muted">{{ stat.label }}</p>
           </div>
         }
       </div>
@@ -334,32 +404,36 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       PROMESSES — 4 engagements
+       PROMESSES
   ════════════════════════════════════════════════════ -->
-  <section class="py-16 sm:py-24 border-t theme-border scroll-reveal">
+  <section class="border-t scroll-reveal"
+           style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
     <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
 
-      <div class="mb-12">
-        <p class="text-[10px] uppercase tracking-[0.4em] font-bold mb-2" style="color:#d4af37;">Notre promesse</p>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black theme-text tracking-tight">L'excellence partout</h2>
+      <div class="mb-12 sm:mb-16">
+        <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-3"
+           style="color:rgba(212,175,55,0.65);">Notre engagement</p>
+        <h2 class="font-black theme-text tracking-tight leading-none"
+            style="font-size:clamp(2.4rem,7vw,5.5rem);">L'EXCELLENCE<br>PARTOUT</h2>
       </div>
 
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-1">
         @for (p of [
-          { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: '100% Authentique',    desc: 'Chaque article est certifié original.' },
-          { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',                                                                                                                                                            title: 'Livraison Rapide',     desc: '24–48h Abidjan · 72h intérieur CI.' },
-          { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',                                                                                                                      title: 'Paiement Sécurisé',    desc: 'Transactions Wave CI protégées.' },
-          { icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',                                                                                                                 title: 'Retour sous 3 jours',  desc: 'Remboursement garanti sans friction.' }
+          { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: '100% Authentique',   desc: 'Chaque article est certifié original.' },
+          { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',                                                                                                                                                           title: 'Livraison rapide',    desc: '24–48h Abidjan · 72h intérieur CI.' },
+          { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',                                                                                                                     title: 'Paiement sécurisé',   desc: 'Transactions Wave CI protégées.' },
+          { icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',                                                                                                                title: 'Retour sous 3 jours', desc: 'Remboursement garanti sans friction.' }
         ]; track p.title) {
-          <div class="border theme-border p-5 sm:p-7 flex flex-col gap-5 hover:border-gold/40 transition-colors duration-300 group">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 border flex items-center justify-center flex-shrink-0 group-hover:border-gold/60 transition-colors"
-                 style="border-color: rgba(212,175,55,0.25);">
-              <svg class="w-4.5 h-4.5 sm:w-5 sm:h-5" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="p.icon"/>
+          <div class="border p-6 sm:p-8 flex flex-col gap-6 group hover:border-gold/40 transition-colors duration-300"
+               style="border-color:rgba(212,175,55,0.12);">
+            <div class="w-10 h-10 border flex items-center justify-center flex-shrink-0"
+                 style="border-color:rgba(212,175,55,0.2);">
+              <svg class="w-4.5 h-4.5" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" [attr.d]="p.icon"/>
               </svg>
             </div>
             <div>
-              <h3 class="font-black theme-text text-sm sm:text-base mb-1.5 tracking-tight">{{ p.title }}</h3>
+              <h3 class="font-black theme-text text-sm sm:text-base mb-2 tracking-tight">{{ p.title }}</h3>
               <p class="theme-muted text-xs sm:text-sm leading-relaxed">{{ p.desc }}</p>
             </div>
           </div>
@@ -372,19 +446,20 @@
   <!-- ════════════════════════════════════════════════════
        CTA FINAL
   ════════════════════════════════════════════════════ -->
-  <section class="relative py-24 sm:py-32 lg:py-40 overflow-hidden scroll-reveal border-t theme-border">
+  <section class="relative border-t overflow-hidden scroll-reveal"
+           style="border-color:rgba(212,175,55,0.1);padding:clamp(80px,12vw,160px) 1.5rem;">
 
-    <div class="absolute inset-0 pointer-events-none">
-      <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(212,175,55,0.06) 0%, transparent 65%);"></div>
-    </div>
+    <div class="absolute inset-0 pointer-events-none"
+         style="background:radial-gradient(ellipse at center,rgba(212,175,55,0.05) 0%,transparent 65%);"></div>
 
-    <div class="relative max-w-2xl mx-auto px-5 text-center">
+    <div class="relative max-w-2xl mx-auto text-center">
+      <div class="w-8 h-[1px] mx-auto mb-10" style="background:#d4af37;"></div>
 
-      <p class="text-[10px] uppercase tracking-[0.45em] font-bold mb-5 sm:mb-6"
-         style="color:#d4af37;">Rejoignez +1 200 clients</p>
+      <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-8"
+         style="color:rgba(212,175,55,0.6);">Rejoignez +1 200 clients</p>
 
-      <h2 class="font-black theme-text leading-[0.9] tracking-tight mb-8 sm:mb-10
-                 text-[12vw] sm:text-[7vw] lg:text-[5.5vw]">
+      <h2 class="font-black theme-text leading-[0.88] tracking-tight mb-12"
+          style="font-size:clamp(3rem,9vw,6.5rem);">
         CE QUE<br>VOUS<br>
         <span style="color:#d4af37;">CHERCHEZ</span><br>
         EST ICI.
@@ -392,8 +467,8 @@
 
       <div class="flex flex-col sm:flex-row justify-center gap-3">
         <a routerLink="/products"
-           class="inline-flex items-center justify-center gap-3 px-8 py-4 font-black text-xs uppercase tracking-widest text-black transition-all hover:-translate-y-0.5"
-           style="background:#d4af37; box-shadow: 0 10px 40px rgba(212,175,55,0.3);">
+           class="inline-flex items-center justify-center gap-3 px-8 py-4 font-black text-xs uppercase tracking-[0.2em] text-black transition-all hover:-translate-y-0.5"
+           style="background:#d4af37;box-shadow:0 8px 32px rgba(212,175,55,0.25);">
           Explorer la boutique
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -401,11 +476,14 @@
         </a>
         @if (!(currentUser$ | async)) {
           <a routerLink="/auth/register"
-             class="inline-flex items-center justify-center px-8 py-4 font-bold text-xs uppercase tracking-widest border theme-border theme-muted hover:border-gold/50 hover:text-gold transition-all duration-300">
+             class="inline-flex items-center justify-center px-8 py-4 font-bold text-xs uppercase tracking-[0.2em] border transition-all duration-300 hover:text-gold"
+             style="color:rgba(255,255,255,0.35);border-color:rgba(255,255,255,0.12);">
             Créer mon compte
           </a>
         }
       </div>
+
+      <div class="w-8 h-[1px] mx-auto mt-12" style="background:#d4af37;opacity:0.4;"></div>
     </div>
   </section>
 
