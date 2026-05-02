@@ -19,7 +19,7 @@ import { ThemeService } from '../../core/services/theme.service';
 
         <!-- Modale -->
         <div class="relative w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-prompt-in"
-             style="background:#181818;border:1px solid rgba(255,255,255,0.08)"
+             style="background:#ffffff;border:1px solid rgba(0,0,0,0.10)"
              (click)="$event.stopPropagation()">
 
           <!-- Bandeau haut doré -->
@@ -28,7 +28,7 @@ import { ThemeService } from '../../core/services/theme.service';
           <!-- Bouton fermer -->
           <button (click)="close()"
             class="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
-            style="color:#9ca3af;background:transparent"
+            style="color:#6b7280;background:transparent"
             (mouseenter)="$event.target && setHover($event, true)"
             (mouseleave)="$event.target && setHover($event, false)">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,10 +47,10 @@ import { ThemeService } from '../../core/services/theme.service';
             </div>
 
             <!-- Texte -->
-            <h2 class="text-lg font-black text-center mb-2" style="color:#f1f1f1">
+            <h2 class="text-lg font-black text-center mb-2" style="color:#111111">
               Connexion requise
             </h2>
-            <p class="text-sm text-center mb-6 leading-relaxed" style="color:#9ca3af">
+            <p class="text-sm text-center mb-6 leading-relaxed" style="color:#6b7280">
               Vous devez être connecté pour passer une commande sur&nbsp;SDM&nbsp;STORE.
             </p>
 
@@ -72,12 +72,12 @@ import { ThemeService } from '../../core/services/theme.service';
               <button (click)="goToRegister()"
                 class="w-full py-3 rounded-xl font-bold text-sm transition-all duration-200
                        hover:-translate-y-0.5"
-                style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#f1f1f1">
+                style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);color:#111111"
                 Créer un compte
               </button>
             </div>
 
-            <p class="text-xs text-center mt-4" style="color:#6b7280">
+            <p class="text-xs text-center mt-4" style="color:#9ca3af">
               Vos articles restent dans le panier après connexion.
             </p>
           </div>
@@ -132,6 +132,6 @@ export class AuthPromptComponent implements OnInit, OnDestroy {
 
   setHover(event: Event, on: boolean): void {
     const el = event.target as HTMLElement;
-    el.style.background = on ? 'rgba(255,255,255,0.08)' : 'transparent';
+    el.style.background = on ? 'rgba(0,0,0,0.06)' : 'transparent';
   }
 }
