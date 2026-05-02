@@ -23,8 +23,9 @@ export class ProfileComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
 
-  showOldPwd = false;
-  showNewPwd = false;
+  activeTab: 'profile' | 'security' = 'profile';
+  showOldPwd     = false;
+  showNewPwd     = false;
   showConfirmPwd = false;
 
   constructor(
