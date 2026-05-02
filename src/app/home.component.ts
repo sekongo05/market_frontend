@@ -71,12 +71,17 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this.router.navigate(['/products'], { queryParams: { categorie: slug } });
   }
 
+  isNew(product: ProductResponse): boolean {
+    if (!product.createdAt) return false;
+    return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= 7;
+  }
+
   private _loadProducts(): void {
-    this.productService.getProducts({ page: 0, size: 8, sort: 'newest' }).subscribe({
+    this.productService.getProducts({ page: 0, size: 24, sort: 'newest' }).subscribe({
       next: (r) => {
         if (r.success) {
           const pg = r.data as PageResponse<ProductResponse>;
-          this.newProducts = pg.content;
+          this.newProducts = pg.content.filter(p => this.isNew(p)).slice(0, 8);
           this.discountProducts = pg.content.filter(p => p.discountPercent && p.discountPercent > 0).slice(0, 4);
         }
         this.newProductsLoading = false;
