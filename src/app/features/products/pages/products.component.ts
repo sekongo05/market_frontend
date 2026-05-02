@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -19,7 +19,7 @@ import { ScrollLockService } from '../../../core/services/scroll-lock.service';
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TooltipDirective, MediaUrlPipe],
+  imports: [CommonModule, NgTemplateOutlet, FormsModule, ReactiveFormsModule, TooltipDirective, MediaUrlPipe],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })
@@ -63,38 +63,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
   viewGallery: { url: string; type: 'IMAGE' | 'VIDEO' }[] = [];
   viewGalleryIndex = 0;
 
-  private readonly VIEW_GALLERIES: Record<string, string[]> = {
-    electronique: [
-      'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=85',
-      'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&q=85',
-      'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&q=85',
-      'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&q=85',
-    ],
-    mode: [
-      'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=85',
-      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&q=85',
-      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=85',
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=85',
-    ],
-    maison: [
-      'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&q=85',
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=85',
-      'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=85',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=85',
-    ],
-    beaute: [
-      'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800&q=85',
-      'https://images.unsplash.com/photo-1541643600914-78b084683702?w=800&q=85',
-      'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&q=85',
-      'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=800&q=85',
-    ],
-    sport: [
-      'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&q=85',
-      'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=85',
-      'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=85',
-      'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=85',
-    ],
-  };
+  totalItems = 0;
+
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
@@ -160,12 +130,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       }
       return;
     }
-    const slug = product.category?.slug?.toLowerCase() ?? '';
-    const catKey = Object.keys(this.VIEW_GALLERIES).find(k => slug.includes(k)) ?? '';
-    const pool = catKey ? this.VIEW_GALLERIES[catKey] : Object.values(this.VIEW_GALLERIES)[0];
-    const main = product.imageUrl;
-    const others = pool.filter(url => url !== main).slice(0, 3);
-    this.viewGallery = [main, ...others].map(url => ({ url, type: 'IMAGE' as const }));
+    this.viewGallery = [{ url: product.imageUrl, type: 'IMAGE' as const }];
   }
 
   closeProductView(): void {
@@ -493,6 +458,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
           const pageResponse = response.data as PageResponse<ProductResponse>;
           this.products = pageResponse.content;
           this.totalPages = pageResponse.totalPages;
+          this.totalItems = pageResponse.totalElements;
           this.currentPage = page;
         }
         this.loading = false;

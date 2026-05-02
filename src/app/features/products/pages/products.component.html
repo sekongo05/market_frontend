@@ -11,6 +11,9 @@
           <h1 class="text-3xl font-black theme-text">
             {{ selectedCategoryName ?? 'Collection' }}
           </h1>
+          @if (!loading && totalItems > 0) {
+            <p class="text-xs theme-muted mt-1">{{ totalItems }} article{{ totalItems > 1 ? 's' : '' }}</p>
+          }
         </div>
 
         <div class="flex flex-col gap-2 w-full md:flex-row md:w-auto md:items-center">
@@ -202,12 +205,85 @@
       </div>
     }
 
+    <!-- ── Template carte produit (réutilisé dans les deux vues) ── -->
+    <ng-template #productCard let-product="product" let-i="i">
+      <div class="group luxury-card rounded-3xl overflow-hidden animate-fade-in-up"
+           [style.animation-delay]="(i % 8 * 0.07) + 's'">
+        <div (click)="openProductView(product)" class="cursor-pointer relative overflow-hidden aspect-[3/4]">
+          <img [src]="product.imageUrl | mediaUrl" [alt]="product.name"
+               loading="lazy"
+               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+               (error)="$any($event.target).src='https://placehold.co/400x600/1a1a1a/d4af37?text=Luxe'"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          @if (product.stock === 0) {
+            <span class="absolute top-3 left-3 bg-red-900/80 text-red-300 text-xs font-bold px-2.5 py-1 rounded-full">Épuisé</span>
+          }
+          @if (product.discountPercent && product.discountPercent > 0) {
+            <span class="absolute top-3 right-3 bg-orange-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg shadow-orange-900/40">
+              -{{ product.discountPercent }}%
+            </span>
+          }
+          @if (isNew(product) && !(product.discountPercent && product.discountPercent > 0)) {
+            <span class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-violet-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-violet-900/40">
+              <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+              NOUVEAU
+            </span>
+          }
+          @if (isManager) {
+            <div class="absolute top-3 right-3 flex gap-1.5 transition-opacity duration-200 lg:opacity-0 lg:group-hover:opacity-100">
+              <button (click)="$event.stopPropagation(); openEditModal(product)"
+                appTooltip="Modifier ce produit" tooltipPosition="bottom"
+                class="w-8 h-8 bg-black/70 border border-yellow-600/40 text-yellow-400 rounded-lg flex items-center justify-center hover:bg-yellow-600/20 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button (click)="$event.stopPropagation(); deleteProduct(product)"
+                appTooltip="Supprimer ce produit" tooltipPosition="bottom"
+                class="w-8 h-8 bg-black/70 border border-red-500/40 text-red-400 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          }
+        </div>
+        <div (click)="openProductView(product)" class="cursor-pointer p-3 sm:p-4 pb-0">
+          <p class="text-[10px] sm:text-xs text-gold font-semibold uppercase tracking-wider mb-0.5 truncate">{{ product.category.name }}</p>
+          <h3 class="font-bold theme-text text-xs sm:text-sm leading-tight truncate mb-1">{{ product.name }}</h3>
+          <p class="hidden sm:block text-xs theme-muted line-clamp-2 mb-2">{{ product.description }}</p>
+        </div>
+        <div class="px-3 sm:px-4 pb-3 sm:pb-4 flex items-center justify-between mt-1 sm:mt-0">
+          <div>
+            @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
+              <div class="flex items-baseline gap-1.5">
+                <span class="text-base sm:text-xl font-black text-orange-400">{{ (product.salePrice / 1000) | number:'1.0-0' }}K</span>
+                <span class="text-xs theme-muted line-through">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+                <span class="text-xs theme-muted">FCFA</span>
+              </div>
+            } @else {
+              <span class="text-base sm:text-xl font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+              <span class="text-[10px] sm:text-xs theme-muted ml-0.5">FCFA</span>
+            }
+          </div>
+          @if (!isManager) {
+            <button (click)="addToCart(product)" [disabled]="product.stock === 0"
+              class="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+              [class]="addedIds.has(product.id) ? 'bg-green-500 text-white scale-95' : 'bg-gold text-black hover:shadow-lg hover:shadow-yellow-600/20 hover:-translate-y-0.5'">
+              @if (addedIds.has(product.id)) {
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                Ajouté !
+              } @else {
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Ajouter
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </ng-template>
+
     <!-- ── Vue GROUPÉE par catégorie (onglet "Tout") ─────────────── -->
     @if (!loading && products.length > 0 && selectedCategoryId === null) {
       <div class="space-y-14">
         @for (group of productsByCategory; track group.category.id) {
           <section>
-            <!-- Section header -->
             <div class="flex items-center justify-between mb-6">
               <div class="flex items-center gap-3">
                 <div class="h-6 w-1 bg-gold rounded-full"></div>
@@ -217,86 +293,13 @@
                 </span>
               </div>
               <button (click)="selectCategory(group.category.id)"
-                class="text-xs font-bold text-gold hover:underline transition-all hidden sm:block">
+                class="text-xs font-bold text-gold hover:underline transition-all">
                 Voir tout →
               </button>
             </div>
-            <!-- Products grid -->
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
               @for (product of group.items; track product.id; let i = $index) {
-                <div class="group luxury-card rounded-3xl overflow-hidden animate-fade-in-up"
-                     [style.animation-delay]="(i % 8 * 0.07) + 's'">
-                  <div (click)="openProductView(product)" class="cursor-pointer block relative overflow-hidden h-40 sm:h-52">
-                    <img [src]="product.imageUrl | mediaUrl" [alt]="product.name"
-                         loading="lazy"
-                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                         (error)="$any($event.target).src='https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'"/>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    @if (product.stock > 0) {
-                      <span class="absolute top-3 left-3 bg-gold text-black text-xs font-bold px-2.5 py-1 rounded-full shadow">En stock</span>
-                    } @else {
-                      <span class="absolute top-3 left-3 bg-red-900/80 text-red-300 text-xs font-bold px-2.5 py-1 rounded-full">Épuisé</span>
-                    }
-                    @if (product.discountPercent && product.discountPercent > 0) {
-                      <span class="absolute top-3 right-3 bg-orange-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg shadow-orange-900/40">
-                        -{{ product.discountPercent }}%
-                      </span>
-                    }
-                    @if (isNew(product) && !(product.discountPercent && product.discountPercent > 0)) {
-                      <span class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-violet-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-violet-900/40">
-                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                        NOUVEAU
-                      </span>
-                      <!--  -->
-                    }
-                    @if (isManager) {
-                      <div class="absolute top-3 right-3 flex gap-1.5 transition-opacity duration-200 lg:opacity-0 lg:group-hover:opacity-100">
-                        <button (click)="$event.stopPropagation(); openEditModal(product)"
-                          appTooltip="Modifier ce produit" tooltipPosition="bottom"
-                          class="w-8 h-8 bg-black/70 border border-yellow-600/40 text-yellow-400 rounded-lg flex items-center justify-center hover:bg-yellow-600/20 transition-colors">
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </button>
-                        <button (click)="$event.stopPropagation(); deleteProduct(product)"
-                          appTooltip="Supprimer ce produit" tooltipPosition="bottom"
-                          class="w-8 h-8 bg-black/70 border border-red-500/40 text-red-400 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors">
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        </button>
-                      </div>
-                    }
-                  </div>
-                  <div (click)="openProductView(product)" class="cursor-pointer block p-3 sm:p-4 pb-0">
-                    <p class="text-[10px] sm:text-xs text-gold font-semibold uppercase tracking-wider mb-0.5 sm:mb-1 truncate">{{ product.category.name }}</p>
-                    <h3 class="font-bold theme-text text-xs sm:text-sm leading-tight truncate mb-1">{{ product.name }}</h3>
-                    <p class="hidden sm:block text-xs theme-muted line-clamp-2 mb-3">{{ product.description }}</p>
-                  </div>
-                  <div class="px-3 sm:px-4 pb-3 sm:pb-4 flex items-center justify-between mt-1 sm:mt-0">
-                    <div>
-                      @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                        <div class="flex items-baseline gap-1.5">
-                          <span class="text-xl font-black text-orange-400">{{ (product.salePrice / 1000) | number:'1.0-0' }}K</span>
-                          <span class="text-xs theme-muted line-through">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
-                          <span class="text-xs theme-muted">FCFA</span>
-                        </div>
-                      } @else {
-                        <span class="text-base sm:text-xl font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
-                        <span class="text-[10px] sm:text-xs theme-muted ml-0.5">FCFA</span>
-                      }
-                    </div>
-                    @if (!isManager) {
-                      <button (click)="addToCart(product)" [disabled]="product.stock === 0"
-                        class="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                        [class]="addedIds.has(product.id) ? 'bg-green-500 text-white scale-95' : 'bg-gold text-black hover:shadow-lg hover:shadow-yellow-600/20 hover:-translate-y-0.5'">
-                        @if (addedIds.has(product.id)) {
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                          Ajouté !
-                        } @else {
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                          Ajouter
-                        }
-                      </button>
-                    }
-                  </div>
-                </div>
+                <ng-container *ngTemplateOutlet="productCard; context: { product: product, i: i }"></ng-container>
               }
             </div>
           </section>
@@ -308,64 +311,7 @@
     @if (!loading && products.length > 0 && selectedCategoryId !== null) {
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
         @for (product of products; track product.id; let i = $index) {
-          <div class="group luxury-card rounded-3xl overflow-hidden animate-fade-in-up"
-               [style.animation-delay]="(i % 8 * 0.07) + 's'">
-            <div (click)="openProductView(product)" class="cursor-pointer block relative overflow-hidden h-40 sm:h-52">
-              <img [src]="product.imageUrl | mediaUrl" [alt]="product.name"
-                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                   (error)="$any($event.target).src='https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'"/>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              @if (product.stock > 0) {
-                <span class="absolute top-3 left-3 bg-gold text-black text-xs font-bold px-2.5 py-1 rounded-full shadow">En stock</span>
-              } @else {
-                <span class="absolute top-3 left-3 bg-red-900/80 text-red-300 text-xs font-bold px-2.5 py-1 rounded-full">Épuisé</span>
-              }
-              @if (isNew(product)) {
-                <span class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-violet-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-violet-900/40">
-                  <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                  NOUVEAU
-                </span>
-              }
-              @if (isManager) {
-                <div class="absolute top-3 right-3 flex gap-1.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">
-                  <button (click)="$event.stopPropagation(); openEditModal(product)"
-                    appTooltip="Modifier ce produit" tooltipPosition="bottom"
-                    class="w-8 h-8 bg-black/70 border border-yellow-600/40 text-yellow-400 rounded-lg flex items-center justify-center hover:bg-yellow-600/20 transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                  </button>
-                  <button (click)="$event.stopPropagation(); deleteProduct(product)"
-                    appTooltip="Supprimer ce produit" tooltipPosition="bottom"
-                    class="w-8 h-8 bg-black/70 border border-red-500/40 text-red-400 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                  </button>
-                </div>
-              }
-            </div>
-            <div (click)="openProductView(product)" class="cursor-pointer block p-4 pb-0">
-              <p class="text-xs text-gold font-semibold uppercase tracking-wider mb-1">{{ product.category.name }}</p>
-              <h3 class="font-bold theme-text text-sm leading-tight truncate mb-1">{{ product.name }}</h3>
-              <p class="text-xs theme-muted line-clamp-2 mb-3">{{ product.description }}</p>
-            </div>
-            <div class="px-4 pb-4 flex items-center justify-between">
-              <div>
-                <span class="text-xl font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
-                <span class="text-xs theme-muted ml-1">FCFA</span>
-              </div>
-              @if (!isManager) {
-                <button (click)="addToCart(product)" [disabled]="product.stock === 0"
-                  class="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                  [class]="addedIds.has(product.id) ? 'bg-green-500 text-white scale-95' : 'bg-gold text-black hover:shadow-lg hover:shadow-yellow-600/20 hover:-translate-y-0.5'">
-                  @if (addedIds.has(product.id)) {
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                    Ajouté !
-                  } @else {
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    Ajouter
-                  }
-                </button>
-              }
-            </div>
-          </div>
+          <ng-container *ngTemplateOutlet="productCard; context: { product: product, i: i }"></ng-container>
         }
       </div>
     }
