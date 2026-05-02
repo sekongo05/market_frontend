@@ -54,9 +54,17 @@
   <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10">
     <div class="w-full max-w-md">
 
-      <!-- Mobile logo -->
-      <div class="flex items-center gap-2.5 mb-10 lg:hidden">
-        <app-logo size="lg"></app-logo>
+      <!-- Top row: bouton retour + logo mobile -->
+      <div class="flex items-center justify-between mb-10">
+        <a routerLink="/" class="inline-flex items-center gap-1.5 text-xs font-semibold theme-muted hover:text-gold transition-colors group">
+          <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Accueil
+        </a>
+        <div class="lg:hidden">
+          <app-logo size="lg"></app-logo>
+        </div>
       </div>
 
       <div class="mb-8">
