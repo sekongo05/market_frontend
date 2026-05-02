@@ -25,7 +25,7 @@
       </div>
 
       <!-- Tabs -->
-      <div class="flex gap-1 overflow-x-auto pb-px">
+      <div class="flex gap-1 overflow-x-auto pb-px scrollbar-none">
         @for (tab of [
           {key:'stats',      label:'Statistiques'},
           {key:'orders',     label:'Commandes'},
@@ -33,11 +33,11 @@
           {key:'delivery',   label:'Livraisons'},
           {key:'returns',    label:'Retours'},
           {key:'reviews',    label:'Avis'},
-          {key:'promos',     label:'Codes promo'},
+          {key:'promos',     label:'Promos'},
           {key:'users',      label:'Utilisateurs'},
           {key:'categories', label:'Catégories'}
         ]; track tab.key) {
-          <button (click)="setTab($any(tab.key))" class="px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2 whitespace-nowrap"
+          <button (click)="setTab($any(tab.key))" class="px-3 sm:px-5 py-3 text-sm font-bold rounded-t-xl transition-colors border-b-2 whitespace-nowrap"
             [ngClass]="activeTab === tab.key
               ? 'border-[#d4af37] text-gold bg-gold/8'
               : 'border-transparent theme-muted hover:text-gold'">
@@ -951,6 +951,7 @@
 
       @if (!promosLoading) {
         <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+          <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
               <tr class="theme-surface-2">
@@ -1013,6 +1014,7 @@
               }
             </tbody>
           </table>
+          </div>
         </div>
       }
     </div>
@@ -1039,6 +1041,7 @@
 
       @if (!reviewsLoading) {
         <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+          <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
               <tr class="theme-surface-2">
@@ -1095,6 +1098,7 @@
               }
             </tbody>
           </table>
+          </div>
         </div>
 
         @if (reviewsTotalPages > 1) {
@@ -1133,6 +1137,7 @@
 
       @if (!returnsLoading) {
         <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+          <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
               <tr class="theme-surface-2">
@@ -1182,6 +1187,7 @@
               }
             </tbody>
           </table>
+          </div>
         </div>
 
         @if (returnsTotalPages > 1) {

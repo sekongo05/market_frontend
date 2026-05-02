@@ -17,6 +17,7 @@ import { CategoryResponse } from '../../../core/models/category.models';
 import { OrderResponse } from '../../../core/models/order.models';
 import { DeliveryResponse, AddDeliveryEventRequest, UpdateDeliveryRequest } from '../../../core/models/delivery.models';
 import { PageResponse, OrderStatus, DeliveryStatus } from '../../../core/models/common.models';
+import { ScrollLockService } from '../../../core/services/scroll-lock.service';
 
 interface Toast { id: number; msg: string; type: 'success' | 'error'; }
 
@@ -79,13 +80,10 @@ export class ManagerComponent implements OnInit, OnDestroy {
   statusFilter: OrderStatus | '' = '';
   statusUpdatingId: number | null = null;
   readonly orderStatuses = Object.values(OrderStatus);
-  // PENDING → APPROVED : manager valide la commande (via /validate)
-  // APPROVED → null    : attente du paiement client (passe à CONFIRMED via validation paiement)
-  // CONFIRMED → DELIVERED : paiement validé, prêt pour livraison
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
-    PENDING:   OrderStatus.APPROVED,
-    APPROVED:  null,
-    CONFIRMED: OrderStatus.DELIVERED,
+    PENDING:   OrderStatus.CONFIRMED,
+    CONFIRMED: OrderStatus.SHIPPED,
+    SHIPPED:   OrderStatus.DELIVERED,
     DELIVERED: null,
     CANCELLED: null,
   };
@@ -167,6 +165,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private scrollLock: ScrollLockService,
   ) {}
 
   @HostListener('document:keydown.escape')
@@ -194,7 +193,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    document.body.style.overflow = '';
+    this.scrollLock.forceUnlock();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -262,7 +261,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.productMedia = [];
     this.initForm();
     this.drawerOpen = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.cdr.detectChanges();
     setTimeout(() => document.getElementById('manager-drawer-body')?.scrollTo(0, 0), 0);
   }
@@ -281,7 +280,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.productMedia = product.media ?? [];
     this.initForm(product);
     this.drawerOpen = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.loadMedia(product.id);
     this.cdr.detectChanges();
     setTimeout(() => document.getElementById('manager-drawer-body')?.scrollTo(0, 0), 0);
@@ -294,7 +293,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
 
   closeDrawer(): void {
     this.drawerOpen = false;
-    document.body.style.overflow = '';
+    this.scrollLock.unlock();
     this.editingProduct = null;
     this.drawerError = null;
     this.selectedImages = [];
@@ -644,7 +643,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     const next = this.nextStatusMap[order.orderStatus];
     if (!next) return;
     this.statusUpdatingId = order.id;
-    // PENDING → APPROVED : utiliser l'endpoint dédié /validate
+    // PENDING → CONFIRMED : utiliser l'endpoint dédié /validate
     const request$ = order.orderStatus === 'PENDING'
       ? this.orderService.validateOrder(order.id)
       : this.orderService.updateOrderStatus(order.id, next);
@@ -826,8 +825,8 @@ export class ManagerComponent implements OnInit, OnDestroy {
   orderStatusLabel(s: string): string {
     const m: Record<string, string> = {
       PENDING:   'En attente',
-      APPROVED:  'Approuvée',
       CONFIRMED: 'Confirmée',
+      SHIPPED:   'Expédiée',
       DELIVERED: 'Livrée',
       CANCELLED: 'Annulée',
     };
@@ -837,8 +836,8 @@ export class ManagerComponent implements OnInit, OnDestroy {
   orderStatusClass(s: string): string {
     const m: Record<string, string> = {
       PENDING:   'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-      APPROVED:  'bg-indigo-500/15 text-indigo-400 border border-indigo-500/25',
       CONFIRMED: 'bg-blue-500/15   text-blue-400   border border-blue-500/25',
+      SHIPPED:   'bg-orange-500/15 text-orange-400 border border-orange-500/25',
       DELIVERED: 'bg-green-500/15  text-green-400  border border-green-500/25',
       CANCELLED: 'bg-red-500/15    text-red-400    border border-red-500/25',
     };

@@ -24,9 +24,9 @@ export enum UserRole {
 }
 
 export enum OrderStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
+  PENDING   = 'PENDING',
   CONFIRMED = 'CONFIRMED',
+  SHIPPED   = 'SHIPPED',
   DELIVERED = 'DELIVERED',
   CANCELLED = 'CANCELLED',
 }

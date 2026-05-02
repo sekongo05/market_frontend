@@ -20,6 +20,7 @@ import { PromoCheckResponse, PublicPromoResponse } from '../../core/models/promo
 import { Subject } from 'rxjs';
 import { takeUntil, timeout } from 'rxjs/operators';
 import { LogoComponent } from './logo.component';
+import { ScrollLockService } from '../../core/services/scroll-lock.service';
 
 @Component({
   selector: 'app-navbar',
@@ -83,7 +84,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private router: Router,
     readonly themeService: ThemeService,
     readonly cartService: CartService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private scrollLock: ScrollLockService
   ) {}
 
   getTemplate(type: NotificationType): NotifTemplate {
@@ -131,7 +133,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    document.body.style.overflow = '';
+    this.scrollLock.forceUnlock();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -142,7 +144,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showUserMenu = false;
     this.showNotifications = false;
     this.mobileOpen = false;
-    document.body.style.overflow = this.showCart ? 'hidden' : '';
+    if (this.showCart) { this.scrollLock.lock(); } else { this.scrollLock.forceUnlock(); }
     if (this.showCart && !this.promosLoaded) this._loadActivePromos();
     if (this.showCart) setTimeout(() => document.getElementById('cart-drawer-body')?.scrollTo(0, 0), 0);
   }
@@ -155,7 +157,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   closeAll():      void {
     this.showCart = false; this.showUserMenu = false;
     this.showNotifications = false; this.mobileOpen = false;
-    document.body.style.overflow = '';
+    this.scrollLock.forceUnlock();
     this._resetCheckout();
   }
 
@@ -173,7 +175,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   private _syncBodyScroll(): void {
     const locked = this.showCart || this.mobileOpen || this.showNotifications;
-    document.body.style.overflow = locked ? 'hidden' : '';
+    if (locked) { this.scrollLock.lock(); } else { this.scrollLock.forceUnlock(); }
   }
 
   loadNotifications(): void {

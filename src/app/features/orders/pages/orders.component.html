@@ -217,11 +217,11 @@
                 </div>
               }
 
-              <!-- Actions (commande en cours : PENDING ou APPROVED) -->
-              @if (order.orderStatus === 'PENDING' || order.orderStatus === 'APPROVED') {
+              <!-- Actions (commande annulable : PENDING ou CONFIRMED) -->
+              @if (order.orderStatus === 'PENDING' || order.orderStatus === 'CONFIRMED') {
                 <div class="border-t theme-border pt-4 space-y-3">
 
-                  <!-- Commande en attente d'approbation -->
+                  <!-- Message statut courant -->
                   @if (order.orderStatus === 'PENDING') {
                     <div class="flex items-start gap-3 p-3 rounded-xl"
                          style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2)">
@@ -229,7 +229,17 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
-                      <p class="text-xs text-yellow-300 font-medium">En attente de validation de la commande par notre équipe. Le paiement sera disponible une fois la commande approuvée.</p>
+                      <p class="text-xs text-yellow-300 font-medium">Votre commande est en attente de confirmation par notre équipe.</p>
+                    </div>
+                  }
+                  @if (order.orderStatus === 'CONFIRMED') {
+                    <div class="flex items-start gap-3 p-3 rounded-xl"
+                         style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)">
+                      <svg class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <p class="text-xs text-blue-300 font-medium">Votre commande a été confirmée et est en cours de préparation.</p>
                     </div>
                   }
 

@@ -25,6 +25,7 @@ import { ReviewResponse } from '../../../core/models/review.models';
 import { ReturnResponse, ReturnDecisionRequest } from '../../../core/models/return.models';
 import { UserRole, PageResponse, OrderStatus, DeliveryStatus } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
+import { ScrollLockService } from '../../../core/services/scroll-lock.service';
 
 export interface Insight {
   type: 'success' | 'warning' | 'danger' | 'info' | 'action';
@@ -72,9 +73,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   statusUpdatingId: number | null = null;
   readonly orderStatuses = Object.values(OrderStatus);
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
-    PENDING:   OrderStatus.APPROVED,
-    APPROVED:  null,
-    CONFIRMED: OrderStatus.DELIVERED,
+    PENDING:   OrderStatus.CONFIRMED,
+    CONFIRMED: OrderStatus.SHIPPED,
+    SHIPPED:   OrderStatus.DELIVERED,
     DELIVERED: null,
     CANCELLED: null,
   };
@@ -210,6 +211,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private returnService: ReturnService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
+    private scrollLock: ScrollLockService,
   ) {}
 
   ngOnInit(): void {
@@ -224,6 +226,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.scrollLock.forceUnlock();
     this.refreshSub?.unsubscribe();
     this.destroy$.next();
     this.destroy$.complete();
@@ -351,8 +354,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   orderStatusLabel(s: string): string {
     const m: Record<string, string> = {
-      PENDING: 'En attente', APPROVED: 'Approuvée', CONFIRMED: 'Confirmée',
-      DELIVERED: 'Livrée', CANCELLED: 'Annulée',
+      PENDING:   'En attente',
+      CONFIRMED: 'Confirmée',
+      SHIPPED:   'Expédiée',
+      DELIVERED: 'Livrée',
+      CANCELLED: 'Annulée',
     };
     return m[s] ?? s;
   }
@@ -360,8 +366,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   orderStatusClass(s: string): string {
     const m: Record<string, string> = {
       PENDING:   'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-      APPROVED:  'bg-indigo-500/15 text-indigo-400 border border-indigo-500/25',
       CONFIRMED: 'bg-blue-500/15   text-blue-400   border border-blue-500/25',
+      SHIPPED:   'bg-orange-500/15 text-orange-400 border border-orange-500/25',
       DELIVERED: 'bg-green-500/15  text-green-400  border border-green-500/25',
       CANCELLED: 'bg-red-500/15    text-red-400    border border-red-500/25',
     };
@@ -424,7 +430,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this._resetDrawer();
     this.initProductForm();
     this.drawerOpen = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.cdr.detectChanges();
     setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
   }
@@ -436,7 +442,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.productMedia = product.media ?? [];
     this.initProductForm(product);
     this.drawerOpen = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.loadMedia(product.id);
     this.cdr.detectChanges();
     setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
@@ -451,7 +457,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.drawerOpen = false;
     this.editingProduct = null;
     this._resetDrawer();
-    document.body.style.overflow = '';
+    this.scrollLock.unlock();
     this.cdr.detectChanges();
   }
 
@@ -837,7 +843,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.categoryForm = { name: '', description: '', imageUrl: '' };
     this.categoryFormError = null;
     this.showCategoryForm = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.cdr.detectChanges();
   }
 
@@ -846,11 +852,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.categoryForm = { name: cat.name, description: cat.description ?? '', imageUrl: cat.imageUrl ?? '' };
     this.categoryFormError = null;
     this.showCategoryForm = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.cdr.detectChanges();
   }
 
-  closeCategoryForm(): void { this.showCategoryForm = false; this.editingCategory = null; this.categoryFormError = null; document.body.style.overflow = ''; this.cdr.detectChanges(); }
+  closeCategoryForm(): void { this.showCategoryForm = false; this.editingCategory = null; this.categoryFormError = null; this.scrollLock.unlock(); this.cdr.detectChanges(); }
 
   submitCategory(): void {
     if (!this.categoryForm.name.trim()) { this.categoryFormError = 'Le nom est obligatoire'; return; }
@@ -903,7 +909,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.userFullProfile = null;
     this.userFullProfileLoading = true;
     this.showUserProfile = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.cdr.detectChanges();
     this.userService.getFullProfile(userId).subscribe({
       next: (r) => { if (r.success) this.userFullProfile = r.data; this.userFullProfileLoading = false; this.cdr.detectChanges(); },
@@ -911,7 +917,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  closeUserProfile(): void { this.showUserProfile = false; this.userFullProfile = null; document.body.style.overflow = ''; this.cdr.detectChanges(); }
+  closeUserProfile(): void { this.showUserProfile = false; this.userFullProfile = null; this.scrollLock.unlock(); this.cdr.detectChanges(); }
 
   // ── Caisse journalière ─────────────────────────────────────────────────────
 
@@ -1041,11 +1047,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.returnDecision = 'APPROVED';
     this.returnDecisionNote = '';
     this.returnDecisionModal = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.cdr.detectChanges();
   }
 
-  closeReturnDecisionModal(): void { this.returnDecisionModal = false; this.returnDecisionItem = null; document.body.style.overflow = ''; this.cdr.detectChanges(); }
+  closeReturnDecisionModal(): void { this.returnDecisionModal = false; this.returnDecisionItem = null; this.scrollLock.unlock(); this.cdr.detectChanges(); }
 
   submitReturnDecision(): void {
     if (!this.returnDecisionItem) return;
@@ -1130,15 +1136,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   statusLabel(status: string): string {
-    const labels: Record<string, string> = { PENDING: 'En attente', APPROVED: 'Approuvée', CONFIRMED: 'Confirmée', DELIVERED: 'Livrée', CANCELLED: 'Annulée' };
+    const labels: Record<string, string> = { PENDING: 'En attente', CONFIRMED: 'Confirmée', SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée' };
     return labels[status] ?? status;
   }
 
   statusColor(status: string): string {
     const colors: Record<string, string> = {
-      PENDING: 'bg-yellow-500/15 text-yellow-400', APPROVED: 'bg-indigo-500/15 text-indigo-400',
-      CONFIRMED: 'bg-blue-500/15 text-indigo-400', DELIVERED: 'bg-emerald-500/15 text-emerald-400',
-      CANCELLED: 'bg-red-500/15 text-red-400',
+      PENDING:   'bg-yellow-500/15 text-yellow-400',
+      CONFIRMED: 'bg-blue-500/15   text-blue-400',
+      SHIPPED:   'bg-orange-500/15 text-orange-400',
+      DELIVERED: 'bg-emerald-500/15 text-emerald-400',
+      CANCELLED: 'bg-red-500/15    text-red-400',
     };
     return colors[status] ?? 'bg-white/10 text-gray-400';
   }

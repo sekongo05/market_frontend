@@ -14,6 +14,7 @@ import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
+import { ScrollLockService } from '../../../core/services/scroll-lock.service';
 
 @Component({
   selector: 'app-products',
@@ -137,7 +138,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private authPromptService: AuthPromptService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private scrollLock: ScrollLockService
   ) {}
 
   openProductView(product: ProductResponse): void {
@@ -145,7 +147,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.selectedProductQty = 1;
     this.viewGalleryIndex = 0;
     this._buildViewGallery(product);
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.cdr.detectChanges();
     setTimeout(() => document.getElementById('product-view-panel')?.scrollTo(0, 0), 0);
   }
@@ -168,7 +170,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   closeProductView(): void {
     this.selectedProduct = null;
-    document.body.style.overflow = '';
+    this.scrollLock.unlock();
     this.cdr.detectChanges();
   }
 
@@ -234,7 +236,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    document.body.style.overflow = '';
+    this.scrollLock.forceUnlock();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -275,7 +277,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.uploadError = null;
     this.initForm();
     this.showModal = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.cdr.detectChanges();
   }
 
@@ -292,13 +294,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.uploadError = null;
     this.initForm(product);
     this.showModal = true;
-    document.body.style.overflow = 'hidden';
+    this.scrollLock.lock();
     this.cdr.detectChanges();
   }
 
   closeModal(): void {
     this.showModal = false;
-    document.body.style.overflow = '';
+    this.scrollLock.unlock();
     this.editingProduct = null;
     this.modalError = null;
     this.modalSuccess = null;
