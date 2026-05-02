@@ -6,20 +6,18 @@
   ════════════════════════════════════════════════════ -->
   <section class="relative min-h-screen overflow-hidden">
 
-    <!-- Image de fond (mobile = full bg / desktop = moitié droite) -->
-    <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1600&q=90"
+    <!-- Image plein écran -->
+    <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=95"
          alt="Montre de prestige SDM Store"
-         class="absolute inset-0 w-full h-full object-cover object-center lg:object-right lg:left-[42%] lg:right-0 lg:w-auto"
-         style="object-position: center center;"
+         class="absolute inset-0 w-full h-full object-cover"
+         style="object-position: 65% center;"
          fetchpriority="high"/>
 
-    <!-- Mobile : dégradé bas vers noir -->
+    <!-- Overlay : protège le texte gauche sur desktop + bas sur mobile -->
+    <div class="absolute inset-0"
+         style="background:linear-gradient(105deg,rgba(4,4,4,0.92) 0%,rgba(4,4,4,0.62) 38%,rgba(4,4,4,0.18) 60%,transparent 78%)"></div>
     <div class="absolute inset-0 lg:hidden"
-         style="background:linear-gradient(to top,rgba(5,5,5,0.98) 0%,rgba(5,5,5,0.6) 40%,rgba(5,5,5,0.05) 100%)"></div>
-
-    <!-- Desktop : panneau noir gauche 42% + fondu de liaison -->
-    <div class="hidden lg:block absolute inset-0"
-         style="background:linear-gradient(to right,#080808 0%,#080808 40%,rgba(8,8,8,0.85) 48%,transparent 58%)"></div>
+         style="background:linear-gradient(to top,rgba(4,4,4,0.94) 0%,rgba(4,4,4,0.30) 45%,transparent 68%)"></div>
 
     <!-- Contenu -->
     <div class="relative z-10 min-h-screen flex flex-col justify-end lg:justify-center

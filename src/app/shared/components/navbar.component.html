@@ -118,7 +118,7 @@
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
                         <button (click)="closeNotificationDetail()"
                           appTooltip="Retour à la liste" tooltipPosition="bottom"
-                          class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/8 transition-colors flex-shrink-0">
+                          class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-black/[.06] transition-colors flex-shrink-0">
                           <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                           </svg>
@@ -204,7 +204,7 @@
                       <div class="max-h-96 overflow-y-auto divide-y theme-border">
                         @for (notif of notifications; track notif.id) {
                           @let t = getTemplate(notif.type);
-                          <div class="flex items-start gap-3 px-5 py-4 hover:bg-white/5 transition-colors group"
+                          <div class="flex items-start gap-3 px-5 py-4 hover:bg-black/[.04] transition-colors group"
                                [class.opacity-55]="notif.read">
                             <!-- Icône type -->
                             <div class="relative flex-shrink-0 mt-0.5">
@@ -214,7 +214,7 @@
                                 </svg>
                               </div>
                               @if (!notif.read) {
-                                <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-gold border-2 border-[var(--surface)]"></span>
+                                <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-gold border-2 border-white"></span>
                               }
                             </div>
                             <!-- Contenu cliquable -->
@@ -257,9 +257,9 @@
             <div class="relative" data-user-menu>
               <button (click)="toggleUserMenu()" appTooltip="Mon compte" tooltipPosition="bottom"
                 class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl border transition-all duration-200
-                       border-transparent hover:border-white/12 hover:bg-white/5"
-                [class.border-white/12]="showUserMenu"
-                [class.bg-white/5]="showUserMenu">
+                       border-transparent hover:border-black/[.08] hover:bg-black/[.04]"
+                [class.border-black/10]="showUserMenu"
+                [class.bg-black/5]="showUserMenu">
                 <!-- Avatar ring -->
                 <div class="relative">
                   <div class="w-8 h-8 bg-gold rounded-xl flex items-center justify-center
@@ -416,7 +416,7 @@
                     <div class="flex flex-col">
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
                         <button (click)="closeNotificationDetail()"
-                          class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/8 transition-colors flex-shrink-0">
+                          class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-black/[.06] transition-colors flex-shrink-0">
                           <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                           </svg>
@@ -479,7 +479,7 @@
                       <div class="max-h-80 overflow-y-auto divide-y theme-border">
                         @for (notif of notifications; track notif.id) {
                           @let tM = getTemplate(notif.type);
-                          <div class="flex items-start gap-3 px-5 py-4 hover:bg-white/5 transition-colors group"
+                          <div class="flex items-start gap-3 px-5 py-4 hover:bg-black/[.04] transition-colors group"
                                [class.opacity-55]="notif.read">
                             <div class="relative flex-shrink-0 mt-0.5">
                               <div class="w-8 h-8 rounded-xl flex items-center justify-center" [ngClass]="tM.bgClass">
@@ -488,7 +488,7 @@
                                 </svg>
                               </div>
                               @if (!notif.read) {
-                                <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-gold border-2 border-[var(--surface)]"></span>
+                                <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-gold border-2 border-white"></span>
                               }
                             </div>
                             <button type="button" (click)="openNotification(notif)" class="flex-1 min-w-0 text-left">
@@ -523,7 +523,7 @@
           <!-- Hamburger -->
           <button (click)="toggleMobile()" appTooltip="Menu" tooltipPosition="bottom"
             class="w-11 h-11 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
-                   text-gray-400 hover:text-white hover:bg-white/5">
+                   text-gray-500 hover:text-gray-700 hover:bg-black/5">
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
                   style="background:#6b7280"
                   [style.transform]="mobileOpen ? 'translateY(6.5px) rotate(45deg)' : 'none'"></span>
@@ -734,7 +734,7 @@
         }
         <button (click)="showCart = false"
           class="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-150
-                 text-gray-500 hover:text-white hover:bg-white/10">
+                 text-gray-500 hover:text-gray-700 hover:bg-black/5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -792,7 +792,7 @@
                      style="background:rgba(0,0,0,0.05)">
                   <button (click)="cartService.updateQuantity(item.productId, item.quantity - 1)"
                     class="w-11 h-11 flex items-center justify-center text-lg font-light transition-colors
-                           hover:bg-white/10"
+                           hover:bg-black/5"
                     style="color:#6b7280">−</button>
                   <span class="w-8 text-center text-sm font-black" style="color:#111111">{{ item.quantity }}</span>
                   <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1)"
