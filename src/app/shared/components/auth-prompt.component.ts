@@ -72,7 +72,7 @@ import { ThemeService } from '../../core/services/theme.service';
               <button (click)="goToRegister()"
                 class="w-full py-3 rounded-xl font-bold text-sm transition-all duration-200
                        hover:-translate-y-0.5"
-                style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);color:#111111"
+                style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);color:#111111">
                 Créer un compte
               </button>
             </div>
