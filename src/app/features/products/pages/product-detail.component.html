@@ -304,7 +304,7 @@
                     <button (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1"
                       appTooltip="Diminuer la quantité" tooltipPosition="top"
                       class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
-                             hover:text-gold hover:bg-white/5 transition-colors">
+                             hover:text-gold hover:bg-black/5 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
                       </svg>
@@ -313,7 +313,7 @@
                     <button (click)="setQuantity(quantity + 1)" [disabled]="quantity >= product.stock"
                       appTooltip="Augmenter la quantité" tooltipPosition="top"
                       class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
-                             hover:text-gold hover:bg-white/5 transition-colors">
+                             hover:text-gold hover:bg-black/5 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                       </svg>

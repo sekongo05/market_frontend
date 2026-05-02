@@ -274,20 +274,20 @@
                     } @else if (editingStockId === product.id) {
                       <div class="flex items-center justify-center gap-1">
                         <button type="button" (click)="adjustStock(-1)"
-                          class="w-6 h-6 rounded-lg bg-white/10 theme-muted hover:text-gold flex items-center justify-center text-base font-bold leading-none transition-colors">−</button>
+                          class="w-6 h-6 rounded-lg bg-black/[.07] theme-muted hover:text-gold flex items-center justify-center text-base font-bold leading-none transition-colors">−</button>
                         <input type="number" min="0"
                                [(ngModel)]="editingStockValue"
                                (keydown.enter)="confirmEditStock(product)"
                                (keydown.escape)="cancelEditStock()"
                                class="w-14 text-center theme-input px-1 py-1 rounded-lg text-sm font-bold"/>
                         <button type="button" (click)="adjustStock(1)"
-                          class="w-6 h-6 rounded-lg bg-white/10 theme-muted hover:text-gold flex items-center justify-center text-base font-bold leading-none transition-colors">+</button>
+                          class="w-6 h-6 rounded-lg bg-black/[.07] theme-muted hover:text-gold flex items-center justify-center text-base font-bold leading-none transition-colors">+</button>
                         <button type="button" (click)="confirmEditStock(product)" title="Valider"
                           class="w-6 h-6 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 flex items-center justify-center transition-colors">
                           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                         </button>
                         <button type="button" (click)="cancelEditStock()" title="Annuler"
-                          class="w-6 h-6 rounded-lg bg-white/5 theme-muted hover:text-gold flex items-center justify-center transition-colors">
+                          class="w-6 h-6 rounded-lg bg-black/[.04] theme-muted hover:text-gold flex items-center justify-center transition-colors">
                           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                       </div>
@@ -327,7 +327,7 @@
                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                         </button>
                         <button type="button" (click)="cancelEditDiscount()" title="Annuler"
-                          class="w-8 h-8 rounded-lg bg-white/5 theme-muted hover:text-gold flex items-center justify-center transition-colors">
+                          class="w-8 h-8 rounded-lg bg-black/[.04] theme-muted hover:text-gold flex items-center justify-center transition-colors">
                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                       </div>

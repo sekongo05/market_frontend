@@ -182,7 +182,7 @@
           </div>
           <p class="text-3xl font-black theme-text leading-none">{{ completionRate }}<span class="text-lg theme-muted font-semibold">%</span></p>
           <!-- Barre de progression -->
-          <div class="mt-3 h-1.5 bg-white/8 rounded-full overflow-hidden">
+          <div class="mt-3 h-1.5 bg-black/[.06] rounded-full overflow-hidden">
             <div class="h-full rounded-full transition-all duration-700"
                  [style.width.%]="completionRate"
                  [ngClass]="completionRate >= 80 ? 'bg-emerald-400' : completionRate >= 50 ? 'bg-amber-400' : 'bg-red-400'">
@@ -245,10 +245,10 @@
 
             <!-- Stock faible -->
             <div class="flex items-center justify-between p-3 rounded-2xl transition-colors"
-                 [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/8 border border-amber-500/20' : 'bg-white/4'">
+                 [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/8 border border-amber-500/20' : 'bg-black/[.03]'">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                     [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/20' : 'bg-white/8'">
+                     [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/20' : 'bg-black/[.06]'">
                   <svg class="w-4 h-4" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'"
                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
@@ -270,9 +270,9 @@
             </div>
 
             <!-- Commandes en attente -->
-            <div class="flex items-center justify-between p-3 rounded-2xl bg-white/4">
+            <div class="flex items-center justify-between p-3 rounded-2xl bg-black/[.03]">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl bg-white/8 flex items-center justify-center flex-shrink-0">
+                <div class="w-8 h-8 rounded-xl bg-black/[.06] flex items-center justify-center flex-shrink-0">
                   <svg class="w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
@@ -306,7 +306,7 @@
                         <span class="text-sm font-black theme-text w-6 text-right">{{ item.count }}</span>
                       </div>
                     </div>
-                    <div class="h-1.5 bg-white/8 rounded-full overflow-hidden">
+                    <div class="h-1.5 bg-black/[.06] rounded-full overflow-hidden">
                       <div class="h-full rounded-full transition-all duration-700"
                            [style.width.%]="total > 0 ? (item.count / total) * 100 : 0"
                            [ngClass]="statusColor(item.status).includes('yellow') ? 'bg-yellow-400' :
@@ -331,7 +331,7 @@
               @for (product of topProducts; track product.productId; let i = $index) {
                 <div class="flex items-center gap-3">
                   <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0"
-                       [ngClass]="i === 0 ? 'bg-gold text-black' : i === 1 ? 'bg-gold/25 text-gold' : 'bg-white/8 theme-muted'">
+                       [ngClass]="i === 0 ? 'bg-gold text-black' : i === 1 ? 'bg-gold/25 text-gold' : 'bg-black/[.06] theme-muted'">
                     {{ i + 1 }}
                   </div>
                   <div class="flex-1 min-w-0">
@@ -339,7 +339,7 @@
                       <span class="text-xs font-semibold theme-text truncate">{{ product.productName }}</span>
                       <span class="text-xs font-black theme-text ml-2 flex-shrink-0">{{ product.totalSold }}</span>
                     </div>
-                    <div class="h-1 bg-white/8 rounded-full overflow-hidden">
+                    <div class="h-1 bg-black/[.06] rounded-full overflow-hidden">
                       <div class="h-full rounded-full transition-all duration-700"
                            [style.width.%]="(product.totalSold / maxTopProduct) * 100"
                            [ngClass]="i === 0 ? 'bg-gradient-to-r from-[#b8860b] to-[#d4af37]' : i === 1 ? 'bg-gold/50' : 'bg-white/20'">
@@ -373,7 +373,7 @@
               </thead>
               <tbody>
                 @for (order of stats.recentOrders; track order.orderNumber) {
-                  <tr class="border-t theme-border hover:bg-white/3 transition-colors">
+                  <tr class="border-t theme-border hover:bg-black/[.02] transition-colors">
                     <td class="px-5 py-3.5">
                       <span class="font-mono text-xs font-semibold theme-text">{{ order.orderNumber }}</span>
                     </td>
@@ -422,14 +422,14 @@
             </div>
             <div class="flex items-center gap-2">
               <button (click)="changeYear(-1)" appTooltip="Année précédente" tooltipPosition="bottom"
-                class="w-8 h-8 rounded-xl bg-white/8 hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
+                class="w-8 h-8 rounded-xl bg-black/[.06] hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
               </button>
               <span class="text-sm font-bold theme-text w-12 text-center">{{ selectedYear }}</span>
               <button (click)="changeYear(1)" appTooltip="Année suivante" tooltipPosition="bottom"
-                class="w-8 h-8 rounded-xl bg-white/8 hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
+                class="w-8 h-8 rounded-xl bg-black/[.06] hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
@@ -463,7 +463,7 @@
                          'bg-gold shadow-lg shadow-yellow-600/30 scale-x-110': item.month === currentCalendarMonth && selectedYear === selectedYear,
                          'bg-amber-500/60':   idx === bestMonthIndex && item.month !== currentCalendarMonth,
                          'bg-white/20 group-hover:bg-white/35': item.revenue > 0 && idx !== bestMonthIndex && item.month !== currentCalendarMonth,
-                         'bg-white/8':        item.revenue === 0
+                         'bg-black/[.06]':        item.revenue === 0
                        }">
                   </div>
                   <span class="text-[9px] font-medium transition-colors"
@@ -491,7 +491,7 @@
                      [ngClass]="{
                        'bg-gold text-black': i === 0,
                        'bg-gold/20 text-gold': i === 1,
-                       'bg-white/8 theme-muted': i >= 2
+                       'bg-black/[.06] theme-muted': i >= 2
                      }">
                   {{ i + 1 }}
                 </div>
@@ -500,7 +500,7 @@
                     <span class="text-sm font-semibold theme-text truncate">{{ product.productName }}</span>
                     <span class="text-sm font-black theme-text ml-2 shrink-0">{{ product.totalSold }} vendus</span>
                   </div>
-                  <div class="h-1.5 bg-white/8 rounded-full overflow-hidden">
+                  <div class="h-1.5 bg-black/[.06] rounded-full overflow-hidden">
                     <div class="h-full rounded-full transition-all duration-700"
                          [style.width.%]="(product.totalSold / maxTopProduct) * 100"
                          [ngClass]="{
@@ -541,7 +541,7 @@
         </div>
         @if (dailyCaisse) {
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div class="p-4 bg-white/4 rounded-2xl text-center">
+            <div class="p-4 bg-black/[.03] rounded-2xl text-center">
               <p class="text-2xl font-black theme-text">{{ dailyCaisse.ordersCount }}</p>
               <p class="text-xs theme-muted mt-1">Commandes</p>
             </div>
@@ -553,7 +553,7 @@
               <p class="text-xl font-black text-gold">{{ formatAmount(dailyCaisse.totalRevenue) }}</p>
               <p class="text-xs theme-muted mt-1">CA validé</p>
             </div>
-            <div class="p-4 bg-white/4 rounded-2xl text-center">
+            <div class="p-4 bg-black/[.03] rounded-2xl text-center">
               <p class="text-xl font-black theme-text">{{ formatAmount(dailyCaisse.pendingRevenue) }}</p>
               <p class="text-xs theme-muted mt-1">CA en attente</p>
             </div>
@@ -617,7 +617,7 @@
             </thead>
             <tbody>
               @for (user of users; track user.id) {
-                <tr class="border-t theme-border hover:bg-white/3 transition-colors">
+                <tr class="border-t theme-border hover:bg-black/[.02] transition-colors">
                   <!-- Nom -->
                   <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
@@ -676,18 +676,18 @@
             <span class="text-xs theme-muted">Page {{ usersPage + 1 }} / {{ usersTotalPages }}</span>
             <div class="flex gap-2">
               <button (click)="loadUsers(usersPage - 1)" [disabled]="usersPage === 0"
-                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                 ← Préc.
               </button>
               @for (page of userPages; track page) {
                 <button (click)="loadUsers(page)"
                   class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
-                  [ngClass]="page === usersPage ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-gold/15 hover:text-gold'">
+                  [ngClass]="page === usersPage ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
                   {{ page + 1 }}
                 </button>
               }
               <button (click)="loadUsers(usersPage + 1)" [disabled]="usersPage >= usersTotalPages - 1"
-                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                 Suiv. →
               </button>
             </div>
@@ -739,7 +739,7 @@
                 <p class="text-xs theme-muted mt-0.5">{{ editingCategory ? editingCategory.name : 'Remplissez les informations' }}</p>
               </div>
               <button (click)="closeCategoryForm()"
-                class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/8 theme-muted hover:bg-white/12 transition-colors">
+                class="w-8 h-8 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -784,7 +784,7 @@
                 {{ editingCategory ? 'Enregistrer' : 'Créer la catégorie' }}
               </button>
               <button (click)="closeCategoryForm()"
-                class="px-5 py-2.5 bg-white/8 theme-muted font-semibold text-sm rounded-xl hover:bg-white/12 transition-colors">
+                class="px-5 py-2.5 bg-black/[.06] theme-muted font-semibold text-sm rounded-xl hover:bg-white/12 transition-colors">
                 Annuler
               </button>
             </div>
@@ -936,7 +936,7 @@
             </div>
           </div>
           <div class="flex gap-3">
-            <button (click)="closePromoForm()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors">Annuler</button>
+            <button (click)="closePromoForm()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-black/[.04] transition-colors">Annuler</button>
             <button (click)="submitPromo()" [disabled]="promoFormLoading || !promoForm.code"
               class="flex-1 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg transition-all disabled:opacity-50">
               Créer
@@ -991,7 +991,7 @@
                   </td>
                   <td class="px-5 py-4 hidden md:table-cell">
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
-                      [ngClass]="promo.publicVisible ? 'bg-blue-500/15 text-blue-400' : 'bg-white/8 text-gray-500'">
+                      [ngClass]="promo.publicVisible ? 'bg-blue-500/15 text-blue-400' : 'bg-black/[.06] text-gray-500'">
                       {{ promo.publicVisible ? 'Visible' : 'Masqué' }}
                     </span>
                   </td>
@@ -1106,7 +1106,7 @@
             @for (p of reviewPages; track p) {
               <button (click)="loadReviews(p)"
                 class="w-9 h-9 rounded-xl text-sm font-bold transition-colors"
-                [ngClass]="reviewsPage === p ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">
+                [ngClass]="reviewsPage === p ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">
                 {{ p + 1 }}
               </button>
             }
@@ -1195,7 +1195,7 @@
             @for (p of returnPages; track p) {
               <button (click)="loadReturns(p)"
                 class="w-9 h-9 rounded-xl text-sm font-bold transition-colors"
-                [ngClass]="returnsPage === p ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">
+                [ngClass]="returnsPage === p ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">
                 {{ p + 1 }}
               </button>
             }
@@ -1258,7 +1258,7 @@
             </thead>
             <tbody>
               @for (order of allOrders; track order.id) {
-                <tr class="border-t theme-border hover:bg-white/3 transition-colors">
+                <tr class="border-t theme-border hover:bg-black/[.02] transition-colors">
                   <td class="px-5 py-3.5">
                     <div>
                       <p class="font-mono text-xs font-semibold theme-text">{{ order.orderNumber }}</p>
@@ -1311,18 +1311,18 @@
             <span class="text-xs theme-muted">Page {{ ordersPage + 1 }} / {{ ordersTotalPages }}</span>
             <div class="flex gap-2">
               <button (click)="loadAllOrders(ordersPage - 1)" [disabled]="ordersPage === 0"
-                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
+                class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
                 ← Préc.
               </button>
               @for (page of orderPages; track page) {
                 <button (click)="loadAllOrders(page)"
                   class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
-                  [ngClass]="page === ordersPage ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-gold/15 hover:text-gold'">
+                  [ngClass]="page === ordersPage ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
                   {{ page + 1 }}
                 </button>
               }
               <button (click)="loadAllOrders(ordersPage + 1)" [disabled]="ordersPage >= ordersTotalPages - 1"
-                class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
+                class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
                 Suiv. →
               </button>
             </div>
@@ -1398,14 +1398,14 @@
                   <!-- Stock inline edit -->
                   @if (editingStockId === product.id) {
                     <div class="flex items-center gap-1">
-                      <button (click)="adjustStock(-1)" class="w-6 h-6 bg-white/8 rounded-lg flex items-center justify-center theme-muted hover:bg-white/15 text-xs font-bold">−</button>
+                      <button (click)="adjustStock(-1)" class="w-6 h-6 bg-black/[.06] rounded-lg flex items-center justify-center theme-muted hover:bg-white/15 text-xs font-bold">−</button>
                       <input [(ngModel)]="editingStockValue" type="number" min="0"
                         class="w-12 text-center theme-input rounded-lg text-xs py-1 font-bold"/>
-                      <button (click)="adjustStock(1)" class="w-6 h-6 bg-white/8 rounded-lg flex items-center justify-center theme-muted hover:bg-white/15 text-xs font-bold">+</button>
+                      <button (click)="adjustStock(1)" class="w-6 h-6 bg-black/[.06] rounded-lg flex items-center justify-center theme-muted hover:bg-white/15 text-xs font-bold">+</button>
                       <button (click)="confirmEditStock(product)" class="w-6 h-6 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400 hover:bg-green-500/30">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                       </button>
-                      <button (click)="cancelEditStock()" class="w-6 h-6 bg-white/8 rounded-lg flex items-center justify-center theme-muted hover:bg-white/15">
+                      <button (click)="cancelEditStock()" class="w-6 h-6 bg-black/[.06] rounded-lg flex items-center justify-center theme-muted hover:bg-white/15">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                       </button>
                     </div>
@@ -1464,16 +1464,16 @@
         @if (productsTotalPages > 1) {
           <div class="flex justify-center items-center gap-2 mt-6">
             <button (click)="loadProducts(productsPage - 1)" [disabled]="productsPage === 0"
-              class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">← Préc.</button>
+              class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">← Préc.</button>
             @for (page of productPages; track page) {
               <button (click)="loadProducts(page)"
                 class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
-                [ngClass]="page === productsPage ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-gold/15 hover:text-gold'">
+                [ngClass]="page === productsPage ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
                 {{ page + 1 }}
               </button>
             }
             <button (click)="loadProducts(productsPage + 1)" [disabled]="productsPage >= productsTotalPages - 1"
-              class="px-3 py-1.5 rounded-lg bg-white/8 text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">Suiv. →</button>
+              class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">Suiv. →</button>
           </div>
         }
       }
@@ -1513,7 +1513,7 @@
       @for (order of deliveryOrders; track order.id) {
         <div class="luxury-card rounded-2xl overflow-hidden">
           <!-- Row résumé -->
-          <button class="w-full px-5 py-4 flex items-center justify-between gap-4 hover:bg-white/3 transition-colors text-left"
+          <button class="w-full px-5 py-4 flex items-center justify-between gap-4 hover:bg-black/[.02] transition-colors text-left"
                   (click)="toggleDeliveryOrder(order.id)">
             <div class="flex items-center gap-4 min-w-0 flex-1">
               <div class="min-w-0">
@@ -1554,12 +1554,12 @@
                 <div class="flex gap-1 mb-4">
                   <button (click)="deliverySubTab = 'events'"
                     class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors"
-                    [ngClass]="deliverySubTab === 'events' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">
+                    [ngClass]="deliverySubTab === 'events' ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">
                     Événements
                   </button>
                   <button (click)="deliverySubTab = 'update'"
                     class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors"
-                    [ngClass]="deliverySubTab === 'update' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">
+                    [ngClass]="deliverySubTab === 'update' ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">
                     Modifier
                   </button>
                 </div>
@@ -1669,7 +1669,7 @@
           <h3 class="text-lg font-bold theme-text">{{ editingProduct ? 'Modifier' : 'Nouveau' }} produit</h3>
           <p class="text-xs theme-muted mt-0.5">{{ editingProduct ? editingProduct.name : 'Remplissez les informations' }}</p>
         </div>
-        <button (click)="closeDrawer()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/8 theme-muted hover:bg-white/12 transition-colors">
+        <button (click)="closeDrawer()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
@@ -1678,9 +1678,9 @@
       @if (editingProduct) {
         <div class="flex gap-1 px-6 pt-4 flex-shrink-0">
           <button (click)="setDrawerTab('info')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
-            [ngClass]="drawerTab === 'info' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">Informations</button>
+            [ngClass]="drawerTab === 'info' ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">Informations</button>
           <button (click)="setDrawerTab('media')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
-            [ngClass]="drawerTab === 'media' ? 'bg-gold text-black' : 'bg-white/8 theme-muted hover:bg-white/12'">Médias ({{ productMedia.length }})</button>
+            [ngClass]="drawerTab === 'media' ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">Médias ({{ productMedia.length }})</button>
         </div>
       }
 
@@ -1736,7 +1736,7 @@
               @if (!editingProduct && imagePreviews.length > 0) {
                 <div class="grid grid-cols-4 gap-2 mb-2">
                   @for (preview of imagePreviews; track $index; let i = $index) {
-                    <div class="relative aspect-square rounded-xl overflow-hidden bg-white/5">
+                    <div class="relative aspect-square rounded-xl overflow-hidden bg-black/[.04]">
                       <img [src]="preview" class="w-full h-full object-cover"/>
                       <button type="button" (click)="removeImage(i)"
                         class="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white">
@@ -1747,7 +1747,7 @@
                 </div>
               }
               @if (editingProduct && imagePreview) {
-                <div class="relative w-24 h-24 rounded-xl overflow-hidden mb-2 bg-white/5">
+                <div class="relative w-24 h-24 rounded-xl overflow-hidden mb-2 bg-black/[.04]">
                   <img [src]="imagePreview" class="w-full h-full object-cover"/>
                   <button type="button" (click)="clearImage()"
                     class="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white">
@@ -1780,7 +1780,7 @@
             }
             @if (!mediaLoading) {
               @for (media of productMedia; track media.id; let i = $index) {
-                <div class="flex items-center gap-3 p-2 bg-white/4 rounded-xl">
+                <div class="flex items-center gap-3 p-2 bg-black/[.03] rounded-xl">
                   @if (media.mediaType === 'IMAGE') {
                     <img [src]="media.url" class="w-12 h-12 rounded-lg object-cover flex-shrink-0"/>
                   } @else {
@@ -1815,7 +1815,7 @@
       <!-- Footer -->
       @if (drawerTab === 'info') {
         <div class="flex gap-3 px-6 py-5 border-t theme-border flex-shrink-0">
-          <button (click)="closeDrawer()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors">
+          <button (click)="closeDrawer()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-black/[.04] transition-colors">
             Annuler
           </button>
           <button (click)="saveProduct()" [disabled]="drawerLoading || productForm.invalid"
@@ -1838,7 +1838,7 @@
     <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl p-6 animate-scale-in">
       <h3 class="text-lg font-bold theme-text mb-1">Statuer sur la demande</h3>
       <p class="text-xs theme-muted mb-4">{{ returnDecisionItem.orderNumber }} — {{ returnDecisionItem.customerName }}</p>
-      <p class="text-sm theme-muted mb-4 p-3 bg-white/4 rounded-xl">{{ returnDecisionItem.reason }}</p>
+      <p class="text-sm theme-muted mb-4 p-3 bg-black/[.03] rounded-xl">{{ returnDecisionItem.reason }}</p>
       <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Décision *</label>
       <select [(ngModel)]="returnDecision" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm mb-4">
         <option value="APPROVED">Accepter le retour</option>
@@ -1849,7 +1849,7 @@
       <textarea [(ngModel)]="returnDecisionNote" rows="3" placeholder="Explication pour le client…"
         class="theme-input w-full px-3 py-2.5 rounded-xl text-sm resize-none mb-4"></textarea>
       <div class="flex gap-3">
-        <button (click)="closeReturnDecisionModal()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors">Annuler</button>
+        <button (click)="closeReturnDecisionModal()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-black/[.04] transition-colors">Annuler</button>
         <button (click)="submitReturnDecision()" [disabled]="returnDecisionLoading"
           class="flex-1 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg transition-all disabled:opacity-50">
           Confirmer
@@ -1867,7 +1867,7 @@
 
       <div class="flex items-center justify-between px-6 py-5 border-b theme-border sticky top-0 theme-surface">
         <h3 class="text-lg font-bold theme-text">Fiche client</h3>
-        <button (click)="closeUserProfile()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/8 theme-muted hover:bg-white/12 transition-colors">
+        <button (click)="closeUserProfile()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
@@ -1880,7 +1880,7 @@
         <div class="p-6 space-y-5">
 
           <!-- Identité -->
-          <div class="p-4 bg-white/4 rounded-2xl">
+          <div class="p-4 bg-black/[.03] rounded-2xl">
             <div class="flex items-center gap-3 mb-3">
               <div class="w-12 h-12 rounded-2xl bg-gold/15 flex items-center justify-center text-gold font-black text-lg">
                 {{ userFullProfile.prenom[0] }}{{ userFullProfile.nom[0] }}
@@ -1902,7 +1902,7 @@
 
           <!-- Stats commandes -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div class="p-3 bg-white/4 rounded-xl text-center">
+            <div class="p-3 bg-black/[.03] rounded-xl text-center">
               <p class="text-2xl font-black theme-text">{{ userFullProfile.totalOrders }}</p>
               <p class="text-xs theme-muted mt-0.5">Total cmd</p>
             </div>
@@ -1932,7 +1932,7 @@
               <p class="text-xs font-bold theme-muted uppercase tracking-wider mb-2">Dernières commandes</p>
               <div class="space-y-2">
                 @for (order of userFullProfile.recentOrders; track order.id) {
-                  <div class="flex items-center justify-between p-3 bg-white/4 rounded-xl">
+                  <div class="flex items-center justify-between p-3 bg-black/[.03] rounded-xl">
                     <div>
                       <p class="font-mono font-bold text-sm theme-text">{{ order.orderNumber }}</p>
                       <p class="text-xs theme-muted">{{ order.createdAt | date:'dd/MM/yyyy' }}</p>
@@ -1986,7 +1986,7 @@
           <p class="text-xs theme-muted mt-0.5">Le compte sera actif immédiatement</p>
         </div>
         <button (click)="closeCreateUserModal()"
-          class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/8 theme-muted hover:bg-white/12 transition-colors">
+          class="w-8 h-8 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
@@ -2040,7 +2040,7 @@
       <!-- Footer -->
       <div class="flex gap-3 px-6 pb-6">
         <button (click)="closeCreateUserModal()" [disabled]="createUserLoading"
-          class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-white/5 transition-colors disabled:opacity-50">
+          class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-black/[.04] transition-colors disabled:opacity-50">
           Annuler
         </button>
         <button (click)="submitCreateUser()" [disabled]="createUserLoading || !createUserForm.prenom || !createUserForm.nom || !createUserForm.email || !createUserForm.password || !createUserForm.phone"

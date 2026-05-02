@@ -270,7 +270,7 @@
                                border-2 border-black"></span>
                 </div>
                 <div class="hidden xl:block text-left">
-                  <p class="text-xs font-bold leading-none mb-0.5 text-white">{{ fullName }}</p>
+                  <p class="text-xs font-bold leading-none mb-0.5" style="color:#111111">{{ fullName }}</p>
                   @if (currentUser.role !== 'CUSTOMER') {
                     <p class="text-xs leading-none" style="color:#d4af37">{{ currentUser.role }}</p>
                   }
@@ -930,7 +930,7 @@
                   </div>
                 }
                 <div class="flex items-center justify-between px-3 py-2 text-xs font-black">
-                  <span style="color:#ffffff">Total</span>
+                  <span style="color:#111111">Total</span>
                   <span style="color:#d4af37">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K FCFA</span>
                 </div>
               </div>

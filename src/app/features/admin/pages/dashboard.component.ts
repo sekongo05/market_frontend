@@ -371,7 +371,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       DELIVERED: 'bg-green-500/15  text-green-400  border border-green-500/25',
       CANCELLED: 'bg-red-500/15    text-red-400    border border-red-500/25',
     };
-    return m[s] ?? 'bg-white/10 theme-muted border border-white/10';
+    return m[s] ?? 'bg-black/[.06] theme-muted border border-black/[.10]';
   }
 
   nextStatusLabel(s: string): string {
@@ -767,7 +767,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       DELIVERED:        'bg-green-500/15  text-green-400  border border-green-500/25',
       FAILED:           'bg-red-500/15    text-red-400    border border-red-500/25',
     };
-    return m[s] ?? 'bg-white/10 theme-muted border border-white/10';
+    return m[s] ?? 'bg-black/[.06] theme-muted border border-black/[.10]';
   }
 
   get deliveryOrderPages(): number[] { return Array.from({ length: this.deliveryOrdersTotalPages }, (_, i) => i); }
@@ -1084,7 +1084,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       REJECTED:  'bg-red-500/15    text-red-400    border border-red-500/25',
       COMPLETED: 'bg-blue-500/15   text-blue-400   border border-blue-500/25',
     };
-    return m[s] ?? 'bg-white/10 text-gray-400 border border-white/10';
+    return m[s] ?? 'bg-black/[.06] text-gray-500 border border-black/[.10]';
   }
 
   get returnPages(): number[] { return Array.from({ length: this.returnsTotalPages }, (_, i) => i); }
@@ -1148,7 +1148,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       DELIVERED: 'bg-emerald-500/15 text-emerald-400',
       CANCELLED: 'bg-red-500/15    text-red-400',
     };
-    return colors[status] ?? 'bg-white/10 text-gray-400';
+    return colors[status] ?? 'bg-black/[.06] text-gray-500';
   }
 
   insightColors(type: Insight['type']): { border: string; bg: string; text: string; dot: string } {

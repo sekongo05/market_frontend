@@ -104,7 +104,7 @@ export class OrdersComponent implements OnInit {
       DELIVERED: 'bg-green-500/15  text-green-400  border border-green-500/25',
       CANCELLED: 'bg-red-500/15    text-red-400    border border-red-500/25',
     };
-    return m[s] ?? 'bg-white/10 theme-muted border border-white/10';
+    return m[s] ?? 'bg-black/[.06] theme-muted border border-black/[.10]';
   }
 
   deliveryLabel(s: string): string {
