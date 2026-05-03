@@ -41,8 +41,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class SupportWidgetComponent {
 
-  readonly whatsappUrl = 'https://wa.me/2250153761320?text=Bonjour%2C%20j%27ai%20besoin%20d%27aide%20pour%20ma%20commande%20SDM%20STORE.';
-
+readonly whatsappUrl ='https://wa.me/2250153761320?text=Bonjour%2C%20je%20souhaite%20commander%20un%20produit%20sur%20SDM%20STORE.%20Pouvez-vous%20me%20donner%20les%20informations%20et%20la%20disponibilit%C3%A9%20%3F';
   constructor(private authService: AuthService) {}
 
   get isCustomer(): boolean {
