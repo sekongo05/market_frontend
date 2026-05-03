@@ -290,11 +290,11 @@
                   <div class="flex items-baseline gap-1.5 flex-wrap">
                     <span class="font-black text-orange-400 leading-none"
                           [ngClass]="wide ? 'text-xl sm:text-2xl' : 'text-sm sm:text-base'">
-                      {{ (product.salePrice / 1000) | number:'1.0-0' }}K
+                      {{ (product.salePrice / 1000) | number:'1.0-0': 'fr-FR' }}
                     </span>
                     <span class="text-white/45 line-through leading-none"
                           [ngClass]="wide ? 'text-sm' : 'text-[10px]'">
-                      {{ (product.price / 1000) | number:'1.0-0' }}K
+                      {{ product.price  | number:'1.0-0': 'fr-FR' }}
                     </span>
                     <span class="text-white/40 text-[9px]">FCFA</span>
                   </div>
@@ -302,7 +302,7 @@
                   <div class="flex items-baseline gap-1">
                     <span class="font-black leading-none" style="color:#d4af37;"
                           [ngClass]="wide ? 'text-xl sm:text-2xl' : 'text-sm sm:text-base'">
-                      {{ (product.price / 1000) | number:'1.0-0' }}K
+                      {{ (product.price / 1000) | number:'1.0-0': 'fr-FR' }}
                     </span>
                     <span class="text-white/40 text-[9px]">FCFA</span>
                   </div>
