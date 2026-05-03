@@ -556,7 +556,7 @@
             <span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-sm font-black">-{{ selectedProduct.discountPercent }}%</span>
               <span class="text-base theme-muted">FCFA · TTC</span>
             } @else {
-              <span class="text-4xl font-black text-gold">{{ (selectedProduct.price / 1000) | number:'1.0-0' }}K</span>
+              <span class="text-4xl font-black text-gold">{{ selectedProduct.price | number:'1.0-0' }}</span>
               <span class="text-base theme-muted">FCFA · TTC</span>
             }
           </div>
@@ -564,8 +564,8 @@
           <!-- Stock -->
           <div class="flex items-center gap-2">
             @if (selectedProduct.stock > 0) {
-              <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-<!--               <span class="text-sm text-green-400 font-medium">{{ selectedProduct.stock }} unités disponibles</span>
+<!--               <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+ --><!--               <span class="text-sm text-green-400 font-medium">{{ selectedProduct.stock }} unités disponibles</span>
  -->            } @else {
               <div class="w-2 h-2 rounded-full bg-red-400"></div>
               <span class="text-sm text-red-400 font-medium">Rupture de stock</span>
