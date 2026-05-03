@@ -153,7 +153,7 @@
               <div>
                 <p class="text-xs theme-muted font-semibold mb-0.5">Total</p>
                 <p class="text-xl font-black text-gold">
-                  {{ (order.totalAmount / 1000) | number:'1.0-0' }}<span class="text-sm font-bold">K</span>
+                  {{ (order.totalAmount ) | number:'1.0-0': 'fr-FR' }}<span class="text-sm font-bold"></span>
                   <span class="text-xs theme-muted font-semibold ml-1">FCFA</span>
                 </p>
               </div>
@@ -188,7 +188,7 @@
                         <span class="text-xs theme-muted flex-shrink-0">× {{ item.quantity }}</span>
                       </div>
                       <span class="font-black text-gold flex-shrink-0 ml-4">
-                        {{ (item.subtotal / 1000) | number:'1.0-0' }}K FCFA
+                        {{ (item.subtotal ) | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA
                       </span>
                     </div>
                   }
@@ -196,7 +196,7 @@
                   <div class="flex justify-between items-center px-4 py-2.5 border-t theme-border"
                        style="background:rgba(212,175,55,0.06)">
                     <span class="text-xs font-bold theme-muted uppercase tracking-wider">Total</span>
-                    <span class="font-black text-gold">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K FCFA</span>
+                    <span class="font-black text-gold">{{ (order.totalAmount ) | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
                   </div>
                 </div>
               </div>
