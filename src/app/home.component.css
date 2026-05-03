@@ -1,20 +1,258 @@
+/* ═══════════════════════════════════════════════════════════════════
+   HERO — animations d'entrée cinématiques
+═══════════════════════════════════════════════════════════════════ */
+
+@keyframes ken-burns {
+  from { transform: scale(1.07); }
+  to   { transform: scale(1); }
+}
+
+@keyframes word-rise {
+  from { opacity: 0; transform: translateY(110%) skewY(3deg); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0) skewY(0deg);   filter: blur(0);   }
+}
+
+@keyframes fade-blur-in {
+  from { opacity: 0; filter: blur(8px);  transform: translateY(14px); }
+  to   { opacity: 1; filter: blur(0);    transform: translateY(0);    }
+}
+
+@keyframes slide-up-fade {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes line-draw-y {
+  from { transform: scaleY(0); transform-origin: top; }
+  to   { transform: scaleY(1); transform-origin: top; }
+}
+
+@keyframes particle-float {
+  0%   { opacity: 0;   transform: translateY(0)        translateX(0); }
+  18%  { opacity: 0.9; }
+  82%  { opacity: 0.4; }
+  100% { opacity: 0;   transform: translateY(-180px)   translateX(14px); }
+}
+
+.hero-parallax { transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.hero-img      { animation: ken-burns 20s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.hero-line-v   { animation: line-draw-y 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; transform-origin: top; }
+.hero-wrap     { overflow: hidden; display: block; }
+.hero-word     { display: block; animation: word-rise 1.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.hero-eyebrow { animation: fade-blur-in 0.9s ease 0.2s  both; }
+.hero-desc    { animation: fade-blur-in 1s   ease 1.4s  both; }
+.hero-chips   { animation: slide-up-fade 0.8s ease 1.7s both; }
+.hero-ctas    { animation: slide-up-fade 0.8s ease 2.0s both; }
+.hero-sig     { animation: slide-up-fade 0.7s ease 2.2s both; }
+.hero-badge   { animation: slide-up-fade 0.9s cubic-bezier(0.16, 1, 0.3, 1) 2.6s both; }
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.7);
+  pointer-events: none;
+  animation: particle-float linear infinite;
+}
+
+/* Mouse spotlight */
+.hero-spotlight { --mx: 50%; --my: 50%; }
+.hero-spotlight::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(700px circle at var(--mx) var(--my), rgba(212, 175, 55, 0.028), transparent 40%);
+  pointer-events: none; z-index: 4;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GOLD SHIMMER — sur le mot "DU" et titres de sections
+═══════════════════════════════════════════════════════════════════ */
+
+@keyframes shimmer {
+  0%   { background-position:  200% center; }
+  100% { background-position: -200% center; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    #9a7415 0%,
+    #d4af37 25%,
+    #fef9c3 50%,
+    #d4af37 75%,
+    #9a7415 100%
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear 1.5s infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MARQUEE
+═══════════════════════════════════════════════════════════════════ */
+
 @keyframes marquee-scroll {
-  from { transform: translateX(0); }
+  from { transform: translateX(0);    }
   to   { transform: translateX(-50%); }
 }
 
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marquee-scroll 42s linear infinite;
+  animation: marquee-scroll 44s linear infinite;
   will-change: transform;
 }
-
 .marquee-track:hover { animation-play-state: paused; }
 
-@keyframes badge-appear {
-  from { opacity: 0; transform: translateY(12px) scale(0.95); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+/* ═══════════════════════════════════════════════════════════════════
+   COLLECTION CARDS — glint sweep + bracket corners
+═══════════════════════════════════════════════════════════════════ */
+
+@keyframes sweep-glint {
+  from { left: -55%; }
+  to   { left: 165%; }
 }
 
-.hero-badge { animation: badge-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.2s both; }
+.glint-card { position: relative; overflow: hidden; }
+.glint-card::before {
+  content: '';
+  position: absolute; top: 0; left: -55%;
+  width: 80px; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.08), rgba(255, 255, 255, 0.04), transparent);
+  transform: skewX(-12deg);
+  opacity: 0; z-index: 10; pointer-events: none;
+}
+.glint-card:hover::before { opacity: 1; animation: sweep-glint 1s ease forwards; }
+
+.bracket-card { position: relative; }
+.bracket-card::before,
+.bracket-card::after {
+  content: '';
+  position: absolute;
+  width: 20px; height: 20px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0; z-index: 15;
+}
+.bracket-card::before { top: 16px;    left: 16px;   border-top: 1px solid #d4af37; border-left:   1px solid #d4af37; }
+.bracket-card::after  { bottom: 16px; right: 16px;  border-bottom: 1px solid #d4af37; border-right: 1px solid #d4af37; }
+.bracket-card:hover::before,
+.bracket-card:hover::after { opacity: 1; width: 34px; height: 34px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SCROLL REVEAL — déclenché quand la section entre dans le viewport
+═══════════════════════════════════════════════════════════════════ */
+
+/* État caché initial */
+.scroll-reveal:not(.in-view) .r-up    { opacity: 0 !important; transform: translateY(38px) !important; }
+.scroll-reveal:not(.in-view) .r-left  { opacity: 0 !important; transform: translateX(-48px) !important; }
+.scroll-reveal:not(.in-view) .r-right { opacity: 0 !important; transform: translateX(48px)  !important; }
+.scroll-reveal:not(.in-view) .r-scale { opacity: 0 !important; transform: scale(0.88) !important; }
+.scroll-reveal:not(.in-view) .r-line  {
+  opacity: 0 !important;
+  transform: scaleX(0) !important;
+  transform-origin: left center !important;
+}
+
+/* Transition vers l'état visible */
+.scroll-reveal.in-view .r-up,
+.scroll-reveal.in-view .r-left,
+.scroll-reveal.in-view .r-right,
+.scroll-reveal.in-view .r-scale {
+  opacity: 1; transform: none;
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal.in-view .r-line {
+  opacity: 1; transform: scaleX(1); transform-origin: left center;
+  transition: opacity 0.8s ease, transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PRODUCT CARDS — animation au rendu DOM (async)
+═══════════════════════════════════════════════════════════════════ */
+
+@keyframes card-appear {
+  from { opacity: 0; transform: translateY(24px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0);   }
+}
+.card-appear { animation: card-appear 0.75s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   QUOTE — effet 3D flip en entrée
+═══════════════════════════════════════════════════════════════════ */
+
+@keyframes quote-flip {
+  from { opacity: 0; transform: rotateX(-25deg) translateY(20px); }
+  to   { opacity: 1; transform: rotateX(0deg)   translateY(0); }
+}
+
+.scroll-reveal:not(.in-view) .r-flip {
+  opacity: 0 !important;
+  transform: rotateX(-25deg) translateY(20px) !important;
+  transform-style: preserve-3d;
+}
+
+.scroll-reveal.in-view .r-flip {
+  opacity: 1; transform: none;
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATS — glow pulsant sur les chiffres
+═══════════════════════════════════════════════════════════════════ */
+
+@keyframes stat-glow {
+  0%,  100% { text-shadow: 0 0  0px rgba(212, 175, 55, 0.0); }
+  50%        { text-shadow: 0 0 50px rgba(212, 175, 55, 0.55), 0 0 100px rgba(212, 175, 55, 0.2); }
+}
+
+#stats-row.in-view .stat-num {
+  animation: stat-glow 4s ease-in-out 0.5s infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PRODUCT CARD HOVER — shimmer diagonal
+═══════════════════════════════════════════════════════════════════ */
+
+@keyframes card-shimmer {
+  from { left: -60%; }
+  to   { left: 160%; }
+}
+
+.product-card-wrap {
+  position: relative; overflow: hidden;
+}
+.product-card-wrap::after {
+  content: '';
+  position: absolute; top: 0; left: -60%; height: 100%; width: 50px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+  transform: skewX(-20deg);
+  opacity: 0; z-index: 5; pointer-events: none;
+}
+.product-card-wrap:hover::after {
+  opacity: 1; animation: card-shimmer 0.6s ease forwards;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   EDITORIAL — ligne dorée animée
+═══════════════════════════════════════════════════════════════════ */
+
+@keyframes gold-pulse {
+  0%, 100% { opacity: 0.6; box-shadow: none; }
+  50%       { opacity: 1;   box-shadow: 0 0 12px rgba(212, 175, 55, 0.4); }
+}
+
+.gold-line-pulse { animation: gold-pulse 3s ease-in-out infinite; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CTA — halo radial pulsant
+═══════════════════════════════════════════════════════════════════ */
+
+@keyframes halo-pulse {
+  0%, 100% { opacity: 0.04; transform: scale(1); }
+  50%       { opacity: 0.09; transform: scale(1.08); }
+}
+
+.cta-halo { animation: halo-pulse 6s ease-in-out infinite; }

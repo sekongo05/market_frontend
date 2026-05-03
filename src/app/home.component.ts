@@ -35,27 +35,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     'Patek Philippe', 'Omega', 'Tag Heuer', 'Breitling', 'IWC', 'Tissot', 'Bulgari',
   ];
 
-  readonly testimonials = [
-    {
-      quote: 'La montre est arrivée le lendemain, parfaitement emballée. Qualité irréprochable, je recommande à 100%.',
-      name: 'Moussa K.',
-      city: 'Abidjan, Cocody',
-      initials: 'MK',
-    },
-    {
-      quote: "J'ai commandé pour offrir à ma femme et elle était aux anges. SDM Store ne déçoit vraiment jamais.",
-      name: 'Ibrahim D.',
-      city: 'Bouaké',
-      initials: 'ID',
-    },
-    {
-      quote: "Enfin une boutique sérieuse à Abidjan. La chaîne en or est authentique, j'ai fait vérifier par un bijoutier.",
-      name: 'Fatou A.',
-      city: 'Abidjan, Plateau',
-      initials: 'FA',
-    },
-  ];
-
   get hasDeals(): boolean {
     return !this.newProductsLoading && this.discountProducts.length > 0;
   }
@@ -76,7 +55,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     {
       n: '03',
       title: 'Recevez chez vous',
-      desc: '24–48h à Abidjan, 72h max partout en Côte d\'Ivoire. Paiement à la livraison à Abidjan. Pour l’intérieur du pays, 50% à payer avant expédition.',
+      desc: '24–48h à Abidjan, 72h max partout en Côte d\'Ivoire. Paiement à la livraison à Abidjan. Pour l\'intérieur du pays, 50% à payer avant expédition.',
       icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
     },
   ];
@@ -108,12 +87,32 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= 7;
   }
 
+  onHeroMouseMove(event: MouseEvent): void {
+    const section = event.currentTarget as HTMLElement;
+    const rect    = section.getBoundingClientRect();
+    const cx = (event.clientX - rect.left) / rect.width  - 0.5;
+    const cy = (event.clientY - rect.top)  / rect.height - 0.5;
+
+    const parallax = section.querySelector('.hero-parallax') as HTMLElement | null;
+    if (parallax) {
+      parallax.style.transform = `translate(${(cx * -12).toFixed(2)}px, ${(cy * -8).toFixed(2)}px)`;
+    }
+
+    section.style.setProperty('--mx', ((event.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%');
+    section.style.setProperty('--my', ((event.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%');
+  }
+
+  onHeroMouseLeave(event: MouseEvent): void {
+    const parallax = (event.currentTarget as HTMLElement).querySelector('.hero-parallax') as HTMLElement | null;
+    if (parallax) parallax.style.transform = '';
+  }
+
   private _loadProducts(): void {
     this.productService.getProducts({ page: 0, size: 24, sort: 'newest' }).subscribe({
       next: (r) => {
         if (r.success) {
           const pg = r.data as PageResponse<ProductResponse>;
-          this.newProducts = pg.content.filter(p => this.isNew(p)).slice(0, 8);
+          this.newProducts    = pg.content.filter(p => this.isNew(p)).slice(0, 8);
           this.discountProducts = pg.content.filter(p => p.discountPercent && p.discountPercent > 0).slice(0, 4);
         }
         this.newProductsLoading = false;
@@ -134,8 +133,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
           this._count('statBrands',   15,   1400);
           this._count('statClients',  1200, 2400);
         }
+        this._observer!.unobserve(entry.target);
       });
-    }, { threshold: 0.12 });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
     document.querySelectorAll('.scroll-reveal').forEach(el => this._observer!.observe(el));
     const stats = document.getElementById('stats-row');
