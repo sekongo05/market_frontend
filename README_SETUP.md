@@ -321,7 +321,7 @@ Voir **[DEVELOPMENT_CHECKLIST.md](DEVELOPMENT_CHECKLIST.md)** pour la roadmap co
 
 ## 👨‍💻 Auteur
 
-Frontend créé avec Angular 21, TailwindCSS, et beaucoup de ❤️
+Frontend créé avec Angular 21, TailwindCSS
 
 ---
 

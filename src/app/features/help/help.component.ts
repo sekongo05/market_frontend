@@ -45,16 +45,16 @@ export class HelpComponent {
     // ── Paiement
     {
       q: 'Quels modes de paiement sont acceptés ?',
-      a: 'Nous acceptons le paiement via Wave CI. Le règlement s\'effectue au moment de la livraison — vous payez lorsque vous recevez votre commande entre les mains du livreur. Nous n\'acceptons pas les paiements en avance par virement bancaire.'
+      a: 'Nous acceptons le paiement via Wave CI. Le règlement s\'effectue au moment de la livraison — vous payez lorsque vous recevez votre commande entre les mains du livreur.'
     },
     // ── Retours
     {
       q: 'Puis-je retourner un article ?',
-      a: 'Oui. Vous disposez de 3 jours après la date de réception pour initier un retour. L\'article doit être non utilisé, dans son emballage d\'origine. Connectez-vous, allez dans "Mes commandes", sélectionnez la commande concernée et cliquez sur "Retourner un article". Consultez notre politique de retour complète pour les conditions détaillées.'
+      a: 'Oui. Vous disposez de 24 heures après la date de réception pour initier un retour. L\'article doit être non utilisé, dans son emballage d\'origine. Connectez-vous, allez dans "Mes commandes", sélectionnez la commande concernée et cliquez sur "Retourner un article". Consultez notre politique de retour complète pour les conditions détaillées.'
     },
     {
       q: 'Que faire si un article est endommagé ou non conforme à la réception ?',
-      a: 'Photographiez immédiatement l\'article et son emballage, puis contactez-nous sous 48h par email (sdmstore05@gmail.com) ou par téléphone en indiquant votre numéro de commande et en joignant les photos. Nous prenons en charge le remplacement ou le remboursement intégral sans frais pour vous.'
+      a: 'Photographiez immédiatement l\'article et son emballage, puis contactez-nous sous 48h par email (sdmstore05@gmail.com) ou par téléphone en indiquant votre numéro de commande et en joignant les photos.'
     },
     // ── Compte
     {
