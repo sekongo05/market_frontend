@@ -475,7 +475,7 @@
                   <p class="text-[10px] text-gold font-semibold uppercase tracking-wider mb-0.5">{{ related.category.name }}</p>
                   <p class="font-bold theme-text text-sm leading-tight truncate mb-2">{{ related.name }}</p>
                   <div class="flex items-center justify-between">
-                    <span class="font-black text-gold text-base">{{ (related.price / 1000) | number:'1.0-0' }}K</span>
+                    <span class="font-black text-gold text-base">{{ related.price | number:'1.0-0': 'fr-FR' }}</span>
                     <span class="text-[10px] theme-muted">FCFA</span>
                   </div>
                 </div>
