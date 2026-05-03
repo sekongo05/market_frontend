@@ -839,7 +839,7 @@
             <div class="flex-1 min-w-0">
               <p class="font-bold text-sm leading-snug mb-1 pr-7 line-clamp-2" style="color:#111111">{{ item.productName }}</p>
               <p class="text-xs font-semibold mb-3" style="color:#d4af37">
-                {{ (item.price / 1000) | number:'1.0-0' }}&thinsp;000 FCFA / unité
+                {{ (item.price ) | number:'1.0-0': 'fr-FR' }}&thinsp;000 FCFA / unité
               </p>
               <div class="flex items-center justify-between">
                 <!-- Contrôle quantité -->
@@ -857,7 +857,7 @@
                 </div>
                 <!-- Sous-total ligne -->
                 <p class="text-sm font-black" style="color:#d4af37">
-                  {{ ((item.price * item.quantity) / 1000) | number:'1.0-0' }}&thinsp;K FCFA
+                  {{ (item.price * item.quantity)  | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA
                 </p>
               </div>
             </div>
@@ -899,7 +899,7 @@
             <div class="flex items-center justify-between text-sm">
               <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
               <span class="font-semibold" style="color:#374151">
-                {{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K FCFA
+                {{ cartTotal  | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA
               </span>
             </div>
             <div class="flex items-center justify-between text-sm">
@@ -910,7 +910,7 @@
             <div class="flex items-center justify-between">
               <span class="font-bold text-sm" style="color:#111111">Total</span>
               <div class="flex items-baseline gap-1">
-                <span class="text-2xl font-black gold-text">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K</span>
+                <span class="text-2xl font-black gold-text">{{ cartTotal  | number:'1.0-0': 'fr-FR' }}</span>
                 <span class="text-xs" style="color:#6b7280">FCFA</span>
               </div>
             </div>
