@@ -839,7 +839,7 @@
             <div class="flex-1 min-w-0">
               <p class="font-bold text-sm leading-snug mb-1 pr-7 line-clamp-2" style="color:#111111">{{ item.productName }}</p>
               <p class="text-xs font-semibold mb-3" style="color:#d4af37">
-                {{ (item.price ) | number:'1.0-0': 'fr-FR' }}&thinsp;000 FCFA / unité
+                {{ (item.price/1000 ) | number:'1.0-0': 'fr-FR' }}&thinsp;000 FCFA / unité
               </p>
               <div class="flex items-center justify-between">
                 <!-- Contrôle quantité -->
@@ -986,7 +986,7 @@
                 }
                 <div class="flex items-center justify-between px-3 py-2 text-xs font-black">
                   <span style="color:#111111">Total</span>
-                  <span style="color:#d4af37">{{ (cartTotal / 1000) | number:'1.0-0' }}&thinsp;K FCFA</span>
+                  <span style="color:#d4af37">{{ cartTotal  | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
                 </div>
               </div>
 
