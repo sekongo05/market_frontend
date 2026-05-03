@@ -28,6 +28,38 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private _observer?: IntersectionObserver;
   private _statsAnimated = false;
 
+  readonly marqueeItems = [
+    'Rolex', 'Cartier', 'Richard Mille', 'Hublot', 'Audemars Piguet',
+    'Patek Philippe', 'Omega', 'Tag Heuer', 'Breitling', 'IWC', 'Tissot', 'Bulgari',
+    'Rolex', 'Cartier', 'Richard Mille', 'Hublot', 'Audemars Piguet',
+    'Patek Philippe', 'Omega', 'Tag Heuer', 'Breitling', 'IWC', 'Tissot', 'Bulgari',
+  ];
+
+  readonly testimonials = [
+    {
+      quote: 'La montre est arrivée le lendemain, parfaitement emballée. Qualité irréprochable, je recommande à 100%.',
+      name: 'Moussa K.',
+      city: 'Abidjan, Cocody',
+      initials: 'MK',
+    },
+    {
+      quote: "J'ai commandé pour offrir à ma femme et elle était aux anges. SDM Store ne déçoit vraiment jamais.",
+      name: 'Ibrahim D.',
+      city: 'Bouaké',
+      initials: 'ID',
+    },
+    {
+      quote: "Enfin une boutique sérieuse à Abidjan. La chaîne en or est authentique, j'ai fait vérifier par un bijoutier.",
+      name: 'Fatou A.',
+      city: 'Abidjan, Plateau',
+      initials: 'FA',
+    },
+  ];
+
+  get hasDeals(): boolean {
+    return !this.newProductsLoading && this.discountProducts.length > 0;
+  }
+
   readonly steps = [
     {
       n: '01',

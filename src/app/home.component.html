@@ -1,37 +1,53 @@
 <div class="theme-bg">
 
   <!-- ════════════════════════════════════════════════════
-       HERO — texte gauche / image droite (desktop)
-             image plein écran + texte bas (mobile)
+       1. HERO — image plein écran, badges flottants
   ════════════════════════════════════════════════════ -->
   <section class="relative min-h-screen overflow-hidden">
 
-    <!-- Image plein écran -->
+    <!-- Image -->
     <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=95"
          alt="Montre de prestige SDM Store"
          class="absolute inset-0 w-full h-full object-cover"
-         style="object-position: 65% center;"
+         style="object-position:65% center"
          fetchpriority="high"/>
 
-    <!-- Overlay : protège le texte gauche sur desktop + bas sur mobile -->
+    <!-- Overlays -->
     <div class="absolute inset-0"
-         style="background:linear-gradient(105deg,rgba(4,4,4,0.92) 0%,rgba(4,4,4,0.62) 38%,rgba(4,4,4,0.18) 60%,transparent 78%)"></div>
+         style="background:linear-gradient(105deg,rgba(4,4,4,0.95) 0%,rgba(4,4,4,0.65) 38%,rgba(4,4,4,0.12) 60%,transparent 78%)"></div>
     <div class="absolute inset-0 lg:hidden"
-         style="background:linear-gradient(to top,rgba(4,4,4,0.94) 0%,rgba(4,4,4,0.30) 45%,transparent 68%)"></div>
+         style="background:linear-gradient(to top,rgba(4,4,4,0.97) 0%,rgba(4,4,4,0.28) 45%,transparent 68%)"></div>
 
-    <!-- Contenu -->
+    <!-- Accent left line -->
+    <div class="absolute top-0 left-0 w-[1px] hidden lg:block"
+         style="height:clamp(200px,40vh,420px);background:linear-gradient(to bottom,rgba(212,175,55,0.7),transparent)"></div>
+
+    <!-- Vertical label right (desktop) -->
+    <div class="absolute top-1/2 right-8 hidden xl:flex items-center -translate-y-1/2"
+         style="transform:translateY(-50%) rotate(90deg);transform-origin:center;writing-mode:horizontal-tb;">
+      <span class="text-[7px] uppercase tracking-[0.6em] font-bold"
+            style="color:rgba(212,175,55,0.25);">SDM · Store · Prestige · Abidjan</span>
+    </div>
+
+    <!-- Content -->
     <div class="relative z-10 min-h-screen flex flex-col justify-end lg:justify-center
                 px-7 sm:px-12 lg:px-16 xl:px-24
-                pb-16 pt-28 sm:pt-36 lg:pb-0 lg:pt-0 lg:max-w-[50%]
+                pb-16 pt-28 sm:pt-36 lg:pb-0 lg:pt-0 lg:max-w-[52%]
                 animate-fade-in-up">
 
-      <!-- Filet doré (desktop uniquement) -->
       <div class="hidden lg:block w-8 h-[1px] mb-14" style="background:#d4af37;"></div>
 
-      <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-6 sm:mb-8"
-         style="color:rgba(212,175,55,0.7);">
-        Maison de la montre · Abidjan, Côte d'Ivoire
-      </p>
+      <!-- Eyebrow + pulse -->
+      <div class="flex items-center gap-2.5 mb-6 sm:mb-8">
+        <div class="relative flex h-2 w-2 flex-shrink-0">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50"
+                style="background:#d4af37;"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2" style="background:#d4af37;"></span>
+        </div>
+        <p class="text-[9px] uppercase tracking-[0.55em] font-bold" style="color:rgba(212,175,55,0.7);">
+          Maison de la montre · Abidjan, Côte d'Ivoire
+        </p>
+      </div>
 
       <h1 class="font-black leading-[0.85] tracking-tight text-white mb-8 sm:mb-10">
         <span class="block" style="font-size:clamp(3.8rem,13vw,7rem);">L'HEURE</span>
@@ -39,11 +55,35 @@
         <span class="block" style="font-size:clamp(3.8rem,13vw,7rem);">PRESTIGE.</span>
       </h1>
 
-      <p class="max-w-xs leading-relaxed mb-10 sm:mb-12"
-         style="color:rgba(255,255,255,0.42);font-size:0.875rem;">
+      <p class="max-w-xs leading-relaxed mb-8 sm:mb-10" style="color:rgba(255,255,255,0.42);font-size:0.875rem;">
         Montres &amp; bijoux d'exception, sélectionnés pour vous et livrés partout en Côte d'Ivoire.
       </p>
 
+      <!-- Trust chips -->
+      <div class="flex flex-wrap gap-2 mb-10">
+        <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+              style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.85);">
+          <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          Authenticité garantie
+        </span>
+        <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+              style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.42);">
+          <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          Livraison 24–48h
+        </span>
+        <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+              style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.42);">
+          Paiement à la livraison
+        </span>
+      </div>
+
+      <!-- CTAs -->
       <div class="flex flex-col sm:flex-row gap-3">
         <a routerLink="/products"
            class="inline-flex items-center gap-3 px-7 py-4 text-xs uppercase tracking-[0.2em] font-black text-black
@@ -64,17 +104,29 @@
         }
       </div>
 
-      <!-- Signature (desktop) -->
-      <div class="hidden lg:flex items-center gap-5 mt-auto pt-20"
-           style="color:rgba(255,255,255,0.18);">
+      <!-- Bottom sig -->
+      <div class="hidden lg:flex items-center gap-5 mt-auto pt-20" style="color:rgba(255,255,255,0.18);">
         <span class="text-[8px] uppercase tracking-[0.5em]">Est. 2020</span>
         <div class="w-6 h-[1px]" style="background:rgba(255,255,255,0.12)"></div>
         <span class="text-[8px] uppercase tracking-[0.5em]">Abidjan · CI</span>
       </div>
-
     </div>
 
-    <!-- Indicateur scroll -->
+    <!-- Floating rating badge (XL) -->
+    <div class="hero-badge absolute bottom-12 right-14 hidden xl:flex flex-col gap-1.5 px-5 py-4"
+         style="background:rgba(8,7,3,0.82);border:1px solid rgba(212,175,55,0.22);backdrop-filter:blur(16px);">
+      <div class="flex items-center gap-1 mb-0.5">
+        @for (i of [1,2,3,4,5]; track i) {
+          <svg class="w-2.5 h-2.5" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+          </svg>
+        }
+      </div>
+      <p class="text-xs font-black text-white">1 200+ clients satisfaits</p>
+      <p class="text-[9px] font-semibold" style="color:rgba(212,175,55,0.55);">Note moyenne : 4.9/5</p>
+    </div>
+
+    <!-- Scroll indicator -->
     <div class="absolute bottom-7 right-6 hidden lg:flex flex-col items-center gap-1.5">
       <div class="w-[1px] h-10 bg-gradient-to-b from-white/40 to-transparent animate-float"></div>
     </div>
@@ -82,22 +134,26 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       BANDE SIGNATURE
+       2. MARQUEE ANIMÉ — grandes marques
   ════════════════════════════════════════════════════ -->
-  <div class="border-y flex items-center justify-center gap-5 sm:gap-10 py-4 px-6 overflow-hidden"
-       style="border-color:rgba(212,175,55,0.12);">
-    @for (item of ['Montres de prestige', 'Bijoux & Or', 'Livraison 24–48h', 'Paiement à la livraison']; track item) {
-      <span class="flex items-center gap-5 sm:gap-10 text-[9px] sm:text-[10px] uppercase tracking-[0.35em] font-bold whitespace-nowrap"
-            style="color:rgba(212,175,55,0.45);">
-        {{ item }}
-        <span class="w-1 h-1 rounded-full flex-shrink-0 last:hidden" style="background:rgba(212,175,55,0.3)"></span>
-      </span>
-    }
+  <div class="overflow-hidden cursor-default select-none"
+       style="background:#06060200;border-top:1px solid rgba(212,175,55,0.1);border-bottom:1px solid rgba(212,175,55,0.1);">
+    <div class="marquee-track py-4">
+      @for (item of marqueeItems; track $index) {
+        <span class="flex items-center gap-3 px-5 text-[10px] uppercase tracking-[0.42em] font-bold whitespace-nowrap"
+              style="color:rgba(212,175,55,0.37);">
+          {{ item }}
+          <svg class="w-[3px] h-[3px] flex-shrink-0" viewBox="0 0 3 3" fill="rgba(212,175,55,0.28)">
+            <circle cx="1.5" cy="1.5" r="1.5"/>
+          </svg>
+        </span>
+      }
+    </div>
   </div>
 
 
   <!-- ════════════════════════════════════════════════════
-       NOS COLLECTIONS — layout éditorial asymétrique
+       3. NOS COLLECTIONS
   ════════════════════════════════════════════════════ -->
   <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;">
 
@@ -108,10 +164,9 @@
           style="font-size:clamp(2.4rem,7vw,5.5rem);">NOS COLLECTIONS</h2>
     </div>
 
-    <!-- Grille : Montres (grande) | Bijoux + Mode (empilées) -->
     <div class="flex flex-col lg:flex-row gap-1 px-1">
 
-      <!-- Montres — héro large -->
+      <!-- Montres -->
       <a (click)="goToCategory('montres')"
          class="group relative overflow-hidden cursor-pointer block lg:flex-[58]"
          style="height:clamp(260px,58vw,680px);">
@@ -119,21 +174,23 @@
              alt="Montres" loading="lazy"
              class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-1000 ease-out"/>
         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent"></div>
+        <!-- Top category label -->
+        <div class="absolute top-5 left-5 px-3 py-1.5 text-[8px] uppercase tracking-[0.4em] font-black"
+             style="background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.25);color:rgba(212,175,55,0.8);">
+          Notre spécialité
+        </div>
         <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-9">
-          <p class="text-[8px] uppercase tracking-[0.55em] font-bold mb-3"
-             style="color:rgba(212,175,55,0.75);">Notre spécialité</p>
           <h3 class="text-white font-black tracking-tight leading-none mb-4"
               style="font-size:clamp(2rem,5vw,4rem);">MONTRES</h3>
           <div class="flex items-center gap-4">
-            <div class="h-[1px] w-8 transition-all duration-700 group-hover:w-20"
-                 style="background:#d4af37;"></div>
+            <div class="h-[1px] w-8 transition-all duration-700 group-hover:w-20" style="background:#d4af37;"></div>
             <span class="text-[9px] uppercase tracking-[0.4em] transition-opacity duration-500 opacity-50 group-hover:opacity-100"
                   style="color:#d4af37;">Explorer →</span>
           </div>
         </div>
       </a>
 
-      <!-- Colonne droite : Bijoux + Mode -->
+      <!-- Colonne droite -->
       <div class="flex flex-row lg:flex-col gap-1 lg:flex-[42]">
 
         <a (click)="goToCategory('bijoux')"
@@ -147,8 +204,7 @@
                style="color:rgba(212,175,55,0.7);">Or · Argent · Luxe</p>
             <h3 class="text-white font-black tracking-tight leading-none mb-2.5"
                 style="font-size:clamp(1.4rem,3.5vw,2.2rem);">BIJOUX</h3>
-            <div class="h-[1px] w-5 transition-all duration-700 group-hover:w-12"
-                 style="background:#d4af37;"></div>
+            <div class="h-[1px] w-5 transition-all duration-700 group-hover:w-12" style="background:#d4af37;"></div>
           </div>
         </a>
 
@@ -163,8 +219,7 @@
                style="color:rgba(212,175,55,0.7);">Femme · Homme</p>
             <h3 class="text-white font-black tracking-tight leading-none mb-2.5"
                 style="font-size:clamp(1.4rem,3.5vw,2.2rem);">MODE</h3>
-            <div class="h-[1px] w-5 transition-all duration-700 group-hover:w-12"
-                 style="background:#d4af37;"></div>
+            <div class="h-[1px] w-5 transition-all duration-700 group-hover:w-12" style="background:#d4af37;"></div>
           </div>
         </a>
 
@@ -174,7 +229,7 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       NOUVELLES PIÈCES
+       4. NOUVELLES PIÈCES
   ════════════════════════════════════════════════════ -->
   <section class="scroll-reveal" style="padding-bottom:clamp(60px,8vw,110px);">
 
@@ -192,7 +247,6 @@
       </a>
     </div>
 
-    <!-- Skeleton -->
     @if (newProductsLoading) {
       <div class="flex gap-3 overflow-x-auto px-5 sm:px-8 scrollbar-none sm:grid sm:grid-cols-4">
         @for (i of [1,2,3,4]; track i) {
@@ -205,15 +259,14 @@
       </div>
     }
 
-    <!-- Produits -->
     @if (!newProductsLoading && newProducts.length > 0) {
       <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
                   sm:grid sm:grid-cols-3 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
-        @for (product of newProducts; track product.id) {
+        @for (product of newProducts; track product.id; let idx = $index) {
           <a [routerLink]="['/products']" [queryParams]="{categorie: product.category?.slug}"
              class="group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block">
 
-            <div class="relative overflow-hidden mb-3 rounded" style="aspect-ratio:3/4;">
+            <div class="relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
               <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
                    class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
                    (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
@@ -228,13 +281,14 @@
                   <span class="text-white/70 text-[10px] font-black uppercase tracking-widest">Épuisé</span>
                 </div>
               }
+              <!-- Rank bubble top-right -->
+              <div class="absolute top-2.5 right-2.5 w-6 h-6 flex items-center justify-center text-[8px] font-black text-black"
+                   style="background:#d4af37;">{{ idx + 1 }}</div>
             </div>
 
             <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1"
                style="color:rgba(212,175,55,0.7);">{{ product.category?.name }}</p>
-            <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">
-              {{ product.name }}
-            </p>
+            <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
                 <span class="font-black text-sm sm:text-base text-orange-400">{{ (product.salePrice / 1000) | number:'1.0-0' }}K</span>
@@ -265,7 +319,69 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       CITATION — pleine largeur, atmosphère maison de luxe
+       5. VENTES FLASH — conditionnel si des offres existent
+  ════════════════════════════════════════════════════ -->
+  @if (hasDeals) {
+    <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;background:linear-gradient(135deg,#0e0500 0%,#0a0a0a 50%,#0e0500 100%);">
+      <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+            </span>
+            <p class="text-[9px] uppercase tracking-[0.55em] font-bold text-orange-500/70">Offres limitées</p>
+          </div>
+          <h2 class="font-black theme-text tracking-tight leading-none"
+              style="font-size:clamp(2.4rem,7vw,5.5rem);">
+            VENTES<br><span style="color:#f97316;">FLASH</span>
+          </h2>
+        </div>
+        <a routerLink="/products"
+           class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-orange-400"
+           style="color:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.1);">
+          Voir tout
+        </a>
+      </div>
+
+      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
+                  sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
+        @for (product of discountProducts; track product.id) {
+          <a [routerLink]="['/products']" [queryParams]="{categorie: product.category?.slug}"
+             class="group flex-shrink-0 w-[70vw] sm:w-auto cursor-pointer block">
+            <div class="relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
+              <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+                   class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700"
+                   (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/f97316?text=SDM'"/>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+              @if (product.discountPercent) {
+                <div class="absolute top-3 left-3 px-3 py-1.5 text-[10px] font-black text-white"
+                     style="background:#f97316;">
+                  −{{ product.discountPercent }}%
+                </div>
+              }
+            </div>
+            <p class="text-[8px] uppercase tracking-[0.3em] font-bold mb-1"
+               style="color:rgba(249,115,22,0.6);">{{ product.category?.name }}</p>
+            <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-1">{{ product.name }}</p>
+            <div class="flex items-baseline gap-1.5">
+              @if (product.salePrice) {
+                <span class="font-black text-sm text-orange-400">{{ (product.salePrice / 1000) | number:'1.0-0' }}K</span>
+                <span class="text-xs theme-muted line-through">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+              } @else {
+                <span class="font-black text-sm theme-text">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+              }
+              <span class="text-[9px] theme-muted">FCFA</span>
+            </div>
+          </a>
+        }
+      </div>
+    </section>
+  }
+
+
+  <!-- ════════════════════════════════════════════════════
+       6. CITATION
   ════════════════════════════════════════════════════ -->
   <section class="scroll-reveal border-t border-b"
            style="border-color:rgba(212,175,55,0.1);padding:clamp(70px,10vw,130px) 1.5rem;">
@@ -284,90 +400,115 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       ÉDITORIAL — image gauche | texte droite
+       7. MAGAZINE ÉDITORIAL — image + mini-stats
   ════════════════════════════════════════════════════ -->
-  <section class="scroll-reveal flex flex-col lg:flex-row overflow-hidden"
-           style="min-height:clamp(420px,55vw,680px);">
+  <section class="scroll-reveal overflow-hidden"
+           style="padding:clamp(60px,8vw,110px) 0;background:linear-gradient(135deg,#060606 0%,#0c0a03 50%,#060606 100%);">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+      <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-stretch">
 
-    <!-- Image -->
-    <div class="relative lg:flex-[55] h-[60vw] lg:h-auto overflow-hidden">
-      <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200&q=90"
-           alt="Éditorial SDM Store" loading="lazy"
-           class="w-full h-full object-cover object-center hover:scale-[1.03] transition-transform duration-1000 ease-out"/>
-      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/60 hidden lg:block"></div>
-    </div>
+        <!-- Image portrait -->
+        <div class="relative lg:flex-[52] overflow-hidden" style="min-height:clamp(320px,55vw,640px);">
+          <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200&q=90"
+               alt="Éditorial SDM Store" loading="lazy"
+               class="absolute inset-0 w-full h-full object-cover object-center hover:scale-[1.03] transition-transform duration-1000 ease-out"/>
+          <div class="absolute inset-0" style="background:linear-gradient(to bottom,transparent 55%,rgba(6,6,6,0.6) 100%)"></div>
+          <!-- Floating authenticity tag -->
+          <div class="absolute bottom-6 left-6 flex items-center gap-2.5 px-4 py-2.5"
+               style="background:rgba(8,7,3,0.88);border:1px solid rgba(212,175,55,0.22);backdrop-filter:blur(12px);">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <span class="text-[9px] font-black text-white uppercase tracking-wider">Authenticité certifiée</span>
+          </div>
+        </div>
 
-    <!-- Texte -->
-    <div class="lg:flex-[45] flex flex-col justify-center px-8 sm:px-12 lg:px-14 xl:px-20
-                py-14 lg:py-0"
-         style="background:#080808;">
-      <div class="w-6 h-[1px] mb-10" style="background:#d4af37;"></div>
-      <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-6"
-         style="color:rgba(212,175,55,0.65);">Édition limitée</p>
-      <h2 class="font-black text-white leading-[0.88] tracking-tight mb-8"
-          style="font-size:clamp(2.4rem,5.5vw,4rem);">
-        L'ÉLÉGANCE<br>EST UN<br>
-        <span style="color:#d4af37;">CHOIX.</span>
-      </h2>
-      <p class="leading-relaxed mb-10 text-sm max-w-xs"
-         style="color:rgba(255,255,255,0.4);">
-        Chaque pièce est choisie pour son caractère, sa rareté et son savoir-faire. Rien de banal, tout de l'exception.
-      </p>
-      <a routerLink="/products"
-         class="self-start inline-flex items-center gap-3 px-6 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-black transition-all duration-300 hover:-translate-y-0.5"
-         style="background:#d4af37;">
-        Explorer
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-        </svg>
-      </a>
+        <!-- Texte + mini-stats -->
+        <div class="lg:flex-[48] flex flex-col justify-center">
+          <div class="w-6 h-[1px] mb-10" style="background:#d4af37;"></div>
+          <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-6"
+             style="color:rgba(212,175,55,0.65);">Édition limitée</p>
+          <h2 class="font-black text-white leading-[0.88] tracking-tight mb-8"
+              style="font-size:clamp(2.4rem,5.5vw,4rem);">
+            L'ÉLÉGANCE<br>EST UN<br>
+            <span style="color:#d4af37;">CHOIX.</span>
+          </h2>
+          <p class="leading-relaxed mb-10 text-sm" style="color:rgba(255,255,255,0.4);max-width:28rem;">
+            Chaque pièce est choisie pour son caractère, sa rareté et son savoir-faire. Rien de banal, tout de l'exception.
+          </p>
+
+          <!-- Mini stats grid -->
+          <div class="grid grid-cols-2 gap-x-8 gap-y-6 mb-12">
+            @for (s of [
+              {v:'500+', l:'Références en stock'},
+              {v:'15+',  l:'Grandes marques'},
+              {v:'24h',  l:'Livraison Abidjan'},
+              {v:'100%', l:'Pièces authentifiées'}
+            ]; track s.l) {
+              <div class="border-l-2 pl-4" style="border-color:rgba(212,175,55,0.35);">
+                <p class="font-black text-white text-xl leading-none mb-1">{{ s.v }}</p>
+                <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:rgba(255,255,255,0.3);">{{ s.l }}</p>
+              </div>
+            }
+          </div>
+
+          <a routerLink="/products"
+             class="self-start inline-flex items-center gap-3 px-6 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-black transition-all duration-300 hover:-translate-y-0.5"
+             style="background:#d4af37;">
+            Explorer la collection
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+        </div>
+
+      </div>
     </div>
   </section>
 
 
   <!-- ════════════════════════════════════════════════════
-       COMMENT ÇA MARCHE
+       8. COMMENT ÇA MARCHE — avec ligne connectrice
   ════════════════════════════════════════════════════ -->
   <section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
     <div class="max-w-5xl mx-auto px-5 sm:px-8 lg:px-12">
 
-      <div class="mb-14 sm:mb-18">
+      <div class="mb-14 sm:mb-20">
         <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-3"
            style="color:rgba(212,175,55,0.65);">Simple &amp; rapide</p>
         <h2 class="font-black theme-text tracking-tight leading-none"
             style="font-size:clamp(2.4rem,7vw,5.5rem);">COMMENT ÇA MARCHE</h2>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-0">
-        @for (step of steps; track step.n; let last = $last) {
-          <div class="pb-10 sm:pb-0 sm:pr-10 lg:pr-16"
-               [class.border-b]="!last"
-               [class.sm\:border-b-0]="!last"
-               [class.sm\:border-r]="!last"
-               style="border-color:rgba(212,175,55,0.1);">
+      <div class="relative">
+        <!-- Ligne connectrice desktop -->
+        <div class="absolute hidden sm:block"
+             style="top:28px;left:28px;right:28px;height:1px;background:linear-gradient(to right,rgba(212,175,55,0.5),rgba(212,175,55,0.08))"></div>
 
-            <div class="flex sm:flex-col gap-7 sm:gap-0 sm:items-start" [class.mb-10]="!last">
-              <div class="flex-shrink-0 sm:mb-9">
-                <div class="w-14 h-14 border flex items-center justify-center relative"
-                     style="border-color:rgba(212,175,55,0.25);">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-6">
+          @for (step of steps; track step.n) {
+            <div class="relative flex sm:flex-col gap-6 sm:gap-0">
+
+              <!-- Icone + numéro -->
+              <div class="relative flex-shrink-0 sm:mb-8 z-10">
+                <div class="w-14 h-14 flex items-center justify-center relative theme-surface"
+                     style="border:1px solid rgba(212,175,55,0.3);">
                   <svg class="w-6 h-6" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    @for (d of step.icon.split(' M'); track $index; let fi = $first) {
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            [attr.d]="fi ? step.icon.split(' M')[0] : 'M' + d"/>
-                    }
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="step.icon"/>
                   </svg>
                   <span class="absolute -top-3 -right-3 w-6 h-6 flex items-center justify-center text-[9px] font-black text-black"
                         style="background:#d4af37;">{{ step.n }}</span>
                 </div>
               </div>
-              <div class="sm:mt-0">
+
+              <div>
                 <h3 class="font-black theme-text text-base sm:text-lg mb-2 tracking-tight">{{ step.title }}</h3>
                 <p class="theme-muted text-sm leading-relaxed">{{ step.desc }}</p>
               </div>
             </div>
-
-          </div>
-        }
+          }
+        </div>
       </div>
 
     </div>
@@ -375,19 +516,70 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       STATS
+       9. TÉMOIGNAGES (nouveau)
   ════════════════════════════════════════════════════ -->
-  <section id="stats-row" class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);">
-    <div class="max-w-5xl mx-auto px-5 sm:px-8">
-      <div class="grid grid-cols-2 sm:grid-cols-4"
-           style="border-color:rgba(212,175,55,0.08);">
+  <section class="border-t scroll-reveal"
+           style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;background:#050505;">
+    <div class="max-w-5xl mx-auto px-5 sm:px-8 lg:px-12">
+
+      <div class="mb-12 sm:mb-16">
+        <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-3"
+           style="color:rgba(212,175,55,0.65);">Avis clients</p>
+        <h2 class="font-black theme-text tracking-tight leading-none"
+            style="font-size:clamp(2.4rem,7vw,5.5rem);">ILS NOUS<br>FONT CONFIANCE</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-1">
+        @for (t of testimonials; track t.name) {
+          <div class="group flex flex-col justify-between p-7 sm:p-8 border theme-border
+                      hover:border-gold/30 transition-colors duration-500 cursor-default">
+            <!-- Opening quote -->
+            <div class="text-7xl font-black leading-none mb-3 select-none"
+                 style="color:rgba(212,175,55,0.12);line-height:0.6;">"</div>
+            <p class="text-sm leading-relaxed mb-8" style="color:rgba(255,255,255,0.5);">{{ t.quote }}</p>
+            <div class="flex items-center gap-3">
+              <!-- Avatar initiales -->
+              <div class="w-9 h-9 rounded-none flex items-center justify-center text-xs font-black text-black flex-shrink-0"
+                   style="background:linear-gradient(135deg,#f5d442,#b8941e);">
+                {{ t.initials }}
+              </div>
+              <div>
+                <div class="flex mb-1">
+                  @for (i of [1,2,3,4,5]; track i) {
+                    <svg class="w-2.5 h-2.5" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  }
+                </div>
+                <p class="text-xs font-black theme-text">{{ t.name }}</p>
+                <p class="text-[10px] font-semibold" style="color:rgba(212,175,55,0.5);">{{ t.city }}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════
+       10. STATS
+  ════════════════════════════════════════════════════ -->
+  <section id="stats-row" class="border-t scroll-reveal relative overflow-hidden"
+           style="border-color:rgba(212,175,55,0.1);">
+    <!-- Glow background -->
+    <div class="absolute inset-0 pointer-events-none"
+         style="background:radial-gradient(ellipse at 50% 50%, rgba(212,175,55,0.04) 0%, transparent 70%)"></div>
+
+    <div class="relative max-w-5xl mx-auto px-5 sm:px-8">
+      <div class="grid grid-cols-2 sm:grid-cols-4">
         @for (stat of [
           { value: statProducts, suffix: '+', label: 'Références' },
           { value: statBrands,   suffix: '+', label: 'Marques' },
           { value: statClients,  suffix: '+', label: 'Clients satisfaits' },
           { value: 48,           suffix: 'h', label: 'Livraison max' }
         ]; track stat.label) {
-          <div class="flex flex-col items-center justify-center py-12 px-4 text-center border-r border-b sm:border-b-0 last:border-r-0"
+          <div class="flex flex-col items-center justify-center py-14 px-4 text-center border-r border-b sm:border-b-0 last:border-r-0"
                style="border-color:rgba(212,175,55,0.08);">
             <p class="font-black leading-none mb-2 tabular-nums"
                style="color:#d4af37;font-size:clamp(2.5rem,6vw,4rem);">
@@ -402,7 +594,7 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       PROMESSES
+       11. PROMESSES
   ════════════════════════════════════════════════════ -->
   <section class="border-t scroll-reveal"
            style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
@@ -418,13 +610,15 @@
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-1">
         @for (p of [
           { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', title: 'Livraison rapide', desc: '24–48h Abidjan · 72h intérieur CI.' },
-          { icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', title: 'Retour sous 3 jours', desc: 'Remboursement garanti sans friction.' }
+          { icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', title: 'Retour 3 jours', desc: 'Remboursement garanti sans friction.' },
+          { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Authenticité certifiée', desc: 'Chaque pièce est vérifiée avant expédition.' },
+          { icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z', title: 'Paiement à la livraison', desc: 'Payez quand votre colis arrive.' }
         ]; track p.title) {
-          <div class="border p-6 sm:p-8 flex flex-col gap-6 group hover:border-gold/40 transition-colors duration-300"
+          <div class="border p-6 sm:p-8 flex flex-col gap-5 group hover:border-gold/40 transition-colors duration-300"
                style="border-color:rgba(212,175,55,0.12);">
             <div class="w-10 h-10 border flex items-center justify-center flex-shrink-0"
                  style="border-color:rgba(212,175,55,0.2);">
-              <svg class="w-4.5 h-4.5" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" [attr.d]="p.icon"/>
               </svg>
             </div>
@@ -440,13 +634,18 @@
 
 
   <!-- ════════════════════════════════════════════════════
-       CTA FINAL
+       12. CTA FINAL
   ════════════════════════════════════════════════════ -->
   <section class="relative border-t overflow-hidden scroll-reveal"
            style="border-color:rgba(212,175,55,0.1);padding:clamp(80px,12vw,160px) 1.5rem;">
 
     <div class="absolute inset-0 pointer-events-none"
-         style="background:radial-gradient(ellipse at center,rgba(212,175,55,0.05) 0%,transparent 65%);"></div>
+         style="background:radial-gradient(ellipse at center,rgba(212,175,55,0.06) 0%,transparent 62%);"></div>
+    <!-- Corner lines -->
+    <div class="absolute top-0 left-0 w-16 h-16 pointer-events-none hidden lg:block"
+         style="border-top:1px solid rgba(212,175,55,0.2);border-left:1px solid rgba(212,175,55,0.2);"></div>
+    <div class="absolute bottom-0 right-0 w-16 h-16 pointer-events-none hidden lg:block"
+         style="border-bottom:1px solid rgba(212,175,55,0.2);border-right:1px solid rgba(212,175,55,0.2);"></div>
 
     <div class="relative max-w-2xl mx-auto text-center">
       <div class="w-8 h-[1px] mx-auto mb-10" style="background:#d4af37;"></div>
@@ -464,7 +663,7 @@
       <div class="flex flex-col sm:flex-row justify-center gap-3">
         <a routerLink="/products"
            class="inline-flex items-center justify-center gap-3 px-8 py-4 font-black text-xs uppercase tracking-[0.2em] text-black transition-all hover:-translate-y-0.5"
-           style="background:#d4af37;box-shadow:0 8px 32px rgba(212,175,55,0.25);">
+           style="background:#d4af37;box-shadow:0 8px 32px rgba(212,175,55,0.22);">
           Explorer la boutique
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -479,7 +678,14 @@
         }
       </div>
 
-      <div class="w-8 h-[1px] mx-auto mt-12" style="background:#d4af37;opacity:0.4;"></div>
+      <div class="flex items-center justify-center gap-6 mt-14">
+        @for (badge of ['Livraison rapide', 'Authenticité garantie', 'Paiement à la livraison']; track badge) {
+          <span class="text-[8px] uppercase tracking-[0.35em] font-bold"
+                style="color:rgba(212,175,55,0.35);">{{ badge }}</span>
+        }
+      </div>
+
+      <div class="w-8 h-[1px] mx-auto mt-10" style="background:#d4af37;opacity:0.4;"></div>
     </div>
   </section>
 
