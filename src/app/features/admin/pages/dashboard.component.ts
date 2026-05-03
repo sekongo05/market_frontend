@@ -1175,11 +1175,16 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   return `${val.toLocaleString('fr-FR')} FCFA`;
 } */
 
-  formatCurrency(amount: number): string {
+/*   formatCurrency(amount: number): string {
     if (amount >= 1_000_000) return (amount / 1_000_000).toFixed(1) + 'M';
     if (amount >= 1_000) return Math.round(amount / 1_000) + 'K';
     return amount.toString();
-  }
+  } */
+
+  formatCurrency(amount: number | null | undefined): string {
+  const n = amount ?? 0;
+  return `${n.toLocaleString('fr-FR')} FCFA`;
+}
 
   timeAgo(dateStr: string): string {
     if (!dateStr) return '';
