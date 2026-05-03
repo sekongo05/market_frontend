@@ -255,11 +255,11 @@
                     } @else if (product.discountPercent && product.discountPercent > 0) {
                       <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-400 mb-0.5">-{{ product.discountPercent }}%</span>
                       <br/>
-                      <span class="text-xs theme-muted line-through mr-1">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
-                      <span class="font-black text-orange-400">{{ (product.salePrice! / 1000) | number:'1.0-0' }}K</span>
+                      <span class="text-xs theme-muted line-through mr-1">{{ (product.price ) | number:'1.0-0': 'fr-FR' }}</span>
+                      <span class="font-black text-orange-400">{{ (product.salePrice! ) | number:'1.0-0': 'fr-FR' }}</span>
                       <span class="text-xs theme-muted ml-1">FCFA</span>
                     } @else {
-                      <span class="font-black text-gold">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+                      <span class="font-black text-gold">{{ (product.price ) | number:'1.0-0': 'fr-FR' }}</span>
                       <span class="text-xs theme-muted ml-1">FCFA</span>
                     }
                   </td>
@@ -480,7 +480,7 @@
 
                   <!-- Montant -->
                   <td class="px-4 py-4 text-right">
-                    <span class="font-black text-gold">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K</span>
+                    <span class="font-black text-gold">{{ (order.totalAmount ) | number:'1.0-0': 'fr-FR' }}</span>
                     <span class="text-xs theme-muted ml-1">FCFA</span>
                   </td>
 
@@ -605,7 +605,7 @@
                 <p class="text-xs theme-muted">{{ order.deliveryAddress | slice:0:50 }}</p>
               </div>
               <div class="text-right shrink-0">
-                <p class="font-black text-gold text-sm">{{ (order.totalAmount / 1000) | number:'1.0-0' }}K FCFA</p>
+                <p class="font-black text-gold text-sm">{{ (order.totalAmount ) | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</p>
                 <p class="text-xs theme-muted">{{ order.createdAt | date:'dd/MM/yy' }}</p>
               </div>
               <button (click)="toggleDeliveryOrder(order.id)"

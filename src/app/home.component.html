@@ -384,10 +384,10 @@
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-1">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.salePrice) {
-                <span class="font-black text-sm text-orange-400">{{ (product.salePrice / 1000) | number:'1.0-0' }}K</span>
-                <span class="text-xs theme-muted line-through">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+                <span class="font-black text-sm text-orange-400">{{ (product.salePrice / 1000) | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
+                <span class="text-xs theme-muted line-through">{{ (product.price / 1000) | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
               } @else {
-                <span class="font-black text-sm theme-text">{{ (product.price / 1000) | number:'1.0-0' }}K</span>
+                <span class="font-black text-sm theme-text">{{ (product.price / 1000) | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
               }
               <span class="text-[9px] theme-muted">FCFA</span>
             </div>
