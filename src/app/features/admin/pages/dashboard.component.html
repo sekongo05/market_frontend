@@ -1251,6 +1251,7 @@
               <tr class="theme-surface-2">
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">N° commande</th>
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Client</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Articles</th>
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Montant</th>
                 <th class="text-right text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Actions</th>
@@ -1267,6 +1268,13 @@
                   </td>
                   <td class="px-5 py-3.5 hidden md:table-cell">
                     <p class="text-sm theme-text font-medium">{{ order.customerName }}</p>
+                  </td>
+                  <td class="px-5 py-3.5 hidden lg:table-cell">
+                    <p class="text-xs theme-muted max-w-[220px] truncate">
+                      @for (item of order.items; track item.productId; let last = $last) {
+                        {{ item.productName }} ×{{ item.quantity }}{{ last ? '' : ', ' }}
+                      }
+                    </p>
                   </td>
                   <td class="px-5 py-3.5">
                     <span class="inline-flex px-2 py-0.5 rounded-lg text-xs font-bold" [class]="orderStatusClass(order.orderStatus)">

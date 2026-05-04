@@ -907,10 +907,19 @@
               <span class="font-semibold text-green-400">Gratuite</span>
             </div>
             <div class="h-px my-1" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.35),transparent)"></div>
+            @if (discountAmount > 0) {
+              <div class="flex items-center justify-between text-sm">
+                <span style="color:#6b7280">Réduction ({{ promoCheckResult!.discountPercent }}%)</span>
+                <span class="font-semibold text-green-400">−{{ discountAmount | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
+              </div>
+            }
             <div class="flex items-center justify-between">
               <span class="font-bold text-sm" style="color:#111111">Total</span>
               <div class="flex items-baseline gap-1">
-                <span class="text-2xl font-black gold-text">{{ cartTotal  | number:'1.0-0': 'fr-FR' }}</span>
+                @if (discountAmount > 0) {
+                  <span class="text-sm line-through" style="color:#9ca3af">{{ cartTotal | number:'1.0-0': 'fr-FR' }}</span>
+                }
+                <span class="text-2xl font-black gold-text">{{ finalTotal | number:'1.0-0': 'fr-FR' }}</span>
                 <span class="text-xs" style="color:#6b7280">FCFA</span>
               </div>
             </div>
@@ -986,7 +995,12 @@
                 }
                 <div class="flex items-center justify-between px-3 py-2 text-xs font-black">
                   <span style="color:#111111">Total</span>
-                  <span style="color:#d4af37">{{ cartTotal  | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
+                  <div class="flex items-baseline gap-1.5">
+                    @if (discountAmount > 0) {
+                      <span class="line-through" style="color:#9ca3af">{{ cartTotal | number:'1.0-0': 'fr-FR' }}</span>
+                    }
+                    <span style="color:#d4af37">{{ finalTotal | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
+                  </div>
                 </div>
               </div>
 

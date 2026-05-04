@@ -464,6 +464,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
   get cartCount(): number { return this.cartItems.reduce((s, i) => s + i.quantity, 0); }
   get cartTotal(): number { return this.cartService.getTotalPrice(); }
+  get discountAmount(): number {
+    if (!this.promoCheckResult?.valid) return 0;
+    return this.promoCheckResult.discountAmount ?? 0;
+  }
+  get finalTotal(): number {
+    if (!this.promoCheckResult?.valid) return this.cartTotal;
+    return this.promoCheckResult.finalAmount ?? this.cartTotal;
+  }
 
   get fullName(): string {
     return this.currentUser ? `${this.currentUser.prenom} ${this.currentUser.nom}` : '';
