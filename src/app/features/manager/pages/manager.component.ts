@@ -56,17 +56,18 @@ export class ManagerComponent implements OnInit, OnDestroy {
   drawerError: string | null = null;
   productForm!: FormGroup;
 
-  // ── Image upload ──────────────────────────────────────────────────────────
-  // Create mode: multi-image (max 4) + video
-  selectedImages: File[] = [];
-  imagePreviews: string[] = [];
+  // ── Création : paires photo+couleur ──────────────────────────────────────
+  creationItems: { file: File; preview: string; colorName: string; colorHex: string; stock: number }[] = [];
+  pendingCreationFile: File | null = null;
+  pendingCreationPreview: string | null = null;
+  pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
+  pendingCreationColorError: string | null = null;
+  // ── Édition : image principale uniquement ────────────────────────────────
   selectedVideo: File | null = null;
   videoPreview: string | null = null;
-  // Edit mode: single main image
   imagePreview: string | null = null;
   selectedImageFile: File | null = null;
   uploadError: string | null = null;
-  dragOver = false;
 
   // ── Drawer tabs & media ───────────────────────────────────────────────────
   drawerTab: 'info' | 'media' | 'variants' = 'info';
@@ -278,8 +279,11 @@ export class ManagerComponent implements OnInit, OnDestroy {
   openCreateDrawer(): void {
     this.editingProduct = null;
     this.drawerError = null;
-    this.selectedImages = [];
-    this.imagePreviews = [];
+    this.creationItems = [];
+    this.pendingCreationFile = null;
+    this.pendingCreationPreview = null;
+    this.pendingCreationColorError = null;
+    this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
     this.selectedVideo = null;
     this.videoPreview = null;
     this.imagePreview = null;
@@ -297,8 +301,10 @@ export class ManagerComponent implements OnInit, OnDestroy {
   openEditDrawer(product: ProductResponse): void {
     this.editingProduct = product;
     this.drawerError = null;
-    this.selectedImages = [];
-    this.imagePreviews = [];
+    this.creationItems = [];
+    this.pendingCreationFile = null;
+    this.pendingCreationPreview = null;
+    this.pendingCreationColorError = null;
     this.selectedVideo = null;
     this.videoPreview = null;
     this.imagePreview = product.imageUrl || null;
@@ -331,6 +337,11 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.drawerError = null;
     this.selectedImages = [];
     this.imagePreviews = [];
+    this.creationItems = [];
+    this.pendingCreationFile = null;
+    this.pendingCreationPreview = null;
+    this.pendingCreationColorError = null;
+    this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
     this.selectedVideo = null;
     this.videoPreview = null;
     this.imagePreview = null;
@@ -364,40 +375,72 @@ export class ManagerComponent implements OnInit, OnDestroy {
 
     let req$;
     if (this.editingProduct) {
-      // Édition : 1 image principale + vidéo optionnelle
       if (this.selectedImageFile) fd.append('mainImage', this.selectedImageFile);
       if (this.selectedVideo) fd.append('video', this.selectedVideo);
       req$ = this.productService.updateProduct(this.editingProduct.id, fd);
     } else {
-      // Création : jusqu'à 4 images (1ère = principale) + vidéo optionnelle
-      for (const img of this.selectedImages) fd.append('images', img);
+      if (this.creationItems.length > 0) fd.append('images', this.creationItems[0].file);
       if (this.selectedVideo) fd.append('video', this.selectedVideo);
       req$ = this.productService.createProduct(fd);
     }
 
     const wasCreating = !this.editingProduct;
+    const itemsSnapshot = [...this.creationItems];
     req$.subscribe({
       next: (r) => {
-        this.drawerLoading = false;
         if (r.success) {
           this.loadProducts(this.currentPage);
           if (wasCreating && r.data) {
-            // Après création : rester dans le drawer en mode édition, aller sur l'onglet Couleurs
-            this.editingProduct = r.data;
-            this.drawerTab = 'variants';
-            this.productVariants = [];
-            this.loadVariants(r.data.id);
-            this.initForm(r.data);
-            this.toast('Produit ajouté ✓ — Ajoutez des couleurs si nécessaire');
+            const product = r.data;
+            this.editingProduct = product;
+            this.initForm(product);
+            this.drawerTab = 'media';
+            if (itemsSnapshot.length === 0) {
+              this.drawerLoading = false;
+              this.productVariants = [];
+              this.productMedia = [];
+              this.toast('Produit ajouté ✓');
+              this.cdr.detectChanges();
+              return;
+            }
+            const processItem = (index: number) => {
+              if (index >= itemsSnapshot.length) {
+                this.drawerLoading = false;
+                this.creationItems = [];
+                this.loadVariants(product.id);
+                this.loadMedia(product.id);
+                this.toast(`Produit créé avec ${itemsSnapshot.length} couleur(s) ✓`);
+                this.cdr.detectChanges();
+                return;
+              }
+              const item = itemsSnapshot[index];
+              const createVariant = (imageUrl: string) => {
+                this.productVariantService.addVariant(product.id, {
+                  colorName: item.colorName, colorHex: item.colorHex,
+                  imageUrl, stock: item.stock,
+                }).subscribe({ next: () => processItem(index + 1), error: () => processItem(index + 1) });
+              };
+              if (index === 0 && product.imageUrl) {
+                createVariant(product.imageUrl);
+              } else {
+                this.productMediaService.upload(product.id, item.file).subscribe({
+                  next: (mr) => createVariant(mr.success ? mr.data.url : ''),
+                  error: () => processItem(index + 1),
+                });
+              }
+            };
+            processItem(0);
           } else {
+            this.drawerLoading = false;
             this.toast('Produit mis à jour ✓');
             this.closeDrawer();
+            this.cdr.detectChanges();
           }
         } else {
+          this.drawerLoading = false;
           this._applyLocalSave(v);
           this.closeDrawer();
         }
-        this.cdr.detectChanges();
       },
       error: () => {
         this.drawerLoading = false;
@@ -531,73 +574,73 @@ export class ManagerComponent implements OnInit, OnDestroy {
 
   // ── Image upload ──────────────────────────────────────────────────────────
 
-  onFileDrop(event: DragEvent): void {
-    event.preventDefault(); this.dragOver = false;
-    const files = event.dataTransfer?.files;
-    if (files) Array.from(files).forEach(f => this._uploadFile(f));
-  }
-  onDragOver(event: DragEvent): void { event.preventDefault(); this.dragOver = true; this.cdr.detectChanges(); }
-  onDragLeave(): void { this.dragOver = false; this.cdr.detectChanges(); }
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files) Array.from(input.files).forEach(f => this._uploadFile(f));
-    input.value = '';
-  }
-  onVideoSelected(event: Event): void {
+  // ── Création : sélection photo → formulaire couleur ─────────────────────
+
+  onCreationImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (file) this._uploadFile(file);
     input.value = '';
+    if (!file || this.creationItems.length >= 4) return;
+    this.pendingCreationFile = file;
+    this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
+    this.pendingCreationColorError = null;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.pendingCreationPreview = e.target?.result as string; this.cdr.detectChanges(); };
+    reader.readAsDataURL(file);
   }
 
-  private _isImageFile(file: File): boolean {
-    if (file.type.startsWith('image/')) return true;
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-    return ['heic', 'heif'].includes(ext);
+  cancelPendingCreation(): void {
+    this.pendingCreationFile = null;
+    this.pendingCreationPreview = null;
+    this.pendingCreationColorError = null;
   }
 
-  private _isVideoFile(file: File): boolean {
-    return file.type.startsWith('video/');
-  }
-
-  private _uploadFile(file: File): void {
-    if (this._isVideoFile(file)) {
-      if (file.size > 50 * 1024 * 1024) { this.uploadError = 'Vidéo trop lourde — max 50 Mo'; this.cdr.detectChanges(); return; }
-      this.selectedVideo = file;
-      this.uploadError = null;
-      const reader = new FileReader();
-      reader.onload = (e) => { this.videoPreview = e.target?.result as string; this.cdr.detectChanges(); };
-      reader.readAsDataURL(file);
-      return;
-    }
-    if (!this._isImageFile(file)) { this.uploadError = 'Format non supporté — JPEG, PNG, WEBP, GIF, BMP, TIFF, SVG, AVIF, HEIC'; this.cdr.detectChanges(); return; }
-    if (file.size > 20 * 1024 * 1024) { this.uploadError = 'Image trop lourde — max 20 Mo'; this.cdr.detectChanges(); return; }
-
-    if (this.editingProduct) {
-      // Mode édition : 1 seule image principale
-      this.selectedImageFile = file;
-      this.uploadError = null;
-      const reader = new FileReader();
-      reader.onload = (e) => { this.imagePreview = e.target?.result as string; this.cdr.detectChanges(); };
-      reader.readAsDataURL(file);
-    } else {
-      // Mode création : jusqu'à 4 images
-      if (this.selectedImages.length >= 4) { this.uploadError = 'Maximum 4 images autorisées'; this.cdr.detectChanges(); return; }
-      this.uploadError = null;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.selectedImages = [...this.selectedImages, file];
-        this.imagePreviews = [...this.imagePreviews, e.target?.result as string];
-        this.cdr.detectChanges();
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  removeImage(index: number): void {
-    this.selectedImages = this.selectedImages.filter((_, i) => i !== index);
-    this.imagePreviews = this.imagePreviews.filter((_, i) => i !== index);
+  confirmCreationItem(): void {
+    if (!this.pendingCreationFile) return;
+    if (!this.pendingCreationColor.colorName.trim()) { this.pendingCreationColorError = 'Le nom de la couleur est requis'; return; }
+    if (!/^#[0-9A-Fa-f]{6}$/.test(this.pendingCreationColor.colorHex)) { this.pendingCreationColorError = 'Code couleur invalide (ex: #FF5733)'; return; }
+    this.creationItems = [...this.creationItems, {
+      file: this.pendingCreationFile,
+      preview: this.pendingCreationPreview!,
+      colorName: this.pendingCreationColor.colorName.trim(),
+      colorHex: this.pendingCreationColor.colorHex,
+      stock: this.pendingCreationColor.stock || 0,
+    }];
+    this.pendingCreationFile = null;
+    this.pendingCreationPreview = null;
+    this.pendingCreationColorError = null;
     this.cdr.detectChanges();
+  }
+
+  removeCreationItem(index: number): void {
+    this.creationItems = this.creationItems.filter((_, i) => i !== index);
+    this.cdr.detectChanges();
+  }
+
+  // ── Édition : image principale + vidéo ───────────────────────────────────
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !file.type.startsWith('image/')) return;
+    this.selectedImageFile = file;
+    this.uploadError = null;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.imagePreview = e.target?.result as string; this.cdr.detectChanges(); };
+    reader.readAsDataURL(file);
+  }
+
+  onVideoSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    (event.target as HTMLInputElement).value = '';
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) { this.uploadError = 'Vidéo trop lourde — max 50 Mo'; this.cdr.detectChanges(); return; }
+    this.selectedVideo = file;
+    this.uploadError = null;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.videoPreview = e.target?.result as string; this.cdr.detectChanges(); };
+    reader.readAsDataURL(file);
   }
 
   removeVideo(): void { this.selectedVideo = null; this.videoPreview = null; this.cdr.detectChanges(); }
