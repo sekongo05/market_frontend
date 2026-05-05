@@ -14,6 +14,7 @@ export interface CreateOrderRequest {
 export interface OrderItemResponse {
   productId: number;
   productName: string;
+  imageUrl: string | null;
   quantity: number;
   unitPrice: number;
   subtotal: number;

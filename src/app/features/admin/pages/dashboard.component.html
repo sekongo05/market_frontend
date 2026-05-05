@@ -1270,11 +1270,35 @@
                     <p class="text-sm theme-text font-medium">{{ order.customerName }}</p>
                   </td>
                   <td class="px-5 py-3.5 hidden lg:table-cell">
-                    <p class="text-xs theme-muted max-w-[220px] truncate">
-                      @for (item of order.items; track item.productId; let last = $last) {
-                        {{ item.productName }} ×{{ item.quantity }}{{ last ? '' : ', ' }}
-                      }
-                    </p>
+                    <div class="flex items-center gap-2">
+                      <!-- Vignettes photos (max 3) -->
+                      <div class="flex -space-x-2">
+                        @for (item of order.items.slice(0,3); track item.productId) {
+                          @if (item.imageUrl) {
+                            <img [src]="item.imageUrl" [alt]="item.productName"
+                              class="w-8 h-8 rounded-lg object-cover border-2 border-white dark:border-gray-800 flex-shrink-0"
+                              style="border-color: var(--surface)"/>
+                          } @else {
+                            <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold theme-muted"
+                                 style="background:rgba(184,148,30,0.1);border:2px solid var(--surface)">
+                              {{ item.productName.charAt(0) }}
+                            </div>
+                          }
+                        }
+                        @if (order.items.length > 3) {
+                          <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold theme-muted"
+                               style="background:rgba(0,0,0,0.06);border:2px solid var(--surface)">
+                            +{{ order.items.length - 3 }}
+                          </div>
+                        }
+                      </div>
+                      <!-- Nom(s) article(s) -->
+                      <p class="text-xs theme-muted max-w-[140px] truncate">
+                        @for (item of order.items; track item.productId; let last = $last) {
+                          {{ item.productName }} ×{{ item.quantity }}{{ last ? '' : ', ' }}
+                        }
+                      </p>
+                    </div>
                   </td>
                   <td class="px-5 py-3.5">
                     <span class="inline-flex px-2 py-0.5 rounded-lg text-xs font-bold" [class]="orderStatusClass(order.orderStatus)">
