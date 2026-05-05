@@ -1276,7 +1276,7 @@
                         @for (item of order.items.slice(0,3); track item.productId) {
                           @if (item.imageUrl) {
                             <img [src]="item.imageUrl" [alt]="item.productName"
-                              class="w-30 h-30 rounded-lg object-cover border-2 border-white dark:border-gray-800 flex-shrink-0"
+                              class="w-16 h-16 rounded-lg object-cover border-2 border-white dark:border-gray-800 flex-shrink-0"
                               style="border-color: var(--surface)"/>
                           } @else {
                             <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold theme-muted"
