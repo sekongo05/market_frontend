@@ -1366,130 +1366,175 @@
 <!-- ══════════ MODAL DÉTAIL COMMANDE ══════════ -->
 @if (orderDetailOpen && selectedOrder) {
   <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 animate-fade-in">
-    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeOrderDetail()"></div>
-    <div class="relative w-full sm:max-w-2xl max-h-[92dvh] theme-surface border theme-border rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col animate-slide-in-right overflow-hidden">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeOrderDetail()"></div>
+    <div class="relative w-full sm:max-w-2xl max-h-[95dvh] theme-surface border theme-border rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden" style="animation:slideUp .25s ease">
 
-      <!-- Header -->
-      <div class="flex items-start justify-between px-6 py-5 border-b theme-border flex-shrink-0">
-        <div>
-          <div class="flex items-center gap-3 mb-1">
-            <h3 class="font-mono text-base font-black theme-text">{{ selectedOrder.orderNumber }}</h3>
-            <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold" [class]="orderStatusClass(selectedOrder.orderStatus)">
+      <!-- ── Header ── -->
+      <div class="flex-shrink-0 px-6 pt-6 pb-4 border-b theme-border">
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <p class="text-[10px] font-bold theme-muted uppercase tracking-widest mb-1">Commande</p>
+            <h2 class="font-mono text-xl font-black theme-text tracking-wide leading-none">{{ selectedOrder.orderNumber }}</h2>
+            <p class="text-xs theme-muted mt-1.5">{{ selectedOrder.createdAt | date:'dd MMMM yyyy à HH:mm' }}</p>
+          </div>
+          <div class="flex items-center gap-3 flex-shrink-0">
+            <span class="inline-flex px-3 py-1.5 rounded-xl text-xs font-bold" [class]="orderStatusClass(selectedOrder.orderStatus)">
               {{ orderStatusLabel(selectedOrder.orderStatus) }}
             </span>
+            <button (click)="closeOrderDetail()"
+              class="w-9 h-9 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
           </div>
-          <p class="text-xs theme-muted">Passée le {{ selectedOrder.createdAt | date:'dd MMMM yyyy à HH:mm' }}</p>
         </div>
-        <button (click)="closeOrderDetail()"
-          class="w-8 h-8 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors flex-shrink-0 mt-0.5">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+
+        <!-- Client + Adresse en ligne sous le titre -->
+        <div class="flex flex-wrap gap-x-6 gap-y-1.5 mt-4">
+          <div class="flex items-center gap-2 text-sm">
+            <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="font-semibold theme-text">{{ selectedOrder.customerName || '—' }}</span>
+          </div>
+          @if (selectedOrder.deliveryAddress) {
+            <div class="flex items-center gap-2 text-sm">
+              <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span class="theme-muted">{{ selectedOrder.deliveryAddress }}</span>
+            </div>
+          }
+          @if (selectedOrder.trackingNumber) {
+            <div class="flex items-center gap-2 text-sm">
+              <svg class="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              <span class="font-mono text-indigo-400 font-semibold">{{ selectedOrder.trackingNumber }}</span>
+            </div>
+          }
+        </div>
       </div>
 
-      <!-- Body scrollable -->
-      <div class="flex-1 overflow-y-auto overscroll-contain p-6 space-y-6">
+      <!-- ── Articles ── -->
+      <div class="flex-1 overflow-y-auto overscroll-contain">
 
-        <!-- Infos client + livraison -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="p-4 rounded-2xl luxury-card space-y-2">
-            <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Client</p>
-            <p class="font-bold theme-text text-sm">{{ selectedOrder.customerName || '—' }}</p>
-          </div>
-          <div class="p-4 rounded-2xl luxury-card space-y-2">
-            <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Adresse de livraison</p>
-            <p class="text-sm theme-text leading-snug">{{ selectedOrder.deliveryAddress || '—' }}</p>
-          </div>
-          @if (selectedOrder.trackingNumber) {
-            <div class="p-4 rounded-2xl luxury-card space-y-2 sm:col-span-2">
-              <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Numéro de suivi</p>
-              <p class="font-mono text-sm text-gold">{{ selectedOrder.trackingNumber }}</p>
+        <!-- Titre section -->
+        <div class="px-6 pt-5 pb-3 flex items-center gap-2">
+          <p class="text-[10px] font-black theme-muted uppercase tracking-widest">
+            Articles commandés
+          </p>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-gold/15 text-gold">
+            {{ selectedOrder.items.length }}
+          </span>
+        </div>
+
+        <!-- Grille produits -->
+        <div class="px-6 pb-5 space-y-3">
+          @for (item of selectedOrder.items; track item.productId) {
+            <div class="flex gap-4 p-4 rounded-2xl luxury-card border theme-border hover:border-gold/20 transition-colors">
+
+              <!-- Grande image -->
+              <div class="flex-shrink-0 w-28 h-28 rounded-2xl overflow-hidden border theme-border bg-black/[.04]">
+                @if (item.imageUrl) {
+                  <img [src]="item.imageUrl" [alt]="item.productName"
+                    class="w-full h-full object-cover"
+                    (error)="$any($event.target).src='https://placehold.co/112x112/1a1a1a/d4af37?text=?'"/>
+                } @else {
+                  <div class="w-full h-full flex items-center justify-center">
+                    <span class="text-3xl font-black text-gold/30">{{ item.productName.charAt(0) }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Infos produit -->
+              <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                <div>
+                  <p class="font-bold theme-text text-base leading-snug line-clamp-2">{{ item.productName }}</p>
+
+                  <!-- Couleur -->
+                  @if (item.selectedColor) {
+                    <div class="flex items-center gap-2 mt-2">
+                      <span class="w-4 h-4 rounded-full border-2 border-white/20 flex-shrink-0 shadow-sm"
+                            [style.background-color]="item.selectedColorHex"></span>
+                      <span class="text-sm font-semibold theme-muted">{{ item.selectedColor }}</span>
+                    </div>
+                  }
+                </div>
+
+                <!-- Prix + quantité -->
+                <div class="flex items-end justify-between gap-2 mt-3">
+                  <div>
+                    <p class="text-xs theme-muted mb-0.5">Prix unitaire</p>
+                    <p class="text-sm font-bold theme-text">{{ formatCurrency(item.unitPrice) }} <span class="text-xs font-normal theme-muted">FCFA</span></p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-xs theme-muted mb-0.5">Qté</p>
+                    <div class="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center">
+                      <span class="text-sm font-black text-gold">{{ item.quantity }}</span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-xs theme-muted mb-0.5">Sous-total</p>
+                    <p class="text-lg font-black text-gold leading-none">{{ formatCurrency(item.subtotal) }}</p>
+                    <p class="text-[10px] theme-muted">FCFA</p>
+                  </div>
+                </div>
+              </div>
+
             </div>
           }
         </div>
 
-        <!-- Articles -->
-        <div>
-          <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-3">
-            Articles ({{ selectedOrder.items.length }})
-          </p>
-          <div class="space-y-2">
-            @for (item of selectedOrder.items; track item.productId) {
-              <div class="flex items-center gap-3 p-3 rounded-2xl luxury-card">
-                @if (item.imageUrl) {
-                  <img [src]="item.imageUrl" [alt]="item.productName"
-                    class="w-14 h-14 rounded-xl object-cover flex-shrink-0 border theme-border"/>
-                } @else {
-                  <div class="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center text-lg font-black theme-muted"
-                       style="background:rgba(184,148,30,0.08)">
-                    {{ item.productName.charAt(0) }}
-                  </div>
-                }
-                <div class="flex-1 min-w-0">
-                  <p class="font-bold theme-text text-sm truncate">{{ item.productName }}</p>
-                  @if (item.selectedColor) {
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                      <span class="w-3 h-3 rounded-full border border-white/20 flex-shrink-0"
-                            [style.background-color]="item.selectedColorHex"></span>
-                      <span class="text-xs theme-muted">{{ item.selectedColor }}</span>
-                    </div>
-                  }
-                  <p class="text-xs theme-muted mt-0.5">{{ formatCurrency(item.unitPrice) }} FCFA × {{ item.quantity }}</p>
-                </div>
-                <div class="text-right flex-shrink-0">
-                  <p class="font-black text-gold text-sm">{{ formatCurrency(item.subtotal) }}</p>
-                  <p class="text-[10px] theme-muted">FCFA</p>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-
-        <!-- Récapitulatif financier -->
-        <div class="p-4 rounded-2xl luxury-card space-y-2.5">
-          <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-3">Récapitulatif</p>
-          <div class="flex justify-between text-sm">
+        <!-- ── Récapitulatif financier ── -->
+        <div class="mx-6 mb-6 rounded-2xl overflow-hidden border theme-border">
+          <div class="px-5 py-3 flex justify-between items-center text-sm border-b theme-border">
             <span class="theme-muted">Sous-total</span>
             <span class="font-semibold theme-text">
               {{ formatCurrency(selectedOrder.totalAmount + (selectedOrder.discountAmount ?? 0)) }} FCFA
             </span>
           </div>
           @if (selectedOrder.promoCode) {
-            <div class="flex justify-between text-sm">
-              <span class="theme-muted">Code promo <span class="font-mono text-gold">{{ selectedOrder.promoCode }}</span></span>
-              <span class="font-semibold text-green-400">−{{ formatCurrency(selectedOrder.discountAmount ?? 0) }} FCFA</span>
+            <div class="px-5 py-3 flex justify-between items-center text-sm border-b theme-border">
+              <span class="flex items-center gap-2 theme-muted">
+                Code promo
+                <span class="font-mono font-bold text-gold text-xs px-2 py-0.5 rounded-lg bg-gold/10">{{ selectedOrder.promoCode }}</span>
+              </span>
+              <span class="font-bold text-green-400">−{{ formatCurrency(selectedOrder.discountAmount ?? 0) }} FCFA</span>
             </div>
           }
-          <div class="border-t theme-border pt-2.5 flex justify-between">
-            <span class="font-bold theme-text">Total payé</span>
-            <span class="font-black text-gold text-base">{{ formatCurrency(selectedOrder.totalAmount) }} FCFA</span>
+          <div class="px-5 py-4 flex justify-between items-center" style="background:rgba(212,175,55,0.06)">
+            <span class="font-black theme-text text-sm uppercase tracking-wide">Total payé</span>
+            <span class="font-black text-gold text-xl">{{ formatCurrency(selectedOrder.totalAmount) }} <span class="text-sm font-semibold">FCFA</span></span>
           </div>
         </div>
 
       </div>
 
-      <!-- Footer actions -->
-      <div class="flex gap-2 px-6 py-4 border-t theme-border flex-shrink-0">
+      <!-- ── Footer actions ── -->
+      <div class="flex-shrink-0 flex gap-3 px-6 py-4 border-t theme-border">
         <button (click)="closeOrderDetail()"
-          class="flex-1 py-2.5 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
+          class="flex-1 py-3 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
           Fermer
         </button>
         @if (statusUpdatingId === selectedOrder.id) {
-          <div class="flex-1 flex items-center justify-center">
-            <svg class="w-5 h-5 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+          <div class="flex-1 flex items-center justify-center gap-2 py-3 bg-gold/10 rounded-xl">
+            <svg class="w-4 h-4 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
             </svg>
+            <span class="text-sm font-semibold text-gold">Mise à jour…</span>
           </div>
         } @else {
           @if (nextStatusMap[selectedOrder.orderStatus]) {
             <button (click)="advanceOrderStatus(selectedOrder)"
-              class="flex-1 py-2.5 bg-gold text-black rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-yellow-600/20 transition-all">
+              class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-black hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all">
               {{ nextStatusLabel(selectedOrder.orderStatus) }}
             </button>
           }
           @if (selectedOrder.orderStatus !== 'CANCELLED' && selectedOrder.orderStatus !== 'DELIVERED') {
             <button (click)="cancelOrderByManager(selectedOrder); closeOrderDetail()"
-              class="px-4 py-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-bold hover:bg-red-500/20 transition-colors">
+              class="px-5 py-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-bold hover:bg-red-500/20 transition-colors">
               Annuler
             </button>
           }
