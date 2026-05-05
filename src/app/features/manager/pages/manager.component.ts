@@ -88,6 +88,8 @@ export class ManagerComponent implements OnInit, OnDestroy {
   ordersTotalPages = 0;
   statusFilter: OrderStatus | '' = '';
   statusUpdatingId: number | null = null;
+  selectedOrder: OrderResponse | null = null;
+  orderDetailOpen = false;
   readonly orderStatuses = Object.values(OrderStatus);
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
     PENDING:   OrderStatus.CONFIRMED,
@@ -662,6 +664,20 @@ export class ManagerComponent implements OnInit, OnDestroy {
   }
 
   // ── Orders management ─────────────────────────────────────────────────────
+
+  openOrderDetail(order: OrderResponse): void {
+    this.selectedOrder = order;
+    this.orderDetailOpen = true;
+    this.scrollLock.lock();
+    this.cdr.detectChanges();
+  }
+
+  closeOrderDetail(): void {
+    this.orderDetailOpen = false;
+    this.selectedOrder = null;
+    this.scrollLock.unlock();
+    this.cdr.detectChanges();
+  }
 
   loadAllOrders(page = 0): void {
     this.ordersLoading = true;
