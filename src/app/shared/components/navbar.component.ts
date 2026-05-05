@@ -245,6 +245,28 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  getNotificationLink(type: NotificationType): string | null {
+    const orderTypes: NotificationType[] = [
+      NotificationType.ORDER_CREATED,
+      NotificationType.ORDER_CONFIRMED,
+      NotificationType.ORDER_CANCELLED,
+      NotificationType.ORDER_STATUS_CHANGED,
+      NotificationType.DELIVERY_UPDATE,
+    ];
+    if (!orderTypes.includes(type)) return null;
+    const role = this.currentUser?.role;
+    if (role === 'ADMIN') return '/admin';
+    if (role === 'MANAGER') return '/manager';
+    return '/orders';
+  }
+
+  navigateFromNotif(notif: NotificationResponse): void {
+    const link = this.getNotificationLink(notif.type);
+    if (!link) return;
+    this.closeAll();
+    this.router.navigate([link]);
+  }
+
   markAsRead(notif: NotificationResponse): void {
     if (notif.read) return;
     this.notificationService.markAsRead(notif.id)

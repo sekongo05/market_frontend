@@ -113,6 +113,7 @@
                   <!-- ── Vue détail d'une notification ── -->
                   @if (selectedNotification) {
                     @let tpl = getTemplate(selectedNotification.type);
+                    @let notifLink = getNotificationLink(selectedNotification.type);
                     <div class="flex flex-col">
                       <!-- Header détail -->
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
@@ -155,6 +156,15 @@
                              [ngClass]="[tpl.borderClass, tpl.bannerClass]"
                              [innerHTML]="selectedNotification.body | notifBody">
                         </div>
+                        @if (notifLink) {
+                          <button (click)="navigateFromNotif(selectedNotification)"
+                            class="mt-4 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gold text-black text-sm font-semibold hover:bg-gold/90 transition-colors">
+                            Voir la page concernée
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                          </button>
+                        }
                       </div>
                     </div>
 
@@ -429,6 +439,7 @@
                   <!-- réutilise le même contenu que desktop -->
                   @if (selectedNotification) {
                     @let tplM = getTemplate(selectedNotification.type);
+                    @let notifLinkM = getNotificationLink(selectedNotification.type);
                     <div class="flex flex-col">
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
                         <button (click)="closeNotificationDetail()"
@@ -462,6 +473,15 @@
                         <div class="notif-body text-sm theme-text leading-relaxed rounded-xl border p-4 break-words"
                              [ngClass]="[tplM.borderClass, tplM.bannerClass]"
                              [innerHTML]="selectedNotification.body | notifBody"></div>
+                        @if (notifLinkM) {
+                          <button (click)="navigateFromNotif(selectedNotification)"
+                            class="mt-4 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gold text-black text-sm font-semibold hover:bg-gold/90 transition-colors">
+                            Voir la page concernée
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                          </button>
+                        }
                       </div>
                     </div>
                   } @else {
