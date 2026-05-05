@@ -100,6 +100,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   productMedia: ProductMediaItem[] = [];
   mediaLoading = false;
   mediaUploading = false;
+  pendingMediaFile: File | null = null;
+  pendingMediaPreview: string | null = null;
+  pendingMediaColor = { colorName: '', colorHex: '#000000', stock: 0 };
+  mediaColorError: string | null = null;
   productVariants: ProductVariant[] = [];
   variantsLoading = false;
   variantSaving = false;
@@ -516,6 +520,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.variantError = null;
     this.editingVariant = null;
     this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+    this.pendingMediaFile = null;
+    this.pendingMediaPreview = null;
+    this.mediaColorError = null;
   }
 
   saveProduct(): void {
@@ -694,20 +701,53 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   onMediaSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file && this.editingProduct) this._uploadMedia(file);
-    (event.target as HTMLInputElement).value = '';
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !this.editingProduct) return;
+    this.pendingMediaFile = file;
+    this.pendingMediaColor = { colorName: '', colorHex: '#000000', stock: 0 };
+    this.mediaColorError = null;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.pendingMediaPreview = e.target?.result as string; this.cdr.detectChanges(); };
+    reader.readAsDataURL(file);
   }
 
-  private _uploadMedia(file: File): void {
-    if (!this.editingProduct) return;
+  cancelPendingMedia(): void {
+    this.pendingMediaFile = null;
+    this.pendingMediaPreview = null;
+    this.mediaColorError = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmMediaUpload(): void {
+    if (!this.pendingMediaFile || !this.editingProduct) return;
+    if (!this.pendingMediaColor.colorName.trim()) { this.mediaColorError = 'Le nom de la couleur est requis'; return; }
+    if (!/^#[0-9A-Fa-f]{6}$/.test(this.pendingMediaColor.colorHex)) { this.mediaColorError = 'Code couleur invalide (ex: #FF5733)'; return; }
+    this.mediaColorError = null;
     this.mediaUploading = true;
     this.cdr.detectChanges();
+    const file = this.pendingMediaFile;
+    const color = { ...this.pendingMediaColor };
+    this.pendingMediaFile = null;
+    this.pendingMediaPreview = null;
     this.productMediaService.upload(this.editingProduct.id, file).subscribe({
       next: (r) => {
-        if (r.success) this.productMedia = [...this.productMedia, r.data];
+        if (r.success) {
+          this.productMedia = [...this.productMedia, r.data];
+          const variantReq: ProductVariantRequest = {
+            colorName: color.colorName.trim(),
+            colorHex: color.colorHex,
+            imageUrl: r.data.url,
+            stock: color.stock || 0,
+          };
+          this.productVariantService.addVariant(this.editingProduct!.id, variantReq).subscribe({
+            next: (vr: any) => { if (vr.success) this.productVariants = [...this.productVariants, vr.data]; this.cdr.detectChanges(); },
+            error: () => {},
+          });
+          this.toast('Photo & couleur ajoutées ✓');
+        }
         this.mediaUploading = false;
-        this.toast('Média ajouté ✓');
         this.cdr.detectChanges();
       },
       error: () => { this.mediaUploading = false; this.toast('Erreur d\'upload', 'error'); this.cdr.detectChanges(); },
