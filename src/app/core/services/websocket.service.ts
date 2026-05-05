@@ -2,20 +2,22 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Client } from '@stomp/stompjs';
 import { Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { WsNotification, WsStockUpdate, WsOrderEvent } from '../models/notification.models';
+import { WsNotification, WsStockUpdate, WsOrderEvent, WsOrderStatusUpdate } from '../models/notification.models';
 
 @Injectable({ providedIn: 'root' })
 export class WebSocketService implements OnDestroy {
 
   private client: Client | null = null;
 
-  private notificationSubject = new Subject<WsNotification>();
-  private stockSubject        = new Subject<WsStockUpdate>();
-  private orderEventSubject   = new Subject<WsOrderEvent>();
+  private notificationSubject      = new Subject<WsNotification>();
+  private stockSubject             = new Subject<WsStockUpdate>();
+  private orderEventSubject        = new Subject<WsOrderEvent>();
+  private orderStatusUpdateSubject = new Subject<WsOrderStatusUpdate>();
 
-  readonly notification$ = this.notificationSubject.asObservable();
-  readonly stockUpdate$  = this.stockSubject.asObservable();
-  readonly orderEvent$   = this.orderEventSubject.asObservable();
+  readonly notification$      = this.notificationSubject.asObservable();
+  readonly stockUpdate$       = this.stockSubject.asObservable();
+  readonly orderEvent$        = this.orderEventSubject.asObservable();
+  readonly orderStatusUpdate$ = this.orderStatusUpdateSubject.asObservable();
 
   connect(token: string, isStaff: boolean): void {
     if (this.client?.active) return;
@@ -30,7 +32,12 @@ export class WebSocketService implements OnDestroy {
           try { this.notificationSubject.next(JSON.parse(msg.body)); } catch { /* ignore */ }
         });
 
-        // Mises à jour de stock (toutes les sessions, même non connectées, sont OK)
+        // Mise à jour de statut de commande en temps réel (tous utilisateurs connectés)
+        this.client!.subscribe('/user/queue/order-status', (msg) => {
+          try { this.orderStatusUpdateSubject.next(JSON.parse(msg.body)); } catch { /* ignore */ }
+        });
+
+        // Mises à jour de stock
         this.client!.subscribe('/topic/stock', (msg) => {
           try { this.stockSubject.next(JSON.parse(msg.body)); } catch { /* ignore */ }
         });

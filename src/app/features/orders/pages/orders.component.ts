@@ -1,7 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { OrderService } from '../../../core/services/order.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 import { OrderResponse } from '../../../core/models/order.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
@@ -13,7 +16,7 @@ import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css'],
 })
-export class OrdersComponent implements OnInit {
+export class OrdersComponent implements OnInit, OnDestroy {
   orders: OrderResponse[] = [];
   loading = false;
   error: string | null = null;
@@ -28,14 +31,37 @@ export class OrdersComponent implements OnInit {
   cancelError: string | null = null;
   cancelErrorOrderId: number | null = null;
 
-  constructor(private orderService: OrderService, private cdr: ChangeDetectorRef) {}
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private orderService: OrderService,
+    private wsService: WebSocketService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.cancelConfirmId !== null) { this.cancelConfirmId = null; this.cdr.detectChanges(); }
   }
 
-  ngOnInit(): void { this.loadOrders(); }
+  ngOnInit(): void {
+    this.loadOrders();
+    this.wsService.orderStatusUpdate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(update => {
+        const idx = this.orders.findIndex(o => o.id === update.orderId);
+        if (idx !== -1) {
+          this.orders = [...this.orders];
+          this.orders[idx] = { ...this.orders[idx], orderStatus: update.orderStatus as any };
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   loadOrders(page = 0): void {
     this.loading = true;

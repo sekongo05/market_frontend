@@ -34,3 +34,9 @@ export interface WsOrderEvent {
   orderNumber: string;
   pendingCount: number;
 }
+
+export interface WsOrderStatusUpdate {
+  orderId: number;
+  orderNumber: string;
+  orderStatus: string;
+}
