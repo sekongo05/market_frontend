@@ -252,6 +252,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
       NotificationType.ORDER_CANCELLED,
       NotificationType.ORDER_STATUS_CHANGED,
       NotificationType.DELIVERY_UPDATE,
+      NotificationType.CARRIER_ASSIGNED,
+      NotificationType.RETURN_REQUESTED,
+      NotificationType.RETURN_DECIDED,
     ];
     if (!orderTypes.includes(type)) return null;
     const role = this.currentUser?.role;
