@@ -122,6 +122,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   editingStockValue = 0;
   stockSavingId: number | null = null;
   confirmDeleteId: number | null = null;
+  discountEditingId: number | null = null;
+  discountEditValue = 0;
+  discountSavingId: number | null = null;
   productCategories: CategoryResponse[] = [];
   readonly genders: { value: Gender; label: string }[] = [
     { value: 'HOMME',  label: 'Homme'   },
@@ -687,6 +690,35 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     if (stock <= 3)  return 'text-orange-400';
     return 'text-green-400';
   }
+
+  startEditDiscount(product: ProductResponse): void {
+    this.discountEditingId = product.id;
+    this.discountEditValue = product.discountPercent ?? 0;
+    this.cdr.detectChanges();
+  }
+
+  confirmEditDiscount(product: ProductResponse): void {
+    const pct = Math.max(0, Math.min(100, Math.round(+this.discountEditValue || 0)));
+    this.discountEditingId = null;
+    const unchanged = (product.discountPercent ?? 0) === pct;
+    if (unchanged) return;
+    this.discountSavingId = product.id;
+    this.cdr.detectChanges();
+    this.productService.setDiscount(product.id, pct > 0 ? pct : null).subscribe({
+      next: (r) => {
+        if (r.success) {
+          const idx = this.products.findIndex(p => p.id === product.id);
+          if (idx !== -1) this.products[idx] = { ...this.products[idx], discountPercent: r.data.discountPercent, salePrice: r.data.salePrice };
+          this.products = [...this.products];
+        }
+        this.discountSavingId = null;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.discountSavingId = null; this.cdr.detectChanges(); },
+    });
+  }
+
+  cancelEditDiscount(): void { this.discountEditingId = null; this.cdr.detectChanges(); }
 
   get productPages(): number[] { return Array.from({ length: this.productsTotalPages }, (_, i) => i); }
 

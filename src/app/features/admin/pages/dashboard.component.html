@@ -1429,11 +1429,44 @@
               <!-- Info -->
               <div class="p-4 flex flex-col flex-1">
                 <p class="font-bold theme-text text-sm truncate mb-0.5">{{ product.name }}</p>
-                <p class="text-xs theme-muted mb-3 truncate">{{ product.category.name }}</p>
+                <p class="text-xs theme-muted mb-2 truncate">{{ product.category.name }}</p>
 
+                <!-- Prix avec remise inline -->
+                <div class="mb-1">
+                  @if (discountEditingId === product.id) {
+                    <div class="flex items-center gap-1 mb-1">
+                      <input type="number" min="0" max="100" [(ngModel)]="discountEditValue"
+                             (keydown.enter)="confirmEditDiscount(product)" (keydown.escape)="cancelEditDiscount()"
+                             class="w-16 text-center theme-input px-1 py-1 rounded-lg text-sm font-bold"/>
+                      <span class="text-xs theme-muted">%</span>
+                      <button type="button" (click)="confirmEditDiscount(product)"
+                        class="w-6 h-6 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400 hover:bg-green-500/30">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                      </button>
+                      <button type="button" (click)="cancelEditDiscount()"
+                        class="w-6 h-6 bg-black/[.06] rounded-lg flex items-center justify-center theme-muted hover:bg-white/15">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                  } @else if (discountSavingId === product.id) {
+                    <svg class="w-4 h-4 text-gold animate-spin mb-1" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                  } @else if (product.discountPercent && product.discountPercent > 0) {
+                    <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-400 mb-0.5">-{{ product.discountPercent }}%</span>
+                    <div class="flex items-baseline gap-1">
+                      <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+                      <span class="font-black text-orange-400 text-base">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
+                      <span class="text-xs theme-muted">FCFA</span>
+                    </div>
+                  } @else {
+                    <span class="font-black text-gold text-base">{{ formatCurrency(product.price) }}</span>
+                  }
+                </div>
+
+                <!-- Stock inline edit -->
                 <div class="flex items-center justify-between mb-3">
-                  <span class="font-black text-gold text-base">{{ formatCurrency(product.price) }} FCFA</span>
-                  <!-- Stock inline edit -->
                   @if (editingStockId === product.id) {
                     <div class="flex items-center gap-1">
                       <button (click)="adjustStock(-1)" class="w-6 h-6 bg-black/[.06] rounded-lg flex items-center justify-center theme-muted hover:bg-white/15 text-xs font-bold">−</button>
@@ -1462,10 +1495,6 @@
 
                 <!-- Actions -->
                 <div class="flex gap-2 mt-auto">
-                  <button (click)="openEditDrawer(product)"
-                    class="flex-1 py-2 text-xs font-bold rounded-xl bg-white/6 theme-muted hover:bg-gold/10 hover:text-gold transition-colors">
-                    Modifier
-                  </button>
                   @if (confirmDeleteId === product.id) {
                     <button (click)="doDelete(product)"
                       class="flex-1 py-2 text-xs font-bold rounded-xl bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors">
@@ -1476,8 +1505,19 @@
                       ✕
                     </button>
                   } @else {
+                    <!-- Remise % -->
+                    <button (click)="startEditDiscount(product)"
+                      class="py-2 px-2.5 text-xs font-black rounded-xl transition-colors"
+                      [class]="(product.discountPercent && product.discountPercent > 0) ? 'bg-orange-500/20 border border-orange-500/40 text-orange-400 hover:bg-orange-500/30' : 'bg-white/6 theme-muted hover:bg-orange-500/15 hover:text-orange-400'"
+                      title="Définir une remise">
+                      %
+                    </button>
+                    <button (click)="openEditDrawer(product)"
+                      class="flex-1 py-2 text-xs font-bold rounded-xl bg-white/6 theme-muted hover:bg-gold/10 hover:text-gold transition-colors">
+                      Modifier
+                    </button>
                     <button (click)="startDelete(product.id)"
-                      class="py-2 px-3 text-xs font-bold rounded-xl bg-white/6 text-red-400/60 hover:bg-red-500/15 hover:text-red-400 transition-colors">
+                      class="py-2 px-2.5 text-xs font-bold rounded-xl bg-white/6 text-red-400/60 hover:bg-red-500/15 hover:text-red-400 transition-colors">
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                       </svg>
@@ -1704,11 +1744,11 @@
       <!-- Header -->
       <div class="flex items-center justify-between px-6 py-5 border-b theme-border flex-shrink-0">
         <div>
-          <h3 class="text-lg font-bold theme-text">{{ editingProduct ? 'Modifier' : 'Nouveau' }} produit</h3>
-          <p class="text-xs theme-muted mt-0.5">{{ editingProduct ? editingProduct.name : 'Remplissez les informations' }}</p>
+          <h3 class="text-lg font-black theme-text">{{ editingProduct ? 'Modifier le produit' : 'Nouveau produit' }}</h3>
+          <p class="text-xs theme-muted mt-0.5">{{ editingProduct ? editingProduct.name : 'Remplissez les informations ci-dessous' }}</p>
         </div>
-        <button (click)="closeDrawer()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        <button (click)="closeDrawer()" class="w-9 h-9 rounded-xl luxury-card theme-muted flex items-center justify-center hover:text-gold transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
