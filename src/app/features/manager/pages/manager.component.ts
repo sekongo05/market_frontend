@@ -366,16 +366,28 @@ export class ManagerComponent implements OnInit, OnDestroy {
       req$ = this.productService.createProduct(fd);
     }
 
+    const wasCreating = !this.editingProduct;
     req$.subscribe({
       next: (r) => {
         this.drawerLoading = false;
         if (r.success) {
-          this.toast(this.editingProduct ? 'Produit mis à jour ✓' : 'Produit ajouté ✓');
           this.loadProducts(this.currentPage);
+          if (wasCreating && r.data) {
+            // Après création : rester dans le drawer en mode édition, aller sur l'onglet Couleurs
+            this.editingProduct = r.data;
+            this.drawerTab = 'variants';
+            this.productVariants = [];
+            this.loadVariants(r.data.id);
+            this.initForm(r.data);
+            this.toast('Produit ajouté ✓ — Ajoutez des couleurs si nécessaire');
+          } else {
+            this.toast('Produit mis à jour ✓');
+            this.closeDrawer();
+          }
         } else {
           this._applyLocalSave(v);
+          this.closeDrawer();
         }
-        this.closeDrawer();
         this.cdr.detectChanges();
       },
       error: () => {

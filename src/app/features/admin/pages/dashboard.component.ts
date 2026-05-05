@@ -526,12 +526,23 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       req$ = this.productService.createProduct(fd);
     }
 
+    const wasCreating = !this.editingProduct;
     req$.subscribe({
       next: (r) => {
         this.drawerLoading = false;
-        this.toast(this.editingProduct ? 'Produit mis à jour ✓' : 'Produit créé ✓');
         this.loadProducts(this.productsPage);
-        this.closeDrawer();
+        if (wasCreating && r.data) {
+          // Après création : rester dans le drawer en mode édition, aller sur l'onglet Couleurs
+          this.editingProduct = r.data;
+          this.drawerTab = 'variants';
+          this.productVariants = [];
+          this.loadVariants(r.data.id);
+          this.initProductForm(r.data);
+          this.toast('Produit créé ✓ — Ajoutez des couleurs si nécessaire');
+        } else {
+          this.toast('Produit mis à jour ✓');
+          this.closeDrawer();
+        }
         this.cdr.detectChanges();
       },
       error: (err) => {
