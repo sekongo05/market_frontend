@@ -492,11 +492,17 @@
                           </div>
                         }
                       </div>
-                      <p class="text-xs theme-muted max-w-[160px] truncate">
+                      <div class="space-y-0.5 max-w-[160px]">
                         @for (item of order.items; track item.productId; let last = $last) {
-                          {{ item.productName }} ×{{ item.quantity }}{{ last ? '' : ', ' }}
+                          <div class="flex items-center gap-1 text-xs theme-muted">
+                            @if (item.selectedColorHex) {
+                              <span class="w-2 h-2 rounded-full flex-shrink-0 border border-white/20"
+                                    [style.background-color]="item.selectedColorHex"></span>
+                            }
+                            <span class="truncate">{{ item.productName }} ×{{ item.quantity }}</span>
+                          </div>
                         }
-                      </p>
+                      </div>
                     </div>
                     <p class="text-xs theme-muted">{{ order.deliveryAddress | slice:0:40 }}…</p>
                   </td>
@@ -620,11 +626,17 @@
                     {{ orderStatusLabel(order.orderStatus) }}
                   </span>
                 </div>
-                <p class="text-xs theme-muted mt-1 truncate">
+                <div class="text-xs theme-muted mt-1 space-y-0.5">
                   @for (item of order.items; track item.productId; let last = $last) {
-                    {{ item.productName }} ×{{ item.quantity }}{{ !last ? ', ' : '' }}
+                    <div class="flex items-center gap-1">
+                      @if (item.selectedColorHex) {
+                        <span class="w-2 h-2 rounded-full flex-shrink-0 border border-white/20"
+                              [style.background-color]="item.selectedColorHex"></span>
+                      }
+                      <span class="truncate">{{ item.productName }} ×{{ item.quantity }}</span>
+                    </div>
                   }
-                </p>
+                </div>
                 <p class="text-xs theme-muted">{{ order.deliveryAddress | slice:0:50 }}</p>
               </div>
               <div class="text-right shrink-0">
@@ -926,7 +938,7 @@
               Informations
             </button>
             <button type="button" (click)="setDrawerTab('media')"
-              class="py-3 px-1 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
+              class="py-3 px-1 mr-6 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
               [class.border-gold]="drawerTab === 'media'"
               [class.text-gold]="drawerTab === 'media'"
               [class.border-transparent]="drawerTab !== 'media'"
@@ -934,6 +946,17 @@
               Galerie médias
               @if (productMedia.length > 0) {
                 <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-gold/15 text-gold">{{ productMedia.length }}</span>
+              }
+            </button>
+            <button type="button" (click)="setDrawerTab('variants')"
+              class="py-3 px-1 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
+              [class.border-gold]="drawerTab === 'variants'"
+              [class.text-gold]="drawerTab === 'variants'"
+              [class.border-transparent]="drawerTab !== 'variants'"
+              [class.theme-muted]="drawerTab !== 'variants'">
+              Couleurs
+              @if (productVariants.length > 0) {
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-gold/15 text-gold">{{ productVariants.length }}</span>
               }
             </button>
           </div>
@@ -1025,8 +1048,99 @@
           </div>
         }
 
+        <!-- ── Onglet Couleurs ─────────────────────────────────────────────── -->
+        @if (drawerTab === 'variants' && editingProduct) {
+          <div class="p-6 space-y-4">
+            <p class="text-xs theme-muted">Ajoutez des variantes de couleur avec leur stock individuel. Le client devra choisir une couleur avant de commander.</p>
+
+            @if (variantError) {
+              <div class="p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-xs">{{ variantError }}</div>
+            }
+
+            <!-- Formulaire -->
+            <div class="p-4 rounded-xl border theme-border space-y-3" [class.border-gold]="editingVariant">
+              <p class="text-xs font-bold theme-text">{{ editingVariant ? 'Modifier la couleur' : 'Ajouter une couleur' }}</p>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Nom *</label>
+                  <input [(ngModel)]="newVariant.colorName" type="text" placeholder="ex: Rouge" class="theme-input w-full px-3 py-2 rounded-lg text-sm"/>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Couleur *</label>
+                  <div class="flex items-center gap-2">
+                    <input [(ngModel)]="newVariant.colorHex" type="color" class="w-10 h-9 rounded-lg border theme-border cursor-pointer p-0.5"/>
+                    <input [(ngModel)]="newVariant.colorHex" type="text" placeholder="#000000" maxlength="7"
+                           class="theme-input flex-1 px-2 py-2 rounded-lg text-xs font-mono"/>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Stock *</label>
+                <input [(ngModel)]="newVariant.stock" type="number" min="0" placeholder="0" class="theme-input w-full px-3 py-2 rounded-lg text-sm"/>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">URL image (optionnel)</label>
+                <input [(ngModel)]="newVariant.imageUrl" type="text" placeholder="https://…" class="theme-input w-full px-3 py-2 rounded-lg text-sm"/>
+              </div>
+
+              <div class="flex gap-2 pt-1">
+                @if (editingVariant) {
+                  <button type="button" (click)="cancelEditVariant()" class="flex-1 py-2 rounded-lg border theme-border theme-muted font-semibold text-xs hover:bg-black/[.04] transition-colors">
+                    Annuler
+                  </button>
+                }
+                <button type="button" (click)="saveVariant()" [disabled]="variantSaving"
+                  class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-gold text-black font-bold text-xs hover:shadow-lg hover:shadow-yellow-600/25 transition-all disabled:opacity-50">
+                  @if (variantSaving) {
+                    <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                  }
+                  {{ editingVariant ? 'Enregistrer' : 'Ajouter' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Liste des couleurs -->
+            @if (variantsLoading) {
+              <div class="flex justify-center py-4">
+                <svg class="w-5 h-5 text-gold animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+              </div>
+            }
+            @if (!variantsLoading) {
+              @for (variant of productVariants; track variant.id) {
+                <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(0,0,0,0.04)">
+                  <div class="w-8 h-8 rounded-full flex-shrink-0 border-2 border-white/10 shadow"
+                       [style.background-color]="variant.colorHex"></div>
+                  @if (variant.imageUrl) {
+                    <img [src]="variant.imageUrl" [alt]="variant.colorName" class="w-8 h-8 rounded-lg object-cover flex-shrink-0"/>
+                  }
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold theme-text truncate">{{ variant.colorName }}</p>
+                    <p class="text-xs theme-muted">Stock : {{ variant.stock }}</p>
+                  </div>
+                  <button type="button" (click)="startEditVariant(variant)" class="p-1.5 rounded-lg theme-muted hover:text-gold transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </button>
+                  <button type="button" (click)="deleteVariant(variant.id)" class="p-1.5 rounded-lg text-red-400/50 hover:text-red-400 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              }
+              @if (productVariants.length === 0) {
+                <p class="text-center text-sm theme-muted py-4">Aucune variante de couleur</p>
+              }
+            }
+          </div>
+        }
+
         <form [formGroup]="productForm" (ngSubmit)="saveProduct()" id="productForm"
-              class="p-6 space-y-5" [class.hidden]="drawerTab === 'media'">
+              class="p-6 space-y-5" [class.hidden]="drawerTab === 'media' || drawerTab === 'variants'">
 
           @if (drawerError) {
             <div class="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">

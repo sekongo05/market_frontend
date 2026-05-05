@@ -3,6 +3,7 @@ import { OrderStatus, DeliveryStatus } from './common.models';
 export interface OrderItem {
   productId: number;
   quantity: number;
+  variantId?: number;
 }
 
 export interface CreateOrderRequest {
@@ -18,6 +19,8 @@ export interface OrderItemResponse {
   quantity: number;
   unitPrice: number;
   subtotal: number;
+  selectedColor?: string;
+  selectedColorHex?: string;
 }
 
 export interface OrderResponse {

@@ -407,7 +407,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
       : `Intérieur du pays — ${this.deliveryCity}`;
     const fullAddress = `${adresse} | Tél: ${this.deliveryPhone.trim()}`;
     const payload: any = {
-      items: this.cartItems.map(i => ({ productId: i.productId, quantity: i.quantity })),
+      items: this.cartItems.map(i => ({
+        productId: i.productId,
+        quantity: i.quantity,
+        ...(i.variantId != null ? { variantId: i.variantId } : {}),
+      })),
       deliveryAddress: fullAddress,
     };
     if (this.promoCheckResult?.valid && this.promoCheckResult.code) {

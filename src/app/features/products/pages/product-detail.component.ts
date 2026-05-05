@@ -13,7 +13,7 @@ import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
-import { ProductMediaItem, ProductResponse } from '../../../core/models/product.models';
+import { ProductMediaItem, ProductResponse, ProductVariant } from '../../../core/models/product.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
 export interface GalleryItem {
@@ -87,6 +87,9 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   quantity = 1;
   addedToCart = false;
 
+  // Variant selection
+  selectedVariant: ProductVariant | null = null;
+
   private destroy$ = new Subject<void>();
   private observer?: IntersectionObserver;
 
@@ -140,6 +143,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       next: (response) => {
         if (response.success && response.data) {
           this.product = response.data;
+          this.selectedVariant = null;
           this._buildGallery();
           this._loadRelated();
         } else {
@@ -233,14 +237,45 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // ── Cart ─────────────────────────────────────────────────────────────────
 
+  // ── Variant selection ─────────────────────────────────────────────────────
+
+  get hasVariants(): boolean {
+    return (this.product?.variants?.length ?? 0) > 0;
+  }
+
+  get effectiveStock(): number {
+    if (!this.product) return 0;
+    if (this.hasVariants) {
+      return this.selectedVariant?.stock ?? 0;
+    }
+    return this.product.stock;
+  }
+
+  selectVariant(variant: ProductVariant): void {
+    this.selectedVariant = this.selectedVariant?.id === variant.id ? null : variant;
+    this.quantity = Math.min(this.quantity, Math.max(1, this.effectiveStock));
+    if (this.selectedVariant?.imageUrl) {
+      const idx = this.galleryItems.findIndex(g => g.url === this.selectedVariant!.imageUrl);
+      if (idx >= 0) this.activeIndex = idx;
+    }
+    this.cdr.detectChanges();
+  }
+
+  // ── Cart ─────────────────────────────────────────────────────────────────
+
   setQuantity(q: number): void {
     if (!this.product) return;
-    this.quantity = Math.max(1, Math.min(q, this.product.stock));
+    this.quantity = Math.max(1, Math.min(q, this.effectiveStock || this.product.stock));
     this.cdr.detectChanges();
   }
 
   addToCart(): void {
-    if (!this.product || this.product.stock === 0) return;
+    if (!this.product) return;
+    if (this.hasVariants && !this.selectedVariant) {
+      this.cdr.detectChanges();
+      return;
+    }
+    if (this.effectiveStock === 0) return;
     if (!this.authService.isAuthenticated()) {
       this.authPromptService.show();
       return;
@@ -248,9 +283,12 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.cartService.addToCart({
       productId: this.product.id,
       productName: this.product.name,
-      price: this.product.price,
+      price: this.product.salePrice ?? this.product.price,
       quantity: this.quantity,
-      imageUrl: this.product.imageUrl,
+      imageUrl: this.selectedVariant?.imageUrl || this.product.imageUrl,
+      variantId: this.selectedVariant?.id,
+      selectedColor: this.selectedVariant?.colorName,
+      selectedColorHex: this.selectedVariant?.colorHex,
     });
     this.addedToCart = true;
     this.cdr.detectChanges();
@@ -309,15 +347,19 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get stockLabel(): string {
     if (!this.product) return '';
-    if (this.product.stock === 0) return 'Épuisé';
-    if (this.product.stock <= 3) return `Plus que ${this.product.stock} en stock`;
+    if (this.hasVariants && !this.selectedVariant) return 'Choisissez une couleur';
+    const s = this.effectiveStock;
+    if (s === 0) return 'Épuisé';
+    if (s <= 3) return `Plus que ${s} en stock`;
     return 'En stock';
   }
 
   get stockColor(): string {
     if (!this.product) return '#9ca3af';
-    if (this.product.stock === 0) return '#f87171';
-    if (this.product.stock <= 3) return '#fb923c';
+    if (this.hasVariants && !this.selectedVariant) return '#9ca3af';
+    const s = this.effectiveStock;
+    if (s === 0) return '#f87171';
+    if (s <= 3) return '#fb923c';
     return '#4ade80';
   }
 

@@ -10,6 +10,15 @@ export interface ProductMediaItem {
   position: number;
 }
 
+export interface ProductVariant {
+  id: number;
+  colorName: string;
+  colorHex: string;
+  imageUrl?: string;
+  stock: number;
+  createdAt?: string;
+}
+
 export interface ProductResponse {
   id: number;
   name: string;
@@ -22,6 +31,7 @@ export interface ProductResponse {
   gender: Gender;
   imageUrl: string;
   media?: ProductMediaItem[];
+  variants?: ProductVariant[];
   category: CategoryResponse;
   active: boolean;
   createdAt: string;

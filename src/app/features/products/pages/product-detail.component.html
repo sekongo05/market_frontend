@@ -115,14 +115,20 @@
 
             <!-- Stock badge -->
             <div class="absolute top-4 left-4 z-10">
-              @if (product.stock === 0) {
+              @if (effectiveStock === 0 && (!hasVariants || selectedVariant)) {
                 <span class="px-3 py-1 bg-red-900/80 text-red-300 text-xs font-bold rounded-full">Épuisé</span>
-              } @else if (product.stock <= 3) {
+              } @else if (effectiveStock <= 3 && effectiveStock > 0 && (!hasVariants || selectedVariant)) {
                 <span class="px-3 py-1 bg-orange-900/80 text-orange-300 text-xs font-bold rounded-full animate-pulse">
-                  {{ product.stock }} restant{{ product.stock > 1 ? 's' : '' }}
+                  {{ effectiveStock }} restant{{ effectiveStock > 1 ? 's' : '' }}
                 </span>
-              } @else {
+              } @else if (!hasVariants || selectedVariant) {
                 <span class="px-3 py-1 bg-gold text-black text-xs font-bold rounded-full">En stock</span>
+              }
+              @if (selectedVariant) {
+                <span class="ml-2 px-2.5 py-1 text-xs font-bold rounded-full border border-white/20 text-white"
+                      [style.background-color]="selectedVariant.colorHex + '99'">
+                  {{ selectedVariant.colorName }}
+                </span>
               }
             </div>
 
@@ -273,6 +279,65 @@
             </div>
           </div>
 
+          <!-- Color variant selector -->
+          @if (hasVariants) {
+            <div class="p-5 rounded-2xl luxury-card">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">Couleur</h3>
+                @if (selectedVariant) {
+                  <span class="text-sm font-bold theme-text">{{ selectedVariant.colorName }}</span>
+                } @else {
+                  <span class="text-xs text-orange-400 font-semibold">Choisissez une couleur</span>
+                }
+              </div>
+              <div class="flex flex-wrap gap-3">
+                @for (variant of product.variants; track variant.id) {
+                  <button
+                    (click)="selectVariant(variant)"
+                    [disabled]="variant.stock === 0"
+                    [appTooltip]="variant.colorName + (variant.stock === 0 ? ' — Épuisé' : ' — ' + variant.stock + ' en stock')"
+                    tooltipPosition="top"
+                    class="relative group flex flex-col items-center gap-1.5 transition-all duration-200"
+                    [class.opacity-40]="variant.stock === 0"
+                    [class.cursor-not-allowed]="variant.stock === 0">
+
+                    <!-- Color circle -->
+                    <div class="w-9 h-9 rounded-full border-2 transition-all duration-200 shadow-md"
+                         [style.background-color]="variant.colorHex"
+                         [class.border-gold]="selectedVariant?.id === variant.id"
+                         [class.scale-110]="selectedVariant?.id === variant.id"
+                         [class.border-transparent]="selectedVariant?.id !== variant.id"
+                         [class.ring-2]="selectedVariant?.id === variant.id"
+                         [class.ring-gold]="selectedVariant?.id === variant.id"
+                         [class.ring-offset-2]="selectedVariant?.id === variant.id">
+                      <!-- Diagonal line if out of stock -->
+                      @if (variant.stock === 0) {
+                        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 36 36">
+                          <line x1="4" y1="32" x2="32" y2="4" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+                        </svg>
+                      }
+                    </div>
+
+                    <!-- Color image preview if available -->
+                    @if (variant.imageUrl) {
+                      <div class="w-8 h-8 rounded-lg overflow-hidden border border-white/10 shadow">
+                        <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.colorName"
+                             class="w-full h-full object-cover"/>
+                      </div>
+                    }
+                  </button>
+                }
+              </div>
+
+              @if (selectedVariant && selectedVariant.stock > 0 && selectedVariant.stock <= 3) {
+                <p class="mt-3 text-xs text-orange-400 font-semibold flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse inline-block"></span>
+                  Plus que {{ selectedVariant.stock }} en stock pour cette couleur
+                </p>
+              }
+            </div>
+          }
+
           <!-- CTA zone — adapté au rôle -->
           @if (isManager) {
             <!-- Manager : bouton Modifier -->
@@ -295,7 +360,28 @@
             </div>
           } @else {
             <!-- Customer : panier normal -->
-            @if (product.stock > 0) {
+            @if (!hasVariants && product.stock === 0) {
+              <!-- Épuisé (sans variante) -->
+              <div class="p-4 rounded-2xl bg-red-500/8 border border-red-500/20 text-red-400 text-sm font-semibold text-center">
+                Ce produit est actuellement épuisé
+              </div>
+              <button (click)="goBack()"
+                class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
+                       hover:theme-text luxury-card transition-all duration-200">
+                ← Retour à la collection
+              </button>
+            } @else if (hasVariants && selectedVariant && selectedVariant.stock === 0) {
+              <!-- Variante épuisée -->
+              <div class="p-4 rounded-2xl bg-red-500/8 border border-red-500/20 text-red-400 text-sm font-semibold text-center">
+                La couleur « {{ selectedVariant.colorName }} » est actuellement épuisée
+              </div>
+              <button (click)="goBack()"
+                class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
+                       hover:theme-text luxury-card transition-all duration-200">
+                ← Retour à la collection
+              </button>
+            } @else if (!hasVariants || selectedVariant) {
+              <!-- Disponible -->
               <div class="flex flex-col gap-3">
                 <!-- Qty selector -->
                 <div class="flex items-center gap-4">
@@ -310,7 +396,7 @@
                       </svg>
                     </button>
                     <span class="w-12 text-center font-black theme-text text-sm">{{ quantity }}</span>
-                    <button (click)="setQuantity(quantity + 1)" [disabled]="quantity >= product.stock"
+                    <button (click)="setQuantity(quantity + 1)" [disabled]="quantity >= effectiveStock"
                       appTooltip="Augmenter la quantité" tooltipPosition="top"
                       class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
                              hover:text-gold hover:bg-black/5 transition-colors">
@@ -348,9 +434,16 @@
                 </button>
               </div>
             } @else {
-              <div class="p-4 rounded-2xl bg-red-500/8 border border-red-500/20 text-red-400 text-sm font-semibold text-center">
-                Ce produit est actuellement épuisé
-              </div>
+              <!-- Variante pas encore sélectionnée -->
+              <button (click)="addToCart()" disabled
+                class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
+                       bg-gold/30 text-black/40 cursor-not-allowed transition-all duration-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                </svg>
+                Sélectionner une couleur d'abord
+              </button>
               <button (click)="goBack()"
                 class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
                        hover:theme-text luxury-card transition-all duration-200">

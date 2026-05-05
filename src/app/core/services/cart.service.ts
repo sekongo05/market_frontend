@@ -7,6 +7,9 @@ export interface CartItem {
   price: number;
   quantity: number;
   imageUrl: string;
+  variantId?: number;
+  selectedColor?: string;
+  selectedColorHex?: string;
 }
 
 @Injectable({
@@ -21,7 +24,9 @@ export class CartService {
 
   addToCart(item: CartItem): void {
     const cart = this.cartSubject.value;
-    const existingItem = cart.find((i) => i.productId === item.productId);
+    const existingItem = cart.find(
+      (i) => i.productId === item.productId && i.variantId === item.variantId
+    );
 
     if (existingItem) {
       existingItem.quantity += item.quantity;
@@ -33,21 +38,21 @@ export class CartService {
     this.cartSubject.next([...cart]);
   }
 
-  removeFromCart(productId: number): void {
+  removeFromCart(productId: number, variantId?: number): void {
     const cart = this.cartSubject.value.filter(
-      (item) => item.productId !== productId
+      (item) => !(item.productId === productId && item.variantId === variantId)
     );
     this.saveCart(cart);
     this.cartSubject.next(cart);
   }
 
-  updateQuantity(productId: number, quantity: number): void {
+  updateQuantity(productId: number, quantity: number, variantId?: number): void {
     const cart = this.cartSubject.value;
-    const item = cart.find((i) => i.productId === productId);
+    const item = cart.find((i) => i.productId === productId && i.variantId === variantId);
 
     if (item) {
       if (quantity <= 0) {
-        this.removeFromCart(productId);
+        this.removeFromCart(productId, variantId);
       } else {
         item.quantity = quantity;
         this.saveCart(cart);

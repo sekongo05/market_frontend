@@ -11,6 +11,7 @@ import { CategoryService } from '../../../core/services/category.service';
 import { OrderService } from '../../../core/services/order.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ProductMediaService } from '../../../core/services/product-media.service';
+import { ProductVariantService, ProductVariantRequest } from '../../../core/services/product-variant.service';
 import { DeliveryService } from '../../../core/services/delivery.service';
 import { PromoService } from '../../../core/services/promo.service';
 import { ReviewService } from '../../../core/services/review.service';
@@ -19,7 +20,7 @@ import { WebSocketService } from '../../../core/services/websocket.service';
 import { UserResponse, AdminCreateUserRequest, UserFullProfileResponse } from '../../../core/models/user.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { OrderResponse, GetOrdersParams } from '../../../core/models/order.models';
-import { ProductResponse, GetProductsParams, ProductMediaItem, Gender } from '../../../core/models/product.models';
+import { ProductResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender } from '../../../core/models/product.models';
 import { DeliveryResponse, AddDeliveryEventRequest, UpdateDeliveryRequest } from '../../../core/models/delivery.models';
 import { PromoResponse, CreatePromoRequest, PublicPromoResponse } from '../../../core/models/promo.models';
 import { ReviewResponse } from '../../../core/models/review.models';
@@ -93,10 +94,16 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   drawerLoading = false;
   drawerError: string | null = null;
   productForm!: FormGroup;
-  drawerTab: 'info' | 'media' = 'info';
+  drawerTab: 'info' | 'media' | 'variants' = 'info';
   productMedia: ProductMediaItem[] = [];
   mediaLoading = false;
   mediaUploading = false;
+  productVariants: ProductVariant[] = [];
+  variantsLoading = false;
+  variantSaving = false;
+  variantError: string | null = null;
+  newVariant: ProductVariantRequest = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+  editingVariant: ProductVariant | null = null;
   selectedImages: File[] = [];
   imagePreviews: string[] = [];
   selectedVideo: File | null = null;
@@ -207,6 +214,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private orderService: OrderService,
     private productService: ProductService,
     private productMediaService: ProductMediaService,
+    private productVariantService: ProductVariantService,
     private deliveryService: DeliveryService,
     private promoService: PromoService,
     private reviewService: ReviewService,
@@ -454,15 +462,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this._resetDrawer();
     this.imagePreview = product.imageUrl || null;
     this.productMedia = product.media ?? [];
+    this.productVariants = product.variants ?? [];
     this.initProductForm(product);
     this.drawerOpen = true;
     this.scrollLock.lock();
     this.loadMedia(product.id);
+    this.loadVariants(product.id);
     this.cdr.detectChanges();
     setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
   }
 
-  setDrawerTab(tab: 'info' | 'media'): void {
+  setDrawerTab(tab: 'info' | 'media' | 'variants'): void {
     this.drawerTab = tab;
     document.getElementById('admin-drawer-panel')?.scrollTo(0, 0);
   }
@@ -486,6 +496,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.uploadError = null;
     this.drawerTab = 'info';
     this.productMedia = [];
+    this.productVariants = [];
+    this.variantError = null;
+    this.editingVariant = null;
+    this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
   }
 
   saveProduct(): void {
@@ -677,6 +691,70 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     if (!this.editingProduct) return;
     this.productMediaService.delete(this.editingProduct.id, mediaId).subscribe({
       next: () => { this.productMedia = this.productMedia.filter(m => m.id !== mediaId); this.cdr.detectChanges(); },
+      error: () => this.toast('Erreur de suppression', 'error'),
+    });
+  }
+
+  // ── Variants ───────────────────────────────────────────────────────────────
+
+  loadVariants(productId: number): void {
+    this.variantsLoading = true;
+    this.productVariantService.getVariants(productId).subscribe({
+      next: (r) => { if (r.success) this.productVariants = r.data; this.variantsLoading = false; this.cdr.detectChanges(); },
+      error: () => { this.variantsLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  saveVariant(): void {
+    if (!this.editingProduct) return;
+    if (!this.newVariant.colorName.trim()) { this.variantError = 'Le nom de la couleur est requis'; return; }
+    if (!/^#[0-9A-Fa-f]{6}$/.test(this.newVariant.colorHex)) { this.variantError = 'Couleur hex invalide (ex: #FF5733)'; return; }
+    this.variantSaving = true;
+    this.variantError = null;
+
+    const req$ = this.editingVariant
+      ? this.productVariantService.updateVariant(this.editingProduct.id, this.editingVariant.id, this.newVariant)
+      : this.productVariantService.addVariant(this.editingProduct.id, this.newVariant);
+
+    req$.subscribe({
+      next: (r) => {
+        if (r.success) {
+          if (this.editingVariant) {
+            this.productVariants = this.productVariants.map(v => v.id === r.data.id ? r.data : v);
+          } else {
+            this.productVariants = [...this.productVariants, r.data];
+          }
+          this.editingVariant = null;
+          this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+        }
+        this.variantSaving = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.variantError = err?.error?.message || 'Erreur lors de l\'enregistrement';
+        this.variantSaving = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  startEditVariant(variant: ProductVariant): void {
+    this.editingVariant = variant;
+    this.newVariant = { colorName: variant.colorName, colorHex: variant.colorHex, imageUrl: variant.imageUrl || '', stock: variant.stock };
+    this.cdr.detectChanges();
+  }
+
+  cancelEditVariant(): void {
+    this.editingVariant = null;
+    this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+    this.variantError = null;
+    this.cdr.detectChanges();
+  }
+
+  deleteVariant(variantId: number): void {
+    if (!this.editingProduct) return;
+    this.productVariantService.deleteVariant(this.editingProduct.id, variantId).subscribe({
+      next: () => { this.productVariants = this.productVariants.filter(v => v.id !== variantId); this.cdr.detectChanges(); },
       error: () => this.toast('Erreur de suppression', 'error'),
     });
   }
