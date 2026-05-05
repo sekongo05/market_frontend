@@ -223,7 +223,7 @@
                 </div>
               }
 
-              <!-- Actions (commande annulable : PENDING ou CONFIRMED) -->
+              <!-- Actions (messages PENDING/CONFIRMED + annulation PENDING uniquement) -->
               @if (order.orderStatus === 'PENDING' || order.orderStatus === 'CONFIRMED') {
                 <div class="border-t theme-border pt-4 space-y-3">
 
@@ -249,34 +249,48 @@
                     </div>
                   }
 
-                  <!-- Annuler -->
-                  @if (cancelConfirmId === order.id) {
-                    <div class="flex items-center gap-3 p-3 rounded-xl"
+                  <!-- Erreur d'annulation -->
+                  @if (cancelErrorOrderId === order.id && cancelError) {
+                    <div class="flex items-start gap-3 p-3 rounded-xl"
                          style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">
-                      <p class="flex-1 text-sm text-red-400 font-medium">Confirmer l'annulation ?</p>
-                      <button (click)="doCancel(order)"
-                        [disabled]="cancellingId === order.id"
-                        class="px-4 py-2.5 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors">
-                        @if (cancellingId === order.id) {
-                          <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                        } @else {
-                          Oui, annuler
-                        }
-                      </button>
-                      <button (click)="cancelConfirmCancel()"
-                        class="px-4 py-2.5 luxury-card theme-muted text-xs font-bold rounded-lg hover:theme-text transition-colors">
-                        Garder
-                      </button>
-                    </div>
-                  } @else {
-                    <button (click)="startCancel(order.id)"
-                      class="flex items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300 transition-colors">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
-                      Annuler cette commande
-                    </button>
+                      <p class="text-xs text-red-400 font-medium">{{ cancelError }}</p>
+                    </div>
+                  }
+
+                  <!-- Annuler (PENDING uniquement) -->
+                  @if (order.orderStatus === 'PENDING') {
+                    @if (cancelConfirmId === order.id) {
+                      <div class="flex items-center gap-3 p-3 rounded-xl"
+                           style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">
+                        <p class="flex-1 text-sm text-red-400 font-medium">Confirmer l'annulation ?</p>
+                        <button (click)="doCancel(order)"
+                          [disabled]="cancellingId === order.id"
+                          class="px-4 py-2.5 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors">
+                          @if (cancellingId === order.id) {
+                            <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                          } @else {
+                            Oui, annuler
+                          }
+                        </button>
+                        <button (click)="cancelConfirmCancel()"
+                          class="px-4 py-2.5 luxury-card theme-muted text-xs font-bold rounded-lg hover:theme-text transition-colors">
+                          Garder
+                        </button>
+                      </div>
+                    } @else {
+                      <button (click)="startCancel(order.id)"
+                        class="flex items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Annuler cette commande
+                      </button>
+                    }
                   }
 
                 </div>

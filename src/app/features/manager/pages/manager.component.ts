@@ -677,7 +677,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
         this.statusUpdatingId = null;
         this.cdr.detectChanges();
       },
-      error: () => { this.statusUpdatingId = null; this.toast('Erreur d\'annulation', 'error'); this.cdr.detectChanges(); },
+      error: (err: any) => { this.statusUpdatingId = null; this.toast(err?.error?.message || 'Erreur d\'annulation', 'error'); this.cdr.detectChanges(); },
     });
   }
 

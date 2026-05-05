@@ -475,7 +475,7 @@
 
             <!-- Actions -->
             <div class="flex justify-end pt-3 border-t theme-border">
-              <button type="submit" [disabled]="passwordForm.invalid || changingPassword"
+              <button type="submit" [disabled]="passwordForm.invalid || changingPassword || passwordForm.get('newPassword')?.value !== passwordForm.get('confirmPassword')?.value"
                 class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-200
                        disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0
                        hover:-translate-y-0.5"

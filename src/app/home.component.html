@@ -284,7 +284,7 @@
       <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
                   sm:grid sm:grid-cols-3 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
         @for (product of newProducts; track product.id; let idx = $index) {
-          <a [routerLink]="['/products']" [queryParams]="{categorie: product.category?.slug}"
+          <a [routerLink]="['/products']" [queryParams]="{categorie: product.category.slug}"
              class="card-appear group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block"
              [style.animation-delay.ms]="idx * 75">
 
@@ -309,7 +309,7 @@
             </div>
 
             <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1"
-               style="color:rgba(212,175,55,0.68);">{{ product.category?.name }}</p>
+               style="color:rgba(212,175,55,0.68);">{{ product.category.name }}</p>
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
@@ -367,7 +367,7 @@
       <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
                   sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
         @for (product of discountProducts; track product.id; let idx = $index) {
-          <a [routerLink]="['/products']" [queryParams]="{categorie: product.category?.slug}"
+          <a [routerLink]="['/products']" [queryParams]="{categorie: product.category.slug}"
              class="card-appear group flex-shrink-0 w-[70vw] sm:w-auto cursor-pointer block"
              [style.animation-delay.ms]="idx * 80">
             <div class="product-card-wrap relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
@@ -380,7 +380,7 @@
                      style="background:#f97316;">−{{ product.discountPercent }}%</div>
               }
             </div>
-            <p class="text-[8px] uppercase tracking-[0.3em] font-bold mb-1 text-orange-500/60">{{ product.category?.name }}</p>
+            <p class="text-[8px] uppercase tracking-[0.3em] font-bold mb-1 text-orange-500/60">{{ product.category.name }}</p>
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-1">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.salePrice) {

@@ -25,6 +25,8 @@ export class OrdersComponent implements OnInit {
   expandedId: number | null = null;
   cancelConfirmId: number | null = null;
   cancellingId: number | null = null;
+  cancelError: string | null = null;
+  cancelErrorOrderId: number | null = null;
 
   constructor(private orderService: OrderService, private cdr: ChangeDetectorRef) {}
 
@@ -49,8 +51,8 @@ export class OrdersComponent implements OnInit {
         this.loading = false;
         this.cdr.detectChanges();
       },
-      error: () => {
-        this.error = 'Erreur lors du chargement des commandes';
+      error: (err: any) => {
+        this.error = err?.error?.message || 'Erreur lors du chargement des commandes';
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -59,27 +61,39 @@ export class OrdersComponent implements OnInit {
 
   toggleDetails(id: number): void {
     this.expandedId = this.expandedId === id ? null : id;
-    if (this.cancelConfirmId !== null) this.cancelConfirmId = null;
+    this.cancelConfirmId = null;
+    this.cancelError = null;
+    this.cancelErrorOrderId = null;
     this.cdr.detectChanges();
   }
 
-  startCancel(id: number): void { this.cancelConfirmId = id; this.cdr.detectChanges(); }
-  cancelConfirmCancel(): void   { this.cancelConfirmId = null; this.cdr.detectChanges(); }
+  startCancel(id: number): void { this.cancelConfirmId = id; this.cancelError = null; this.cancelErrorOrderId = null; this.cdr.detectChanges(); }
+  cancelConfirmCancel(): void   { this.cancelConfirmId = null; this.cancelError = null; this.cancelErrorOrderId = null; this.cdr.detectChanges(); }
 
   doCancel(order: OrderResponse): void {
     this.cancelConfirmId = null;
     this.cancellingId = order.id;
+    this.cancelError = null;
+    this.cancelErrorOrderId = null;
     this.cdr.detectChanges();
     this.orderService.cancelOrder(order.id).subscribe({
       next: (r) => {
         if (r.success) {
           const idx = this.orders.findIndex(o => o.id === order.id);
           if (idx !== -1) { this.orders = [...this.orders]; this.orders[idx] = r.data; }
+        } else {
+          this.cancelError = r.message || 'Impossible d\'annuler cette commande';
+          this.cancelErrorOrderId = order.id;
         }
         this.cancellingId = null;
         this.cdr.detectChanges();
       },
-      error: () => { this.cancellingId = null; this.cdr.detectChanges(); },
+      error: (err: any) => {
+        this.cancelError = err?.error?.message || 'Impossible d\'annuler cette commande';
+        this.cancelErrorOrderId = order.id;
+        this.cancellingId = null;
+        this.cdr.detectChanges();
+      },
     });
   }
 

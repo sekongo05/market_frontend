@@ -107,7 +107,7 @@ export class ProfileComponent implements OnInit {
         this.saving = false;
         this.cdr.detectChanges();
       },
-      error: () => { this._showError('Erreur lors de la mise à jour'); this.saving = false; this.cdr.detectChanges(); },
+      error: (err: any) => { this._showError(err?.error?.message || 'Erreur lors de la mise à jour'); this.saving = false; this.cdr.detectChanges(); },
     });
   }
 
@@ -120,11 +120,11 @@ export class ProfileComponent implements OnInit {
     this.userService.changePassword({ oldPassword, newPassword }).subscribe({
       next: (r) => {
         if (r.success) { this._showSuccess('Mot de passe modifié avec succès'); this.passwordForm.reset(); }
-        else { this._showError('Ancien mot de passe incorrect'); }
+        else { this._showError(r.message || 'Ancien mot de passe incorrect'); }
         this.changingPassword = false;
         this.cdr.detectChanges();
       },
-      error: () => { this._showError('Erreur lors du changement de mot de passe'); this.changingPassword = false; this.cdr.detectChanges(); },
+      error: (err: any) => { this._showError(err?.error?.message || 'Erreur lors du changement de mot de passe'); this.changingPassword = false; this.cdr.detectChanges(); },
     });
   }
 
