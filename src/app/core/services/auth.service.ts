@@ -11,6 +11,7 @@ import {
   RefreshTokenRequest,
 } from '../models/auth.models';
 import { ApiService } from './api.service';
+import { WebSocketService } from './websocket.service';
 
 export interface CurrentUser extends AuthResponse {
   id?: number;
@@ -27,7 +28,8 @@ export class AuthService {
 
   constructor(
     private apiService: ApiService,
-    private http: HttpClient
+    private http: HttpClient,
+    private webSocketService: WebSocketService
   ) {
     this.loadUserFromToken();
   }
@@ -38,6 +40,7 @@ export class AuthService {
         if (response.success && response.data) {
           this.setTokens(response.data.token, response.data.refreshToken);
           this.setCurrentUser(response.data);
+          this._connectWs(response.data);
         }
       })
     );
@@ -49,12 +52,14 @@ export class AuthService {
         if (response.success && response.data) {
           this.setTokens(response.data.token, response.data.refreshToken);
           this.setCurrentUser(response.data);
+          this._connectWs(response.data);
         }
       })
     );
   }
 
   logout(): void {
+    this.webSocketService.disconnect();
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem('current_user');
@@ -114,15 +119,22 @@ export class AuthService {
     this.currentUserSubject.next(user as CurrentUser);
   }
 
+  private _connectWs(user: AuthResponse): void {
+    const token = this.getToken();
+    if (!token) return;
+    const isStaff = user.role === 'ADMIN' || user.role === 'MANAGER';
+    this.webSocketService.connect(token, isStaff);
+  }
+
   private loadUserFromToken(): void {
-    // Could be extended to decode JWT and load user data
     const token = this.getToken();
     if (token) {
-      // Try to load user from a stored session or the token
       const userJson = localStorage.getItem('current_user');
       if (userJson) {
         try {
-          this.currentUserSubject.next(JSON.parse(userJson));
+          const user: AuthResponse = JSON.parse(userJson);
+          this.currentUserSubject.next(user as CurrentUser);
+          this._connectWs(user);
         } catch (e) {
           console.error('Failed to parse stored user', e);
         }

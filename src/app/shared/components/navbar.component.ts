@@ -16,6 +16,7 @@ import { CartService, CartItem } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
 import { PromoService } from '../../core/services/promo.service';
 import { ToastService } from '../../core/services/toast.service';
+import { WebSocketService } from '../../core/services/websocket.service';
 import { PromoCheckResponse, PublicPromoResponse } from '../../core/models/promo.models';
 import { Subject } from 'rxjs';
 import { takeUntil, timeout } from 'rxjs/operators';
@@ -87,7 +88,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     readonly themeService: ThemeService,
     readonly cartService: CartService,
     private cdr: ChangeDetectorRef,
-    private scrollLock: ScrollLockService
+    private scrollLock: ScrollLockService,
+    private webSocketService: WebSocketService
   ) {}
 
   getTemplate(type: NotificationType): NotifTemplate {
@@ -133,6 +135,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .subscribe(items => { this.cartItems = items; this.cdr.detectChanges(); });
 
     if (this.currentUser) this.loadUnreadCount();
+
+    this.webSocketService.notification$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.unreadNotifications++;
+        if (this.showNotifications) this.loadNotifications();
+        this.cdr.detectChanges();
+      });
   }
 
   ngOnDestroy(): void {

@@ -17,3 +17,10 @@ export interface GetNotificationsParams {
   page?: number;
   size?: number;
 }
+
+export interface WsNotification {
+  id?: number;
+  type: string;
+  subject: string;
+  createdAt?: string;
+}
