@@ -1276,7 +1276,7 @@
                         @for (item of order.items.slice(0,3); track item.productId) {
                           @if (item.imageUrl) {
                             <img [src]="item.imageUrl" [alt]="item.productName"
-                              class="w-8 h-8 rounded-lg object-cover border-2 border-white dark:border-gray-800 flex-shrink-0"
+                              class="w-30 h-30 rounded-lg object-cover border-2 border-white dark:border-gray-800 flex-shrink-0"
                               style="border-color: var(--surface)"/>
                           } @else {
                             <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold theme-muted"
@@ -1712,157 +1712,131 @@
         </button>
       </div>
 
-      <!-- Sous-onglets -->
+      <!-- Tabs (edit only) -->
       @if (editingProduct) {
-        <div class="flex gap-1 px-6 pt-4 flex-shrink-0">
-          <button (click)="setDrawerTab('info')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
-            [ngClass]="drawerTab === 'info' ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">Informations</button>
-          <button (click)="setDrawerTab('media')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
-            [ngClass]="drawerTab === 'media' ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">Médias ({{ productMedia.length }})</button>
-          <button (click)="setDrawerTab('variants')" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-colors"
-            [ngClass]="drawerTab === 'variants' ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">
-            Couleurs ({{ productVariants.length }})
+        <div class="flex border-b theme-border px-6 flex-shrink-0">
+          <button type="button" (click)="setDrawerTab('info')"
+            class="py-3 px-1 mr-6 text-sm font-bold border-b-2 transition-colors"
+            [class.border-gold]="drawerTab === 'info'"
+            [class.text-gold]="drawerTab === 'info'"
+            [class.border-transparent]="drawerTab !== 'info'"
+            [class.theme-muted]="drawerTab !== 'info'">
+            Informations
+          </button>
+          <button type="button" (click)="setDrawerTab('media')"
+            class="py-3 px-1 mr-6 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
+            [class.border-gold]="drawerTab === 'media'"
+            [class.text-gold]="drawerTab === 'media'"
+            [class.border-transparent]="drawerTab !== 'media'"
+            [class.theme-muted]="drawerTab !== 'media'">
+            Galerie médias
+            @if (productMedia.length > 0) {
+              <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-gold/15 text-gold">{{ productMedia.length }}</span>
+            }
+          </button>
+          <button type="button" (click)="setDrawerTab('variants')"
+            class="py-3 px-1 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
+            [class.border-gold]="drawerTab === 'variants'"
+            [class.text-gold]="drawerTab === 'variants'"
+            [class.border-transparent]="drawerTab !== 'variants'"
+            [class.theme-muted]="drawerTab !== 'variants'">
+            Couleurs
+            @if (productVariants.length > 0) {
+              <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-gold/15 text-gold">{{ productVariants.length }}</span>
+            }
           </button>
         </div>
       }
 
       <!-- Body -->
-      <div class="flex-1 px-6 py-4 overflow-y-auto overscroll-contain">
+      <div class="flex-1 overflow-y-auto overscroll-contain">
 
-        @if (drawerError) {
-          <div class="mb-4 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">{{ drawerError }}</div>
-        }
-
-        <!-- Tab info -->
-        @if (drawerTab === 'info') {
-          <form [formGroup]="productForm" class="space-y-4">
-            <div>
-              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Nom *</label>
-              <input formControlName="name" type="text" placeholder="Nom du produit" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
-            </div>
-            <div>
-              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Description *</label>
-              <textarea formControlName="description" rows="3" placeholder="Description…" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm resize-none"></textarea>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix (FCFA) *</label>
-                <input formControlName="price" type="number" min="1" placeholder="0" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
-              </div>
-              <div>
-                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Stock *</label>
-                <input formControlName="stock" type="number" min="0" placeholder="0" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Genre *</label>
-                <select formControlName="gender" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm">
-                  @for (g of genders; track g.value) { <option [value]="g.value" class="theme-option">{{ g.label }}</option> }
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Catégorie *</label>
-                <select formControlName="categoryId" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm">
-                  <option [value]="null">Sélectionner…</option>
-                  @for (cat of productCategories; track cat.id) { <option [value]="cat.id" class="theme-option">{{ cat.name }}</option> }
-                </select>
-              </div>
-            </div>
-
-            <!-- Upload image -->
-            <div>
-              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">
-                {{ editingProduct ? 'Image principale' : 'Images (max 4)' }}
-              </label>
-              @if (!editingProduct && imagePreviews.length > 0) {
-                <div class="grid grid-cols-4 gap-2 mb-2">
-                  @for (preview of imagePreviews; track $index; let i = $index) {
-                    <div class="relative aspect-square rounded-xl overflow-hidden bg-black/[.04]">
-                      <img [src]="preview" class="w-full h-full object-cover"/>
-                      <button type="button" (click)="removeImage(i)"
-                        class="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
-                      </button>
-                    </div>
-                  }
-                </div>
-              }
-              @if (editingProduct && imagePreview) {
-                <div class="relative w-24 h-24 rounded-xl overflow-hidden mb-2 bg-black/[.04]">
-                  <img [src]="imagePreview" class="w-full h-full object-cover"/>
-                  <button type="button" (click)="clearImage()"
-                    class="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
-                  </button>
-                </div>
-              }
-              @if (uploadError) {
-                <p class="text-xs text-red-400 mb-2">{{ uploadError }}</p>
-              }
-              <label class="flex items-center gap-2 px-4 py-2.5 border border-dashed theme-border rounded-xl text-sm theme-muted cursor-pointer hover:border-gold/40 hover:text-gold transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                Choisir une image
-                <input type="file" accept="image/*" class="hidden" [multiple]="!editingProduct" (change)="onFileSelected($event)"/>
-              </label>
-            </div>
-          </form>
-        }
-
-        <!-- Tab media -->
+        <!-- Tab médias -->
         @if (drawerTab === 'media' && editingProduct) {
-          <div class="space-y-3">
-            @if (mediaLoading) {
-              <div class="flex justify-center py-8">
-                <svg class="w-6 h-6 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+          <div class="p-6 space-y-5">
+
+            <label class="flex items-center justify-center gap-2 w-full py-4 rounded-2xl border-2 border-dashed theme-drop-border cursor-pointer transition-all hover:border-gold/50 hover:bg-gold/5">
+              @if (mediaUploading) {
+                <svg class="w-5 h-5 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
+                <span class="text-sm font-semibold theme-muted">Upload en cours…</span>
+              } @else {
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                <span class="text-sm font-semibold theme-text">Ajouter une image ou vidéo</span>
+              }
+              <input type="file" accept="image/*,video/*" class="hidden" [disabled]="mediaUploading" (change)="onMediaSelected($event)"/>
+            </label>
+
+            @if (mediaLoading) {
+              <div class="grid grid-cols-2 gap-3">
+                @for (i of [1,2,3,4]; track i) {
+                  <div class="aspect-square rounded-xl luxury-card animate-pulse"></div>
+                }
               </div>
             }
-            @if (!mediaLoading) {
-              @for (media of productMedia; track media.id; let i = $index) {
-                <div class="flex items-center gap-3 p-2 bg-black/[.03] rounded-xl">
-                  @if (media.mediaType === 'IMAGE') {
-                    <img [src]="media.url" class="w-12 h-12 rounded-lg object-cover flex-shrink-0"/>
-                  } @else {
-                    <video [src]="media.url" class="w-12 h-12 rounded-lg object-cover flex-shrink-0"></video>
-                  }
-                  <span class="text-xs theme-muted flex-1 truncate">{{ media.mediaType }} #{{ i + 1 }}</span>
-                  <button (click)="deleteMedia(media.id)" class="text-red-400/60 hover:text-red-400 transition-colors p-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                  </button>
-                </div>
-              }
-              @if (productMedia.length === 0) {
-                <p class="text-center text-sm theme-muted py-4">Aucun média supplémentaire</p>
-              }
-              <label class="flex items-center justify-center gap-2 px-4 py-2.5 border border-dashed theme-border rounded-xl text-sm theme-muted cursor-pointer hover:border-gold/40 hover:text-gold transition-colors">
-                @if (mediaUploading) {
-                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                  Envoi en cours…
-                } @else {
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                  Ajouter un média
+
+            @if (!mediaLoading && productMedia.length > 0) {
+              <div class="grid grid-cols-2 gap-3">
+                @for (media of productMedia; track media.id; let i = $index) {
+                  <div class="relative group rounded-xl overflow-hidden aspect-square luxury-card">
+                    @if (media.mediaType === 'VIDEO') {
+                      <video [src]="media.url" class="w-full h-full object-cover" muted></video>
+                      <div class="absolute top-2 left-2 px-1.5 py-0.5 rounded-md bg-black/70 text-[10px] font-bold text-white">VIDEO</div>
+                    } @else {
+                      <img [src]="media.url" [alt]="'Média ' + (i + 1)" class="w-full h-full object-cover"
+                           (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
+                    }
+                    <div class="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/70 text-[10px] font-black text-white flex items-center justify-center">
+                      {{ i + 1 }}
+                    </div>
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                      <div class="flex gap-1">
+                        <button type="button" (click)="moveMedia(i, 'up')" [disabled]="i === 0"
+                          class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center disabled:opacity-30 transition-colors">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                        </button>
+                        <button type="button" (click)="moveMedia(i, 'down')" [disabled]="i === productMedia.length - 1"
+                          class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center disabled:opacity-30 transition-colors">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                      </div>
+                      <button type="button" (click)="deleteMedia(media.id)"
+                        class="flex items-center gap-1 px-2.5 py-1.5 bg-red-500/80 hover:bg-red-500 text-white text-xs font-bold rounded-lg transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        Supprimer
+                      </button>
+                    </div>
+                  </div>
                 }
-                <input type="file" accept="image/*,video/*" class="hidden" (change)="onMediaSelected($event)"/>
-              </label>
+              </div>
+            }
+
+            @if (!mediaLoading && productMedia.length === 0) {
+              <div class="py-10 text-center">
+                <div class="w-12 h-12 luxury-card rounded-xl mx-auto flex items-center justify-center mb-3">
+                  <svg class="w-6 h-6 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <p class="theme-muted text-sm">Aucun média pour ce produit</p>
+              </div>
             }
           </div>
         }
 
-        <!-- Tab variants -->
-        @if (drawerTab === 'variants') {
-          <div class="space-y-4">
-            <p class="text-xs theme-muted">Les variantes de couleur permettent au client de choisir une couleur spécifique avec son propre stock.</p>
+        <!-- Tab couleurs -->
+        @if (drawerTab === 'variants' && editingProduct) {
+          <div class="p-6 space-y-4">
+            <p class="text-xs theme-muted">Ajoutez des variantes de couleur avec leur stock individuel. Le client devra choisir une couleur avant de commander.</p>
 
             @if (variantError) {
               <div class="p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-xs">{{ variantError }}</div>
             }
 
-            <!-- Formulaire ajout / édition -->
             <div class="p-4 rounded-xl border theme-border space-y-3" [class.border-gold]="editingVariant">
               <p class="text-xs font-bold theme-text">{{ editingVariant ? 'Modifier la couleur' : 'Ajouter une couleur' }}</p>
 
@@ -1893,11 +1867,11 @@
 
               <div class="flex gap-2 pt-1">
                 @if (editingVariant) {
-                  <button (click)="cancelEditVariant()" class="flex-1 py-2 rounded-lg border theme-border theme-muted font-semibold text-xs hover:bg-black/[.04] transition-colors">
+                  <button type="button" (click)="cancelEditVariant()" class="flex-1 py-2 rounded-lg border theme-border theme-muted font-semibold text-xs hover:bg-black/[.04] transition-colors">
                     Annuler
                   </button>
                 }
-                <button (click)="saveVariant()" [disabled]="variantSaving"
+                <button type="button" (click)="saveVariant()" [disabled]="variantSaving"
                   class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-gold text-black font-bold text-xs hover:shadow-lg hover:shadow-yellow-600/25 transition-all disabled:opacity-50">
                   @if (variantSaving) {
                     <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
@@ -1907,7 +1881,6 @@
               </div>
             </div>
 
-            <!-- Liste des variants -->
             @if (variantsLoading) {
               <div class="flex justify-center py-4">
                 <svg class="w-5 h-5 text-gold animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
@@ -1915,7 +1888,7 @@
             }
             @if (!variantsLoading) {
               @for (variant of productVariants; track variant.id) {
-                <div class="flex items-center gap-3 p-3 bg-black/[.03] rounded-xl">
+                <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(0,0,0,0.04)">
                   <div class="w-8 h-8 rounded-full flex-shrink-0 border-2 border-white/10 shadow"
                        [style.background-color]="variant.colorHex"></div>
                   @if (variant.imageUrl) {
@@ -1923,14 +1896,14 @@
                   }
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-bold theme-text truncate">{{ variant.colorName }}</p>
-                    <p class="text-xs theme-muted">Stock : {{ variant.stock }} · {{ variant.colorHex }}</p>
+                    <p class="text-xs theme-muted">Stock : {{ variant.stock }}</p>
                   </div>
-                  <button (click)="startEditVariant(variant)" class="p-1.5 rounded-lg theme-muted hover:text-gold transition-colors">
+                  <button type="button" (click)="startEditVariant(variant)" class="p-1.5 rounded-lg theme-muted hover:text-gold transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
                   </button>
-                  <button (click)="deleteVariant(variant.id)" class="p-1.5 rounded-lg text-red-400/50 hover:text-red-400 transition-colors">
+                  <button type="button" (click)="deleteVariant(variant.id)" class="p-1.5 rounded-lg text-red-400/50 hover:text-red-400 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
@@ -1943,23 +1916,219 @@
             }
           </div>
         }
+
+        <!-- Tab info / form création -->
+        <form [formGroup]="productForm" (ngSubmit)="saveProduct()" id="adminProductForm"
+              class="p-6 space-y-5" [class.hidden]="drawerTab === 'media' || drawerTab === 'variants'">
+
+          @if (drawerError) {
+            <div class="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              {{ drawerError }}
+            </div>
+          }
+
+          <!-- Images & vidéo -->
+          <div>
+            <!-- Création : 4 slots images + 1 vidéo -->
+            @if (!editingProduct) {
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">
+                Images <span class="text-gold">({{ selectedImages.length }}/4)</span>
+                <span class="normal-case font-normal ml-2">— la 1ère sera l'image principale</span>
+              </label>
+
+              <div class="grid grid-cols-4 gap-2 mb-3"
+                   (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onFileDrop($event)">
+                @for (preview of imagePreviews; track $index) {
+                  <div class="relative aspect-square rounded-xl overflow-hidden border-2"
+                       [class.border-gold]="$index === 0"
+                       [class.border-white\/15]="$index > 0">
+                    <img [src]="preview" class="w-full h-full object-cover"/>
+                    @if ($index === 0) {
+                      <span class="absolute top-1 left-1 px-1.5 py-0.5 bg-gold text-black text-[9px] font-black rounded uppercase">Principale</span>
+                    }
+                    <button type="button" (click)="removeImage($index)"
+                      class="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                      <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+                }
+                @if (selectedImages.length < 4) {
+                  <label class="aspect-square rounded-xl border-2 border-dashed border-white/15 hover:border-gold/50 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all"
+                         [class.border-yellow-500]="dragOver && selectedImages.length === 0">
+                    <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span class="text-[9px] theme-muted font-semibold">
+                      {{ selectedImages.length === 0 ? 'Principale' : 'Photo ' + (selectedImages.length + 1) }}
+                    </span>
+                    <input type="file" accept="image/*,.heic,.heif" multiple class="hidden" (change)="onFileSelected($event)"/>
+                  </label>
+                }
+              </div>
+              <p class="text-[10px] theme-muted mb-4">JPEG · PNG · WEBP · AVIF · HEIC · max 20 Mo · compression automatique</p>
+
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">
+                Vidéo <span class="font-normal normal-case text-gold">(optionnelle)</span>
+              </label>
+              @if (videoPreview) {
+                <div class="relative rounded-xl overflow-hidden mb-2 bg-zinc-900 flex items-center gap-3 p-3">
+                  <svg class="w-8 h-8 text-gold flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  <span class="text-xs theme-text truncate flex-1">{{ selectedVideo?.name }}</span>
+                  <button type="button" (click)="removeVideo()"
+                    class="w-6 h-6 bg-red-500/80 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+              } @else {
+                <label class="flex items-center gap-3 w-full py-3 px-4 rounded-xl border-2 border-dashed border-white/15 hover:border-gold/50 cursor-pointer transition-all">
+                  <svg class="w-5 h-5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                  </svg>
+                  <div>
+                    <p class="text-xs font-semibold theme-text">Ajouter une vidéo</p>
+                    <p class="text-[10px] theme-muted">MP4 · WEBM · MOV · max 50 Mo</p>
+                  </div>
+                  <input type="file" accept="video/*" class="hidden" (change)="onVideoSelected($event)"/>
+                </label>
+              }
+            }
+
+            <!-- Édition : image principale + vidéo optionnelle -->
+            @if (editingProduct) {
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Image principale</label>
+              @if (imagePreview) {
+                <div class="relative rounded-2xl overflow-hidden mb-3 aspect-video bg-black/20">
+                  <img [src]="imagePreview" alt="Aperçu" class="w-full h-full object-cover"/>
+                  <div class="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <label class="flex items-center gap-1.5 px-3 py-2 bg-gold text-black text-xs font-bold rounded-xl cursor-pointer">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                      Changer
+                      <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="onFileSelected($event)"/>
+                    </label>
+                    <button type="button" (click)="clearImage()"
+                      class="flex items-center gap-1.5 px-3 py-2 bg-red-500/80 text-white text-xs font-bold rounded-xl">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      Retirer
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <label class="flex flex-col items-center justify-center gap-2 w-full py-6 rounded-2xl border-2 border-dashed border-white/15 hover:border-gold/50 cursor-pointer transition-all mb-3">
+                  <svg class="w-6 h-6 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  <p class="text-xs theme-muted">Changer l'image principale</p>
+                  <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="onFileSelected($event)"/>
+                </label>
+              }
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mt-4 mb-2">
+                Ajouter une vidéo <span class="font-normal normal-case text-gold">(optionnel)</span>
+              </label>
+              @if (videoPreview) {
+                <div class="relative rounded-xl overflow-hidden bg-zinc-900 flex items-center gap-3 p-3">
+                  <svg class="w-8 h-8 text-gold flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  <span class="text-xs theme-text truncate flex-1">{{ selectedVideo?.name }}</span>
+                  <button type="button" (click)="removeVideo()" class="w-6 h-6 bg-red-500/80 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+              } @else {
+                <label class="flex items-center gap-3 w-full py-3 px-4 rounded-xl border-2 border-dashed border-white/15 hover:border-gold/50 cursor-pointer transition-all">
+                  <svg class="w-5 h-5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                  </svg>
+                  <div>
+                    <p class="text-xs font-semibold theme-text">Ajouter une vidéo</p>
+                    <p class="text-[10px] theme-muted">MP4 · WEBM · MOV · max 50 Mo</p>
+                  </div>
+                  <input type="file" accept="video/*" class="hidden" (change)="onVideoSelected($event)"/>
+                </label>
+              }
+            }
+
+            @if (uploadError) {
+              <p class="text-xs text-orange-400 mt-2 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ uploadError }}
+              </p>
+            }
+          </div>
+
+          <!-- Nom -->
+          <div>
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Nom du produit *</label>
+            <input formControlName="name" type="text" placeholder="Ex: Veste en cuir noir"
+              class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Description *</label>
+            <textarea formControlName="description" rows="3" placeholder="Décrivez le produit en quelques mots…"
+              class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all resize-none"></textarea>
+          </div>
+
+          <!-- Prix + Stock -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix (FCFA) *</label>
+              <input formControlName="price" type="number" min="0" placeholder="45000"
+                class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+            </div>
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Stock *</label>
+              <input formControlName="stock" type="number" min="0" placeholder="10"
+                class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+            </div>
+          </div>
+
+          <!-- Catégorie + Genre -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Catégorie *</label>
+              <select formControlName="categoryId" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
+                <option value="" class="theme-option">Catégorie…</option>
+                @for (cat of productCategories; track cat.id) {
+                  <option [value]="cat.id" class="theme-option">{{ cat.name }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Genre *</label>
+              <select formControlName="gender" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
+                @for (g of genders; track g.value) {
+                  <option [value]="g.value" class="theme-option">{{ g.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+        </form>
       </div>
 
-      <!-- Footer -->
-      @if (drawerTab === 'info') {
-        <div class="flex gap-3 px-6 py-5 border-t theme-border flex-shrink-0">
-          <button (click)="closeDrawer()" class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-black/[.04] transition-colors">
-            Annuler
-          </button>
-          <button (click)="saveProduct()" [disabled]="drawerLoading || productForm.invalid"
-            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-yellow-600/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-            @if (drawerLoading) {
+      <!-- Footer — toujours visible -->
+      <div class="px-6 py-4 border-t theme-border flex-shrink-0 flex gap-3">
+        <button type="button" (click)="closeDrawer()"
+          class="flex-1 py-3 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
+          Annuler
+        </button>
+        <button type="submit" form="adminProductForm"
+                [disabled]="productForm.invalid || drawerLoading"
+          class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-bold
+                 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-yellow-600/20 transition-all">
+          @if (drawerLoading) {
+            <span class="flex items-center justify-center gap-2">
               <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-            }
-            {{ editingProduct ? 'Enregistrer' : 'Créer le produit' }}
-          </button>
-        </div>
-      }
+              Sauvegarde…
+            </span>
+          } @else {
+            {{ editingProduct ? 'Mettre à jour' : 'Ajouter le produit' }}
+          }
+        </button>
+      </div>
     </div>
   </div>
 }

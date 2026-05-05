@@ -695,6 +695,19 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  moveMedia(index: number, direction: 'up' | 'down'): void {
+    if (!this.editingProduct) return;
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= this.productMedia.length) return;
+    const arr = [...this.productMedia];
+    [arr[index], arr[newIndex]] = [arr[newIndex], arr[index]];
+    this.productMedia = arr;
+    this.cdr.detectChanges();
+    this.productMediaService.reorder(this.editingProduct.id, arr.map(m => m.id)).subscribe({
+      error: () => this.toast('Erreur de réorganisation', 'error'),
+    });
+  }
+
   // ── Variants ───────────────────────────────────────────────────────────────
 
   loadVariants(productId: number): void {
