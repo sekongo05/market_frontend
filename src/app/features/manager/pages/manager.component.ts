@@ -18,6 +18,7 @@ import { OrderResponse } from '../../../core/models/order.models';
 import { DeliveryResponse, AddDeliveryEventRequest, UpdateDeliveryRequest } from '../../../core/models/delivery.models';
 import { PageResponse, OrderStatus, DeliveryStatus } from '../../../core/models/common.models';
 import { ScrollLockService } from '../../../core/services/scroll-lock.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 
 interface Toast { id: number; msg: string; type: 'success' | 'error'; }
 
@@ -73,6 +74,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
   mediaUploading = false;
 
   // ── Orders management ─────────────────────────────────────────────────────
+  pendingOrdersCount = 0;
   allOrders: OrderResponse[] = [];
   ordersLoading = false;
   ordersPage = 0;
@@ -162,6 +164,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     private orderService: OrderService,
     private deliveryService: DeliveryService,
     private dashboardService: DashboardService,
+    private wsService: WebSocketService,
     private fb: FormBuilder,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -190,6 +193,17 @@ export class ManagerComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(() => this.loadProducts(0));
+
+    // Temps réel : nouvelles commandes / changements de statut
+    this.wsService.orderEvent$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        this.pendingOrdersCount = event.pendingCount;
+        if (this.pageTab === 'orders') {
+          this.loadAllOrders(0);
+        }
+        this.cdr.detectChanges();
+      });
   }
 
   ngOnDestroy(): void {

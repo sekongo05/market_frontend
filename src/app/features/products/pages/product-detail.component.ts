@@ -12,6 +12,7 @@ import { ProductService } from '../../../core/services/product.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 import { ProductMediaItem, ProductResponse } from '../../../core/models/product.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
@@ -97,6 +98,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private cartService: CartService,
     private authService: AuthService,
     private authPromptService: AuthPromptService,
+    private wsService: WebSocketService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -114,6 +116,16 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnInit(): void {
+    this.wsService.stockUpdate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(update => {
+        if (this.product && this.product.id === update.productId) {
+          (this.product as any).stock = update.stock;
+          this.quantity = Math.min(this.quantity, Math.max(1, update.stock));
+          this.cdr.detectChanges();
+        }
+      });
+
     this.route.paramMap.pipe(
       takeUntil(this.destroy$),
       switchMap(params => {

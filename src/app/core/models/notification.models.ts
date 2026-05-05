@@ -24,3 +24,13 @@ export interface WsNotification {
   subject: string;
   createdAt?: string;
 }
+
+export interface WsStockUpdate {
+  productId: number;
+  stock: number;
+}
+
+export interface WsOrderEvent {
+  orderNumber: string;
+  pendingCount: number;
+}

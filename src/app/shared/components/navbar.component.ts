@@ -32,8 +32,9 @@ import { ScrollLockService } from '../../core/services/scroll-lock.service';
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   currentUser: CurrentUser | null = null;
-  unreadNotifications = 0;
-  showUserMenu       = false;
+  unreadNotifications  = 0;
+  pendingOrdersCount   = 0;
+  showUserMenu         = false;
   showCart           = false;
   showNotifications  = false;
   mobileOpen          = false;
@@ -141,6 +142,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.unreadNotifications++;
         if (this.showNotifications) this.loadNotifications();
+        this.cdr.detectChanges();
+      });
+
+    this.webSocketService.orderEvent$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        this.pendingOrdersCount = event.pendingCount;
         this.cdr.detectChanges();
       });
   }

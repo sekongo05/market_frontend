@@ -9,6 +9,7 @@ import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 import { ProductResponse, GetProductsParams, SortOption } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
@@ -106,6 +107,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private cartService: CartService,
     private authPromptService: AuthPromptService,
+    private wsService: WebSocketService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
@@ -201,6 +203,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(() => this.loadProducts(0));
+
+    this.wsService.stockUpdate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(update => {
+        const p = this.products.find(p => p.id === update.productId);
+        if (p) { (p as any).stock = update.stock; this.cdr.detectChanges(); }
+      });
   }
 
   ngOnDestroy(): void {

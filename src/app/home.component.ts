@@ -3,9 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
 import { ProductService } from './core/services/product.service';
+import { WebSocketService } from './core/services/websocket.service';
 import { MediaUrlPipe } from './shared/pipes/media-url.pipe';
 import { ProductResponse } from './core/models/product.models';
 import { PageResponse } from './core/models/common.models';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -27,6 +30,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   private _observer?: IntersectionObserver;
   private _statsAnimated = false;
+  private destroy$ = new Subject<void>();
 
   readonly marqueeItems = [
     'Rolex', 'Cartier', 'Richard Mille', 'Hublot', 'Audemars Piguet',
@@ -63,6 +67,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private productService: ProductService,
+    private wsService: WebSocketService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {
@@ -72,10 +77,13 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this._loadProducts();
     this._initObserver();
+    this._subscribeStock();
   }
 
   ngOnDestroy(): void {
     this._observer?.disconnect();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   goToCategory(slug: string): void {
@@ -105,6 +113,19 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   onHeroMouseLeave(event: MouseEvent): void {
     const parallax = (event.currentTarget as HTMLElement).querySelector('.hero-parallax') as HTMLElement | null;
     if (parallax) parallax.style.transform = '';
+  }
+
+  private _subscribeStock(): void {
+    this.wsService.stockUpdate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(update => {
+        let changed = false;
+        for (const list of [this.newProducts, this.discountProducts]) {
+          const p = list.find(p => p.id === update.productId);
+          if (p) { (p as any).stock = update.stock; changed = true; }
+        }
+        if (changed) this.cdr.detectChanges();
+      });
   }
 
   private _loadProducts(): void {

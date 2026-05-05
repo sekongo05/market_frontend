@@ -15,6 +15,7 @@ import { DeliveryService } from '../../../core/services/delivery.service';
 import { PromoService } from '../../../core/services/promo.service';
 import { ReviewService } from '../../../core/services/review.service';
 import { ReturnService } from '../../../core/services/return.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 import { UserResponse, AdminCreateUserRequest, UserFullProfileResponse } from '../../../core/models/user.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { OrderResponse, GetOrdersParams } from '../../../core/models/order.models';
@@ -65,6 +66,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private _toastId = 0;
 
   // ── Orders ─────────────────────────────────────────────────────────────────
+  pendingOrdersCount = 0;
   allOrders: OrderResponse[] = [];
   ordersLoading = false;
   ordersPage = 0;
@@ -209,6 +211,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private promoService: PromoService,
     private reviewService: ReviewService,
     private returnService: ReturnService,
+    private wsService: WebSocketService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private scrollLock: ScrollLockService,
@@ -223,6 +226,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(() => this.loadProducts(0));
+
+    // Temps réel : nouvelles commandes / changements de statut
+    this.wsService.orderEvent$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        this.pendingOrdersCount = event.pendingCount;
+        if (this.activeTab === 'orders') {
+          this.loadAllOrders(0);
+        }
+        this.cdr.detectChanges();
+      });
   }
 
   ngOnDestroy(): void {
