@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
@@ -200,6 +200,15 @@ export class ManagerComponent implements OnInit, OnDestroy {
       this.router.navigate(['/']);
       return;
     }
+
+    this.authService.currentUser$.pipe(
+      filter(u => u === null),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.closeDrawer();
+      this.router.navigate(['/auth/login']);
+    });
+
     this.initForm();
     this.loadProducts();
     this.loadCategories();
@@ -216,6 +225,18 @@ export class ManagerComponent implements OnInit, OnDestroy {
         this.pendingOrdersCount = event.pendingCount;
         if (this.pageTab === 'orders') {
           this.loadAllOrders(0);
+        }
+        this.cdr.detectChanges();
+      });
+
+    // Temps réel : toutes les autres entités
+    this.wsService.staffEvent$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        switch (event.module) {
+          case 'products':   this.loadProducts(0);                                         break;
+          case 'categories': this.loadCategories();                                        break;
+          case 'deliveries': if (this.pageTab === 'delivery') this.loadDeliveryOrders(0); break;
         }
         this.cdr.detectChanges();
       });

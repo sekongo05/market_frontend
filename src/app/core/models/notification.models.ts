@@ -40,3 +40,8 @@ export interface WsOrderStatusUpdate {
   orderNumber: string;
   orderStatus: string;
 }
+
+export interface WsStaffEvent {
+  module: 'products' | 'categories' | 'users' | 'deliveries' | 'returns' | 'promos' | 'reviews';
+  action: 'created' | 'updated' | 'deleted';
+}

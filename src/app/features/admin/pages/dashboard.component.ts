@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { interval, Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
+import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
@@ -237,9 +239,19 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private scrollLock: ScrollLockService,
+    private authService: AuthService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
+    this.authService.currentUser$.pipe(
+      filter(user => user === null),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.closeDrawer();
+      this.router.navigate(['/auth/login']);
+    });
+
     this.loadStats();
     this.refreshSub = interval(60_000).subscribe(() => this.loadStats());
     this.initProductForm();
@@ -256,6 +268,22 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         this.pendingOrdersCount = event.pendingCount;
         if (this.activeTab === 'orders') {
           this.loadAllOrders(0);
+        }
+        this.cdr.detectChanges();
+      });
+
+    // Temps réel : toutes les autres entités
+    this.wsService.staffEvent$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        switch (event.module) {
+          case 'products':    if (this.activeTab === 'products')    this.loadProducts(0);    break;
+          case 'categories':  if (this.activeTab === 'categories')  this.loadCategories();   break;
+          case 'users':       if (this.activeTab === 'users')       this.loadUsers(0);       break;
+          case 'deliveries':  if (this.activeTab === 'delivery')    this.loadDeliveryOrders(0); break;
+          case 'returns':     if (this.activeTab === 'returns')     this.loadReturns(0);     break;
+          case 'promos':      if (this.activeTab === 'promos')      this.loadPromos();       break;
+          case 'reviews':     if (this.activeTab === 'reviews')     this.loadReviews(0);     break;
         }
         this.cdr.detectChanges();
       });
