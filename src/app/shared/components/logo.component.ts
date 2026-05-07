@@ -45,31 +45,17 @@ import { CommonModule } from '@angular/common';
         </div>
       </div>
 
-      <!-- ── Slogan (masqué sur mobile) ── -->
+      <!-- ── Slogan ── -->
       <div *ngIf="showSlogan"
-     class="flex flex-col justify-center sm:flex-col sm:justify-center"
-     [ngStyle]="{'border-left': '1px solid rgba(201,162,75,.35)', 'padding-left': '0.75em'}">
-
-  <!-- Version Desktop / SM+ -->
-    <div class="hidden sm:block">
-      <span class="block leading-none font-semibold tracking-widest uppercase"
-            style="color:#c9a24b;"
-            [style.fontSize.px]="size * 0.195">Le luxe</span>
-      <span class="block leading-none font-medium tracking-widest uppercase"
-            style="color:#9ca3af; margin-top:0.35em;"
-            [style.fontSize.px]="size * 0.195">à portée de main</span>
-    </div>
-
-  <!-- Version Mobile -->
-  <div class="block sm:hidden text-center">
-    <span class="block leading-none font-semibold tracking-widest uppercase"
-          style="color:#c9a24b;"
-          [style.fontSize.px]="size * 0.18">Le luxe</span>
-    <span class="block leading-none font-medium tracking-widest uppercase"
-          style="color:#9ca3af; margin-top:0.25em;"
-          [style.fontSize.px]="size * 0.18">à portée de main</span>
-  </div>
-</div>
+           class="flex flex-col justify-center"
+           style="border-left: 1px solid rgba(201,162,75,.35); padding-left: 0.75em;">
+        <span class="block leading-none font-semibold tracking-widest uppercase"
+              style="color:#c9a24b;"
+              [style.fontSize.px]="size * 0.195">Le luxe</span>
+        <span class="block leading-none font-medium tracking-widest uppercase"
+              style="color:#9ca3af; margin-top:0.35em;"
+              [style.fontSize.px]="size * 0.195">à portée de main</span>
+      </div>
 
     </div>
   `,
