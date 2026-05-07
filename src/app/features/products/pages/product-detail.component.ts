@@ -286,6 +286,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       price: this.product.salePrice ?? this.product.price,
       quantity: this.quantity,
       imageUrl: this.selectedVariant?.imageUrl || this.product.imageUrl,
+      maxStock: this.effectiveStock,
       variantId: this.selectedVariant?.id,
       selectedColor: this.selectedVariant?.colorName,
       selectedColorHex: this.selectedVariant?.colorHex,
@@ -322,9 +323,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.cartService.addToCart({
       productId: product.id,
       productName: product.name,
-      price: product.price,
+      price: product.salePrice ?? product.price,
       quantity: 1,
       imageUrl: product.imageUrl,
+      maxStock: product.stock,
     });
   }
 

@@ -7,6 +7,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   imageUrl: string;
+  maxStock: number;
   variantId?: number;
   selectedColor?: string;
   selectedColorHex?: string;
@@ -29,9 +30,10 @@ export class CartService {
     );
 
     if (existingItem) {
-      existingItem.quantity += item.quantity;
+      existingItem.quantity = Math.min(existingItem.quantity + item.quantity, item.maxStock);
+      existingItem.maxStock = item.maxStock;
     } else {
-      cart.push(item);
+      cart.push({ ...item, quantity: Math.min(item.quantity, item.maxStock) });
     }
 
     this.saveCart(cart);
@@ -54,7 +56,7 @@ export class CartService {
       if (quantity <= 0) {
         this.removeFromCart(productId, variantId);
       } else {
-        item.quantity = quantity;
+        item.quantity = Math.min(quantity, item.maxStock);
         this.saveCart(cart);
         this.cartSubject.next([...cart]);
       }

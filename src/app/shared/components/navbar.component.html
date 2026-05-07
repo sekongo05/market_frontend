@@ -908,8 +908,10 @@
                     style="color:#6b7280">−</button>
                   <span class="w-8 text-center text-sm font-black" style="color:#111111">{{ item.quantity }}</span>
                   <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1, item.variantId)"
+                    [disabled]="item.quantity >= item.maxStock"
+                    [title]="item.quantity >= item.maxStock ? 'Stock maximum atteint (' + item.maxStock + ')' : ''"
                     class="w-11 h-11 flex items-center justify-center text-lg font-light transition-colors
-                           hover:bg-black/8"
+                           hover:bg-black/8 disabled:opacity-30 disabled:cursor-not-allowed"
                     style="color:#6b7280">+</button>
                 </div>
                 <!-- Sous-total ligne -->
