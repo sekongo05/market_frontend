@@ -49,12 +49,10 @@ import { CommonModule } from '@angular/common';
       <div *ngIf="showSlogan"
            class="flex flex-col justify-center"
            style="border-left: 1px solid rgba(201,162,75,.35); padding-left: 0.75em;">
-        <span class="block leading-none font-semibold tracking-widest uppercase"
-              style="color:#c9a24b;"
-              [style.fontSize.px]="size * 0.195">Le luxe</span>
-        <span class="block leading-none font-medium tracking-widest uppercase"
-              style="color:#9ca3af; margin-top:0.35em;"
-              [style.fontSize.px]="size * 0.195">à portée de main</span>
+        <span class="block leading-none font-semibold tracking-widest uppercase text-[9px] sm:text-[11px]"
+              style="color:#c9a24b;">Le luxe</span>
+        <span class="block leading-none font-medium tracking-widest uppercase text-[9px] sm:text-[11px]"
+              style="color:#9ca3af; margin-top:0.35em;">à portée de main</span>
       </div>
 
     </div>
