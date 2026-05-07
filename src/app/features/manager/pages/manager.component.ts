@@ -356,8 +356,6 @@ export class ManagerComponent implements OnInit, OnDestroy {
     this.scrollLock.unlock();
     this.editingProduct = null;
     this.drawerError = null;
-    this.selectedImages = [];
-    this.imagePreviews = [];
     this.creationItems = [];
     this.pendingCreationFile = null;
     this.pendingCreationPreview = null;

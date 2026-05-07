@@ -147,15 +147,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
       this.authPromptService.show();
       return;
     }
-    for (let i = 0; i < this.selectedProductQty; i++) {
-      this.cartService.addToCart({
-        productId: this.selectedProduct.id,
-        productName: this.selectedProduct.name,
-        price: this.selectedProduct.price,
-        quantity: 1,
-        imageUrl: this.selectedProduct.imageUrl,
-      });
-    }
+    this.cartService.addToCart({
+      productId: this.selectedProduct.id,
+      productName: this.selectedProduct.name,
+      price: this.selectedProduct.salePrice ?? this.selectedProduct.price,
+      quantity: this.selectedProductQty,
+      imageUrl: this.selectedProduct.imageUrl,
+      maxStock: this.selectedProduct.stock,
+    });
     this.addedIds.add(this.selectedProduct.id);
     this.cdr.detectChanges();
     setTimeout(() => {
@@ -172,9 +171,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.cartService.addToCart({
       productId: product.id,
       productName: product.name,
-      price: product.price,
+      price: product.salePrice ?? product.price,
       quantity: 1,
       imageUrl: product.imageUrl,
+      maxStock: product.stock,
     });
     this.addedIds.add(product.id);
     this.cdr.detectChanges();
