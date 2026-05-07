@@ -51,10 +51,10 @@ import { CommonModule } from '@angular/common';
            style="border-left: 1px solid rgba(201,162,75,.35); padding-left: 0.75em;">
         <span class="block leading-none font-semibold tracking-widest uppercase"
               style="color:#c9a24b;"
-              [style.fontSize.px]="size * 0.195">L'excellence</span>
+              [style.fontSize.px]="size * 0.195">Le luxe</span>
         <span class="block leading-none font-medium tracking-widest uppercase"
               style="color:#9ca3af; margin-top:0.35em;"
-              [style.fontSize.px]="size * 0.195">à prix juste</span>
+              [style.fontSize.px]="size * 0.195">à portée de main</span>
       </div>
 
     </div>
