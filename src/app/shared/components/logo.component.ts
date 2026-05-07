@@ -47,7 +47,7 @@ import { CommonModule } from '@angular/common';
 
       <!-- ── Slogan (masqué sur mobile) ── -->
       <div *ngIf="showSlogan"
-           class="hidden sm:flex flex-col justify-center"
+           class=" sm:flex flex-col justify-center"
            style="border-left: 1px solid rgba(201,162,75,.35); padding-left: 0.75em;">
         <span class="block leading-none font-semibold tracking-widest uppercase"
               style="color:#c9a24b;"
