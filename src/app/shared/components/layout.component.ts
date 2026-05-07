@@ -4,12 +4,12 @@ import { NavbarComponent } from './navbar.component';
 import { SupportWidgetComponent } from './support-widget.component';
 import { ToastComponent } from './toast.component';
 import { AuthService } from '../../core/services/auth.service';
-import { LogoComponent } from './logo.component';
+import { SdmLogoComponent } from './logo.component';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterModule, NavbarComponent, SupportWidgetComponent, ToastComponent, LogoComponent],
+  imports: [RouterModule, NavbarComponent, SupportWidgetComponent, ToastComponent, SdmLogoComponent],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
 })

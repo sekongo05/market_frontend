@@ -9,12 +9,12 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { LogoComponent } from '../../../shared/components/logo.component';
+import { SdmLogoComponent } from '../../../shared/components/logo.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, LogoComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, SdmLogoComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })

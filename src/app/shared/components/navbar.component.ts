@@ -20,13 +20,13 @@ import { WebSocketService } from '../../core/services/websocket.service';
 import { PromoCheckResponse, PublicPromoResponse } from '../../core/models/promo.models';
 import { Subject } from 'rxjs';
 import { takeUntil, timeout } from 'rxjs/operators';
-import { LogoComponent } from './logo.component';
+import { SdmLogoComponent } from './logo.component';
 import { ScrollLockService } from '../../core/services/scroll-lock.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, NotifBodyPipe, MediaUrlPipe, LogoComponent],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, NotifBodyPipe, MediaUrlPipe, SdmLogoComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })

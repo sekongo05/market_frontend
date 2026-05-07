@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 280" width="280" height="280">
+  <defs>
+    <linearGradient id="goldGrad04" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8c972"></stop>
+      <stop offset="50%" stop-color="#c9a24b"></stop>
+      <stop offset="100%" stop-color="#8a6d2a"></stop>
+    </linearGradient>
+  </defs>
+  <style>
+    .sdm04-name {
+      font-family: 'Bodoni Moda', 'Didot', 'Times New Roman', Georgia, serif;
+      font-size: 38px;
+      font-weight: 700;
+      fill: #c9a24b;
+      letter-spacing: 4px;
+    }
+    .sdm04-store {
+      font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      fill: #c9a24b;
+      letter-spacing: 6px;
+      opacity: 0.85;
+    }
+  </style>
+
+  
+  <circle cx="140" cy="140" r="140" fill="url(#goldGrad04)"></circle>
+  
+  <circle cx="140" cy="140" r="130" fill="#0e0e10"></circle>
+  
+  <circle cx="140" cy="140" r="122" fill="none" stroke="#c9a24b" stroke-width="1" opacity="0.5"></circle>
+
+  
+  <g transform="translate(118 76)" fill="none" stroke="#c9a24b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 8 L11 8 L15 30 L38 30 L42 14 L13 14"></path>
+    <circle cx="17" cy="38" r="2.4" fill="#c9a24b"></circle>
+    <circle cx="34" cy="38" r="2.4" fill="#c9a24b"></circle>
+  </g>
+
+  
+  <text x="140" y="180" text-anchor="middle" class="sdm04-name">SDM</text>
+
+  
+  <text x="143" y="206" text-anchor="middle" class="sdm04-store">STORE</text>
+</svg>
