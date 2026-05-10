@@ -280,7 +280,7 @@
                [ngClass]="wide ? 'text-[10px] sm:text-xs' : 'text-[9px] sm:text-[10px]'"
                style="color: rgba(212,175,55,0.9);">{{ product.category.name }}</p>
             <!-- Nom produit -->
-            <h3 class=" text-white drop-shadow-md"
+            <h3 class=" text-white drop-shadow-md font-bold"
                 [ngClass]="wide ? 'text-lg sm:text-2xl mb-4' : 'text-xs sm:text-sm mb-2.5'">
               {{ product.name }}
             </h3>
@@ -307,7 +307,7 @@
                           [ngClass]="wide ? 'text-xl sm:text-2xl' : 'text-sm sm:text-base'">
                       {{ product.price  | number:'1.0-0': 'fr-FR' }}
                     </span>
-                    <span class="text-white/40 text-[9px]">FCFA</span>
+                    <span class="text-white/40 text-[9px] font-bold">FCFA</span>
                   </div>
                 }
               </div>
