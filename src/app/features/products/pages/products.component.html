@@ -572,6 +572,28 @@
               <span class="text-sm text-red-400 font-medium">Rupture de stock</span>
             }
           </div>
+           @if ((selectedProduct.variants?.length ?? 0) > 0) {
+    <div class="space-y-2">                                                                                                                                                                                             
+      <p class="text-xs font-bold theme-muted uppercase tracking-wider">                                                                                                                                                
+        Couleur                                                                                                                                                                                                         
+        @if (selectedViewVariant) {                                                                                                                                                                                     
+          <span class="normal-case font-normal text-gold ml-1">— {{ selectedViewVariant.colorName }}</span>                                                                                                             
+        }                                                                                                                                                                                                               
+      </p>
+      <div class="flex flex-wrap gap-2">                                                                                                                                                                                
+        @for (v of selectedProduct.variants!; track v.id) {                                                                                                                                                             
+          <button type="button" (click)="selectedViewVariant = selectedViewVariant?.id === v.id ? null : v"
+            class="w-8 h-8 rounded-full border-2 transition-all"                                                                                                                                                        
+            [style.background-color]="v.colorHex"                                                                                                                                                                       
+            [class.border-gold]="selectedViewVariant?.id === v.id"                                                                                                                                                      
+            [class.border-transparent]="selectedViewVariant?.id !== v.id"                                                                                                                                               
+            [title]="v.colorName">                                                                                                                                                                                      
+          </button>
+        }                                                                                                                                                                                                               
+      </div>      
+    </div>
+  }
+
 
           <!-- Actions client -->
           @if (!isManager) {
@@ -592,7 +614,7 @@
                 </button>
               </div>
               <!-- Ajouter au panier -->
-              <button (click)="addToCartFromView()" [disabled]="selectedProduct.stock === 0"
+              <button (click)="addToCartFromView()" [disabled]="selectedProduct.stock === 0 || ((selectedProduct.variants?.length ?? 0) > 0 && !selectedViewVariant)"
                 class="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                 [class]="addedIds.has(selectedProduct.id) ? 'bg-green-500 text-white scale-95' : 'bg-gold text-black hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5'">
                 @if (addedIds.has(selectedProduct.id)) {
