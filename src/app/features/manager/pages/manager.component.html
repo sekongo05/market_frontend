@@ -1242,10 +1242,13 @@
         <div class="grid grid-cols-2 gap-3">
           <div class="space-y-1.5">                                                                                                                                                                                     
             <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Nom de la couleur *</label>
-            <input type="text" [(ngModel)]="pendingCreationColor.colorName" [ngModelOptions]="{standalone:true}"                                                                                                        
+            <!-- <input type="text" [(ngModel)]="pendingCreationColor.colorName" [ngModelOptions]="{standalone:true}"                                                                                                        
               placeholder="ex: Rouge, Bleu marine…"                                                                                                                                                                     
-              class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none"/>                                               
-          </div>                                                                                                                                                                                                        
+              class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none"/> -->                                               
+            <input type="text" [ngModel]="pendingCreationColor.colorName" (ngModelChange)="pendingCreationColor.colorName = $event; onCreationColorNameChange($event)" 
+                       [ngModelOptions]="{standalone: true}" placeholder="ex: Rouge, Bleu marine…" [ngModelOptions]="{standalone: true}"
+                        class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none"/>
+            </div>                                                                                                                                                                                                        
           <div class="space-y-1.5">                                                                                                                                                                                     
             <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Couleur *</label>                                                                                                                 
             <div class="flex items-center gap-2">                                                                                                                                                                       

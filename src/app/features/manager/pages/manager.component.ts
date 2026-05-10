@@ -595,6 +595,20 @@ export class ManagerComponent implements OnInit, OnDestroy {
 
   // ── Création : sélection photo → formulaire couleur ─────────────────────
 
+    private readonly COLOR_MAP: Record<string, string> = {                                                                                                                                                                
+    'rouge': '#FF0000', 'bleu': '#0000FF', 'vert': '#008000',                                                                                                                                                           
+    'noir': '#000000', 'blanc': '#FFFFFF', 'jaune': '#FFD700',
+    'orange': '#FF8C00', 'violet': '#800080', 'rose': '#FF69B4',                                                                                                                                                        
+    'gris': '#808080', 'marron': '#8B4513', 'beige': '#F5F5DC',                                                                                                                                                         
+    'or': '#D4AF37', 'argent': '#C0C0C0', 'turquoise': '#40E0D0',                                                                                                                                                       
+    'bordeaux': '#800020', 'marine': '#001F5B', 'kaki': '#78866B',                                                                                                                                                      
+  };                                                                                                                                                                                                                    
+                                                                                                                                                                                                                        
+  onCreationColorNameChange(name: string): void {                                                                                                                                                                       
+    const hex = this.COLOR_MAP[name.toLowerCase().trim()];
+    if (hex) this.pendingCreationColor.colorHex = hex;                                                                                                                                                                  
+  } 
+
   onCreationImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -919,6 +933,10 @@ cancelPendingCreation(): void {
     };
     return m[s] ?? s;
   }
+
+
+
+
 
   deliveryStatusClass(s: string): string {
     const m: Record<string, string> = {
