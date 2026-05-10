@@ -1001,8 +1001,8 @@ cancelPendingCreation(): void {
     input.value = '';
     if (!file || !this.editingProduct) return;
     this.pendingMediaFile = file;
-    this.pendingMediaColor = { colorName: '', colorHex: '#000000', stock: 0 };
-    this.mediaColorError = null;
+/*     this.pendingMediaColor = { colorName: '', colorHex: '#000000', stock: 0 };
+ */    this.mediaColorError = null;
     const reader = new FileReader();
     reader.onload = (e) => { this.pendingMediaPreview = e.target?.result as string; this.cdr.detectChanges(); };
     reader.readAsDataURL(file);
