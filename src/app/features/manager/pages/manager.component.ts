@@ -608,11 +608,13 @@ export class ManagerComponent implements OnInit, OnDestroy {
     reader.readAsDataURL(file);
   }
 
-  cancelPendingCreation(): void {
+cancelPendingCreation(): void {                                                                                                                                                                                       
     this.pendingCreationFile = null;
     this.pendingCreationPreview = null;
-    this.pendingCreationColorError = null;
-  }
+    this.pendingCreationColorError = null;                                                                                                                                                                              
+    // NE PAS reset pendingCreationColor ici
+    this.cdr.detectChanges();                                                                                                                                                                                           
+  } 
 
   confirmCreationItem(): void {
     if (!this.pendingCreationFile) return;
