@@ -601,8 +601,8 @@ export class ManagerComponent implements OnInit, OnDestroy {
     input.value = '';
     if (!file || this.creationItems.length >= 4) return;
     this.pendingCreationFile = file;
-    this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
-    this.pendingCreationColorError = null;
+/*     this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
+ */    this.pendingCreationColorError = null;
     const reader = new FileReader();
     reader.onload = (e) => { this.pendingCreationPreview = e.target?.result as string; this.cdr.detectChanges(); };
     reader.readAsDataURL(file);
