@@ -1229,21 +1229,21 @@
                     <div class="space-y-1.5">
                       <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Nom de la couleur *</label>
                       <input type="text" [(ngModel)]="pendingCreationColor.colorName" placeholder="ex: Rouge, Bleu marine…"
-                        class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none"/>
+                        class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none" [ngModelOptions]="{standalone: true}"/>
                     </div>
                     <div class="space-y-1.5">
                       <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Couleur *</label>
                       <div class="flex items-center gap-2">
-                        <input type="color" [(ngModel)]="pendingCreationColor.colorHex"
+                        <input type="color" [(ngModel)]="pendingCreationColor.colorHex" [ngModelOptions]="{standalone: true}"/>
                           class="w-10 h-9 rounded-lg cursor-pointer border theme-border bg-transparent p-0.5"/>
-                        <input type="text" [(ngModel)]="pendingCreationColor.colorHex" maxlength="7" placeholder="#000000"
+                        <input type="text" [(ngModel)]="pendingCreationColor.colorHex" maxlength="7" placeholder="#000000" [ngModelOptions]="{standalone: true}"
                           class="flex-1 px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm font-mono focus:border-gold/50 focus:outline-none"/>
                       </div>
                     </div>
                   </div>
                   <div class="space-y-1.5">
                     <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Stock pour cette couleur</label>
-                    <input type="number" [(ngModel)]="pendingCreationColor.stock" min="0" placeholder="0"
+                    <input type="number" [(ngModel)]="pendingCreationColor.stock" min="0" placeholder="0"  [ngModelOptions]="{standalone: true}"
                       class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm focus:border-gold/50 focus:outline-none"/>
                   </div>
                   <div class="flex gap-2">
