@@ -547,8 +547,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.pendingCreationFile = null;
     this.pendingCreationPreview = null;
     this.pendingCreationColorError = null;
-    this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
-    this.selectedVideo = null;
+/*     this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
+ */    this.selectedVideo = null;
     this.videoPreview = null;
     this.imagePreview = null;
     this.selectedImageFile = null;
