@@ -743,6 +743,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       colorHex: this.pendingCreationColor.colorHex,
       stock: this.pendingCreationColor.stock || 0,
     }];
+      const totalStock = this.creationItems.reduce((sum, i) => sum + i.stock, 0);                                                                                                                                           
+  this.productForm.patchValue({ stock: totalStock });                                                                                                                                                                   
+                                                      
     this.pendingCreationFile = null;
     this.pendingCreationPreview = null;
     this.pendingCreationColorError = null;

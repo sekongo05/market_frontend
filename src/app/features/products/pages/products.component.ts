@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { ProductService } from '../../../core/services/product.service';
@@ -10,7 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
-import { ProductResponse, GetProductsParams, SortOption } from '../../../core/models/product.models';
+import { ProductResponse, GetProductsParams, SortOption,ProductVariant } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
@@ -44,7 +44,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   modalError: string | null = null;
   modalSuccess: string | null = null;
   productForm!: FormGroup;
-
+  selectedViewVariant: ProductVariant | null = null;
   // Category filter
   selectedCategoryId: number | null = null;
   private pendingCategorySlug: string | null = null;
@@ -111,6 +111,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private router: Router,
     private scrollLock: ScrollLockService
   ) {}
 
@@ -143,6 +144,22 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   addToCartFromView(): void {
     if (!this.selectedProduct) return;
+    if (!this.authService.isAuthenticated()) { this.authPromptService.show(); return; }
+    if ((this.selectedProduct.variants?.length ?? 0) > 0 && !this.selectedViewVariant) return;                                                                                                                          
+    this.cartService.addToCart({                                                              
+      productId: this.selectedProduct.id,                                                                                                                                                                               
+      productName: this.selectedProduct.name,
+      price: this.selectedProduct.salePrice ?? this.selectedProduct.price,                                                                                                                                              
+      quantity: this.selectedProductQty,                                  
+      imageUrl: this.selectedViewVariant?.imageUrl || this.selectedProduct.imageUrl,                                                                                                                                    
+      maxStock: this.selectedProduct.stock,                                         
+      variantId: this.selectedViewVariant?.id,                                                                                                                                                                          
+      selectedColor: this.selectedViewVariant?.colorName,
+      selectedColorHex: this.selectedViewVariant?.colorHex,                                                                                                                                                             
+    });                                                    
+  }                         
+/*   addToCartFromView(): void {
+    if (!this.selectedProduct) return;
     if (!this.authService.isAuthenticated()) {
       this.authPromptService.show();
       return;
@@ -161,9 +178,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
       if (this.selectedProduct) this.addedIds.delete(this.selectedProduct.id);
       this.cdr.detectChanges();
     }, 1500);
-  }
+  } */
 
-  addToCart(product: ProductResponse): void {
+
+/*   addToCart(product: ProductResponse): void {
     if (!this.authService.isAuthenticated()) {
       this.authPromptService.show();
       return;
@@ -182,6 +200,22 @@ export class ProductsComponent implements OnInit, OnDestroy {
       this.addedIds.delete(product.id);
       this.cdr.detectChanges();
     }, 1500);
+  } */
+
+  addToCart(product: ProductResponse): void {                                                                                                                                                                           
+    if (!this.authService.isAuthenticated()) { this.authPromptService.show(); return; }
+    if ((product.variants?.length ?? 0) > 0) {                                                                                                                                                                          
+      this.router.navigate(['/products', product.slug]);                                                                                                                                                                
+      return;                                           
+    }                                                                                                                                                                                                                   
+    this.cartService.addToCart({
+      productId: product.id,    
+      productName: product.name,                                                                                                                                                                                        
+      price: product.salePrice ?? product.price,
+      quantity: 1,                                                                                                                                                                                                      
+      imageUrl: product.imageUrl,
+      maxStock: product.stock,
+    });                                                                                                                                                                                                                 
   }
 
   ngOnInit(): void {
