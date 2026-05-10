@@ -1357,7 +1357,8 @@
           </div>
 
         <form [formGroup]="productForm" (ngSubmit)="saveProduct()" id="productForm"
-              class="p-6 space-y-5" [class.hidden]="drawerTab === 'media' || drawerTab === 'variants'">
+        class="p-6 space-y-5"
+        [class.hidden]="editingProduct && (drawerTab === 'media' || drawerTab === 'variants')">
 
         
 
