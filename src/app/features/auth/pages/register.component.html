@@ -110,18 +110,8 @@
           </svg>
           Accueil
         </a>
-        <div class="flex items-center gap-2.5 lg:hidden">
-        <div class="relative w-10 h-10 flex-shrink-0">
-          <div class="absolute inset-0 rounded-xl rotate-3 opacity-70"
-               style="background:#d4af37; box-shadow:0 4px 14px rgba(212,175,55,0.35);"></div>
-          <div class="relative w-full h-full rounded-xl flex items-center justify-center"
-               style="background:linear-gradient(135deg,#f5cc42,#b8941e);">
-            <span class="text-black font-black text-[9px] tracking-tighter select-none">SDM</span>
-          </div>
-        </div>
-        <div class="leading-none">
-          <span class="text-lg font-black theme-text">SDM</span><span class="text-lg font-black" style="color:#d4af37"> STORE</span>
-        </div>
+        <div class="lg:hidden">
+          <app-sdm-logo [size]="68" [showSlogan]="true"></app-sdm-logo>
         </div>
       </div>
 
