@@ -151,7 +151,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       next: (response) => {
         if (response.success && response.data) {
           this.product = response.data;
-          this.selectedVariant = null;
+          this._autoSelectVariant();
           this._buildGallery();
           this._loadRelated();
         } else {
@@ -211,6 +211,22 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         }
       }
     }
+
+    // ── Positionner la galerie sur l'image de la variante auto-sélectionnée ──
+    if (this.selectedVariant?.imageUrl) {
+      const idx = this.galleryItems.findIndex(g => g.url === this.selectedVariant!.imageUrl);
+      if (idx >= 0) this.activeIndex = idx;
+    }
+  }
+
+  private _autoSelectVariant(): void {
+    if (!this.product?.variants?.length) {
+      this.selectedVariant = null;
+      return;
+    }
+    // Pre-select first in-stock variant, fallback to first variant
+    this.selectedVariant =
+      this.product.variants.find(v => v.stock > 0) ?? this.product.variants[0];
   }
 
   private _syncVariantFromImage(url: string): void {
