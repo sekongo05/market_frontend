@@ -136,12 +136,16 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.route.paramMap.pipe(
       takeUntil(this.destroy$),
       switchMap(params => {
-        const id = Number(params.get('id'));
+        const param = params.get('id') ?? '';
+        const numId  = Number(param);
         this.loading = true;
         this.error = null;
         this.activeIndex = 0;
         this.cdr.detectChanges();
-        return this.productService.getProductById(id);
+        // Supporte les deux : ID numérique (/products/42) et slug (/products/montre-luxe)
+        return (numId > 0)
+          ? this.productService.getProductById(numId)
+          : this.productService.getProductBySlug(param);
       })
     ).subscribe({
       next: (response) => {
