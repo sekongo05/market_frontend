@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
@@ -16,6 +16,7 @@ import { takeUntil } from 'rxjs/operators';
   imports: [CommonModule, RouterLink, MediaUrlPipe],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements AfterViewInit, OnDestroy {
   currentUser$;
@@ -96,6 +97,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   onHeroMouseMove(event: MouseEvent): void {
+    if (window.matchMedia('(hover: none)').matches) return;
     const section = event.currentTarget as HTMLElement;
     const rect    = section.getBoundingClientRect();
     const cx = (event.clientX - rect.left) / rect.width  - 0.5;
@@ -111,6 +113,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   onHeroMouseLeave(event: MouseEvent): void {
+    if (window.matchMedia('(hover: none)').matches) return;
     const parallax = (event.currentTarget as HTMLElement).querySelector('.hero-parallax') as HTMLElement | null;
     if (parallax) parallax.style.transform = '';
   }

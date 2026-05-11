@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
@@ -23,6 +23,7 @@ import { ScrollLockService } from '../../../core/services/scroll-lock.service';
   imports: [CommonModule, NgTemplateOutlet, FormsModule, ReactiveFormsModule, RouterLink, TooltipDirective, MediaUrlPipe],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsComponent implements OnInit, OnDestroy {
   products: ProductResponse[] = [];

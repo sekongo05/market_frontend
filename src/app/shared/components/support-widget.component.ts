@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -6,6 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-support-widget',
   standalone: true,
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (isCustomer) {
       <div class="fixed bottom-6 right-6 z-30 flex items-center gap-3">

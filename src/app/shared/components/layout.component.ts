@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './navbar.component';
 import { SupportWidgetComponent } from './support-widget.component';
@@ -12,6 +12,7 @@ import { SdmLogoComponent } from './logo.component';
   imports: [RouterModule, NavbarComponent, SupportWidgetComponent, ToastComponent, SdmLogoComponent],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LayoutComponent {
   constructor(private authService: AuthService) {}

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterModule, RouterLinkActive, Router } from '@angular/router';
@@ -29,6 +29,7 @@ import { ScrollLockService } from '../../core/services/scroll-lock.service';
   imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, NotifBodyPipe, MediaUrlPipe, SdmLogoComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   currentUser: CurrentUser | null = null;
@@ -99,8 +100,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll')
   onScroll(): void {
-    this.scrolled = window.scrollY > 20;
-    this.cdr.detectChanges();
+    const isScrolled = window.scrollY > 20;
+    if (isScrolled !== this.scrolled) {
+      this.scrolled = isScrolled;
+      this.cdr.detectChanges();
+    }
   }
 
   @HostListener('document:keydown.escape')

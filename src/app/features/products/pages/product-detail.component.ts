@@ -1,5 +1,5 @@
 import {
-  Component, OnInit, OnDestroy, ChangeDetectorRef,
+  Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
   AfterViewInit, HostListener
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
@@ -69,6 +69,7 @@ const DEFAULT_GALLERY = [
   imports: [CommonModule, RouterLink, TooltipDirective, MediaUrlPipe],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   product: ProductResponse | null = null;

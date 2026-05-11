@@ -96,7 +96,7 @@
             <!-- Zoom (images only) -->
             @if (activeItem.type === 'IMAGE') {
               <button (click)="toggleZoom()" [appTooltip]="zoomed ? 'Dézoomer' : 'Zoomer'"  tooltipPosition="left"
-                class="absolute top-4 right-4 z-10 w-9 h-9 rounded-xl
+                class="absolute top-4 right-4 z-10 min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl
                        bg-black/50 backdrop-blur-sm border border-white/15 text-white
                        flex items-center justify-center hover:bg-black/70 transition-all duration-200">
                 @if (!zoomed) {
@@ -297,12 +297,12 @@
                     [disabled]="variant.stock === 0"
                     [appTooltip]="variant.colorName + (variant.stock === 0 ? ' — Épuisé' : ' — ' + variant.stock + ' en stock')"
                     tooltipPosition="top"
-                    class="relative group flex flex-col items-center gap-1.5 transition-all duration-200"
+                    class="relative group flex flex-col items-center gap-1.5 transition-all duration-200 min-w-[44px] min-h-[44px] justify-center"
                     [class.opacity-40]="variant.stock === 0"
                     [class.cursor-not-allowed]="variant.stock === 0">
 
                     <!-- Color circle -->
-                    <div class="w-9 h-9 rounded-full border-2 transition-all duration-200 shadow-md"
+                    <div class="w-10 h-10 rounded-full border-2 transition-all duration-200 shadow-md"
                          [style.background-color]="variant.colorHex"
                          [class.border-gold]="selectedVariant?.id === variant.id"
                          [class.scale-110]="selectedVariant?.id === variant.id"
