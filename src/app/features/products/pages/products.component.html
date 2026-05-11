@@ -281,9 +281,23 @@
                style="color: rgba(212,175,55,0.9);">{{ product.category.name }}</p>
             <!-- Nom produit -->
             <h3 class=" text-white drop-shadow-md font-bold"
-                [ngClass]="wide ? 'text-lg sm:text-2xl mb-4' : 'text-xs sm:text-sm mb-2.5'">
+                [ngClass]="wide ? 'text-lg sm:text-2xl mb-2' : 'text-xs sm:text-sm mb-1.5'">
               {{ product.name }}
             </h3>
+
+            <!-- Pastilles de couleurs disponibles -->
+            @if ((product.variants?.length ?? 0) > 0) {
+              <div class="flex items-center gap-1 mb-2">
+                @for (v of product.variants!.slice(0, 4); track v.id) {
+                  <span class="w-3 h-3 rounded-full border border-white/30 flex-shrink-0"
+                        [style.background-color]="v.colorHex"
+                        [title]="v.colorName"></span>
+                }
+                @if (product.variants!.length > 4) {
+                  <span class="text-[9px] text-white/50 font-semibold">+{{ product.variants!.length - 4 }}</span>
+                }
+              </div>
+            }
 
             <!-- Prix + bouton panier -->
             <div class="flex items-center justify-between gap-2">
@@ -606,10 +620,10 @@
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
                 </button>
                 <span class="w-10 text-center font-bold theme-text text-sm">{{ selectedProductQty }}</span>
-                <button (click)="selectedProductQty = selectedProductQty < selectedProduct.stock ? selectedProductQty + 1 : selectedProductQty"
+                <button (click)="selectedProductQty = selectedProductQty < (selectedViewVariant ? selectedViewVariant.stock : selectedProduct.stock) ? selectedProductQty + 1 : selectedProductQty"
                   appTooltip="Augmenter la quantité" tooltipPosition="top"
                   class="w-11 h-11 flex items-center justify-center theme-muted hover:text-gold hover:bg-gold/5 transition-colors"
-                  [disabled]="selectedProductQty >= selectedProduct.stock">
+                  [disabled]="selectedProductQty >= (selectedViewVariant ? selectedViewVariant.stock : selectedProduct.stock)">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 </button>
               </div>
@@ -620,6 +634,9 @@
                 @if (addedIds.has(selectedProduct.id)) {
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                   Ajouté au panier !
+                } @else if ((selectedProduct.variants?.length ?? 0) > 0 && !selectedViewVariant) {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                  Choisissez une couleur
                 } @else {
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                   Ajouter au panier
