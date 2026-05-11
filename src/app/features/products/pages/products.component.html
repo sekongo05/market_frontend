@@ -333,13 +333,13 @@
                     [disabled]="product.stock === 0"
                     class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs flex-shrink-0
                            transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                    [class]="addedIds.has(product.id)
+                    [class]="cartProductIds.has(product.id)
                       ? 'bg-green-500 text-white'
                       : 'text-black hover:brightness-110 hover:-translate-y-0.5 active:scale-95'"
-                    [style]="addedIds.has(product.id) ? '' : 'background:#d4af37; box-shadow:0 4px 16px rgba(212,175,55,0.35);'">
-                    @if (addedIds.has(product.id)) {
+                    [style]="cartProductIds.has(product.id) ? '' : 'background:#d4af37; box-shadow:0 4px 16px rgba(212,175,55,0.35);'">
+                    @if (cartProductIds.has(product.id)) {
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                      Ajouté !
+                      Dans le panier
                     } @else {
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                       Ajouter au panier
@@ -350,11 +350,11 @@
                     [disabled]="product.stock === 0"
                     class="w-9 h-9 rounded-xl flex items-center justify-center font-bold flex-shrink-0
                            transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                    [class]="addedIds.has(product.id)
+                    [class]="cartProductIds.has(product.id)
                       ? 'bg-green-500 text-white scale-90 shadow-lg shadow-green-900/40'
                       : 'text-black hover:scale-110 hover:shadow-lg hover:shadow-yellow-500/40 active:scale-95'"
-                    [style]="addedIds.has(product.id) ? '' : 'background:#d4af37;'">
-                    @if (addedIds.has(product.id)) {
+                    [style]="cartProductIds.has(product.id) ? '' : 'background:#d4af37;'">
+                    @if (cartProductIds.has(product.id)) {
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                     } @else {
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>

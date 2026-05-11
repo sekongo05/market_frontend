@@ -55,8 +55,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
   maxPriceInput: string = '';
   showFilters = false;
 
-  // Tracks product ids that were just added (for button feedback)
+  // Temporary feedback after "add" action (quick-view panel)
   addedIds = new Set<number>();
+  // Persistent set of product IDs already in cart
+  cartProductIds = new Set<number>();
 
   // Product quick-view panel
   selectedProduct: ProductResponse | null = null;
@@ -78,17 +80,29 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   prevViewImage(): void {
     this.viewGalleryIndex = (this.viewGalleryIndex - 1 + this.viewGallery.length) % this.viewGallery.length;
+    this._syncViewVariantFromImage(this.viewGallery[this.viewGalleryIndex]?.url);
     this.cdr.detectChanges();
   }
 
   nextViewImage(): void {
     this.viewGalleryIndex = (this.viewGalleryIndex + 1) % this.viewGallery.length;
+    this._syncViewVariantFromImage(this.viewGallery[this.viewGalleryIndex]?.url);
     this.cdr.detectChanges();
   }
 
   setViewImage(i: number): void {
     this.viewGalleryIndex = i;
+    this._syncViewVariantFromImage(this.viewGallery[i]?.url);
     this.cdr.detectChanges();
+  }
+
+  private _syncViewVariantFromImage(url: string): void {
+    if (!url || !this.selectedProduct?.variants?.length) return;
+    const match = this.selectedProduct.variants.find(v => v.imageUrl === url);
+    if (match) {
+      this.selectedViewVariant = match;
+      this.selectedProductQty = 1;
+    }
   }
 
   // Image upload state — création : multi-images ; édition : image unique
@@ -142,9 +156,16 @@ export class ProductsComponent implements OnInit, OnDestroy {
       if (product.imageUrl && !this.viewGallery.some(i => i.url === product.imageUrl)) {
         this.viewGallery.unshift({ url: product.imageUrl, type: 'IMAGE' });
       }
-      return;
+    } else {
+      this.viewGallery = [{ url: product.imageUrl, type: 'IMAGE' as const }];
     }
-    this.viewGallery = [{ url: product.imageUrl, type: 'IMAGE' as const }];
+    if (product.variants?.length) {
+      for (const v of product.variants) {
+        if (v.imageUrl && !this.viewGallery.some(i => i.url === v.imageUrl)) {
+          this.viewGallery.push({ url: v.imageUrl, type: 'IMAGE' });
+        }
+      }
+    }
   }
 
   closeProductView(): void {
@@ -156,18 +177,24 @@ export class ProductsComponent implements OnInit, OnDestroy {
   addToCartFromView(): void {
     if (!this.selectedProduct) return;
     if (!this.authService.isAuthenticated()) { this.authPromptService.show(); return; }
-    if ((this.selectedProduct.variants?.length ?? 0) > 0 && !this.selectedViewVariant) return;                                                                                                                          
-    this.cartService.addToCart({                                                              
-      productId: this.selectedProduct.id,                                                                                                                                                                               
+    if ((this.selectedProduct.variants?.length ?? 0) > 0 && !this.selectedViewVariant) return;
+    this.cartService.addToCart({
+      productId: this.selectedProduct.id,
       productName: this.selectedProduct.name,
-      price: this.selectedProduct.salePrice ?? this.selectedProduct.price,                                                                                                                                              
-      quantity: this.selectedProductQty,                                  
-      imageUrl: this.selectedViewVariant?.imageUrl || this.selectedProduct.imageUrl,                                                                                                                                    
+      price: this.selectedProduct.salePrice ?? this.selectedProduct.price,
+      quantity: this.selectedProductQty,
+      imageUrl: this.selectedViewVariant?.imageUrl || this.selectedProduct.imageUrl,
       maxStock: this.selectedViewVariant?.stock ?? this.selectedProduct.stock,
-      variantId: this.selectedViewVariant?.id,                                                                                                                                                                          
+      variantId: this.selectedViewVariant?.id,
       selectedColor: this.selectedViewVariant?.colorName,
-      selectedColorHex: this.selectedViewVariant?.colorHex,                                                                                                                                                             
-    });                                                    
+      selectedColorHex: this.selectedViewVariant?.colorHex,
+    });
+    this.addedIds.add(this.selectedProduct.id);
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      if (this.selectedProduct) this.addedIds.delete(this.selectedProduct.id);
+      this.cdr.detectChanges();
+    }, 1500);
   }                         
 /*   addToCartFromView(): void {
     if (!this.selectedProduct) return;
@@ -213,20 +240,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }, 1500);
   } */
 
-  addToCart(product: ProductResponse): void {                                                                                                                                                                           
+  addToCart(product: ProductResponse): void {
     if (!this.authService.isAuthenticated()) { this.authPromptService.show(); return; }
-    if ((product.variants?.length ?? 0) > 0) {                                                                                                                                                                          
-      this.router.navigate(['/products', product.slug]);                                                                                                                                                                
-      return;                                           
-    }                                                                                                                                                                                                                   
+    if ((product.variants?.length ?? 0) > 0) {
+      this.router.navigate(['/products', product.slug]);
+      return;
+    }
+    if (this.cartProductIds.has(product.id)) return;
     this.cartService.addToCart({
-      productId: product.id,    
-      productName: product.name,                                                                                                                                                                                        
+      productId: product.id,
+      productName: product.name,
       price: product.salePrice ?? product.price,
-      quantity: 1,                                                                                                                                                                                                      
+      quantity: 1,
       imageUrl: product.imageUrl,
       maxStock: product.stock,
-    });                                                                                                                                                                                                                 
+    });
   }
 
   ngOnInit(): void {
@@ -248,6 +276,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(() => this.loadProducts(0));
+
+    this.cartService.cart$.pipe(takeUntil(this.destroy$)).subscribe(cart => {
+      this.cartProductIds = new Set(cart.map(i => i.productId));
+      this.cdr.detectChanges();
+    });
 
     this.wsService.stockUpdate$
       .pipe(takeUntil(this.destroy$))

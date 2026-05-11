@@ -179,24 +179,39 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     // ── Priorité 1 : médias réels de l'API ─────────────────────────────────
     if (this.product.media?.length) {
       this.galleryItems = this.product.media.map(m => ({ url: m.url, type: m.mediaType }));
-      // Assurer que l'image principale est en tête si elle n'est pas déjà dans media
       if (this.product.imageUrl) {
         const alreadyInMedia = this.galleryItems.some(i => i.url === this.product!.imageUrl);
         if (!alreadyInMedia) {
           this.galleryItems.unshift({ url: this.product.imageUrl, type: 'IMAGE' });
         }
       }
-      return;
+    } else {
+      // ── Priorité 2 : image principale + galerie Unsplash par catégorie ──────
+      const slug = this.product.category?.slug?.toLowerCase() ?? '';
+      const catKey = Object.keys(CATEGORY_GALLERIES).find(k => slug.includes(k)) ?? '';
+      const pool = catKey ? CATEGORY_GALLERIES[catKey] : DEFAULT_GALLERY;
+      const main = this.product.imageUrl;
+      const others = pool.filter(url => url !== main).slice(0, 3);
+      this.galleryItems = [main, ...others].map(url => ({ url, type: 'IMAGE' as const }));
     }
 
-    // ── Priorité 2 : image principale + galerie Unsplash par catégorie ──────
-    const slug = this.product.category?.slug?.toLowerCase() ?? '';
-    const catKey = Object.keys(CATEGORY_GALLERIES).find(k => slug.includes(k)) ?? '';
-    const pool = catKey ? CATEGORY_GALLERIES[catKey] : DEFAULT_GALLERY;
+    // ── Ajouter les images des variantes (si pas déjà présentes) ────────────
+    if (this.product.variants?.length) {
+      for (const v of this.product.variants) {
+        if (v.imageUrl && !this.galleryItems.some(i => i.url === v.imageUrl)) {
+          this.galleryItems.push({ url: v.imageUrl, type: 'IMAGE' });
+        }
+      }
+    }
+  }
 
-    const main = this.product.imageUrl;
-    const others = pool.filter(url => url !== main).slice(0, 3);
-    this.galleryItems = [main, ...others].map(url => ({ url, type: 'IMAGE' as const }));
+  private _syncVariantFromImage(url: string): void {
+    if (!url || !this.product?.variants?.length) return;
+    const match = this.product.variants.find(v => v.imageUrl === url);
+    if (match) {
+      this.selectedVariant = match;
+      this.quantity = Math.min(this.quantity, Math.max(1, this.effectiveStock));
+    }
   }
 
   get activeItem(): GalleryItem {
@@ -206,18 +221,21 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   setActive(index: number): void {
     this.activeIndex = index;
     this.zoomed = false;
+    this._syncVariantFromImage(this.galleryItems[index]?.url);
     this.cdr.detectChanges();
   }
 
   prevImage(): void {
     this.activeIndex = (this.activeIndex - 1 + this.galleryItems.length) % this.galleryItems.length;
     this.zoomed = false;
+    this._syncVariantFromImage(this.galleryItems[this.activeIndex]?.url);
     this.cdr.detectChanges();
   }
 
   nextImage(): void {
     this.activeIndex = (this.activeIndex + 1) % this.galleryItems.length;
     this.zoomed = false;
+    this._syncVariantFromImage(this.galleryItems[this.activeIndex]?.url);
     this.cdr.detectChanges();
   }
 
