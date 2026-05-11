@@ -119,10 +119,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.selectedProduct = product;
     this.selectedProductQty = 1;
     this.viewGalleryIndex = 0;
+    this.selectedViewVariant = null;
     this._buildViewGallery(product);
     this.scrollLock.lock();
     this.cdr.detectChanges();
     setTimeout(() => document.getElementById('product-view-panel')?.scrollTo(0, 0), 0);
+  }
+
+  selectViewVariant(v: ProductVariant): void {
+    this.selectedViewVariant = this.selectedViewVariant?.id === v.id ? null : v;
+    this.selectedProductQty = 1;
+    if (this.selectedViewVariant?.imageUrl) {
+      const idx = this.viewGallery.findIndex(g => g.url === this.selectedViewVariant!.imageUrl);
+      if (idx >= 0) this.viewGalleryIndex = idx;
+    }
+    this.cdr.detectChanges();
   }
 
   private _buildViewGallery(product: ProductResponse): void {
@@ -152,7 +163,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       price: this.selectedProduct.salePrice ?? this.selectedProduct.price,                                                                                                                                              
       quantity: this.selectedProductQty,                                  
       imageUrl: this.selectedViewVariant?.imageUrl || this.selectedProduct.imageUrl,                                                                                                                                    
-      maxStock: this.selectedProduct.stock,                                         
+      maxStock: this.selectedViewVariant?.stock ?? this.selectedProduct.stock,
       variantId: this.selectedViewVariant?.id,                                                                                                                                                                          
       selectedColor: this.selectedViewVariant?.colorName,
       selectedColorHex: this.selectedViewVariant?.colorHex,                                                                                                                                                             
