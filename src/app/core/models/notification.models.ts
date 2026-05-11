@@ -28,6 +28,8 @@ export interface WsNotification {
 export interface WsStockUpdate {
   productId: number;
   stock: number;
+  variantId?: number;
+  variantStock?: number;
 }
 
 export interface WsOrderEvent {

@@ -122,11 +122,14 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.wsService.stockUpdate$
       .pipe(takeUntil(this.destroy$))
       .subscribe(update => {
-        if (this.product && this.product.id === update.productId) {
-          (this.product as any).stock = update.stock;
-          this.quantity = Math.min(this.quantity, Math.max(1, update.stock));
-          this.cdr.detectChanges();
+        if (!this.product || this.product.id !== update.productId) return;
+        (this.product as any).stock = update.stock;
+        if (update.variantId != null && update.variantStock != null && this.product.variants) {
+          const v = this.product.variants.find(v => v.id === update.variantId);
+          if (v) (v as any).stock = update.variantStock;
         }
+        this.quantity = Math.min(this.quantity, Math.max(1, this.effectiveStock || update.stock));
+        this.cdr.detectChanges();
       });
 
     this.route.paramMap.pipe(

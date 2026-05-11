@@ -286,7 +286,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(update => {
         const p = this.products.find(p => p.id === update.productId);
-        if (p) { (p as any).stock = update.stock; this.cdr.detectChanges(); }
+        if (p) {
+          (p as any).stock = update.stock;
+          if (update.variantId != null && update.variantStock != null && p.variants) {
+            const v = p.variants.find(v => v.id === update.variantId);
+            if (v) (v as any).stock = update.variantStock;
+          }
+          if (this.selectedProduct?.id === update.productId) {
+            (this.selectedProduct as any).stock = update.stock;
+            if (update.variantId != null && update.variantStock != null && this.selectedProduct.variants) {
+              const v = this.selectedProduct.variants.find(v => v.id === update.variantId);
+              if (v) (v as any).stock = update.variantStock;
+            }
+          }
+          this.cdr.detectChanges();
+        }
       });
   }
 
