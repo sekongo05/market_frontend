@@ -279,62 +279,102 @@
             </div>
           </div>
 
-          <!-- Color variant selector -->
+          <!-- Color + Quantity selector (multi-variant Alibaba style) -->
           @if (hasVariants) {
-            <div class="p-5 rounded-2xl luxury-card">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">Couleur</h3>
-                @if (selectedVariant) {
-                  <span class="text-sm font-bold theme-text">{{ selectedVariant.colorName }}</span>
-                } @else {
-                  <span class="text-xs text-orange-400 font-semibold">Choisissez une couleur</span>
+            <div class="rounded-2xl luxury-card overflow-hidden">
+              <div class="flex items-center justify-between px-5 pt-5 pb-3">
+                <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">Couleur & Quantité</h3>
+                @if (totalSelectedQty > 0) {
+                  <span class="text-xs font-bold text-gold">
+                    {{ totalSelectedQty }} article{{ totalSelectedQty > 1 ? 's' : '' }} sélectionné{{ totalSelectedQty > 1 ? 's' : '' }}
+                  </span>
                 }
               </div>
-              <div class="flex flex-wrap gap-3">
-                @for (variant of product.variants; track variant.id) {
-                  <button
-                    (click)="selectVariant(variant)"
-                    [disabled]="variant.stock === 0"
-                    [appTooltip]="variant.colorName + (variant.stock === 0 ? ' — Épuisé' : ' — ' + variant.stock + ' en stock')"
-                    tooltipPosition="top"
-                    class="relative group flex flex-col items-center gap-1.5 transition-all duration-200 min-w-[44px] min-h-[44px] justify-center"
-                    [class.opacity-40]="variant.stock === 0"
-                    [class.cursor-not-allowed]="variant.stock === 0">
 
-                    <!-- Color circle -->
-                    <div class="w-10 h-10 rounded-full border-2 transition-all duration-200 shadow-md"
-                         [style.background-color]="variant.colorHex"
-                         [class.border-gold]="selectedVariant?.id === variant.id"
-                         [class.scale-110]="selectedVariant?.id === variant.id"
-                         [class.border-transparent]="selectedVariant?.id !== variant.id"
-                         [class.ring-2]="selectedVariant?.id === variant.id"
-                         [class.ring-gold]="selectedVariant?.id === variant.id"
-                         [class.ring-offset-2]="selectedVariant?.id === variant.id">
-                      <!-- Diagonal line if out of stock -->
+              <div class="flex flex-col divide-y divide-white/5">
+                @for (variant of product.variants; track variant.id) {
+                  <div
+                    (click)="selectVariant(variant)"
+                    class="flex items-center gap-3 px-5 py-3.5 cursor-pointer transition-all duration-200"
+                    [class.bg-gold]="getVariantQty(variant.id) > 0"
+                    [class.bg-opacity-5]="getVariantQty(variant.id) > 0"
+                    [class.opacity-50]="variant.stock === 0"
+                    [class.pointer-events-none]="variant.stock === 0">
+
+                    <!-- Color image or circle -->
+                    <div class="relative flex-shrink-0">
+                      @if (variant.imageUrl) {
+                        <div class="w-12 h-12 rounded-xl overflow-hidden border-2 transition-all duration-200 shadow"
+                             [class.border-gold]="selectedVariant?.id === variant.id"
+                             [class.border-white]="selectedVariant?.id !== variant.id"
+                             [class.border-opacity-10]="selectedVariant?.id !== variant.id">
+                          <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.colorName"
+                               class="w-full h-full object-cover"/>
+                        </div>
+                      } @else {
+                        <div class="w-12 h-12 rounded-xl border-2 shadow transition-all duration-200 flex items-center justify-center"
+                             [style.background-color]="variant.colorHex"
+                             [class.border-gold]="selectedVariant?.id === variant.id"
+                             [class.border-white]="selectedVariant?.id !== variant.id"
+                             [class.border-opacity-20]="selectedVariant?.id !== variant.id">
+                        </div>
+                      }
+                      <!-- Dot indicator for selected color -->
+                      <div class="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 transition-all duration-200"
+                           [style.background-color]="variant.colorHex"
+                           [class.border-gold]="selectedVariant?.id === variant.id"
+                           [class.border-white]="selectedVariant?.id !== variant.id"
+                           [class.border-opacity-30]="selectedVariant?.id !== variant.id">
+                      </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-bold theme-text truncate">{{ variant.colorName }}</p>
                       @if (variant.stock === 0) {
-                        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 36 36">
-                          <line x1="4" y1="32" x2="32" y2="4" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
-                        </svg>
+                        <p class="text-xs text-red-400 font-semibold">Épuisé</p>
+                      } @else if (variant.stock <= 3) {
+                        <p class="text-xs text-orange-400 font-semibold flex items-center gap-1">
+                          <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse inline-block"></span>
+                          Plus que {{ variant.stock }}
+                        </p>
+                      } @else {
+                        <p class="text-xs theme-muted">{{ variant.stock }} en stock</p>
                       }
                     </div>
 
-                    <!-- Color image preview if available -->
-                    @if (variant.imageUrl) {
-                      <div class="w-8 h-8 rounded-lg overflow-hidden border border-white/10 shadow">
-                        <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.colorName"
-                             class="w-full h-full object-cover"/>
+                    <!-- Qty stepper -->
+                    @if (variant.stock > 0) {
+                      <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card flex-shrink-0"
+                           (click)="$event.stopPropagation()">
+                        <button
+                          (click)="adjustVariantQty(variant, -1)"
+                          [disabled]="getVariantQty(variant.id) === 0"
+                          class="w-9 h-9 flex items-center justify-center theme-muted
+                                 hover:text-gold hover:bg-white/5 transition-colors disabled:opacity-30">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/>
+                          </svg>
+                        </button>
+                        <span class="w-8 text-center font-black text-sm"
+                              [class.gold-text]="getVariantQty(variant.id) > 0"
+                              [class.theme-muted]="getVariantQty(variant.id) === 0">
+                          {{ getVariantQty(variant.id) }}
+                        </span>
+                        <button
+                          (click)="adjustVariantQty(variant, 1)"
+                          [disabled]="getVariantQty(variant.id) >= variant.stock"
+                          class="w-9 h-9 flex items-center justify-center theme-muted
+                                 hover:text-gold hover:bg-white/5 transition-colors disabled:opacity-30">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                          </svg>
+                        </button>
                       </div>
                     }
-                  </button>
+                  </div>
                 }
               </div>
-
-              @if (selectedVariant && selectedVariant.stock > 0 && selectedVariant.stock <= 3) {
-                <p class="mt-3 text-xs text-orange-400 font-semibold flex items-center gap-1.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse inline-block"></span>
-                  Plus que {{ selectedVariant.stock }} en stock pour cette couleur
-                </p>
-              }
             </div>
           }
 
@@ -359,9 +399,8 @@
               </button>
             </div>
           } @else {
-            <!-- Customer : panier normal -->
+            <!-- Customer -->
             @if (!hasVariants && product.stock === 0) {
-              <!-- Épuisé (sans variante) -->
               <div class="p-4 rounded-2xl bg-red-500/8 border border-red-500/20 text-red-400 text-sm font-semibold text-center">
                 Ce produit est actuellement épuisé
               </div>
@@ -370,85 +409,88 @@
                        hover:theme-text luxury-card transition-all duration-200">
                 ← Retour à la collection
               </button>
-            } @else if (hasVariants && selectedVariant && selectedVariant.stock === 0) {
-              <!-- Variante épuisée -->
-              <div class="p-4 rounded-2xl bg-red-500/8 border border-red-500/20 text-red-400 text-sm font-semibold text-center">
-                La couleur « {{ selectedVariant.colorName }} » est actuellement épuisée
-              </div>
-              <button (click)="goBack()"
-                class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
-                       hover:theme-text luxury-card transition-all duration-200">
-                ← Retour à la collection
-              </button>
-            } @else if (!hasVariants || selectedVariant) {
-              <!-- Disponible -->
+            } @else {
               <div class="flex flex-col gap-3">
-                <!-- Qty selector -->
-                <div class="flex items-center gap-4">
-                  <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
-                  <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
-                    <button (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1"
-                      appTooltip="Diminuer la quantité" tooltipPosition="top"
-                      class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
-                             hover:text-gold hover:bg-black/5 transition-colors">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                      </svg>
-                    </button>
-                    <span class="w-12 text-center font-black theme-text text-sm">{{ quantity }}</span>
-                    <button (click)="setQuantity(quantity + 1)" [disabled]="quantity >= effectiveStock"
-                      appTooltip="Augmenter la quantité" tooltipPosition="top"
-                      class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
-                             hover:text-gold hover:bg-black/5 transition-colors">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                      </svg>
-                    </button>
+
+                <!-- Qty selector (sans variante) -->
+                @if (!hasVariants) {
+                  <div class="flex items-center gap-4">
+                    <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
+                    <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
+                      <button (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1"
+                        class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
+                               hover:text-gold hover:bg-black/5 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                        </svg>
+                      </button>
+                      <span class="w-12 text-center font-black theme-text text-sm">{{ quantity }}</span>
+                      <button (click)="setQuantity(quantity + 1)" [disabled]="quantity >= product.stock"
+                        class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
+                               hover:text-gold hover:bg-black/5 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                }
+
+                <!-- Récap sélection variantes -->
+                @if (hasVariants && totalSelectedQty > 0) {
+                  <div class="p-4 rounded-2xl bg-gold/8 border border-gold/20 flex items-center justify-between gap-3">
+                    <div>
+                      <p class="text-xs theme-muted mb-0.5">Total sélectionné</p>
+                      <p class="text-sm font-black gold-text">{{ totalSelectedQty }} article{{ totalSelectedQty > 1 ? 's' : '' }}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs theme-muted mb-0.5">Montant</p>
+                      <p class="text-sm font-black gold-text">{{ formattedTotalPrice }} FCFA</p>
+                    </div>
+                  </div>
+                }
+
                 <!-- CTA -->
                 <button (click)="addToCart()"
+                  [disabled]="hasVariants && totalSelectedQty === 0"
                   class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
-                         transition-all duration-300"
+                         transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                   [class]="addedToCart
                     ? 'bg-green-500 text-white scale-[0.98]'
-                    : 'bg-gold text-black hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5'">
+                    : (hasVariants && totalSelectedQty === 0
+                        ? 'bg-gold/30 text-black/60'
+                        : 'bg-gold text-black hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5')">
                   @if (addedToCart) {
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                     </svg>
                     Ajouté au panier !
+                  } @else if (hasVariants && totalSelectedQty === 0) {
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    Choisissez une quantité
                   } @else {
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
-                    <span class="hidden sm:inline">Ajouter au panier · {{ formattedPrice }} FCFA</span>
-                    <span class="sm:hidden">Ajouter · {{ formattedPrice }} FCFA</span>
+                    @if (hasVariants) {
+                      Ajouter au panier · {{ formattedTotalPrice }} FCFA
+                    } @else {
+                      <span class="hidden sm:inline">Ajouter au panier · {{ formattedPrice }} FCFA</span>
+                      <span class="sm:hidden">Ajouter · {{ formattedPrice }} FCFA</span>
+                    }
                   }
                 </button>
+
                 <button (click)="goBack()"
                   class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
                          hover:theme-text luxury-card transition-all duration-200">
                   ← Retour à la collection
                 </button>
               </div>
-            } @else {
-              <!-- Variante pas encore sélectionnée -->
-              <button (click)="addToCart()" disabled
-                class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
-                       bg-gold/30 text-black/40 cursor-not-allowed transition-all duration-300">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-                </svg>
-                Sélectionner une couleur d'abord
-              </button>
-              <button (click)="goBack()"
-                class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
-                       hover:theme-text luxury-card transition-all duration-200">
-                ← Retour à la collection
-              </button>
             }
           }
 

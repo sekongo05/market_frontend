@@ -88,8 +88,9 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   quantity = 1;
   addedToCart = false;
 
-  // Variant selection
+  // Variant selection — multi-qty mode (one qty stepper per variant)
   selectedVariant: ProductVariant | null = null;
+  variantQty = new Map<number, number>();
 
   private destroy$ = new Subject<void>();
   private observer?: IntersectionObserver;
@@ -220,11 +221,12 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private _autoSelectVariant(): void {
+    this.variantQty = new Map();
     if (!this.product?.variants?.length) {
       this.selectedVariant = null;
       return;
     }
-    // Pre-select first in-stock variant, fallback to first variant
+    // Gallery sync: highlight first in-stock variant
     this.selectedVariant =
       this.product.variants.find(v => v.stock > 0) ?? this.product.variants[0];
   }
@@ -288,54 +290,107 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   get effectiveStock(): number {
     if (!this.product) return 0;
     if (this.hasVariants) {
-      return this.selectedVariant?.stock ?? 0;
+      // Total stock remaining across all variants minus what's already in the qty map
+      return this.product.variants!.reduce((sum, v) => sum + Math.max(0, v.stock - this.getVariantQty(v.id)), 0);
     }
     return this.product.stock;
   }
 
   selectVariant(variant: ProductVariant): void {
-    this.selectedVariant = this.selectedVariant?.id === variant.id ? null : variant;
-    this.quantity = Math.min(this.quantity, Math.max(1, this.effectiveStock));
-    if (this.selectedVariant?.imageUrl) {
-      const idx = this.galleryItems.findIndex(g => g.url === this.selectedVariant!.imageUrl);
+    this.selectedVariant = variant;
+    if (variant.imageUrl) {
+      const idx = this.galleryItems.findIndex(g => g.url === variant.imageUrl);
       if (idx >= 0) this.activeIndex = idx;
     }
     this.cdr.detectChanges();
+  }
+
+  getVariantQty(variantId: number): number {
+    return this.variantQty.get(variantId) ?? 0;
+  }
+
+  adjustVariantQty(variant: ProductVariant, delta: number): void {
+    const current = this.getVariantQty(variant.id);
+    const next = Math.max(0, Math.min(current + delta, variant.stock));
+    if (next === 0) {
+      this.variantQty.delete(variant.id);
+    } else {
+      this.variantQty.set(variant.id, next);
+    }
+    this.cdr.detectChanges();
+  }
+
+  get totalSelectedQty(): number {
+    let total = 0;
+    this.variantQty.forEach(q => total += q);
+    return total;
+  }
+
+  get totalSelectedPrice(): number {
+    if (!this.product) return 0;
+    const unitPrice = this.product.salePrice ?? this.product.price;
+    return unitPrice * this.totalSelectedQty;
+  }
+
+  get formattedTotalPrice(): string {
+    return new Intl.NumberFormat('fr-FR').format(this.totalSelectedPrice);
   }
 
   // ── Cart ─────────────────────────────────────────────────────────────────
 
   setQuantity(q: number): void {
     if (!this.product) return;
-    this.quantity = Math.max(1, Math.min(q, this.effectiveStock || this.product.stock));
+    this.quantity = Math.max(1, Math.min(q, this.product.stock));
     this.cdr.detectChanges();
   }
 
   addToCart(): void {
     if (!this.product) return;
-    if (this.hasVariants && !this.selectedVariant) {
-      this.cdr.detectChanges();
-      return;
-    }
-    if (this.effectiveStock === 0) return;
     if (!this.authService.isAuthenticated()) {
       this.authPromptService.show();
       return;
     }
-    this.cartService.addToCart({
-      productId: this.product.id,
-      productName: this.product.name,
-      price: this.product.salePrice ?? this.product.price,
-      quantity: this.quantity,
-      imageUrl: this.selectedVariant?.imageUrl || this.product.imageUrl,
-      maxStock: this.effectiveStock,
-      variantId: this.selectedVariant?.id,
-      selectedColor: this.selectedVariant?.colorName,
-      selectedColorHex: this.selectedVariant?.colorHex,
-    });
-    this.addedToCart = true;
-    this.cdr.detectChanges();
-    setTimeout(() => { this.addedToCart = false; this.cdr.detectChanges(); }, 2500);
+
+    if (this.hasVariants) {
+      if (this.totalSelectedQty === 0) return;
+      const unitPrice = this.product.salePrice ?? this.product.price;
+      let added = false;
+      this.variantQty.forEach((qty, variantId) => {
+        const variant = this.product!.variants!.find(v => v.id === variantId);
+        if (!variant) return;
+        this.cartService.addToCart({
+          productId: this.product!.id,
+          productName: this.product!.name,
+          price: unitPrice,
+          quantity: qty,
+          imageUrl: variant.imageUrl || this.product!.imageUrl,
+          maxStock: variant.stock,
+          variantId: variant.id,
+          selectedColor: variant.colorName,
+          selectedColorHex: variant.colorHex,
+        });
+        added = true;
+      });
+      if (added) {
+        this.addedToCart = true;
+        this.variantQty = new Map();
+        this.cdr.detectChanges();
+        setTimeout(() => { this.addedToCart = false; this.cdr.detectChanges(); }, 2500);
+      }
+    } else {
+      if (this.product.stock === 0) return;
+      this.cartService.addToCart({
+        productId: this.product.id,
+        productName: this.product.name,
+        price: this.product.salePrice ?? this.product.price,
+        quantity: this.quantity,
+        imageUrl: this.product.imageUrl,
+        maxStock: this.product.stock,
+      });
+      this.addedToCart = true;
+      this.cdr.detectChanges();
+      setTimeout(() => { this.addedToCart = false; this.cdr.detectChanges(); }, 2500);
+    }
   }
 
   // ── Related products ─────────────────────────────────────────────────────
@@ -391,8 +446,12 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get stockLabel(): string {
     if (!this.product) return '';
-    if (this.hasVariants && !this.selectedVariant) return 'Choisissez une couleur';
-    const s = this.effectiveStock;
+    if (this.hasVariants) {
+      const total = this.product.variants!.reduce((s, v) => s + v.stock, 0);
+      if (total === 0) return 'Épuisé';
+      return 'En stock';
+    }
+    const s = this.product.stock;
     if (s === 0) return 'Épuisé';
     if (s <= 3) return `Plus que ${s} en stock`;
     return 'En stock';
@@ -400,8 +459,13 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get stockColor(): string {
     if (!this.product) return '#9ca3af';
-    if (this.hasVariants && !this.selectedVariant) return '#9ca3af';
-    const s = this.effectiveStock;
+    if (this.hasVariants) {
+      const total = this.product.variants!.reduce((s, v) => s + v.stock, 0);
+      if (total === 0) return '#f87171';
+      if (total <= 3) return '#fb923c';
+      return '#4ade80';
+    }
+    const s = this.product.stock;
     if (s === 0) return '#f87171';
     if (s <= 3) return '#fb923c';
     return '#4ade80';
