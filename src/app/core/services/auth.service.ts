@@ -59,11 +59,12 @@ export class AuthService {
   }
 
   logout(): void {
-    this.webSocketService.disconnect();
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem('current_user');
     this.currentUserSubject.next(null);
+    // Repasser en mode anonyme : stock toujours en temps réel, sans token
+    this.webSocketService.connect();
   }
 
   refreshToken(
@@ -135,10 +136,14 @@ export class AuthService {
           const user: AuthResponse = JSON.parse(userJson);
           this.currentUserSubject.next(user as CurrentUser);
           this._connectWs(user);
+          return;
         } catch (e) {
           console.error('Failed to parse stored user', e);
+          localStorage.removeItem('current_user');
         }
       }
     }
+    // Aucune session → connexion anonyme (stock en temps réel sans token)
+    this.webSocketService.connect();
   }
 }
