@@ -159,8 +159,23 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   itemsPreview(order: OrderResponse): string {
     const names = order.items.map(i => i.productName);
-    if (names.length <= 2) return names.join(', ');
-    return names.slice(0, 2).join(', ') + ` +${names.length - 2}`;
+    const unique = [...new Set(names)];
+    if (unique.length <= 2) return unique.join(', ');
+    return unique.slice(0, 2).join(', ') + ` +${unique.length - 2}`;
+  }
+
+  groupItems(items: OrderResponse['items']): { productId: number; productName: string; imageUrl: string | null; unitPrice: number; subtotal: number; lines: { color?: string; colorHex?: string; quantity: number; subtotal: number; imageUrl: string | null }[] }[] {
+    const map = new Map<number, any>();
+    for (const item of items) {
+      if (!map.has(item.productId)) {
+        map.set(item.productId, { productId: item.productId, productName: item.productName, imageUrl: item.imageUrl, unitPrice: item.unitPrice, subtotal: 0, lines: [] });
+      }
+      const g = map.get(item.productId)!;
+      g.subtotal += item.subtotal;
+      g.lines.push({ color: item.selectedColor, colorHex: item.selectedColorHex, quantity: item.quantity, subtotal: item.subtotal, imageUrl: item.imageUrl });
+      if (item.selectedColor && item.imageUrl) g.imageUrl = item.imageUrl;
+    }
+    return Array.from(map.values());
   }
 
   get stepStatuses(): string[] {

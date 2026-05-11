@@ -23,6 +23,22 @@ import { WebSocketService } from '../../../core/services/websocket.service';
 
 interface Toast { id: number; msg: string; type: 'success' | 'error'; }
 
+interface OrderVariantLine {
+  color:    string | null | undefined;
+  colorHex: string | null | undefined;
+  quantity: number;
+  subtotal: number;
+  imageUrl: string | null | undefined;
+}
+interface GroupedOrderItem {
+  productId:   number;
+  productName: string;
+  imageUrl:    string | null | undefined;
+  unitPrice:   number;
+  subtotal:    number;
+  lines:       OrderVariantLine[];
+}
+
 @Component({
   selector: 'app-manager',
   standalone: true,
@@ -839,6 +855,35 @@ cancelPendingCreation(): void {
     this.orderDetailOpen = true;
     this.scrollLock.lock();
     this.cdr.detectChanges();
+  }
+
+  get groupedOrderItems(): GroupedOrderItem[] {
+    if (!this.selectedOrder) return [];
+    const map = new Map<number, GroupedOrderItem>();
+    for (const item of this.selectedOrder.items) {
+      if (!map.has(item.productId)) {
+        map.set(item.productId, {
+          productId:   item.productId,
+          productName: item.productName,
+          imageUrl:    item.imageUrl,
+          unitPrice:   item.unitPrice,
+          subtotal:    0,
+          lines:       [],
+        });
+      }
+      const g = map.get(item.productId)!;
+      g.subtotal += item.subtotal;
+      g.lines.push({
+        color:    item.selectedColor,
+        colorHex: item.selectedColorHex,
+        quantity: item.quantity,
+        subtotal: item.subtotal,
+        imageUrl: item.imageUrl,
+      });
+      // Prefer variant image for the group thumbnail
+      if (item.selectedColor && item.imageUrl) g.imageUrl = item.imageUrl;
+    }
+    return Array.from(map.values());
   }
 
   closeOrderDetail(): void {
