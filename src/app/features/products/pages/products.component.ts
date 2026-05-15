@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { ProductService } from '../../../core/services/product.service';
+import { ProductVariantService } from '../../../core/services/product-variant.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
@@ -118,6 +119,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   constructor(
     private productService: ProductService,
+    private variantService: ProductVariantService,
     private categoryService: CategoryService,
     private authService: AuthService,
     private cartService: CartService,
@@ -139,6 +141,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.scrollLock.lock();
     this.cdr.detectChanges();
     setTimeout(() => document.getElementById('product-view-panel')?.scrollTo(0, 0), 0);
+    // Charge les variantes via API si elles ne sont pas dans la réponse paginée
+    if (!product.variants?.length) {
+      this.variantService.getVariants(product.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (r) => {
+            if (r.success && r.data?.length && this.selectedProduct?.id === product.id) {
+              this.selectedProduct = { ...this.selectedProduct, variants: r.data };
+              this._buildViewGallery(this.selectedProduct);
+              this.cdr.detectChanges();
+            }
+          },
+          error: () => {},
+        });
+    }
   }
 
   selectViewVariant(v: ProductVariant): void {
