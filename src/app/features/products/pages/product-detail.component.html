@@ -296,8 +296,7 @@
                   <div
                     (click)="selectVariant(variant)"
                     class="flex items-center gap-3 px-5 py-3.5 cursor-pointer transition-all duration-200"
-                    [class.bg-gold]="getVariantQty(variant.id) > 0"
-                    [class.bg-opacity-5]="getVariantQty(variant.id) > 0"
+                    [style.background-color]="getVariantQty(variant.id) > 0 ? 'rgba(212,175,55,0.07)' : ''"
                     [class.opacity-50]="variant.stock === 0"
                     [class.pointer-events-none]="variant.stock === 0">
 
@@ -305,26 +304,20 @@
                     <div class="relative flex-shrink-0">
                       @if (variant.imageUrl) {
                         <div class="w-12 h-12 rounded-xl overflow-hidden border-2 transition-all duration-200 shadow"
-                             [class.border-gold]="selectedVariant?.id === variant.id"
-                             [class.border-white]="selectedVariant?.id !== variant.id"
-                             [class.border-opacity-10]="selectedVariant?.id !== variant.id">
+                             [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.15)'">
                           <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.colorName"
                                class="w-full h-full object-cover"/>
                         </div>
                       } @else {
                         <div class="w-12 h-12 rounded-xl border-2 shadow transition-all duration-200 flex items-center justify-center"
                              [style.background-color]="variant.colorHex"
-                             [class.border-gold]="selectedVariant?.id === variant.id"
-                             [class.border-white]="selectedVariant?.id !== variant.id"
-                             [class.border-opacity-20]="selectedVariant?.id !== variant.id">
+                             [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.25)'">
                         </div>
                       }
                       <!-- Dot indicator for selected color -->
                       <div class="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 transition-all duration-200"
                            [style.background-color]="variant.colorHex"
-                           [class.border-gold]="selectedVariant?.id === variant.id"
-                           [class.border-white]="selectedVariant?.id !== variant.id"
-                           [class.border-opacity-30]="selectedVariant?.id !== variant.id">
+                           [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.3)'">
                       </div>
                     </div>
 

@@ -9,7 +9,6 @@ import { Subject } from 'rxjs';
 import { takeUntil, switchMap } from 'rxjs/operators';
 
 import { ProductService } from '../../../core/services/product.service';
-import { ProductVariantService } from '../../../core/services/product-variant.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
@@ -101,7 +100,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private router: Router,
     private location: Location,
     private productService: ProductService,
-    private variantService: ProductVariantService,
     private cartService: CartService,
     private authService: AuthService,
     private authPromptService: AuthPromptService,
@@ -154,7 +152,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       next: (response) => {
         if (response.success && response.data) {
           this.product = response.data;
-          this._loadVariants();
           this._autoSelectVariant();
           this._buildGallery();
           this._loadRelated();
@@ -394,25 +391,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       this.cdr.detectChanges();
       setTimeout(() => { this.addedToCart = false; this.cdr.detectChanges(); }, 2500);
     }
-  }
-
-  // ── Variants (chargement explicite pour garantir l'affichage côté client) ──
-
-  private _loadVariants(): void {
-    if (!this.product) return;
-    this.variantService.getVariants(this.product.id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (r) => {
-          if (r.success && this.product) {
-            this.product = { ...this.product, variants: r.data };
-            this._autoSelectVariant();
-            this._buildGallery();
-            this.cdr.detectChanges();
-          }
-        },
-        error: () => {},
-      });
   }
 
   // ── Related products ─────────────────────────────────────────────────────

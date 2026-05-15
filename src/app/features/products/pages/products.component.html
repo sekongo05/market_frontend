@@ -597,11 +597,10 @@
       <div class="flex flex-wrap gap-2">                                                                                                                                                                                
         @for (v of selectedProduct.variants!; track v.id) {                                                                                                                                                             
           <button type="button" (click)="selectViewVariant(v)"
-            class="min-w-[44px] min-h-[44px] w-10 h-10 rounded-full border-2 transition-all"                                                                                                                                                        
-            [style.background-color]="v.colorHex"                                                                                                                                                                       
-            [class.border-gold]="selectedViewVariant?.id === v.id"                                                                                                                                                      
-            [class.border-transparent]="selectedViewVariant?.id !== v.id"                                                                                                                                               
-            [title]="v.colorName">                                                                                                                                                                                      
+            class="min-w-[44px] min-h-[44px] w-10 h-10 rounded-full border-2 transition-all"
+            [style.background-color]="v.colorHex"
+            [style.border-color]="selectedViewVariant?.id === v.id ? '#d4af37' : 'rgba(255,255,255,0.25)'"
+            [title]="v.colorName">
           </button>
         }                                                                                                                                                                                                               
       </div>      
