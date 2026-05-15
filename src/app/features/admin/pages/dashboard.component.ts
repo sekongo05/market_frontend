@@ -112,7 +112,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   variantError: string | null = null;
   newVariant: ProductVariantRequest = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
   editingVariant: ProductVariant | null = null;
+  newVariantFile: File | null = null;
+  newVariantPreview: string | null = null;
   // Création : paires photo+couleur
+  wizardStep: 1 | 2 | 3 = 1;
+  hasVariantsToggle = false;
   creationItems: { file: File; preview: string; colorName: string; colorHex: string; stock: number }[] = [];
   pendingCreationFile: File | null = null;
   pendingCreationPreview: string | null = null;
@@ -507,8 +511,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.editingProduct = null;
     this._resetDrawer();
     this.initProductForm();
+    this.wizardStep = 1;
+    this.hasVariantsToggle = false;
     this.drawerOpen = true;
     this.scrollLock.lock();
+    this.loadProductCategories();
     this.cdr.detectChanges();
     setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
   }
@@ -543,12 +550,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   private _resetDrawer(): void {
     this.drawerError = null;
+    this.wizardStep = 1;
+    this.hasVariantsToggle = false;
     this.creationItems = [];
     this.pendingCreationFile = null;
     this.pendingCreationPreview = null;
     this.pendingCreationColorError = null;
-/*     this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
- */    this.selectedVideo = null;
+    this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
+    this.selectedVideo = null;
     this.videoPreview = null;
     this.imagePreview = null;
     this.selectedImageFile = null;
@@ -559,6 +568,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.variantError = null;
     this.editingVariant = null;
     this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+    this.newVariantFile = null;
+    this.newVariantPreview = null;
     this.pendingMediaFile = null;
     this.pendingMediaPreview = null;
     this.mediaColorError = null;
@@ -583,8 +594,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       if (this.selectedVideo) fd.append('video', this.selectedVideo);
       req$ = this.productService.updateProduct(this.editingProduct.id, fd);
     } else {
-      // Création : envoyer la 1ère image comme image principale
-      if (this.creationItems.length > 0) fd.append('images', this.creationItems[0].file);
+      if (this.hasVariantsToggle && this.creationItems.length > 0) {
+        fd.append('images', this.creationItems[0].file);
+      } else if (!this.hasVariantsToggle && this.selectedImageFile) {
+        fd.append('images', this.selectedImageFile);
+      }
       if (this.selectedVideo) fd.append('video', this.selectedVideo);
       req$ = this.productService.createProduct(fd);
     }
@@ -927,42 +941,119 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.variantSaving = true;
     this.variantError = null;
 
-    const req$ = this.editingVariant
-      ? this.productVariantService.updateVariant(this.editingProduct.id, this.editingVariant.id, this.newVariant)
-      : this.productVariantService.addVariant(this.editingProduct.id, this.newVariant);
-
-    req$.subscribe({
-      next: (r) => {
-        if (r.success) {
-          if (this.editingVariant) {
-            this.productVariants = this.productVariants.map(v => v.id === r.data.id ? r.data : v);
-          } else {
-            this.productVariants = [...this.productVariants, r.data];
+    const doSave = (imageUrl: string) => {
+      const payload = { ...this.newVariant, imageUrl };
+      const req$ = this.editingVariant
+        ? this.productVariantService.updateVariant(this.editingProduct!.id, this.editingVariant.id, payload)
+        : this.productVariantService.addVariant(this.editingProduct!.id, payload);
+      req$.subscribe({
+        next: (r) => {
+          if (r.success) {
+            if (this.editingVariant) {
+              this.productVariants = this.productVariants.map(v => v.id === r.data.id ? r.data : v);
+            } else {
+              this.productVariants = [...this.productVariants, r.data];
+            }
+            this.editingVariant = null;
+            this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+            this.newVariantFile = null;
+            this.newVariantPreview = null;
           }
-          this.editingVariant = null;
-          this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
-        }
-        this.variantSaving = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.variantError = err?.error?.message || 'Erreur lors de l\'enregistrement';
-        this.variantSaving = false;
-        this.cdr.detectChanges();
-      },
-    });
+          this.variantSaving = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.variantError = err?.error?.message || 'Erreur lors de l\'enregistrement';
+          this.variantSaving = false;
+          this.cdr.detectChanges();
+        },
+      });
+    };
+
+    if (this.newVariantFile) {
+      this.productMediaService.upload(this.editingProduct.id, this.newVariantFile).subscribe({
+        next: (r) => doSave(r.success ? r.data.url : (this.newVariant.imageUrl ?? '')),
+        error: () => doSave(this.newVariant.imageUrl ?? ''),
+      });
+    } else {
+      doSave(this.newVariant.imageUrl ?? '');
+    }
   }
 
   startEditVariant(variant: ProductVariant): void {
     this.editingVariant = variant;
     this.newVariant = { colorName: variant.colorName, colorHex: variant.colorHex, imageUrl: variant.imageUrl || '', stock: variant.stock };
+    this.newVariantFile = null;
+    this.newVariantPreview = variant.imageUrl || null;
     this.cdr.detectChanges();
   }
 
   cancelEditVariant(): void {
     this.editingVariant = null;
     this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+    this.newVariantFile = null;
+    this.newVariantPreview = null;
     this.variantError = null;
+    this.cdr.detectChanges();
+  }
+
+  onVariantImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    this.newVariantFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.newVariantPreview = e.target?.result as string; this.cdr.detectChanges(); };
+    reader.readAsDataURL(file);
+  }
+
+  clearVariantImage(): void {
+    this.newVariantFile = null;
+    this.newVariantPreview = null;
+    this.newVariant = { ...this.newVariant, imageUrl: '' };
+    this.cdr.detectChanges();
+  }
+
+  get isStep1Valid(): boolean {
+    const f = this.productForm;
+    return !!(f.get('name')?.valid && f.get('description')?.valid &&
+              f.get('categoryId')?.value && f.get('gender')?.value);
+  }
+
+  get creationTotalStock(): number {
+    return this.creationItems.reduce((s, i) => s + i.stock, 0);
+  }
+
+  goToNextStep(): void {
+    if (this.wizardStep === 1) {
+      ['name', 'description', 'categoryId', 'gender'].forEach(f => this.productForm.get(f)?.markAsTouched());
+      if (!this.isStep1Valid) { this.cdr.detectChanges(); return; }
+    }
+    if (this.wizardStep < 3) {
+      this.wizardStep = (this.wizardStep + 1) as 1 | 2 | 3;
+      document.getElementById('admin-drawer-panel')?.scrollTo(0, 0);
+      this.cdr.detectChanges();
+    }
+  }
+
+  goToPrevStep(): void {
+    if (this.wizardStep > 1) {
+      this.wizardStep = (this.wizardStep - 1) as 1 | 2 | 3;
+      document.getElementById('admin-drawer-panel')?.scrollTo(0, 0);
+      this.cdr.detectChanges();
+    }
+  }
+
+  toggleVariants(): void {
+    this.hasVariantsToggle = !this.hasVariantsToggle;
+    this.creationItems = [];
+    this.pendingCreationFile = null;
+    this.pendingCreationPreview = null;
+    this.pendingCreationColorError = null;
+    if (!this.hasVariantsToggle) {
+      this.productForm.patchValue({ stock: null });
+    }
     this.cdr.detectChanges();
   }
 
