@@ -15,7 +15,7 @@ export interface ProductVariantRequest {
 
 @Injectable({ providedIn: 'root' })
 export class ProductVariantService {
-  private readonly base = `${environment.apiUrl}/api/products`;
+  private readonly base = `${environment.apiUrl}/products`;
 
   constructor(private http: HttpClient) {}
 
