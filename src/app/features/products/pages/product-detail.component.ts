@@ -98,6 +98,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   reviewError: string | null = null;
   myReview: ReviewResponse | null = null;
   editingReview = false;
+  canReview = false;
 
   // Cart state
   quantity = 1;
@@ -181,6 +182,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           this._loadRelated();
           this._loadReviews();
           this._loadRating();
+          this._loadCanReview();
         } else {
           this._tryMock();
         }
@@ -596,6 +598,14 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         this.cdr.detectChanges();
       },
       error: () => { this.reviewsLoading = false; this.cdr.detectChanges(); }
+    });
+  }
+
+  private _loadCanReview(): void {
+    if (!this.product || !this.isCustomer) return;
+    this.reviewService.canReviewProduct(this.product.id).subscribe({
+      next: (res) => { this.canReview = res.success && !!res.data; this.cdr.detectChanges(); },
+      error: () => { this.canReview = false; }
     });
   }
 

@@ -30,6 +30,10 @@ export class ReviewService {
     return this.apiService.delete(`/reviews/${id}`);
   }
 
+  canReviewProduct(productId: number): Observable<ApiResponse<boolean>> {
+    return this.apiService.get(`/reviews/can-review/${productId}`);
+  }
+
   getMyReviews(page = 0, size = 10): Observable<ApiResponse<PageResponse<ReviewResponse>>> {
     return this.apiService.get('/reviews/my', { page, size });
   }
