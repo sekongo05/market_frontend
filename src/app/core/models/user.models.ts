@@ -42,7 +42,6 @@ export interface UserFullProfileResponse {
     orderNumber: string;
     amount: number;
     orderStatus: string;
-    paymentStatus: string;
     createdAt: string;
   }[];
 }
