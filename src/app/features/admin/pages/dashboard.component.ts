@@ -707,7 +707,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.confirmDeleteId = null;
     this.productService.deleteProduct(product.id).subscribe({
       next: () => { this.loadProducts(this.productsPage); this.toast(`"${product.name}" supprimé`); this.cdr.detectChanges(); },
-      error: () => { this.toast('Erreur de suppression', 'error'); this.cdr.detectChanges(); },
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Erreur de suppression';
+        this.toast(msg, 'error');
+        this.cdr.detectChanges();
+      },
     });
   }
 

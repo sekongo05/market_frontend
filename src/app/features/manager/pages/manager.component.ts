@@ -670,13 +670,12 @@ export class ManagerComponent implements OnInit, OnDestroy {
   doDelete(product: ProductResponse): void {
     this.confirmDeleteId = null;
     this.productService.deleteProduct(product.id).subscribe({
-      next: (r) => {
-        if (r.success) this.loadProducts(this.currentPage);
-        else this._applyLocalDelete(product.id);
-        this.toast(`"${product.name}" supprimé`);
+      next: () => { this.loadProducts(this.currentPage); this.toast(`"${product.name}" supprimé`); this.cdr.detectChanges(); },
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Erreur de suppression';
+        this.toast(msg, 'error');
         this.cdr.detectChanges();
       },
-      error: () => { this._applyLocalDelete(product.id); this.toast(`"${product.name}" supprimé`); this.cdr.detectChanges(); },
     });
   }
 
