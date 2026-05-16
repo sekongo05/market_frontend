@@ -4,6 +4,7 @@ import { RouterLink, Router } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
 import { ProductService } from './core/services/product.service';
 import { ReviewService } from './core/services/review.service';
+import { DashboardService, PublicStats } from './core/services/dashboard.service';
 import { WebSocketService } from './core/services/websocket.service';
 import { MediaUrlPipe } from './shared/pipes/media-url.pipe';
 import { ProductResponse } from './core/models/product.models';
@@ -29,9 +30,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   featuredReviews: ReviewResponse[] = [];
   reviewsLoading = true;
 
-  statProducts = 0;
-  statBrands   = 0;
-  statClients  = 0;
+  statProducts   = 0;
+  statCategories = 0;
+  statClients    = 0;
+  statReviews    = 0;
+  statAvgRating  = 0;
+  publicStats: PublicStats | null = null;
 
   private _observer?: IntersectionObserver;
   private _statsAnimated = false;
@@ -73,6 +77,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     private authService: AuthService,
     private productService: ProductService,
     private reviewService: ReviewService,
+    private dashboardService: DashboardService,
     private wsService: WebSocketService,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -81,6 +86,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    this._loadPublicStats();
     this._loadProducts();
     this._loadReviews();
     this._initObserver();
@@ -137,6 +143,16 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       });
   }
 
+  get editorialStats(): { v: string; l: string }[] {
+    const p = this.publicStats;
+    return [
+      { v: p ? p.activeProducts   + '+' : '…', l: 'Références en stock' },
+      { v: p ? p.activeCategories + ''  : '…', l: 'Catégories' },
+      { v: '24h',                               l: 'Livraison Abidjan' },
+      { v: '100%',                              l: 'Pièces authentifiées' },
+    ];
+  }
+
   reviewInitials(name: string): string {
     const parts = name.trim().split(' ');
     if (parts.length >= 2) return parts[0] + ' ' + parts[1].charAt(0) + '.';
@@ -154,13 +170,32 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
           const pg = r.data as PageResponse<ProductResponse>;
           this.newProducts      = pg.content.filter(p => this.isNew(p)).slice(0, 8);
           this.discountProducts = pg.content.filter(p => p.discountPercent && p.discountPercent > 0).slice(0, 4);
-          // stats réelles
-          if (pg.totalElements) this._count('statProducts', Math.min(pg.totalElements, 500), 2000);
         }
         this.newProductsLoading = false;
         this.cdr.detectChanges();
       },
       error: () => { this.newProductsLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  private _loadPublicStats(): void {
+    this.dashboardService.getPublicStats().subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.publicStats   = r.data as PublicStats;
+          this.statAvgRating = this.publicStats.averageRating;
+          // Si la section stats est déjà visible avant le chargement, on lance les compteurs
+          if (this._statsAnimated) {
+            this._statsAnimated = false;
+            this._count('statProducts',   this.publicStats.activeProducts,   2000);
+            this._count('statCategories', this.publicStats.activeCategories, 1400);
+            this._count('statClients',    this.publicStats.totalClients,     2400);
+            this._count('statReviews',    this.publicStats.totalReviews,     1800);
+          }
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {},
     });
   }
 
@@ -180,11 +215,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add('in-view');
-        if (entry.target.id === 'stats-row' && !this._statsAnimated) {
+        if (entry.target.id === 'stats-row' && !this._statsAnimated && this.publicStats) {
           this._statsAnimated = true;
-          this._count('statProducts', 500,  2000);
-          this._count('statBrands',   15,   1400);
-          this._count('statClients',  1200, 2400);
+          this._count('statProducts',   this.publicStats.activeProducts,   2000);
+          this._count('statCategories', this.publicStats.activeCategories, 1400);
+          this._count('statClients',    this.publicStats.totalClients,     2400);
+          this._count('statReviews',    this.publicStats.totalReviews,     1800);
         }
         this._observer!.unobserve(entry.target);
       });
@@ -195,7 +231,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     if (stats) this._observer.observe(stats);
   }
 
-  private _count(prop: 'statProducts'|'statBrands'|'statClients', target: number, ms: number): void {
+  private _count(prop: 'statProducts'|'statCategories'|'statClients'|'statReviews', target: number, ms: number): void {
     const t0 = performance.now();
     const tick = (now: number) => {
       const p = Math.min((now - t0) / ms, 1);

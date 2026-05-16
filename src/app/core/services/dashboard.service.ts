@@ -98,4 +98,16 @@ export class DashboardService {
     const params = date ? { date } : {};
     return this.apiService.get('/dashboard/caisse-journaliere', params);
   }
+
+  getPublicStats(): Observable<ApiResponse<PublicStats>> {
+    return this.apiService.get('/public/stats');
+  }
+}
+
+export interface PublicStats {
+  activeProducts:   number;
+  activeCategories: number;
+  totalClients:     number;
+  totalReviews:     number;
+  averageRating:    number;
 }

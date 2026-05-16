@@ -144,8 +144,8 @@
           </svg>
         }
       </div>
-      <p class="text-xs font-black text-white leading-none">1 200+ clients</p>
-      <p class="text-[9px] font-semibold" style="color:rgba(212,175,55,0.55);">nous font confiance · 4.9/5</p>
+      <p class="text-xs font-black text-white leading-none">{{ publicStats ? (publicStats.totalClients + '+') : '…' }} clients</p>
+      <p class="text-[9px] font-semibold" style="color:rgba(212,175,55,0.55);">nous font confiance · {{ publicStats ? (publicStats.averageRating | number:'1.1-1') : '…' }}/5</p>
     </div>
 
     <!-- Indicateur scroll -->
@@ -438,12 +438,7 @@
 
           <!-- Mini-stats staggerées -->
           <div class="grid grid-cols-2 gap-x-8 gap-y-5 mb-12">
-            @for (s of [
-              {v:'500+', l:'Références en stock'},
-              {v:'15+',  l:'Grandes marques'},
-              {v:'24h',  l:'Livraison Abidjan'},
-              {v:'100%', l:'Pièces authentifiées'}
-            ]; track s.l; let i = $index) {
+            @for (s of editorialStats; track s.l; let i = $index) {
               <div class="r-up border-l-2 pl-4" style="border-color:rgba(212,175,55,0.38);"
                    [style.transition-delay.ms]="i * 80 + 300">
                 <p class="font-black text-white text-xl leading-none mb-1">{{ s.v }}</p>
@@ -525,10 +520,10 @@
     <div class="relative max-w-5xl mx-auto px-5 sm:px-8">
       <div class="grid grid-cols-2 sm:grid-cols-4">
         @for (stat of [
-          { value: statProducts, suffix: '+', label: 'Références' },
-          { value: statBrands,   suffix: '+', label: 'Marques' },
-          { value: statClients,  suffix: '+', label: 'Clients satisfaits' },
-          { value: 48,           suffix: 'h', label: 'Livraison max' }
+          { value: statProducts,   suffix: '+', label: 'Références' },
+          { value: statCategories, suffix: '',  label: 'Catégories' },
+          { value: statClients,    suffix: '+', label: 'Clients' },
+          { value: statReviews,    suffix: '+', label: 'Avis vérifiés' }
         ]; track stat.label; let i = $index) {
           <div class="r-up flex flex-col items-center justify-center py-14 px-4 text-center border-r border-b sm:border-b-0 last:border-r-0"
                style="border-color:rgba(212,175,55,0.08);"
@@ -675,7 +670,8 @@
       <div class="r-line w-8 h-[1px] mx-auto mb-10" style="background:#d4af37;"></div>
 
       <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-8"
-         style="color:rgba(212,175,55,0.58);transition-delay:100ms">Rejoignez +1 200 clients</p>
+         style="color:rgba(212,175,55,0.58);transition-delay:100ms">
+        Rejoignez {{ publicStats ? (publicStats.totalClients + '+ clients') : 'notre communauté' }}</p>
 
       <h2 class="font-black theme-text leading-[0.88] tracking-tight mb-12"
           style="font-size:clamp(3rem,9vw,6.5rem);">
