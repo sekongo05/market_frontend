@@ -10,6 +10,10 @@ import { ApiService } from './api.service';
 export class ReviewService {
   constructor(private apiService: ApiService) {}
 
+  getFeaturedReviews(): Observable<ApiResponse<ReviewResponse[]>> {
+    return this.apiService.get('/reviews/featured');
+  }
+
   getProductReviews(productId: number, page = 0, size = 10): Observable<ApiResponse<PageResponse<ReviewResponse>>> {
     return this.apiService.get(`/reviews/product/${productId}`, { page, size });
   }

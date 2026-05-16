@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
 import { ProductService } from './core/services/product.service';
+import { ReviewService } from './core/services/review.service';
 import { WebSocketService } from './core/services/websocket.service';
 import { MediaUrlPipe } from './shared/pipes/media-url.pipe';
 import { ProductResponse } from './core/models/product.models';
+import { ReviewResponse } from './core/models/review.models';
 import { PageResponse } from './core/models/common.models';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -24,6 +26,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   newProducts: ProductResponse[] = [];
   newProductsLoading = true;
   discountProducts: ProductResponse[] = [];
+  featuredReviews: ReviewResponse[] = [];
+  reviewsLoading = true;
 
   statProducts = 0;
   statBrands   = 0;
@@ -68,6 +72,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private productService: ProductService,
+    private reviewService: ReviewService,
     private wsService: WebSocketService,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -77,6 +82,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this._loadProducts();
+    this._loadReviews();
     this._initObserver();
     this._subscribeStock();
   }
@@ -131,18 +137,41 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       });
   }
 
+  reviewInitials(name: string): string {
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return parts[0] + ' ' + parts[1].charAt(0) + '.';
+    return parts[0];
+  }
+
+  starArray(rating: number): number[] {
+    return Array.from({ length: 5 }, (_, i) => i + 1);
+  }
+
   private _loadProducts(): void {
     this.productService.getProducts({ page: 0, size: 24, sort: 'newest' }).subscribe({
       next: (r) => {
         if (r.success) {
           const pg = r.data as PageResponse<ProductResponse>;
-          this.newProducts    = pg.content.filter(p => this.isNew(p)).slice(0, 8);
+          this.newProducts      = pg.content.filter(p => this.isNew(p)).slice(0, 8);
           this.discountProducts = pg.content.filter(p => p.discountPercent && p.discountPercent > 0).slice(0, 4);
+          // stats réelles
+          if (pg.totalElements) this._count('statProducts', Math.min(pg.totalElements, 500), 2000);
         }
         this.newProductsLoading = false;
         this.cdr.detectChanges();
       },
       error: () => { this.newProductsLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  private _loadReviews(): void {
+    this.reviewService.getFeaturedReviews().subscribe({
+      next: (r) => {
+        if (r.success) this.featuredReviews = (r.data as ReviewResponse[]).slice(0, 6);
+        this.reviewsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.reviewsLoading = false; this.cdr.detectChanges(); },
     });
   }
 

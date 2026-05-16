@@ -398,27 +398,7 @@
 
 
   <!-- ════════════════════════════════════════════════════════════════
-       6. CITATION — 3D flip à l'entrée
-  ════════════════════════════════════════════════════════════════════ -->
-  <section class="scroll-reveal border-t border-b"
-           style="border-color:rgba(212,175,55,0.1);padding:clamp(80px,11vw,140px) 1.5rem;perspective:1000px;">
-    <div class="max-w-3xl mx-auto text-center">
-      <div class="r-line w-8 h-[1px] mx-auto mb-12" style="background:#d4af37;"></div>
-      <blockquote class="font-black theme-text leading-[0.9] tracking-tight mb-10"
-                  style="font-size:clamp(2rem,6vw,4.5rem);">
-        <span class="r-flip block" style="transition-delay:0.05s">"LE TEMPS EST</span>
-        <span class="r-flip block" style="transition-delay:0.22s">LA SEULE VRAIE</span>
-        <span class="r-flip gold-shimmer block" style="transition-delay:0.39s">RICHESSE."</span>
-      </blockquote>
-      <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold"
-         style="color:rgba(212,175,55,0.48);transition-delay:0.52s">— Sénèque · Lettres à Lucilius</p>
-      <div class="r-line w-8 h-[1px] mx-auto mt-12" style="background:#d4af37;transition-delay:600ms;"></div>
-    </div>
-  </section>
-
-
-  <!-- ════════════════════════════════════════════════════════════════
-       7. MAGAZINE ÉDITORIAL — slide depuis les côtés
+       6. MAGAZINE ÉDITORIAL — slide depuis les côtés
   ════════════════════════════════════════════════════════════════════ -->
   <section class="scroll-reveal overflow-hidden"
            style="padding:clamp(60px,8vw,110px) 0;background:linear-gradient(135deg,#060606 0%,#0c0a03 50%,#060606 100%);">
@@ -605,6 +585,74 @@
       </div>
     </div>
   </section>
+
+
+  <!-- ════════════════════════════════════════════════════════════════
+       10b. AVIS CLIENTS — preuve sociale réelle
+  ════════════════════════════════════════════════════════════════════ -->
+  @if (!reviewsLoading && featuredReviews.length > 0) {
+    <section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+
+        <div class="mb-12 sm:mb-16">
+          <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
+          <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-2"
+             style="color:rgba(212,175,55,0.65);transition-delay:80ms">Avis vérifiés</p>
+          <h2 class="r-up font-black theme-text tracking-tight leading-none"
+              style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">CE QU'ILS DISENT</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (review of featuredReviews; track review.id; let i = $index) {
+            <div class="r-up flex flex-col gap-4 p-6 border"
+                 style="border-color:rgba(212,175,55,0.14);background:rgba(212,175,55,0.03);"
+                 [style.transition-delay.ms]="i * 80 + 200">
+
+              <!-- Étoiles -->
+              <div class="flex items-center gap-0.5">
+                @for (star of starArray(5); track star) {
+                  <svg class="w-3.5 h-3.5" [style.color]="star <= review.rating ? '#d4af37' : 'rgba(212,175,55,0.2)'"
+                       fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                }
+              </div>
+
+              <!-- Commentaire -->
+              <p class="text-sm leading-relaxed flex-1" style="color:rgba(255,255,255,0.65);">
+                @if (review.comment) {
+                  "{{ review.comment.length > 140 ? (review.comment.slice(0, 140) + '…') : review.comment }}"
+                } @else {
+                  "Très satisfait(e) de mon achat."
+                }
+              </p>
+
+              <!-- Footer carte -->
+              <div class="flex items-center justify-between pt-3 border-t"
+                   style="border-color:rgba(212,175,55,0.1);">
+                <div>
+                  <p class="text-xs font-black theme-text">{{ reviewInitials(review.customerName) }}</p>
+                  <p class="text-[10px] font-medium" style="color:rgba(212,175,55,0.55);">
+                    {{ review.productName }}
+                  </p>
+                </div>
+                <!-- Badge vérifié -->
+                <div class="flex items-center gap-1 px-2 py-1 rounded-full"
+                     style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);">
+                  <svg class="w-2.5 h-2.5" style="color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span class="text-[8px] font-bold uppercase tracking-wider" style="color:#10b981;">Achat vérifié</span>
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+
+      </div>
+    </section>
+  }
 
 
   <!-- ════════════════════════════════════════════════════════════════
