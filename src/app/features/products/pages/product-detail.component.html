@@ -304,32 +304,49 @@
                     <div class="relative flex-shrink-0">
                       @if (variant.imageUrl) {
                         <div class="w-12 h-12 rounded-xl overflow-hidden border-2 transition-all duration-200 shadow"
-                             [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.15)'">
+                             [style.border-color]="variant.stock === 0 ? 'rgba(239,68,68,0.5)' : selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.15)'">
                           <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.colorName"
                                class="w-full h-full object-cover"/>
                         </div>
                       } @else {
                         <div class="w-12 h-12 rounded-xl border-2 shadow transition-all duration-200 flex items-center justify-center"
                              [style.background-color]="variant.colorHex"
-                             [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.25)'">
+                             [style.border-color]="variant.stock === 0 ? 'rgba(239,68,68,0.5)' : selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.25)'">
                         </div>
                       }
-                      <!-- Dot indicator for selected color -->
-                      <div class="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 transition-all duration-200"
-                           [style.background-color]="variant.colorHex"
-                           [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.3)'">
-                      </div>
+                      <!-- Croix épuisé sur la pastille -->
+                      @if (variant.stock === 0) {
+                        <div class="absolute inset-0 rounded-xl flex items-center justify-center bg-black/40">
+                          <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                        </div>
+                      }
+                      <!-- Point rouge clignotant si stock faible -->
+                      @if (variant.stock > 0 && variant.stock <= 3) {
+                        <div class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-orange-400 border-2 border-black/30 animate-pulse"></div>
+                      }
+                      <!-- Dot indicator for selected color (seulement si dispo) -->
+                      @if (variant.stock > 0) {
+                        <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 transition-all duration-200"
+                             [style.background-color]="variant.colorHex"
+                             [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.3)'">
+                        </div>
+                      }
                     </div>
 
                     <!-- Info -->
                     <div class="flex-1 min-w-0">
                       <p class="text-sm font-bold theme-text truncate">{{ variant.colorName }}</p>
                       @if (variant.stock === 0) {
-                        <p class="text-xs text-red-400 font-semibold">Épuisé</p>
+                        <p class="text-xs text-red-400 font-semibold flex items-center gap-1">
+                          <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>
+                          Épuisé
+                        </p>
                       } @else if (variant.stock <= 3) {
                         <p class="text-xs text-orange-400 font-semibold flex items-center gap-1">
                           <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse inline-block"></span>
-                          Plus que {{ variant.stock }}
+                          Plus que {{ variant.stock }} disponible{{ variant.stock > 1 ? 's' : '' }}
                         </p>
                       } @else {
                         <p class="text-xs theme-muted">{{ variant.stock }} en stock</p>
