@@ -313,17 +313,20 @@
                              [style.border-color]="variant.stock === 0 ? 'rgba(239,68,68,0.5)' : selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.25)'">
                         </div>
                       }
-                      <!-- Croix épuisé sur la pastille -->
+                      <!-- Barre diagonale épuisé sur la pastille -->
                       @if (variant.stock === 0) {
-                        <div class="absolute inset-0 rounded-xl flex items-center justify-center bg-black/40">
-                          <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                        <div class="absolute inset-0 rounded-xl overflow-hidden">
+                          <svg class="w-full h-full" viewBox="0 0 48 48" preserveAspectRatio="none">
+                            <line x1="4" y1="44" x2="44" y2="4" stroke="rgba(239,68,68,0.85)" stroke-width="3.5" stroke-linecap="round"/>
                           </svg>
                         </div>
                       }
-                      <!-- Point rouge clignotant si stock faible -->
+                      <!-- Badge stock faible -->
                       @if (variant.stock > 0 && variant.stock <= 3) {
-                        <div class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-orange-400 border-2 border-black/30 animate-pulse"></div>
+                        <div class="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-orange-500 border border-black/30
+                                    flex items-center justify-center animate-pulse">
+                          <span class="text-[9px] font-black text-white leading-none">{{ variant.stock }}</span>
+                        </div>
                       }
                       <!-- Dot indicator for selected color (seulement si dispo) -->
                       @if (variant.stock > 0) {
