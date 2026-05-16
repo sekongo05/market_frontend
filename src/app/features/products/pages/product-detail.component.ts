@@ -8,12 +8,15 @@ import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 import { Subject } from 'rxjs';
 import { takeUntil, switchMap } from 'rxjs/operators';
 
+import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../../core/services/product.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
+import { ReviewService } from '../../../core/services/review.service';
 import { ProductMediaItem, ProductResponse, ProductVariant } from '../../../core/models/product.models';
+import { ReviewResponse, ProductRatingResponse } from '../../../core/models/review.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
 export interface GalleryItem {
@@ -66,7 +69,7 @@ const DEFAULT_GALLERY = [
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, TooltipDirective, MediaUrlPipe],
+  imports: [CommonModule, RouterLink, FormsModule, TooltipDirective, MediaUrlPipe],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -83,6 +86,18 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // Related products (from same category)
   relatedProducts: ProductResponse[] = [];
+
+  // Reviews
+  reviews: ReviewResponse[] = [];
+  productRating: ProductRatingResponse | null = null;
+  reviewsLoading = false;
+  reviewRating = 0;
+  reviewHover = 0;
+  reviewComment = '';
+  reviewSubmitting = false;
+  reviewError: string | null = null;
+  myReview: ReviewResponse | null = null;
+  editingReview = false;
 
   // Cart state
   quantity = 1;
@@ -104,6 +119,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private authService: AuthService,
     private authPromptService: AuthPromptService,
     private wsService: WebSocketService,
+    private reviewService: ReviewService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -118,6 +134,14 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   get isManager(): boolean {
     const role = this.authService.getCurrentUser()?.role;
     return role === 'MANAGER' || role === 'ADMIN';
+  }
+
+  get isCustomer(): boolean {
+    return this.authService.getCurrentUser()?.role === 'CUSTOMER';
+  }
+
+  get isLoggedIn(): boolean {
+    return this.authService.isAuthenticated();
   }
 
   ngOnInit(): void {
@@ -155,6 +179,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           this._autoSelectVariant();
           this._buildGallery();
           this._loadRelated();
+          this._loadReviews();
+          this._loadRating();
         } else {
           this._tryMock();
         }
@@ -548,4 +574,88 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     );
     document.querySelectorAll('.scroll-reveal').forEach(el => this.observer!.observe(el));
   }
+
+  // ── Reviews ──────────────────────────────────────────────────────────────
+
+  private _loadReviews(): void {
+    if (!this.product) return;
+    this.reviewsLoading = true;
+    this.reviewService.getProductReviews(this.product.id, 0, 20).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.reviews = (res.data as any)?.content ?? [];
+          const uid = this.authService.getCurrentUser()?.id;
+          this.myReview = uid ? (this.reviews.find(r => r.userId === uid) ?? null) : null;
+        }
+        this.reviewsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.reviewsLoading = false; this.cdr.detectChanges(); }
+    });
+  }
+
+  private _loadRating(): void {
+    if (!this.product) return;
+    this.reviewService.getProductRating(this.product.id).subscribe({
+      next: (res) => { if (res.success) { this.productRating = res.data; this.cdr.detectChanges(); } },
+      error: () => {}
+    });
+  }
+
+  setReviewRating(r: number): void { this.reviewRating = r; this.cdr.detectChanges(); }
+
+  submitReview(): void {
+    if (!this.product || this.reviewRating === 0) return;
+    this.reviewSubmitting = true;
+    this.reviewError = null;
+    const payload = { productId: this.product.id, rating: this.reviewRating, comment: this.reviewComment.trim() || undefined };
+    const obs$ = (this.editingReview && this.myReview)
+      ? this.reviewService.updateReview(this.myReview.id, payload)
+      : this.reviewService.createReview(payload);
+    obs$.subscribe({
+      next: () => {
+        this.reviewRating = 0;
+        this.reviewComment = '';
+        this.editingReview = false;
+        this.reviewSubmitting = false;
+        this._loadReviews();
+        this._loadRating();
+      },
+      error: (err) => {
+        this.reviewError = err?.error?.message || 'Erreur lors de la publication';
+        this.reviewSubmitting = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  deleteMyReview(): void {
+    if (!this.myReview) return;
+    this.reviewService.deleteReview(this.myReview.id).subscribe({
+      next: () => { this.myReview = null; this.editingReview = false; this._loadReviews(); this._loadRating(); },
+      error: () => {}
+    });
+  }
+
+  startEditReview(): void {
+    if (!this.myReview) return;
+    this.reviewRating = this.myReview.rating;
+    this.reviewComment = this.myReview.comment ?? '';
+    this.editingReview = true;
+    this.cdr.detectChanges();
+  }
+
+  cancelEditReview(): void {
+    this.editingReview = false;
+    this.reviewRating = 0;
+    this.reviewComment = '';
+    this.reviewError = null;
+    this.cdr.detectChanges();
+  }
+
+  reviewInitials(name: string): string {
+    return name.split(' ').map(n => n[0] ?? '').join('').slice(0, 2).toUpperCase();
+  }
+
+  starsRange = [1, 2, 3, 4, 5];
 }
