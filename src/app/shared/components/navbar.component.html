@@ -1058,6 +1058,17 @@
                     <span class="font-bold ml-2 flex-shrink-0" style="color:#d4af37">×{{ item.quantity }}</span>
                   </div>
                 }
+                @if (shippingFee > 0) {
+                  <div class="flex items-center justify-between px-3 py-2 text-xs" style="border-top:1px solid rgba(0,0,0,0.05)">
+                    <span style="color:#6b7280">Frais d'expédition</span>
+                    <span class="font-bold text-orange-400">2 000 FCFA</span>
+                  </div>
+                } @else if (deliveryZone) {
+                  <div class="flex items-center justify-between px-3 py-2 text-xs" style="border-top:1px solid rgba(0,0,0,0.05)">
+                    <span style="color:#6b7280">Livraison</span>
+                    <span class="font-bold text-green-400">GRATUITE</span>
+                  </div>
+                }
                 <div class="flex items-center justify-between px-3 py-2 text-xs font-black">
                   <span style="color:#111111">Total</span>
                   <div class="flex items-baseline gap-1.5">

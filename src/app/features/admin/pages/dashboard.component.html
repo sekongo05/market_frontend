@@ -2045,8 +2045,13 @@
                     <img [src]="variant.imageUrl" [alt]="variant.colorName" class="w-8 h-8 rounded-lg object-cover flex-shrink-0"/>
                   }
                   <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold theme-text truncate">{{ variant.colorName }}</p>
-                    <p class="text-xs theme-muted">Stock : {{ variant.stock }}</p>
+                    <div class="flex items-center gap-2">
+                      <p class="text-sm font-bold theme-text truncate">{{ variant.colorName }}</p>
+                      @if (variant.stock === 0) {
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-400 flex-shrink-0">Épuisé</span>
+                      }
+                    </div>
+                    <p class="text-xs" [class.text-red-400]="variant.stock === 0" [class.theme-muted]="variant.stock > 0">Stock : {{ variant.stock }}</p>
                   </div>
                   <button type="button" (click)="startEditVariant(variant)" class="p-1.5 rounded-lg theme-muted hover:text-gold transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

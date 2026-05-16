@@ -373,6 +373,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   cancelCheckout(): void {
     this.showCheckout = false;
     this.checkoutError = null;
+    this.deliveryZone = '';
     this.cdr.detectChanges();
   }
 
@@ -522,9 +523,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (!this.promoCheckResult?.valid) return 0;
     return this.promoCheckResult.discountAmount ?? 0;
   }
+  get shippingFee(): number { return this.deliveryZone === 'interieur' ? 2000 : 0; }
   get finalTotal(): number {
-    if (!this.promoCheckResult?.valid) return this.cartTotal;
-    return this.promoCheckResult.finalAmount ?? this.cartTotal;
+    const base = !this.promoCheckResult?.valid ? this.cartTotal : (this.promoCheckResult.finalAmount ?? this.cartTotal);
+    return base + this.shippingFee;
   }
 
   get fullName(): string {
