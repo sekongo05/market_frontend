@@ -61,4 +61,5 @@ export interface GetProductsParams {
   sort?: SortOption;
   minPrice?: number;
   maxPrice?: number;
+  inStock?: boolean;
 }

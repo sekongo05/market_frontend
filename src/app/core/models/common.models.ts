@@ -48,6 +48,7 @@ export enum NotificationType {
   RETURN_REQUESTED     = 'RETURN_REQUESTED',
   RETURN_DECIDED       = 'RETURN_DECIDED',
   REVIEW_RECEIVED      = 'REVIEW_RECEIVED',
+  REVIEW_REQUEST       = 'REVIEW_REQUEST',
 }
 
 export enum StockMovementType {

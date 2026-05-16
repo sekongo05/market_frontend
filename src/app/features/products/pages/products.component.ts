@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink, Router } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { ProductService } from '../../../core/services/product.service';
@@ -55,6 +55,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   sortOption: SortOption = 'newest';
   minPriceInput: string = '';
   maxPriceInput: string = '';
+  inStockOnly = false;
   showFilters = false;
 
   // Temporary feedback after "add" action (quick-view panel)
@@ -128,7 +129,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private router: Router,
     private scrollLock: ScrollLockService
   ) {}
 
@@ -213,55 +213,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
       if (this.selectedProduct) this.addedIds.delete(this.selectedProduct.id);
       this.cdr.detectChanges();
     }, 1500);
-  }                         
-/*   addToCartFromView(): void {
-    if (!this.selectedProduct) return;
-    if (!this.authService.isAuthenticated()) {
-      this.authPromptService.show();
-      return;
-    }
-    this.cartService.addToCart({
-      productId: this.selectedProduct.id,
-      productName: this.selectedProduct.name,
-      price: this.selectedProduct.salePrice ?? this.selectedProduct.price,
-      quantity: this.selectedProductQty,
-      imageUrl: this.selectedProduct.imageUrl,
-      maxStock: this.selectedProduct.stock,
-    });
-    this.addedIds.add(this.selectedProduct.id);
-    this.cdr.detectChanges();
-    setTimeout(() => {
-      if (this.selectedProduct) this.addedIds.delete(this.selectedProduct.id);
-      this.cdr.detectChanges();
-    }, 1500);
-  } */
-
-
-/*   addToCart(product: ProductResponse): void {
-    if (!this.authService.isAuthenticated()) {
-      this.authPromptService.show();
-      return;
-    }
-    this.cartService.addToCart({
-      productId: product.id,
-      productName: product.name,
-      price: product.salePrice ?? product.price,
-      quantity: 1,
-      imageUrl: product.imageUrl,
-      maxStock: product.stock,
-    });
-    this.addedIds.add(product.id);
-    this.cdr.detectChanges();
-    setTimeout(() => {
-      this.addedIds.delete(product.id);
-      this.cdr.detectChanges();
-    }, 1500);
-  } */
+  }
 
   addToCart(product: ProductResponse): void {
     if (!this.authService.isAuthenticated()) { this.authPromptService.show(); return; }
     if ((product.variants?.length ?? 0) > 0) {
-      this.router.navigate(['/products', product.slug]);
+      this.openProductView(product);
       return;
     }
     if (this.cartProductIds.has(product.id)) return;
@@ -573,6 +530,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const max = parseFloat(this.maxPriceInput);
     if (!isNaN(min) && min > 0) params.minPrice = min;
     if (!isNaN(max) && max > 0) params.maxPrice = max;
+    if (this.inStockOnly) params.inStock = true;
 
     this.productService.getProducts(params).subscribe({
       next: (response) => {
@@ -666,12 +624,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.sortOption = 'newest';
     this.minPriceInput = '';
     this.maxPriceInput = '';
+    this.inStockOnly = false;
     this.loadProducts(0);
     this.cdr.detectChanges();
   }
 
   get hasActiveFilters(): boolean {
-    return this.sortOption !== 'newest' || !!this.minPriceInput || !!this.maxPriceInput;
+    return this.sortOption !== 'newest' || !!this.minPriceInput || !!this.maxPriceInput || this.inStockOnly;
   }
 
   previousPage(): void {

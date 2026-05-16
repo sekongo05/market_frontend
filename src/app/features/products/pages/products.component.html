@@ -131,6 +131,17 @@
                 class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
             </div>
           </div>
+          <!-- Toggle En stock seulement -->
+          <button (click)="inStockOnly = !inStockOnly; loadProducts(0)"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 flex-shrink-0"
+            [class]="inStockOnly
+              ? 'border-green-500/60 bg-green-500/10 text-green-400'
+              : 'theme-border theme-muted hover:text-green-400 hover:border-green-500/40'">
+            <span class="w-2 h-2 rounded-full flex-shrink-0"
+                  [class]="inStockOnly ? 'bg-green-400 animate-pulse' : 'bg-current opacity-40'"></span>
+            En stock seulement
+          </button>
+
           <div class="flex gap-2">
             <button (click)="applyPriceFilter()"
               class="px-5 py-2.5 bg-gold text-black text-sm font-bold rounded-xl hover:brightness-110 transition-all">
@@ -370,21 +381,7 @@
       </div>
     </ng-template>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         VUE GLOBALE — onglet "Tout" : grille uniforme de tous les articles
-    ══════════════════════════════════════════════════════════════ -->
-    @if (!loading && products.length > 0 && selectedCategoryId === null) {
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-        @for (product of products; track product.id; let i = $index) {
-          <ng-container *ngTemplateOutlet="productCard; context: { product: product, i: i, wide: false }"></ng-container>
-        }
-      </div>
-    }
-
-    <!-- ══════════════════════════════════════════════════════════════
-         VUE FILTRÉE — une catégorie sélectionnée
-    ══════════════════════════════════════════════════════════════ -->
-    @if (!loading && products.length > 0 && selectedCategoryId !== null) {
+    @if (!loading && products.length > 0) {
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         @for (product of products; track product.id; let i = $index) {
           <ng-container *ngTemplateOutlet="productCard; context: { product: product, i: i, wide: false }"></ng-container>
@@ -580,9 +577,9 @@
           <!-- Stock -->
           <div class="flex items-center gap-2">
             @if (selectedProduct.stock > 0) {
-<!--               <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
- --><!--               <span class="text-sm text-green-400 font-medium">{{ selectedProduct.stock }} unités disponibles</span>
- -->            } @else {
+              <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+              <span class="text-sm text-green-400 font-medium">{{ selectedProduct.stock }} unité{{ selectedProduct.stock > 1 ? 's' : '' }} disponible{{ selectedProduct.stock > 1 ? 's' : '' }}</span>
+            } @else {
               <div class="w-2 h-2 rounded-full bg-red-400"></div>
               <span class="text-sm text-red-400 font-medium">Rupture de stock</span>
             }

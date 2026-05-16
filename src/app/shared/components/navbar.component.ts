@@ -76,6 +76,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ];
   checkoutSuccess = false;
 
+  reviewRequestBanner: { subject: string; products: { slug: string; name: string }[] } | null = null;
+  private reviewDismissTimer?: ReturnType<typeof setTimeout>;
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -143,9 +146,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     this.webSocketService.notification$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
+      .subscribe(notif => {
         this.unreadNotifications++;
         if (this.showNotifications) this.loadNotifications();
+        if (notif.type === 'REVIEW_REQUEST' && notif.products?.length) {
+          this._showReviewBanner(notif.subject, notif.products);
+        }
         this.cdr.detectChanges();
       });
 
@@ -157,7 +163,24 @@ export class NavbarComponent implements OnInit, OnDestroy {
       });
   }
 
+  private _showReviewBanner(subject: string, products: { slug: string; name: string }[]): void {
+    clearTimeout(this.reviewDismissTimer);
+    this.reviewRequestBanner = { subject, products };
+    this.cdr.detectChanges();
+    this.reviewDismissTimer = setTimeout(() => {
+      this.reviewRequestBanner = null;
+      this.cdr.detectChanges();
+    }, 30000);
+  }
+
+  dismissReviewBanner(): void {
+    clearTimeout(this.reviewDismissTimer);
+    this.reviewRequestBanner = null;
+    this.cdr.detectChanges();
+  }
+
   ngOnDestroy(): void {
+    clearTimeout(this.reviewDismissTimer);
     this.scrollLock.forceUnlock();
     this.destroy$.next();
     this.destroy$.complete();
