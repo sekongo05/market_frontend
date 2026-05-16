@@ -313,6 +313,11 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     return (this.product?.variants?.length ?? 0) > 0;
   }
 
+  get allVariantsOutOfStock(): boolean {
+    if (!this.hasVariants) return false;
+    return this.product!.variants!.every(v => v.stock === 0);
+  }
+
   get effectiveStock(): number {
     if (!this.product) return 0;
     if (this.hasVariants) {

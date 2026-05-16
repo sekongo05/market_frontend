@@ -296,9 +296,8 @@
                   <div
                     (click)="selectVariant(variant)"
                     class="flex items-center gap-3 px-5 py-3.5 cursor-pointer transition-all duration-200"
-                    [style.background-color]="getVariantQty(variant.id) > 0 ? 'rgba(212,175,55,0.07)' : ''"
-                    [class.opacity-50]="variant.stock === 0"
-                    [class.pointer-events-none]="variant.stock === 0">
+                    [style.background-color]="getVariantQty(variant.id) > 0 ? 'rgba(212,175,55,0.07)' : (selectedVariant?.id === variant.id && variant.stock === 0 ? 'rgba(239,68,68,0.05)' : '')"
+                    [class.opacity-60]="variant.stock === 0">
 
                     <!-- Color image or circle -->
                     <div class="relative flex-shrink-0">
@@ -410,9 +409,13 @@
             </div>
           } @else {
             <!-- Customer -->
-            @if (!hasVariants && product.stock === 0) {
+            @if ((!hasVariants && product.stock === 0) || allVariantsOutOfStock) {
               <div class="p-4 rounded-2xl bg-red-500/8 border border-red-500/20 text-red-400 text-sm font-semibold text-center">
-                Ce produit est actuellement épuisé
+                @if (allVariantsOutOfStock) {
+                  Tous les coloris sont actuellement épuisés
+                } @else {
+                  Ce produit est actuellement épuisé
+                }
               </div>
               <button (click)="goBack()"
                 class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
@@ -480,7 +483,11 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
-                    Choisissez une quantité
+                    @if (selectedVariant?.stock === 0) {
+                      Ce coloris est épuisé — choisissez une autre couleur
+                    } @else {
+                      Choisissez une quantité
+                    }
                   } @else {
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
