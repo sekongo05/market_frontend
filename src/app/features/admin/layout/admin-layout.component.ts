@@ -16,6 +16,7 @@ import { AdminToastService } from '../shared/admin-toast.service';
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
   pendingOrdersCount = 0;
+  mobileNavOpen = false;
   private readonly destroy$ = new Subject<void>();
 
   readonly navItems = [

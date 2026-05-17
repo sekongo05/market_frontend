@@ -16,6 +16,7 @@ import { ManagerToastService } from '../shared/manager-toast.service';
 })
 export class ManagerLayoutComponent implements OnInit, OnDestroy {
   pendingOrdersCount = 0;
+  mobileNavOpen = false;
   private readonly destroy$ = new Subject<void>();
 
   readonly navItems = [

@@ -1,7 +1,14 @@
 <div class="min-h-screen theme-bg flex">
 
+  <!-- ── Overlay mobile ────────────────────────────────────────────────── -->
+  @if (mobileNavOpen) {
+    <div class="fixed inset-0 bg-black/50 z-40 lg:hidden" (click)="mobileNavOpen = false"></div>
+  }
+
   <!-- ── Sidebar ───────────────────────────────────────────────────────── -->
-  <aside class="w-64 flex-shrink-0 theme-surface border-r theme-border flex flex-col sticky top-0 h-screen">
+  <aside class="fixed lg:sticky top-0 left-0 h-screen z-50 w-64 flex-shrink-0 theme-surface border-r theme-border flex flex-col transition-transform duration-300 lg:translate-x-0"
+         [class.-translate-x-full]="!mobileNavOpen"
+         [class.translate-x-0]="mobileNavOpen">
 
     <!-- Logo -->
     <div class="px-6 py-5 border-b theme-border">
@@ -17,6 +24,7 @@
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
       @for (item of navItems; track item.route) {
         <a [routerLink]="item.route" routerLinkActive="bg-gold/10 text-gold border-gold/30"
+           (click)="mobileNavOpen = false"
            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium theme-muted hover:text-gold hover:bg-gold/8 border border-transparent transition-all duration-150 relative">
           <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"/>
@@ -43,7 +51,19 @@
   </aside>
 
   <!-- ── Contenu principal ──────────────────────────────────────────────── -->
-  <main class="flex-1 min-w-0">
+  <main class="flex-1 min-w-0 lg:ml-0">
+    <!-- Mobile top bar -->
+    <div class="lg:hidden flex items-center gap-3 px-4 py-3 theme-surface border-b theme-border sticky top-0 z-30">
+      <button (click)="mobileNavOpen = true" class="p-2 rounded-xl theme-muted hover:text-gold transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <span class="font-bold theme-text text-sm">Espace Gestion</span>
+      @if (pendingOrdersCount > 0) {
+        <span class="ml-auto bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full">{{ pendingOrdersCount }}</span>
+      }
+    </div>
     <router-outlet/>
   </main>
 
