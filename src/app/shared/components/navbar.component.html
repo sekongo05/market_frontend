@@ -126,7 +126,7 @@
 
               <!-- Notification panel -->
               @if (showNotifications) {
-                <div class="absolute right-0 top-full mt-3 w-[480px] max-w-[calc(100vw-1rem)] theme-surface border theme-border rounded-2xl shadow-2xl z-50 overflow-hidden">
+                <div class="absolute right-0 top-full mt-3 w-[480px] max-w-[calc(100vw-1rem)] theme-surface border theme-border rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[calc(100dvh-6rem)]">
 
                   <!-- ── Vue détail d'une notification ── -->
                   @if (selectedNotification) {
@@ -229,7 +229,7 @@
 
                     <!-- Liste -->
                     @if (!notificationsLoading) {
-                      <div class="max-h-96 overflow-y-auto divide-y theme-border">
+                      <div class="overflow-y-auto divide-y theme-border flex-1">
                         @for (notif of notifications; track notif.id) {
                           @let t = getTemplate(notif.type);
                           <div class="flex items-start gap-3 px-5 py-4 hover:bg-black/[.04] transition-colors group"
