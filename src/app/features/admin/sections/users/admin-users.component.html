@@ -1,0 +1,308 @@
+<div class="p-6 lg:p-8 animate-fade-in-up">
+
+  <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+
+    <div class="px-6 py-4 border-b theme-border flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-bold theme-text">Gestion des utilisateurs</h2>
+        <p class="text-xs theme-muted mt-0.5">Activez ou désactivez des comptes utilisateurs</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="openCreateUserModal()"
+          class="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/25 text-green-400 font-semibold text-sm rounded-xl hover:bg-green-500/15 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Créer
+        </button>
+        <button (click)="loadUsers()"
+          class="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Actualiser
+        </button>
+      </div>
+    </div>
+
+    @if (usersLoading) {
+      <div class="p-8 flex justify-center">
+        <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+      </div>
+    }
+
+    @if (!usersLoading && users.length > 0) {
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="theme-surface-2">
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Utilisateur</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3 hidden md:table-cell">Email</th>
+              <th class="text-center text-xs font-bold theme-muted uppercase tracking-wide px-6 py-3">Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users; track user.id) {
+              <tr class="border-t theme-border hover:bg-black/[.02] transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-black flex-shrink-0"
+                         [ngClass]="{
+                           'bg-gradient-to-br from-indigo-400 to-purple-400': user.role === 'CUSTOMER',
+                           'bg-gradient-to-br from-orange-400 to-red-400':   user.role === 'MANAGER',
+                           'bg-gradient-to-br from-[#b8860b] to-[#d4af37]':  user.role === 'ADMIN'
+                         }">
+                      {{ user.prenom[0] }}{{ user.nom[0] }}
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold theme-text">{{ user.prenom }} {{ user.nom }}</p>
+                      <p class="text-xs theme-muted">{{ user.phone }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 hidden md:table-cell">
+                  <span class="text-sm theme-muted">{{ user.email }}</span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  @if (toggleUpdatingId === user.id) {
+                    <svg class="w-4 h-4 text-gold animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                  } @else {
+                    <div class="flex items-center justify-center gap-2">
+                      <button (click)="openUserProfile(user.id)" appTooltip="Voir fiche complète" tooltipPosition="left"
+                        class="w-7 h-7 flex items-center justify-center rounded-lg text-blue-400/60 hover:text-blue-400 hover:bg-blue-500/10 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                      </button>
+                      <button type="button" (click)="toggleUser(user)"
+                        [appTooltip]="user.enabled ? 'Désactiver ce compte' : 'Activer ce compte'" tooltipPosition="left"
+                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+                        [ngClass]="user.enabled ? 'bg-gold' : 'bg-white/15'">
+                        <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform"
+                              [class.translate-x-6]="user.enabled" [class.translate-x-1]="!user.enabled">
+                        </span>
+                      </button>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (usersTotalPages > 1) {
+        <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
+          <span class="text-xs theme-muted">Page {{ usersPage + 1 }} / {{ usersTotalPages }}</span>
+          <div class="flex gap-2">
+            <button (click)="loadUsers(usersPage - 1)" [disabled]="usersPage === 0"
+              class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+              ← Préc.
+            </button>
+            @for (page of userPages; track page) {
+              <button (click)="loadUsers(page)"
+                class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                [ngClass]="page === usersPage ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
+                {{ page + 1 }}
+              </button>
+            }
+            <button (click)="loadUsers(usersPage + 1)" [disabled]="usersPage >= usersTotalPages - 1"
+              class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+              Suiv. →
+            </button>
+          </div>
+        </div>
+      }
+    }
+
+    @if (!usersLoading && users.length === 0) {
+      <div class="py-16 text-center">
+        <p class="theme-muted font-semibold">Aucun utilisateur trouvé</p>
+      </div>
+    }
+  </div>
+
+  <!-- Modal fiche client -->
+  @if (showUserProfile) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+      <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeUserProfile()"></div>
+      <div class="relative w-full max-w-lg theme-surface border theme-border rounded-3xl shadow-2xl overflow-y-auto overscroll-contain max-h-[90vh] animate-scale-in">
+        <div class="flex items-center justify-between px-6 py-5 border-b theme-border sticky top-0 theme-surface">
+          <h3 class="text-lg font-bold theme-text">Fiche client</h3>
+          <button (click)="closeUserProfile()"
+            class="w-8 h-8 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        @if (userFullProfileLoading) {
+          <div class="flex justify-center py-12">
+            <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+          </div>
+        }
+        @if (userFullProfile && !userFullProfileLoading) {
+          <div class="p-6 space-y-5">
+            <div class="p-4 bg-black/[.03] rounded-2xl">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-12 h-12 rounded-2xl bg-gold/15 flex items-center justify-center text-gold font-black text-lg">
+                  {{ userFullProfile.prenom[0] }}{{ userFullProfile.nom[0] }}
+                </div>
+                <div>
+                  <p class="font-bold theme-text">{{ userFullProfile.prenom }} {{ userFullProfile.nom }}</p>
+                  <p class="text-xs theme-muted">{{ userFullProfile.email }}</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div><span class="theme-muted">Tél : </span><span class="theme-text">{{ userFullProfile.phone }}</span></div>
+                <div><span class="theme-muted">Rôle : </span><span class="theme-text">{{ userFullProfile.role }}</span></div>
+                <div><span class="theme-muted">Membre depuis : </span><span class="theme-text">{{ userFullProfile.memberSince | date:'dd/MM/yyyy' }}</span></div>
+                <div><span class="theme-muted">Statut : </span>
+                  <span [ngClass]="userFullProfile.enabled ? 'text-green-400' : 'text-red-400'">
+                    {{ userFullProfile.enabled ? 'Actif' : 'Suspendu' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="p-3 bg-black/[.03] rounded-xl text-center">
+                <p class="text-2xl font-black theme-text">{{ userFullProfile.totalOrders }}</p>
+                <p class="text-xs theme-muted mt-0.5">Total cmd</p>
+              </div>
+              <div class="p-3 bg-green-500/8 rounded-xl text-center">
+                <p class="text-2xl font-black text-green-400">{{ userFullProfile.completedOrders }}</p>
+                <p class="text-xs theme-muted mt-0.5">Payées</p>
+              </div>
+              <div class="p-3 bg-yellow-500/8 rounded-xl text-center">
+                <p class="text-2xl font-black text-yellow-400">{{ userFullProfile.pendingOrders }}</p>
+                <p class="text-xs theme-muted mt-0.5">En attente</p>
+              </div>
+              <div class="p-3 bg-red-500/8 rounded-xl text-center">
+                <p class="text-2xl font-black text-red-400">{{ userFullProfile.cancelledOrders }}</p>
+                <p class="text-xs theme-muted mt-0.5">Annulées</p>
+              </div>
+            </div>
+            <div class="p-4 bg-gold/8 border border-gold/20 rounded-2xl flex items-center justify-between">
+              <p class="font-semibold theme-muted text-sm">Total dépensé</p>
+              <p class="text-2xl font-black text-gold">{{ formatAmount(userFullProfile.totalSpent) }}</p>
+            </div>
+            @if (userFullProfile.recentOrders.length > 0) {
+              <div>
+                <p class="text-xs font-bold theme-muted uppercase tracking-wider mb-2">Dernières commandes</p>
+                <div class="space-y-2">
+                  @for (order of userFullProfile.recentOrders; track order.id) {
+                    <div class="flex items-center justify-between p-3 bg-black/[.03] rounded-xl">
+                      <div>
+                        <p class="font-mono font-bold text-sm theme-text">{{ order.orderNumber }}</p>
+                        <p class="text-xs theme-muted">{{ order.createdAt | date:'dd/MM/yyyy' }}</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="font-bold text-gold text-sm">{{ formatAmount(order.amount) }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Modal créer utilisateur -->
+  @if (showCreateUserModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+      <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeCreateUserModal()"></div>
+      <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl overflow-hidden animate-scale-in">
+        <div class="flex items-center justify-between px-6 py-5 border-b theme-border">
+          <div>
+            <h3 class="text-lg font-bold theme-text">Créer un utilisateur</h3>
+            <p class="text-xs theme-muted mt-0.5">Le compte sera actif immédiatement</p>
+          </div>
+          <button (click)="closeCreateUserModal()"
+            class="w-8 h-8 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="px-6 py-5 space-y-4">
+          @if (createUserError) {
+            <div class="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              {{ createUserError }}
+            </div>
+          }
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Prénom</label>
+              <input [(ngModel)]="createUserForm.prenom" type="text" placeholder="Jean"
+                class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Nom</label>
+              <input [(ngModel)]="createUserForm.nom" type="text" placeholder="Dupont"
+                class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Email</label>
+            <input [(ngModel)]="createUserForm.email" type="email" autocomplete="off" placeholder="jean@exemple.com"
+              class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Téléphone</label>
+            <input [(ngModel)]="createUserForm.phone" type="tel" placeholder="+225 07 000 00 00"
+              class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Mot de passe</label>
+            <input [(ngModel)]="createUserForm.password" type="password" autocomplete="new-password" placeholder="Min. 6 caractères"
+              class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold theme-muted uppercase tracking-wider mb-1.5">Rôle</label>
+            <select [(ngModel)]="createUserForm.role" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all">
+              @for (r of roles; track r) {
+                <option [value]="r" class="theme-option">{{ r }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="flex gap-3 px-6 pb-6">
+          <button (click)="closeCreateUserModal()" [disabled]="createUserLoading"
+            class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-black/[.04] transition-colors disabled:opacity-50">
+            Annuler
+          </button>
+          <button (click)="submitCreateUser()"
+            [disabled]="createUserLoading || !createUserForm.prenom || !createUserForm.nom || !createUserForm.email || !createUserForm.password || !createUserForm.phone"
+            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-yellow-600/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            @if (createUserLoading) {
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+            } @else {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+            }
+            Créer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

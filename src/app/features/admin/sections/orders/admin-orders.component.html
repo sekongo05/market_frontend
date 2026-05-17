@@ -1,0 +1,317 @@
+<div class="p-6 lg:p-8 animate-fade-in-up">
+
+  <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+
+    <div class="px-6 py-4 border-b theme-border flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-bold theme-text">Gestion des commandes</h2>
+        <p class="text-xs theme-muted mt-0.5">{{ allOrders.length }} commande(s) chargée(s)</p>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <select [(ngModel)]="statusFilter" (change)="loadAllOrders(0)" class="theme-input px-3 py-2 rounded-xl text-sm">
+          <option value="">Tous les statuts</option>
+          @for (s of orderStatuses; track s) {
+            <option [value]="s">{{ orderStatusLabel(s) }}</option>
+          }
+        </select>
+        <button (click)="loadAllOrders(0)"
+          class="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Actualiser
+        </button>
+      </div>
+    </div>
+
+    @if (ordersLoading) {
+      <div class="p-8 flex justify-center">
+        <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+      </div>
+    }
+
+    @if (!ordersLoading && allOrders.length > 0) {
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="theme-surface-2">
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">N° commande</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Client</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Articles</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Montant</th>
+              <th class="text-right text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of allOrders; track order.id) {
+              <tr class="border-t theme-border hover:bg-black/[.02] transition-colors">
+                <td class="px-5 py-3.5">
+                  <button (click)="openOrderDetail(order)" class="text-left group">
+                    <p class="font-mono text-xs font-semibold text-gold group-hover:underline underline-offset-2 transition-colors">{{ order.orderNumber }}</p>
+                    <p class="text-[10px] theme-muted mt-0.5">{{ order.createdAt | date:'dd/MM/yy HH:mm' }}</p>
+                  </button>
+                </td>
+                <td class="px-5 py-3.5 hidden md:table-cell">
+                  <p class="text-sm theme-text font-medium">{{ order.customerName }}</p>
+                </td>
+                <td class="px-5 py-3.5 hidden lg:table-cell">
+                  <div class="flex items-center gap-2">
+                    <div class="flex -space-x-2">
+                      @for (item of order.items.slice(0,3); track item.productId) {
+                        @if (item.imageUrl) {
+                          <img [src]="item.imageUrl" [alt]="item.productName"
+                            class="w-8 h-8 rounded-lg object-cover border-2 flex-shrink-0"
+                            style="border-color: var(--surface)"/>
+                        } @else {
+                          <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold theme-muted"
+                               style="background:rgba(184,148,30,0.1);border:2px solid var(--surface)">
+                            {{ item.productName.charAt(0) }}
+                          </div>
+                        }
+                      }
+                      @if (order.items.length > 3) {
+                        <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold theme-muted"
+                             style="background:rgba(0,0,0,0.06);border:2px solid var(--surface)">
+                          +{{ order.items.length - 3 }}
+                        </div>
+                      }
+                    </div>
+                    <div class="space-y-0.5 max-w-[140px]">
+                      @for (item of order.items; track item.productId) {
+                        <div class="flex items-center gap-1 text-xs theme-muted">
+                          @if (item.selectedColorHex) {
+                            <span class="w-2 h-2 rounded-full flex-shrink-0 border border-white/20"
+                                  [style.background-color]="item.selectedColorHex"></span>
+                          }
+                          <span class="truncate">{{ item.productName }} ×{{ item.quantity }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="inline-flex px-2 py-0.5 rounded-lg text-xs font-bold" [class]="orderStatusClass(order.orderStatus)">
+                    {{ orderStatusLabel(order.orderStatus) }}
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 hidden lg:table-cell">
+                  <span class="font-bold text-sm text-gold">{{ formatCurrency(order.totalAmount) }} FCFA</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    @if (statusUpdatingId === order.id) {
+                      <svg class="w-4 h-4 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      </svg>
+                    } @else {
+                      @if (nextStatusMap[order.orderStatus]) {
+                        <button (click)="advanceOrderStatus(order)"
+                          class="px-2.5 py-1 bg-gold/10 border border-gold/25 text-gold text-xs font-bold rounded-lg hover:bg-gold/20 transition-colors">
+                          {{ nextStatusLabel(order.orderStatus) }}
+                        </button>
+                      }
+                      @if (order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'DELIVERED') {
+                        <button (click)="cancelOrderByManager(order)"
+                          class="px-2.5 py-1 bg-red-500/10 border border-red-500/25 text-red-400 text-xs font-bold rounded-lg hover:bg-red-500/20 transition-colors">
+                          Annuler
+                        </button>
+                      }
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (ordersTotalPages > 1) {
+        <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
+          <span class="text-xs theme-muted">Page {{ ordersPage + 1 }} / {{ ordersTotalPages }}</span>
+          <div class="flex gap-2">
+            <button (click)="loadAllOrders(ordersPage - 1)" [disabled]="ordersPage === 0"
+              class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
+              ← Préc.
+            </button>
+            @for (page of orderPages; track page) {
+              <button (click)="loadAllOrders(page)"
+                class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                [ngClass]="page === ordersPage ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
+                {{ page + 1 }}
+              </button>
+            }
+            <button (click)="loadAllOrders(ordersPage + 1)" [disabled]="ordersPage >= ordersTotalPages - 1"
+              class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
+              Suiv. →
+            </button>
+          </div>
+        </div>
+      }
+    }
+
+    @if (!ordersLoading && allOrders.length === 0) {
+      <div class="py-16 text-center"><p class="theme-muted font-semibold">Aucune commande trouvée</p></div>
+    }
+  </div>
+
+  <!-- Modal détail commande -->
+  @if (orderDetailOpen && selectedOrder) {
+    <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 animate-fade-in">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeOrderDetail()"></div>
+      <div class="relative w-full sm:max-w-2xl max-h-[95dvh] theme-surface border theme-border rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden" style="animation:slideUp .25s ease">
+
+        <div class="flex-shrink-0 px-6 pt-6 pb-4 border-b theme-border">
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold theme-muted uppercase tracking-widest mb-1">Commande</p>
+              <h2 class="font-mono text-xl font-black theme-text tracking-wide leading-none">{{ selectedOrder.orderNumber }}</h2>
+              <p class="text-xs theme-muted mt-1.5">{{ selectedOrder.createdAt | date:'dd MMMM yyyy à HH:mm' }}</p>
+            </div>
+            <div class="flex items-center gap-3 flex-shrink-0">
+              <span class="inline-flex px-3 py-1.5 rounded-xl text-xs font-bold" [class]="orderStatusClass(selectedOrder.orderStatus)">
+                {{ orderStatusLabel(selectedOrder.orderStatus) }}
+              </span>
+              <button (click)="closeOrderDetail()"
+                class="w-9 h-9 flex items-center justify-center rounded-xl bg-black/[.06] theme-muted hover:bg-white/12 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-x-6 gap-y-1.5 mt-4">
+            <div class="flex items-center gap-2 text-sm">
+              <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+              <span class="font-semibold theme-text">{{ selectedOrder.customerName || '—' }}</span>
+            </div>
+            @if (selectedOrder.deliveryAddress) {
+              <div class="flex items-center gap-2 text-sm">
+                <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="theme-muted">{{ selectedOrder.deliveryAddress }}</span>
+              </div>
+            }
+            @if (selectedOrder.trackingNumber) {
+              <div class="flex items-center gap-2 text-sm">
+                <svg class="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <span class="font-mono text-indigo-400 font-semibold">{{ selectedOrder.trackingNumber }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto overscroll-contain">
+          <div class="px-6 pt-5 pb-3 flex items-center gap-2">
+            <p class="text-[10px] font-black theme-muted uppercase tracking-widest">Articles commandés</p>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-gold/15 text-gold">{{ selectedOrder.items.length }}</span>
+          </div>
+          <div class="px-6 pb-5 space-y-3">
+            @for (item of selectedOrder.items; track item.productId) {
+              <div class="flex gap-4 p-4 rounded-2xl luxury-card border theme-border hover:border-gold/20 transition-colors">
+                <div class="flex-shrink-0 w-28 h-28 rounded-2xl overflow-hidden border theme-border bg-black/[.04]">
+                  @if (item.imageUrl) {
+                    <img [src]="item.imageUrl" [alt]="item.productName" class="w-full h-full object-cover"
+                      (error)="$any($event.target).src='https://placehold.co/112x112/1a1a1a/d4af37?text=?'"/>
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center">
+                      <span class="text-3xl font-black text-gold/30">{{ item.productName.charAt(0) }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                  <div>
+                    <p class="font-bold theme-text text-base leading-snug line-clamp-2">{{ item.productName }}</p>
+                    @if (item.selectedColor) {
+                      <div class="flex items-center gap-2 mt-2">
+                        <span class="w-4 h-4 rounded-full border-2 border-white/20 flex-shrink-0 shadow-sm"
+                              [style.background-color]="item.selectedColorHex"></span>
+                        <span class="text-sm font-semibold theme-muted">{{ item.selectedColor }}</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="flex items-end justify-between gap-2 mt-3">
+                    <div>
+                      <p class="text-xs theme-muted mb-0.5">Prix unitaire</p>
+                      <p class="text-sm font-bold theme-text">{{ formatCurrency(item.unitPrice) }} <span class="text-xs font-normal theme-muted">FCFA</span></p>
+                    </div>
+                    <div class="text-center">
+                      <p class="text-xs theme-muted mb-0.5">Qté</p>
+                      <div class="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center">
+                        <span class="text-sm font-black text-gold">{{ item.quantity }}</span>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs theme-muted mb-0.5">Sous-total</p>
+                      <p class="text-lg font-black text-gold leading-none">{{ formatCurrency(item.subtotal) }}</p>
+                      <p class="text-[10px] theme-muted">FCFA</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="mx-6 mb-6 rounded-2xl overflow-hidden border theme-border">
+            <div class="px-5 py-3 flex justify-between items-center text-sm border-b theme-border">
+              <span class="theme-muted">Sous-total</span>
+              <span class="font-semibold theme-text">{{ formatCurrency(selectedOrder.totalAmount + (selectedOrder.discountAmount ?? 0)) }} FCFA</span>
+            </div>
+            @if (selectedOrder.promoCode) {
+              <div class="px-5 py-3 flex justify-between items-center text-sm border-b theme-border">
+                <span class="flex items-center gap-2 theme-muted">
+                  Code promo
+                  <span class="font-mono font-bold text-gold text-xs px-2 py-0.5 rounded-lg bg-gold/10">{{ selectedOrder.promoCode }}</span>
+                </span>
+                <span class="font-bold text-green-400">−{{ formatCurrency(selectedOrder.discountAmount ?? 0) }} FCFA</span>
+              </div>
+            }
+            <div class="px-5 py-4 flex justify-between items-center" style="background:rgba(212,175,55,0.06)">
+              <span class="font-black theme-text text-sm uppercase tracking-wide">Total payé</span>
+              <span class="font-black text-gold text-xl">{{ formatCurrency(selectedOrder.totalAmount) }} <span class="text-sm font-semibold">FCFA</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-shrink-0 flex gap-3 px-6 py-4 border-t theme-border">
+          <button (click)="closeOrderDetail()"
+            class="flex-1 py-3 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
+            Fermer
+          </button>
+          @if (statusUpdatingId === selectedOrder.id) {
+            <div class="flex-1 flex items-center justify-center gap-2 py-3 bg-gold/10 rounded-xl">
+              <svg class="w-4 h-4 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              <span class="text-sm font-semibold text-gold">Mise à jour…</span>
+            </div>
+          } @else {
+            @if (nextStatusMap[selectedOrder.orderStatus]) {
+              <button (click)="advanceOrderStatus(selectedOrder)"
+                class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-black hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all">
+                {{ nextStatusLabel(selectedOrder.orderStatus) }}
+              </button>
+            }
+            @if (selectedOrder.orderStatus !== 'CANCELLED' && selectedOrder.orderStatus !== 'DELIVERED') {
+              <button (click)="cancelOrderByManager(selectedOrder); closeOrderDetail()"
+                class="px-5 py-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-bold hover:bg-red-500/20 transition-colors">
+                Annuler
+              </button>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

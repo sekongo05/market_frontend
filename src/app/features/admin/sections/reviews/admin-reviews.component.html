@@ -1,0 +1,102 @@
+<div class="p-6 lg:p-8 animate-fade-in-up">
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-xl font-bold theme-text">Avis & notations</h2>
+      <p class="text-sm theme-muted mt-0.5">{{ reviews.length }} avis chargé(s)</p>
+    </div>
+    <button (click)="loadReviews(0)"
+      class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      Actualiser
+    </button>
+  </div>
+
+  @if (reviewsLoading) {
+    <div class="flex justify-center py-12">
+      <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+    </div>
+  }
+
+  @if (!reviewsLoading) {
+    <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="theme-surface-2">
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Client</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Produit</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Note</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Commentaire</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Visible</th>
+              <th class="px-5 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (review of reviews; track review.id) {
+              <tr class="border-t theme-border hover:bg-white/2 transition-colors">
+                <td class="px-5 py-4">
+                  <p class="font-semibold theme-text text-sm">{{ review.customerName }}</p>
+                  <p class="text-xs theme-muted">{{ review.createdAt | date:'dd/MM/yyyy' }}</p>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm theme-text truncate max-w-[150px]">{{ review.productName }}</p>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-1">
+                    @for (i of [1,2,3,4,5]; track i) {
+                      <span [ngClass]="i <= review.rating ? 'text-yellow-400' : 'text-white/20'" class="text-base">★</span>
+                    }
+                  </div>
+                </td>
+                <td class="px-5 py-4 hidden lg:table-cell">
+                  <p class="text-sm theme-muted truncate max-w-[200px]">{{ review.comment ?? '—' }}</p>
+                </td>
+                <td class="px-5 py-4">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                    [ngClass]="review.visible ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'">
+                    {{ review.visible ? 'Oui' : 'Masqué' }}
+                  </span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2">
+                    <button (click)="toggleReviewVisibility(review)"
+                      class="text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors"
+                      [ngClass]="review.visible ? 'bg-orange-500/10 text-orange-400 hover:bg-orange-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'">
+                      {{ review.visible ? 'Masquer' : 'Afficher' }}
+                    </button>
+                    <button (click)="adminDeleteReview(review)" class="text-red-400/60 hover:text-red-400 transition-colors p-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if (reviews.length === 0) {
+              <tr><td colspan="6" class="py-16 text-center theme-muted">Aucun avis</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (reviewsTotalPages > 1) {
+      <div class="flex justify-center gap-2 mt-4">
+        @for (p of reviewPages; track p) {
+          <button (click)="loadReviews(p)"
+            class="w-9 h-9 rounded-xl text-sm font-bold transition-colors"
+            [ngClass]="reviewsPage === p ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">
+            {{ p + 1 }}
+          </button>
+        }
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,149 @@
+<div class="p-6 lg:p-8 animate-fade-in-up">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div>
+      <h2 class="text-xl font-bold theme-text">Codes promo</h2>
+      <p class="text-sm theme-muted mt-0.5">{{ promos.length }} code(s) au total</p>
+    </div>
+    <button (click)="openPromoForm()"
+      class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nouveau code
+    </button>
+  </div>
+
+  @if (showPromoForm) {
+    <div class="theme-surface border theme-border rounded-3xl p-6 mb-6 animate-fade-in">
+      <h3 class="font-bold theme-text mb-4">Créer un code promo</h3>
+      @if (promoFormError) {
+        <div class="p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm mb-4">{{ promoFormError }}</div>
+      }
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Code *</label>
+          <input [(ngModel)]="promoForm.code" type="text" placeholder="EX: NOEL10"
+            class="theme-input w-full px-3 py-2.5 rounded-xl text-sm uppercase"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Réduction (%) *</label>
+          <input [(ngModel)]="promoForm.discountPercent" type="number" min="1" max="100"
+            class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Expire le</label>
+          <input [(ngModel)]="promoForm.expiresAt" type="date" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Utilisations max</label>
+          <input [(ngModel)]="promoForm.maxUses" type="number" min="1" placeholder="Illimité"
+            class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Description</label>
+        <input [(ngModel)]="promoForm.description" type="text" placeholder="Ex: Promo de Noël"
+          class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+      </div>
+      <div class="flex items-center gap-3 mb-4 p-3 bg-gold/5 border border-gold/15 rounded-xl">
+        <input type="checkbox" [(ngModel)]="promoForm.publicVisible" id="publicVisible"
+          class="w-4 h-4 rounded accent-yellow-500 cursor-pointer"/>
+        <div class="flex-1">
+          <label for="publicVisible" class="text-sm font-bold theme-text cursor-pointer">Afficher dans la boutique</label>
+          <p class="text-xs theme-muted mt-0.5">Les clients verront ce code directement dans leur panier</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button (click)="closePromoForm()"
+          class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-black/[.04] transition-colors">
+          Annuler
+        </button>
+        <button (click)="submitPromo()" [disabled]="promoFormLoading || !promoForm.code"
+          class="flex-1 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg transition-all disabled:opacity-50">
+          Créer
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (promosLoading) {
+    <div class="flex justify-center py-12">
+      <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+    </div>
+  }
+
+  @if (!promosLoading) {
+    <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="theme-surface-2">
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Code</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Réduction</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Utilisations</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Expiration</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Boutique</th>
+              <th class="px-5 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (promo of promos; track promo.id) {
+              <tr class="border-t theme-border hover:bg-white/2 transition-colors">
+                <td class="px-5 py-4">
+                  <span class="font-mono font-bold text-gold text-sm">{{ promo.code }}</span>
+                  @if (promo.description) {
+                    <p class="text-xs theme-muted mt-0.5">{{ promo.description }}</p>
+                  }
+                </td>
+                <td class="px-5 py-4"><span class="font-bold theme-text text-lg">{{ promo.discountPercent }}%</span></td>
+                <td class="px-5 py-4 hidden md:table-cell">
+                  <span class="text-sm theme-text">{{ promo.usedCount }}</span>
+                  @if (promo.maxUses) { <span class="text-xs theme-muted"> / {{ promo.maxUses }}</span> }
+                  @else { <span class="text-xs theme-muted"> / ∞</span> }
+                </td>
+                <td class="px-5 py-4 hidden lg:table-cell">
+                  <span class="text-sm theme-muted">{{ promo.expiresAt ? (promo.expiresAt | date:'dd/MM/yyyy') : 'Pas de limite' }}</span>
+                </td>
+                <td class="px-5 py-4">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                    [ngClass]="promo.active ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="promo.active ? 'bg-green-400' : 'bg-red-400'"></span>
+                    {{ promo.active ? 'Actif' : 'Inactif' }}
+                  </span>
+                </td>
+                <td class="px-5 py-4 hidden md:table-cell">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                    [ngClass]="promo.publicVisible ? 'bg-blue-500/15 text-blue-400' : 'bg-black/[.06] text-gray-500'">
+                    {{ promo.publicVisible ? 'Visible' : 'Masqué' }}
+                  </span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2">
+                    <button (click)="togglePromo(promo)"
+                      class="text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors"
+                      [ngClass]="promo.active ? 'bg-orange-500/10 text-orange-400 hover:bg-orange-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'">
+                      {{ promo.active ? 'Désactiver' : 'Activer' }}
+                    </button>
+                    <button (click)="deletePromo(promo)" class="text-red-400/60 hover:text-red-400 transition-colors p-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if (promos.length === 0) {
+              <tr><td colspan="7" class="py-16 text-center theme-muted">Aucun code promo</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

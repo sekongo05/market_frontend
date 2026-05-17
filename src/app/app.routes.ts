@@ -5,8 +5,8 @@ import { LoginComponent, RegisterComponent } from './features/auth/pages';
 import { ProductsComponent, ProductDetailComponent } from './features/products/pages';
 import { OrdersComponent } from './features/orders/pages';
 import { ProfileComponent } from './features/profile/pages';
-import { AdminDashboardComponent } from './features/admin/pages';
-import { ManagerComponent } from './features/manager/pages';
+import { ADMIN_ROUTES } from './features/admin/admin.routes';
+import { MANAGER_ROUTES } from './features/manager/manager.routes';
 import { HelpComponent } from './features/help/help.component';
 import { PrivacyComponent } from './features/privacy/privacy.component';
 import { AuthenticityComponent } from './features/authenticity/authenticity.component';
@@ -36,15 +36,15 @@ export const APP_ROUTES: Routes = [
       },
       {
         path: 'admin',
-        component: AdminDashboardComponent,
         canActivate: [authGuard, roleGuard],
         data: { roles: [UserRole.ADMIN] },
+        children: ADMIN_ROUTES,
       },
       {
         path: 'manager',
-        component: ManagerComponent,
         canActivate: [authGuard, roleGuard],
         data: { roles: [UserRole.MANAGER, UserRole.ADMIN] },
+        children: MANAGER_ROUTES,
       },
 { path: 'help', component: HelpComponent },
       { path: 'privacy', component: PrivacyComponent },

@@ -1,0 +1,124 @@
+<div class="p-6 lg:p-8 animate-fade-in-up">
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-xl font-bold theme-text">Demandes de retour</h2>
+      <p class="text-sm theme-muted mt-0.5">{{ returns.length }} demande(s) chargée(s)</p>
+    </div>
+    <button (click)="loadReturns(0)"
+      class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      Actualiser
+    </button>
+  </div>
+
+  @if (returnsLoading) {
+    <div class="flex justify-center py-12">
+      <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+    </div>
+  }
+
+  @if (!returnsLoading) {
+    <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="theme-surface-2">
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Commande</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Client</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Motif</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Date</th>
+              <th class="px-5 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ret of returns; track ret.id) {
+              <tr class="border-t theme-border hover:bg-white/2 transition-colors">
+                <td class="px-5 py-4">
+                  <span class="font-mono text-sm font-bold theme-text">{{ ret.orderNumber }}</span>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="font-semibold theme-text text-sm">{{ ret.customerName }}</p>
+                </td>
+                <td class="px-5 py-4 hidden lg:table-cell">
+                  <p class="text-sm theme-muted truncate max-w-[200px]">{{ ret.reason }}</p>
+                </td>
+                <td class="px-5 py-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold"
+                    [ngClass]="returnStatusClass(ret.status)">
+                    {{ returnStatusLabel(ret.status) }}
+                  </span>
+                </td>
+                <td class="px-5 py-4 hidden md:table-cell">
+                  <span class="text-sm theme-muted">{{ ret.createdAt | date:'dd/MM/yyyy' }}</span>
+                </td>
+                <td class="px-5 py-4">
+                  @if (ret.status === 'PENDING' || ret.status === 'APPROVED') {
+                    <button (click)="openReturnDecisionModal(ret)"
+                      class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors">
+                      Statuer
+                    </button>
+                  } @else {
+                    <span class="text-xs theme-muted">{{ ret.processedBy ?? '—' }}</span>
+                  }
+                </td>
+              </tr>
+            }
+            @if (returns.length === 0) {
+              <tr><td colspan="6" class="py-16 text-center theme-muted">Aucune demande de retour</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (returnsTotalPages > 1) {
+      <div class="flex justify-center gap-2 mt-4">
+        @for (p of returnPages; track p) {
+          <button (click)="loadReturns(p)"
+            class="w-9 h-9 rounded-xl text-sm font-bold transition-colors"
+            [ngClass]="returnsPage === p ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-white/12'">
+            {{ p + 1 }}
+          </button>
+        }
+      </div>
+    }
+  }
+
+  <!-- Modal décision retour -->
+  @if (returnDecisionModal && returnDecisionItem) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+      <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeReturnDecisionModal()"></div>
+      <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl p-6 animate-scale-in">
+        <h3 class="text-lg font-bold theme-text mb-1">Statuer sur la demande</h3>
+        <p class="text-xs theme-muted mb-4">{{ returnDecisionItem.orderNumber }} — {{ returnDecisionItem.customerName }}</p>
+        <p class="text-sm theme-muted mb-4 p-3 bg-black/[.03] rounded-xl">{{ returnDecisionItem.reason }}</p>
+        <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Décision *</label>
+        <select [(ngModel)]="returnDecision" class="theme-input w-full px-3 py-2.5 rounded-xl text-sm mb-4">
+          <option value="APPROVED">Accepter le retour</option>
+          <option value="REJECTED">Refuser le retour</option>
+          <option value="COMPLETED">Marquer comme traité</option>
+        </select>
+        <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Note (optionnel)</label>
+        <textarea [(ngModel)]="returnDecisionNote" rows="3" placeholder="Explication pour le client…"
+          class="theme-input w-full px-3 py-2.5 rounded-xl text-sm resize-none mb-4"></textarea>
+        <div class="flex gap-3">
+          <button (click)="closeReturnDecisionModal()"
+            class="flex-1 py-2.5 rounded-xl border theme-border theme-muted font-semibold text-sm hover:bg-black/[.04] transition-colors">
+            Annuler
+          </button>
+          <button (click)="submitReturnDecision()" [disabled]="returnDecisionLoading"
+            class="flex-1 py-2.5 rounded-xl bg-gold text-black font-bold text-sm hover:shadow-lg transition-all disabled:opacity-50">
+            Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,66 @@
+<div class="min-h-screen theme-bg flex">
+
+  <!-- ── Sidebar ───────────────────────────────────────────────────── -->
+  <aside class="w-64 flex-shrink-0 theme-surface border-r theme-border flex flex-col sticky top-0 h-screen">
+
+    <!-- Logo / titre -->
+    <div class="px-6 py-5 border-b theme-border">
+      <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-0.5">Administration</p>
+      <h1 class="text-xl font-black theme-text">SDM Store</h1>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+      @for (item of navItems; track item.route) {
+        <a [routerLink]="item.route" routerLinkActive="bg-gold/10 text-gold border-gold/30"
+           [routerLinkActiveOptions]="{exact: item.route === 'overview'}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium theme-muted hover:text-gold hover:bg-gold/8 border border-transparent transition-all duration-150 group relative">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"/>
+          </svg>
+          <span>{{ item.label }}</span>
+          @if (item.badge && pendingOrdersCount > 0) {
+            <span class="ml-auto bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full">
+              {{ pendingOrdersCount }}
+            </span>
+          }
+        </a>
+      }
+    </nav>
+
+    <!-- Pied de sidebar -->
+    <div class="px-4 py-4 border-t theme-border">
+      <a routerLink="/" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm theme-muted hover:text-gold hover:bg-gold/8 transition-colors duration-150">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Retour au site
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── Contenu principal ─────────────────────────────────────────── -->
+  <main class="flex-1 min-w-0">
+    <router-outlet/>
+  </main>
+
+  <!-- ── Toasts ────────────────────────────────────────────────────── -->
+  <div class="fixed bottom-6 right-6 z-[999] flex flex-col gap-2 pointer-events-none">
+    @for (t of toastService.toasts(); track t.id) {
+      <div class="pointer-events-auto flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl text-sm font-semibold animate-fade-in-up border"
+           [ngClass]="t.type === 'success'
+             ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+             : 'bg-red-500/15 border-red-500/30 text-red-300'">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          @if (t.type === 'success') {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          } @else {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          }
+        </svg>
+        {{ t.msg }}
+      </div>
+    }
+  </div>
+
+</div>
