@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { WhatsappService } from '../../core/services/whatsapp.service';
 
 @Component({
   selector: 'app-support-widget',
@@ -25,7 +26,7 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
 
         <!-- Bouton principal -->
-        <a [href]="waUrl" target="_blank" rel="noopener noreferrer"
+        <a [href]="wa.buildUrl()" target="_blank" rel="noopener noreferrer"
            class="wa-btn flex items-center gap-3 pr-5 pl-4 shadow-2xl
                   hover:-translate-y-0.5 hover:shadow-green-500/30 active:scale-95
                   transition-all duration-300 cursor-pointer"
@@ -79,9 +80,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class SupportWidgetComponent {
 
-  readonly waUrl = 'https://wa.me/2250153761320?text=Bonjour%20SDM%20STORE%20%F0%9F%91%8B%2C%20je%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20de%20vos%20produits.%20Pouvez-vous%20m\'aider%20%3F';
-
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, public wa: WhatsappService) {}
 
   get visible(): boolean {
     const role = this.authService.getCurrentUser()?.role;

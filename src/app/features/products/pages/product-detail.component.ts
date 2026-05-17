@@ -15,6 +15,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { ReviewService } from '../../../core/services/review.service';
+import { WhatsappService } from '../../../core/services/whatsapp.service';
 import { ProductMediaItem, ProductResponse, ProductVariant } from '../../../core/models/product.models';
 import { ReviewResponse, ProductRatingResponse } from '../../../core/models/review.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
@@ -121,7 +122,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private authPromptService: AuthPromptService,
     private wsService: WebSocketService,
     private reviewService: ReviewService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private wa: WhatsappService
   ) {}
 
   goBack(): void {
@@ -177,6 +179,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       next: (response) => {
         if (response.success && response.data) {
           this.product = response.data;
+          this.wa.context.set({ name: response.data.name, price: response.data.price, id: response.data.id });
           this._autoSelectVariant();
           this._buildGallery();
           this._loadRelated();
@@ -206,6 +209,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.destroy$.next();
     this.destroy$.complete();
     this.observer?.disconnect();
+    this.wa.context.set(null);
   }
 
   // ── Gallery ──────────────────────────────────────────────────────────────
