@@ -115,6 +115,26 @@ export class NotificationTemplateService {
       borderClass: 'border-amber-500/30',
       bannerClass: 'bg-amber-500/8',
     },
+
+    [NotificationType.RETURN_COMPLETED]: {
+      label: 'Remboursement effectué',
+      iconPath: 'M9 8h6m-5 0a3 3 0 110 6H9l3 3m-3-6h6m6 1a9 9 0 11-18 0 9 9 0 0118 0z',
+      iconViewBox: '0 0 24 24',
+      colorClass: 'text-emerald-400',
+      bgClass: 'bg-emerald-500/15',
+      borderClass: 'border-emerald-500/30',
+      bannerClass: 'bg-emerald-500/8',
+    },
+
+    [NotificationType.WELCOME]: {
+      label: 'Bienvenue',
+      iconPath: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7',
+      iconViewBox: '0 0 24 24',
+      colorClass: 'text-gold',
+      bgClass: 'bg-yellow-500/15',
+      borderClass: 'border-yellow-500/30',
+      bannerClass: 'bg-yellow-500/8',
+    },
   };
 
   get(type: NotificationType): NotifTemplate {
