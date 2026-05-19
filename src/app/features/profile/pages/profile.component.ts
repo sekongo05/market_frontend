@@ -83,6 +83,24 @@ export class ProfileComponent implements OnInit {
     return !!p && p !== '+225' && p.length > 6;
   }
 
+  get passwordStrength(): { score: number; label: string; color: string } {
+    const pwd: string = this.passwordForm.get('newPassword')?.value ?? '';
+    if (!pwd) return { score: 0, label: '', color: '' };
+    let score = 0;
+    if (pwd.length >= 8)          score++;
+    if (/[A-Z]/.test(pwd))        score++;
+    if (/[0-9]/.test(pwd))        score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+    const map = [
+      { label: '',                    color: '' },
+      { label: 'Trop faible',         color: 'text-red-400' },
+      { label: 'Faible',              color: 'text-orange-400' },
+      { label: 'Correct',             color: 'text-yellow-400' },
+      { label: 'Fort',                color: 'text-green-400' },
+    ];
+    return { score, ...map[score] };
+  }
+
   loadUserProfile(): void {
     this.loading = true;
     this.userService.getProfile().subscribe({

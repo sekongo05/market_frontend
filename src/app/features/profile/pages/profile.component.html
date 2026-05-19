@@ -444,6 +444,14 @@
                   }
                 </button>
               </div>
+              <!-- Lien mot de passe oublié -->
+              <div class="flex justify-end">
+                <a routerLink="/forgot-password"
+                  class="text-xs font-semibold transition-colors hover:underline"
+                  style="color:#d4af37">
+                  Mot de passe oublié ?
+                </a>
+              </div>
             </div>
 
             <!-- Séparateur visuel -->
@@ -478,25 +486,36 @@
                   }
                 </button>
               </div>
-              <!-- Indicateur de force -->
+              <!-- Indicateur de force (4 critères réels) -->
               @if (passwordForm.get('newPassword')?.value?.length > 0) {
-                <div class="space-y-1.5">
+                <div class="space-y-2">
+                  <!-- Barre de progression -->
                   <div class="flex gap-1.5">
                     @for (i of [1,2,3,4]; track i) {
-                      <div class="h-1 flex-1 rounded-full transition-all duration-300"
-                        [class]="passwordForm.get('newPassword')!.value.length >= i * 2
-                          ? (passwordForm.get('newPassword')!.value.length < 6 ? 'bg-red-500' :
-                             passwordForm.get('newPassword')!.value.length < 10 ? 'bg-orange-400' : 'bg-green-400')
+                      <div class="h-1.5 flex-1 rounded-full transition-all duration-300"
+                        [ngClass]="passwordStrength.score >= i
+                          ? (passwordStrength.score === 1 ? 'bg-red-500'
+                           : passwordStrength.score === 2 ? 'bg-orange-400'
+                           : passwordStrength.score === 3 ? 'bg-yellow-400'
+                           : 'bg-green-400')
                           : 'bg-white/10'">
                       </div>
                     }
                   </div>
-                  <p class="text-[11px]"
-                    [class]="passwordForm.get('newPassword')!.value.length < 6 ? 'text-red-400' :
-                             passwordForm.get('newPassword')!.value.length < 10 ? 'text-orange-400' : 'text-green-400'">
-                    {{ passwordForm.get('newPassword')!.value.length < 6 ? 'Trop court (6 caractères minimum)' :
-                       passwordForm.get('newPassword')!.value.length < 10 ? 'Mot de passe correct' : 'Mot de passe fort' }}
-                  </p>
+                  <!-- Label + critères -->
+                  <div class="flex items-center justify-between">
+                    <div class="flex gap-3 text-[10px] theme-muted">
+                      <span [class.text-green-400]="passwordForm.get('newPassword')!.value.length >= 8">≥ 8 car.</span>
+                      <span [class.text-green-400]="/[A-Z]/.test(passwordForm.get('newPassword')!.value)">Maj.</span>
+                      <span [class.text-green-400]="/[0-9]/.test(passwordForm.get('newPassword')!.value)">Chiffre</span>
+                      <span [class.text-green-400]="/[^A-Za-z0-9]/.test(passwordForm.get('newPassword')!.value)">Symbole</span>
+                    </div>
+                    @if (passwordStrength.label) {
+                      <span class="text-[11px] font-bold" [ngClass]="passwordStrength.color">
+                        {{ passwordStrength.label }}
+                      </span>
+                    }
+                  </div>
                 </div>
               }
             </div>
@@ -510,7 +529,7 @@
               <div class="relative">
                 <input [type]="showConfirmPwd ? 'text' : 'password'" formControlName="confirmPassword"
                   placeholder="••••••••" autocomplete="new-password"
-                  class="theme-input w-full px-4 py-3 pr-12 rounded-xl text-sm font-medium transition-all"
+                  class="theme-input w-full px-4 py-3 pr-12 rounded-xl text-sm font-medium transition-all focus:ring-1 focus:ring-gold/40"
                   [class.ring-1]="passwordForm.get('confirmPassword')?.value"
                   [class.ring-red-500]="passwordForm.get('confirmPassword')?.value &&
                                         passwordForm.get('newPassword')?.value !== passwordForm.get('confirmPassword')?.value"

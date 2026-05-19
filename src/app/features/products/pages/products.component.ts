@@ -70,11 +70,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
   viewGalleryIndex = 0;
 
   totalItems = 0;
-
+  showScrollTop = false;
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.selectedProduct) this.closeProductView();
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    this.showScrollTop = window.scrollY > 400;
+    this.cdr.detectChanges();
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   get viewActiveItem(): { url: string; type: 'IMAGE' | 'VIDEO' } {

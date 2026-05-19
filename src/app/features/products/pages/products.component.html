@@ -441,6 +441,19 @@
   </div>
 </div>
 
+<!-- ===== Bouton scroll-to-top ===== -->
+@if (showScrollTop && !selectedProduct) {
+  <button (click)="scrollToTop()"
+    class="fixed bottom-6 right-4 z-30 w-12 h-12 rounded-2xl flex items-center justify-center
+           shadow-lg shadow-black/40 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+    style="background:#d4af37;color:#000;"
+    aria-label="Retour en haut">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/>
+    </svg>
+  </button>
+}
+
 <!-- ===== PANNEAU PLEINE PAGE — DÉTAIL PRODUIT ===== -->
 @if (selectedProduct) {
   <div id="product-view-panel" class="fixed left-0 right-0 bottom-0 z-40 overflow-y-auto overscroll-contain theme-bg animate-fade-in"

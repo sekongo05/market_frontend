@@ -136,7 +136,7 @@
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
 
         <!-- Nom + Prénom -->
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Nom</label>
             <input type="text" formControlName="nom" placeholder="Diallo"

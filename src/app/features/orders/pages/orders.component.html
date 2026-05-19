@@ -154,7 +154,7 @@
                 <!-- Donner mon avis — immédiat -->
                 @for (item of order.items; track item.productId) {
                   <a [routerLink]="['/products', item.productSlug]"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150"
+                    class="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors duration-150"
                     style="background:rgba(212,175,55,0.1);color:#d4af37;border:1px solid rgba(212,175,55,0.25);">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -166,7 +166,7 @@
                 <!-- Retourner un article — J+7 seulement -->
                 @if (canReturn(order)) {
                   <button (click)="openReturnForm(order.id)"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150"
+                    class="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors duration-150"
                     style="background:rgba(249,115,22,0.08);color:#f97316;border:1px solid rgba(249,115,22,0.25);">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -189,7 +189,7 @@
               </div>
 
               <button (click)="toggleDetails(order.id)"
-                class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200"
+                class="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200"
                 style="background:rgba(212,175,55,0.1);color:#d4af37;border:1px solid rgba(212,175,55,0.2);"
                 [style.background]="expandedId === order.id ? 'rgba(212,175,55,0.2)' : 'rgba(212,175,55,0.08)'">
                 <svg class="w-4 h-4 transition-transform duration-300"
