@@ -89,6 +89,10 @@
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
 @keyframes orb-drift {
   0%,100% { transform: translate(0,0) scale(1); }
   33%      { transform: translate(40px,-30px) scale(1.1); }
@@ -109,6 +113,7 @@
 .animate-spin-slow    { animation: spin-slow  20s linear infinite; }
 .animate-drawer-in    { animation: drawerIn   0.38s cubic-bezier(.32,0,.15,1) both; }
 .animate-backdrop-in  { animation: backdropIn 0.25s ease both; }
+.animate-sheet-up     { animation: sheetUp   0.28s cubic-bezier(.22,1,.36,1) both; }
 
 /* Stagger delays */
 .delay-100 { animation-delay: 0.1s; }
