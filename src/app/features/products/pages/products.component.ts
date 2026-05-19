@@ -11,6 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { ProductResponse, GetProductsParams, SortOption,ProductVariant } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
@@ -139,7 +140,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private scrollLock: ScrollLockService
+    private scrollLock: ScrollLockService,
+    private seo: SeoService,
   ) {}
 
   openProductView(product: ProductResponse): void {
@@ -243,6 +245,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.seo.set({
+      title: 'Tous nos produits',
+      description: 'Découvrez notre catalogue complet : mode, montres, bijoux, beauté, électronique et lifestyle. Livraison rapide en Côte d\'Ivoire.',
+      url: '/products',
+    });
     this.initForm();
     const slugParam   = this.route.snapshot.queryParamMap.get('categorie');
     const searchParam = this.route.snapshot.queryParamMap.get('search');

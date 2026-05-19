@@ -1,10 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   readonly isDark = false;
 
   constructor() {
-    document.documentElement.classList.remove('dark');
+    if (isPlatformBrowser(inject(PLATFORM_ID))) {
+      document.documentElement.classList.remove('dark');
+    }
   }
 }

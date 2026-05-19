@@ -1,4 +1,5 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationStart } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -8,18 +9,16 @@ export class ScrollLockService implements OnDestroy {
   private locked = false;
   private savedY = 0;
   private routerSub: Subscription;
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor(router: Router) {
-    // Libère automatiquement le scroll à chaque navigation.
-    // Couvre les cas où un composant est détruit sans appeler unlock()
-    // (navigation rapide, swipe retour iOS, erreur JS).
     this.routerSub = router.events
       .pipe(filter(e => e instanceof NavigationStart))
       .subscribe(() => this.forceUnlock());
   }
 
   lock(): void {
-    if (this.locked) return;
+    if (!this.isBrowser || this.locked) return;
     this.locked = true;
     this.savedY = window.scrollY;
     document.body.style.overflow  = 'hidden';
@@ -37,7 +36,7 @@ export class ScrollLockService implements OnDestroy {
   }
 
   private _restore(): void {
-    if (!this.locked) return;
+    if (!this.isBrowser || !this.locked) return;
     this.locked = false;
     document.body.style.removeProperty('overflow');
     document.body.style.removeProperty('position');

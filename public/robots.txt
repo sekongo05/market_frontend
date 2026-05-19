@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /manager/
+Disallow: /auth/
+Disallow: /profile
+Disallow: /orders
+
+Sitemap: https://sdmstore.ci/sitemap.xml

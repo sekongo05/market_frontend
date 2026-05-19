@@ -6,6 +6,7 @@ import { ProductService } from './core/services/product.service';
 import { ReviewService } from './core/services/review.service';
 import { DashboardService, PublicStats } from './core/services/dashboard.service';
 import { WebSocketService } from './core/services/websocket.service';
+import { SeoService } from './core/services/seo.service';
 import { MediaUrlPipe } from './shared/pipes/media-url.pipe';
 import { ProductResponse } from './core/models/product.models';
 import { ReviewResponse } from './core/models/review.models';
@@ -81,11 +82,13 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     private wsService: WebSocketService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private seo: SeoService,
   ) {
     this.currentUser$ = this.authService.currentUser$;
   }
 
   ngAfterViewInit(): void {
+    this.seo.setDefault();
     this._loadPublicStats();
     this._loadProducts();
     this._loadReviews();

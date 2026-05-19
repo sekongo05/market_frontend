@@ -16,6 +16,7 @@ import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { ReviewService } from '../../../core/services/review.service';
 import { WhatsappService } from '../../../core/services/whatsapp.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { ProductMediaItem, ProductResponse, ProductVariant } from '../../../core/models/product.models';
 import { ReviewResponse, ProductRatingResponse } from '../../../core/models/review.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
@@ -123,7 +124,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private wsService: WebSocketService,
     private reviewService: ReviewService,
     private cdr: ChangeDetectorRef,
-    private wa: WhatsappService
+    private wa: WhatsappService,
+    private seo: SeoService,
   ) {}
 
   goBack(): void {
@@ -186,6 +188,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           this._loadReviews();
           this._loadRating();
           this._loadCanReview();
+          this._updateSeo();
         } else {
           this._tryMock();
         }
@@ -583,6 +586,54 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
+  private _updateSeo(): void {
+    if (!this.product) return;
+    const p = this.product;
+    const price = p.salePrice ?? p.price;
+    const slug = p.slug ?? p.id;
+    const description = p.description
+      ? p.description.slice(0, 160)
+      : `Achetez ${p.name} sur SDM STORE. Livraison rapide en Côte d'Ivoire.`;
+
+    const rating = this.productRating;
+
+    this.seo.set({
+      title: p.name,
+      description,
+      image: p.imageUrl || undefined,
+      url: `/products/${slug}`,
+      type: 'product',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: p.name,
+        description: p.description || description,
+        image: p.imageUrl,
+        sku: String(p.id),
+        brand: { '@type': 'Brand', name: 'SDM STORE' },
+        offers: {
+          '@type': 'Offer',
+          url: `https://sdmstore.ci/products/${slug}`,
+          priceCurrency: 'XOF',
+          price: price,
+          availability: p.stock > 0
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+          seller: { '@type': 'Organization', name: 'SDM STORE' },
+        },
+        ...(rating && rating.totalReviews > 0 ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: rating.averageRating,
+            reviewCount: rating.totalReviews,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        } : {}),
+      },
+    });
+  }
+
   private _initScrollReveal(): void {
     this.observer = new IntersectionObserver(
       (entries) => {
@@ -628,7 +679,13 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private _loadRating(): void {
     if (!this.product) return;
     this.reviewService.getProductRating(this.product.id).subscribe({
-      next: (res) => { if (res.success) { this.productRating = res.data; this.cdr.detectChanges(); } },
+      next: (res) => {
+        if (res.success) {
+          this.productRating = res.data;
+          this._updateSeo();
+          this.cdr.detectChanges();
+        }
+      },
       error: () => {}
     });
   }

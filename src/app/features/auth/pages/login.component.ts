@@ -64,7 +64,6 @@ export class LoginComponent implements OnInit {
       next: (response) => {
         this.loading = false;
         if (response.success) {
-          localStorage.setItem('current_user', JSON.stringify(response.data));
           this.toastService.success(`Bienvenue ${response.data.prenom} !`);
           this.router.navigateByUrl(this.returnUrl);
         } else {

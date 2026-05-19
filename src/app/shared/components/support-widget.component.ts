@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { WhatsappService } from '../../core/services/whatsapp.service';
 
@@ -91,10 +92,12 @@ import { WhatsappService } from '../../core/services/whatsapp.service';
 export class SupportWidgetComponent implements OnInit {
   private authService = inject(AuthService);
   public wa = inject(WhatsappService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   showBubble = signal(false);
 
   ngOnInit(): void {
+    if (!this.isBrowser) return;
     if (sessionStorage.getItem('wa_bubble_closed')) return;
     setTimeout(() => this.showBubble.set(true), 2400);
     setTimeout(() => this.showBubble.set(false), 7000);
@@ -102,7 +105,7 @@ export class SupportWidgetComponent implements OnInit {
 
   closeBubble(): void {
     this.showBubble.set(false);
-    sessionStorage.setItem('wa_bubble_closed', '1');
+    if (this.isBrowser) sessionStorage.setItem('wa_bubble_closed', '1');
   }
 
   get visible(): boolean {

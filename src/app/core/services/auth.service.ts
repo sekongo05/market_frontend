@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { ApiResponse } from '../models/common.models';
@@ -25,6 +26,8 @@ export class AuthService {
   private readonly refreshTokenKey = 'refresh_token';
   private currentUserSubject = new BehaviorSubject<CurrentUser | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor(
     private apiService: ApiService,
@@ -59,11 +62,10 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.refreshTokenKey);
-    localStorage.removeItem('current_user');
+    this._storage('remove', this.tokenKey);
+    this._storage('remove', this.refreshTokenKey);
+    this._storage('remove', 'current_user');
     this.currentUserSubject.next(null);
-    // Repasser en mode anonyme : stock toujours en temps réel, sans token
     this.webSocketService.connect();
   }
 
@@ -95,11 +97,11 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return this._storage('get', this.tokenKey);
   }
 
   getRefreshToken(): string | null {
-    return localStorage.getItem(this.refreshTokenKey);
+    return this._storage('get', this.refreshTokenKey);
   }
 
   isAuthenticated(): boolean {
@@ -111,12 +113,12 @@ export class AuthService {
   }
 
   private setTokens(token: string, refreshToken: string): void {
-    localStorage.setItem(this.tokenKey, token);
-    localStorage.setItem(this.refreshTokenKey, refreshToken);
+    this._storage('set', this.tokenKey, token);
+    this._storage('set', this.refreshTokenKey, refreshToken);
   }
 
   private setCurrentUser(user: AuthResponse): void {
-    localStorage.setItem('current_user', JSON.stringify(user));
+    this._storage('set', 'current_user', JSON.stringify(user));
     this.currentUserSubject.next(user as CurrentUser);
   }
 
@@ -130,7 +132,7 @@ export class AuthService {
   private loadUserFromToken(): void {
     const token = this.getToken();
     if (token) {
-      const userJson = localStorage.getItem('current_user');
+      const userJson = this._storage('get', 'current_user');
       if (userJson) {
         try {
           const user: AuthResponse = JSON.parse(userJson);
@@ -139,11 +141,22 @@ export class AuthService {
           return;
         } catch (e) {
           console.error('Failed to parse stored user', e);
-          localStorage.removeItem('current_user');
+          this._storage('remove', 'current_user');
         }
       }
     }
-    // Aucune session → connexion anonyme (stock en temps réel sans token)
-    this.webSocketService.connect();
+    if (this.isBrowser) {
+      this.webSocketService.connect();
+    }
+  }
+
+  private _storage(op: 'get', key: string): string | null;
+  private _storage(op: 'set', key: string, value: string): void;
+  private _storage(op: 'remove', key: string): void;
+  private _storage(op: 'get' | 'set' | 'remove', key: string, value?: string): string | null | void {
+    if (!this.isBrowser) return op === 'get' ? null : undefined;
+    if (op === 'get') return localStorage.getItem(key);
+    if (op === 'set') localStorage.setItem(key, value!);
+    if (op === 'remove') localStorage.removeItem(key);
   }
 }
