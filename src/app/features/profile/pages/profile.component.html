@@ -109,24 +109,24 @@
             <p class="text-xl sm:text-2xl font-black text-white">
               {{ fullProfile !== null ? fullProfile.totalOrders : '–' }}
             </p>
-            <p class="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">Commandes</p>
+            <p class="text-[11px] text-white/40 uppercase tracking-wider mt-0.5 leading-tight">Commandes</p>
           </div>
-          <div class="text-center px-2 sm:px-4 py-3 rounded-2xl border border-white/[.08] bg-white/[.04]">
+          <div class="text-center px-1 sm:px-4 py-3 rounded-2xl border border-white/[.08] bg-white/[.04]">
             @if (fullProfile !== null) {
-              <p class="text-base sm:text-lg font-black text-gold leading-tight">
-                {{ fullProfile.totalSpent | number:'1.0-0':'fr-FR' }}<span class="text-xs text-gold/60 ml-0.5">F</span>
+              <p class="text-sm sm:text-lg font-black text-gold leading-tight">
+                {{ fullProfile.totalSpent | number:'1.0-0':'fr-FR' }}<span class="text-[10px] text-gold/60 ml-0.5">F</span>
               </p>
             } @else {
               <p class="text-xl sm:text-2xl font-black text-gold">–</p>
             }
-            <p class="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">Dépensés</p>
+            <p class="text-[11px] text-white/40 uppercase tracking-wider mt-0.5 leading-tight">Dépensés</p>
           </div>
           <div class="text-center px-2 sm:px-4 py-3 rounded-2xl border border-white/[.08] bg-white/[.04]">
             <p class="text-xl sm:text-2xl font-black transition-colors"
                [class]="fullProfile !== null && fullProfile.pendingOrders > 0 ? 'text-amber-400' : 'text-white'">
               {{ fullProfile !== null ? fullProfile.pendingOrders : '–' }}
             </p>
-            <p class="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">En cours</p>
+            <p class="text-[11px] text-white/40 uppercase tracking-wider mt-0.5 leading-tight">En cours</p>
           </div>
         </div>
       }

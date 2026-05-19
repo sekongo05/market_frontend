@@ -497,9 +497,9 @@ body   { background: #f8f5f0; color: #111111; }
   height: max(6px, env(safe-area-inset-bottom));
 }
 
-/* ── Main content bottom padding on mobile ── */
+/* ── Main content bottom padding on mobile (hors backoffice) ── */
 @media (max-width: 1023px) {
-  main.theme-bg {
+  main.theme-bg:not(.backoffice-main) {
     padding-bottom: calc(var(--bottom-nav-h) + max(8px, env(safe-area-inset-bottom)));
   }
 }

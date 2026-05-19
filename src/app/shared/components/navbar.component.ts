@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterModule, RouterLinkActive, Router } from '@angular/router';
+import { RouterLink, RouterModule, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { TooltipDirective } from '../directives/tooltip.directive';
 import { AuthService, CurrentUser } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
@@ -75,6 +75,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   reviewRequestBanner: { subject: string; products: { slug: string; name: string }[] } | null = null;
   private reviewDismissTimer?: ReturnType<typeof setTimeout>;
+  isBackoffice = false;
 
   private destroy$ = new Subject<void>();
 
@@ -131,6 +132,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const url = this.router.url;
+    this.isBackoffice = url.startsWith('/manager') || url.startsWith('/admin');
+
+    this.router.events
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          const next = event.urlAfterRedirects;
+          this.isBackoffice = next.startsWith('/manager') || next.startsWith('/admin');
+          this.cdr.detectChanges();
+        }
+      });
+
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => { this.currentUser = user; this.cdr.detectChanges(); });

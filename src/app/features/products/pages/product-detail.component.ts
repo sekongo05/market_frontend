@@ -283,6 +283,18 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.cdr.detectChanges();
   }
 
+  private touchStartX = 0;
+
+  onTouchStart(e: TouchEvent): void {
+    this.touchStartX = e.changedTouches[0].screenX;
+  }
+
+  onTouchEnd(e: TouchEvent): void {
+    const dx = e.changedTouches[0].screenX - this.touchStartX;
+    if (Math.abs(dx) < 40) return;
+    if (dx < 0) this.nextImage(); else this.prevImage();
+  }
+
   prevImage(): void {
     this.activeIndex = (this.activeIndex - 1 + this.galleryItems.length) % this.galleryItems.length;
     this.zoomed = false;

@@ -1196,8 +1196,9 @@
 }
 
 <!-- ══════════════════════════════════════════════════════
-     BOTTOM TAB BAR — mobile uniquement
+     BOTTOM TAB BAR — mobile uniquement (hors backoffice)
 ══════════════════════════════════════════════════════ -->
+@if (!isBackoffice) {
 <nav class="bottom-tab-bar lg:hidden" aria-label="Navigation principale">
 
   @if (!isManager) {
@@ -1357,6 +1358,7 @@
   }
 
 </nav>
+} <!-- /isBackoffice -->
 
 <!-- ── Banner demande d'avis (déclenché par WebSocket au statut DELIVERED) ── -->
 @if (reviewRequestBanner) {

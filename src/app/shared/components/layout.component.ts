@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, RouterModule } from '@angular/router';
+
 import { Subscription } from 'rxjs';
 import { NavbarComponent } from './navbar.component';
 import { SupportWidgetComponent } from './support-widget.component';
@@ -17,6 +18,7 @@ import { SdmLogoComponent } from './logo.component';
 })
 export class LayoutComponent implements OnInit, OnDestroy {
   navigating = false;
+  isBackoffice = false;
   private routerSub?: Subscription;
 
   constructor(
@@ -26,6 +28,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    const url = this.router.url;
+    this.isBackoffice = url.startsWith('/manager') || url.startsWith('/admin');
+
     this.routerSub = this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         this.navigating = true;
@@ -36,6 +41,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
         event instanceof NavigationError
       ) {
         this.navigating = false;
+        if (event instanceof NavigationEnd) {
+          const next = event.urlAfterRedirects;
+          this.isBackoffice = next.startsWith('/manager') || next.startsWith('/admin');
+        }
         this.cdr.markForCheck();
       }
     });

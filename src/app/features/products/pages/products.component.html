@@ -242,12 +242,12 @@
             <div>
               @if (product.stock === 0) {
                 <span class="inline-flex px-2.5 py-1 backdrop-blur-sm bg-black/70 text-red-400
-                             text-[10px] font-black uppercase tracking-wider rounded border border-red-500/30">
+                             text-xs font-black uppercase tracking-wide rounded border border-red-500/30">
                   Épuisé
                 </span>
               } @else if (product.stock <= 5) {
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-500 text-white
-                             text-[10px] font-black uppercase rounded shadow-lg shadow-red-900/50">
+                             text-xs font-black uppercase rounded shadow-lg shadow-red-900/50">
                   <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                   Plus que {{ product.stock }} !
                 </span>
@@ -255,11 +255,11 @@
             </div>
             <!-- Droite : promo / nouveau -->
             @if (product.discountPercent && product.discountPercent > 0) {
-              <span class="px-2.5 py-1 bg-orange-500 text-white text-[10px] font-black rounded shadow-lg shadow-orange-900/40">
+              <span class="px-2.5 py-1 bg-orange-500 text-white text-xs font-black rounded shadow-lg shadow-orange-900/40">
                 −{{ product.discountPercent }}%
               </span>
             } @else if (isNew(product)) {
-              <span class="flex items-center gap-1 px-2.5 py-1 bg-violet-600 text-white text-[10px] font-black rounded shadow-lg shadow-violet-900/40">
+              <span class="flex items-center gap-1 px-2.5 py-1 bg-violet-600 text-white text-xs font-black rounded shadow-lg shadow-violet-900/40">
                 <span class="w-1 h-1 rounded-full bg-white animate-pulse"></span>
                 NOUVEAU
               </span>
@@ -268,7 +268,7 @@
 
           <!-- ── Actions manager ── -->
           @if (isManager) {
-            <div class="absolute top-3 right-3 flex gap-1.5 transition-opacity duration-200 opacity-0 group-hover:opacity-100"
+            <div class="absolute top-3 right-3 flex gap-1.5 transition-opacity duration-200 opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                  (click)="$event.stopPropagation()">
               <button (click)="openEditModal(product)"
                 appTooltip="Modifier ce produit" tooltipPosition="bottom"

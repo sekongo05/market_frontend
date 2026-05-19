@@ -4,7 +4,7 @@
 <app-navbar></app-navbar>
 <app-toast></app-toast>
 
-<main class="min-h-screen theme-bg">
+<main class="min-h-screen theme-bg" [class.backoffice-main]="isBackoffice">
   <router-outlet></router-outlet>
 </main>
 
