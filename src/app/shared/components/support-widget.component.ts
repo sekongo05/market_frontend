@@ -1,34 +1,41 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
 import { WhatsappService } from '../../core/services/whatsapp.service';
 
 @Component({
   selector: 'app-support-widget',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (visible) {
-      <div class="wa-widget fixed bottom-6 right-5 z-50 flex flex-col items-end gap-2">
+      <div class="wa-widget fixed right-5 z-50 flex flex-col items-end gap-2">
 
-        <!-- Bulle message (desktop uniquement) -->
-        <div class="wa-bubble hidden sm:flex flex-col items-start gap-0.5
-                    px-4 py-3 rounded-2xl rounded-br-sm shadow-xl max-w-[220px]"
-             style="background:#fff;color:#111827;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
-          <p class="text-[11px] font-black leading-tight" style="color:#111827;">Besoin d'aide ou d'infos ?</p>
-          <p class="text-[10px] leading-snug" style="color:#6b7280;">
-            Notre équipe répond en quelques minutes 🕐
-          </p>
-          <!-- Flèche bulle -->
-          <div class="absolute -bottom-2 right-7 w-0 h-0"
-               style="border-left:8px solid transparent;border-right:0 solid transparent;border-top:8px solid #fff;"></div>
-        </div>
+        <!-- Bulle message (desktop uniquement, auto-disparaît) -->
+        @if (showBubble()) {
+          <div class="wa-bubble hidden sm:flex flex-col items-start gap-0.5
+                      px-4 py-3 rounded-2xl rounded-br-sm shadow-xl max-w-[220px]"
+               style="background:#fff;color:#111827;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+
+            <!-- Bouton fermer -->
+            <button (click)="closeBubble()"
+              class="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-black leading-none"
+              style="background:#9ca3af;line-height:1;" aria-label="Fermer">×</button>
+
+            <p class="text-[11px] font-black leading-tight" style="color:#111827;">Besoin d'aide ou d'infos ?</p>
+            <p class="text-[10px] leading-snug" style="color:#6b7280;">
+              Notre équipe répond en quelques minutes 🕐
+            </p>
+            <!-- Flèche bulle -->
+            <div class="absolute -bottom-2 right-7 w-0 h-0"
+                 style="border-left:8px solid transparent;border-right:0 solid transparent;border-top:8px solid #fff;"></div>
+          </div>
+        }
 
         <!-- Bouton principal -->
         <a [href]="wa.buildUrl()" target="_blank" rel="noopener noreferrer"
            class="wa-btn flex items-center gap-3 pr-5 pl-4 shadow-2xl
-                  hover:-translate-y-0.5 hover:shadow-green-500/30 active:scale-95
+                  hover:-translate-y-0.5 active:scale-95
                   transition-all duration-300 cursor-pointer"
            style="background:#25D366;border-radius:50px;height:52px;">
 
@@ -48,8 +55,8 @@ import { WhatsappService } from '../../core/services/whatsapp.service';
 
           <!-- Texte -->
           <div class="flex flex-col leading-tight">
-            <span class="text-[11px] font-black text-white tracking-wide">Commander sur WhatsApp</span>
-            <span class="text-[9px] font-semibold" style="color:rgba(255,255,255,0.75);">Disponible 7j/7 · Réponse rapide</span>
+            <span class="text-[11px] font-black text-white tracking-wide">Aide &amp; Support</span>
+            <span class="text-[9px] font-semibold" style="color:rgba(255,255,255,0.75);">Réponse rapide · 7j/7</span>
           </div>
         </a>
 
@@ -57,7 +64,16 @@ import { WhatsappService } from '../../core/services/whatsapp.service';
     }
   `,
   styles: [`
-    .wa-widget { animation: wa-slide-in 0.6s cubic-bezier(0.16,1,0.3,1) 1.8s both; }
+    .wa-widget {
+      bottom: 24px;
+      animation: wa-slide-in 0.6s cubic-bezier(0.16,1,0.3,1) 1.8s both;
+    }
+
+    @media (max-width: 1023px) {
+      .wa-widget {
+        bottom: calc(var(--bottom-nav-h) + 12px);
+      }
+    }
 
     @keyframes wa-slide-in {
       from { opacity: 0; transform: translateX(80px); }
@@ -78,9 +94,22 @@ import { WhatsappService } from '../../core/services/whatsapp.service';
     .wa-btn:hover { box-shadow: 0 14px 40px rgba(37,211,102,0.5); }
   `]
 })
-export class SupportWidgetComponent {
+export class SupportWidgetComponent implements OnInit {
+  private authService = inject(AuthService);
+  public wa = inject(WhatsappService);
 
-  constructor(private authService: AuthService, public wa: WhatsappService) {}
+  showBubble = signal(false);
+
+  ngOnInit(): void {
+    if (sessionStorage.getItem('wa_bubble_closed')) return;
+    setTimeout(() => this.showBubble.set(true), 2400);
+    setTimeout(() => this.showBubble.set(false), 7000);
+  }
+
+  closeBubble(): void {
+    this.showBubble.set(false);
+    sessionStorage.setItem('wa_bubble_closed', '1');
+  }
 
   get visible(): boolean {
     const role = this.authService.getCurrentUser()?.role;
