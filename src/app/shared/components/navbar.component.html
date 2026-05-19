@@ -748,6 +748,32 @@
 
 
 <!-- ══════════════════════════════════════════════════════
+     CART TOAST — feedback ajout au panier (mobile)
+══════════════════════════════════════════════════════ -->
+@if (cartToast) {
+  <div class="fixed top-4 left-4 right-4 z-[9998] lg:hidden cart-toast-in
+              flex items-center gap-3 px-4 py-3.5 rounded-2xl"
+       style="background:#111111;border:1px solid rgba(212,175,55,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.35)">
+    <div class="w-11 h-11 rounded-xl overflow-hidden flex-shrink-0"
+         style="border:1px solid rgba(255,255,255,0.08)">
+      <img [src]="cartToast.imageUrl | mediaUrl" [alt]="cartToast.productName"
+           class="w-full h-full object-cover"
+           (error)="$any($event.target).src='https://placehold.co/44x44/1a1a1a/d4af37?text=SDM'"/>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-[10px] font-semibold uppercase tracking-widest mb-0.5" style="color:rgba(212,175,55,0.7)">Ajouté au panier</p>
+      <p class="text-sm font-bold text-white truncate leading-tight">{{ cartToast.productName }}</p>
+    </div>
+    <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+         style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.25)">
+      <svg class="w-3.5 h-3.5" style="color:#4ade80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════
      PANIER — DRAWER LATÉRAL DROIT
 ══════════════════════════════════════════════════════ -->
 @if (showCart) {
@@ -759,17 +785,51 @@
   <!-- Drawer -->
   <div class="cart-drawer">
 
-    <!-- Drag handle (mobile only) -->
-    <div class="w-12 h-1.5 rounded-full bg-black/10 mx-auto mt-3 mb-0 flex-shrink-0 lg:hidden"></div>
+    <!-- ── EN-TÊTE MOBILE (sombre) ── -->
+    <div class="flex-shrink-0 lg:hidden"
+         style="background:#111111;padding:max(env(safe-area-inset-top),16px) 20px 18px"
+         (touchstart)="onSwipeStart($event)"
+         (touchmove)="onSwipeMove($event)"
+         (touchend)="onSwipeEnd()">
+      <!-- Titre + actions -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-[17px] font-black text-white tracking-tight">Mon panier</span>
+          @if (cartCount > 0) {
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"
+                  style="background:rgba(212,175,55,0.18);color:#d4af37;border:1px solid rgba(212,175,55,0.3)">
+              {{ cartCount }} art.
+            </span>
+          } @else {
+            <span class="text-[11px] font-semibold" style="color:rgba(255,255,255,0.35)">Vide</span>
+          }
+        </div>
+        <div class="flex items-center gap-2">
+          @if (cartItems.length > 0) {
+            <button (click)="cartService.clearCart()"
+              class="text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-colors"
+              style="color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.07)">
+              Vider
+            </button>
+          }
+          <button (click)="showCart = false"
+            class="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150"
+            style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7)">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
 
-    <!-- ── EN-TÊTE ── -->
-    <div class="flex-shrink-0 flex items-center justify-between px-5 py-4"
+    <!-- ── EN-TÊTE DESKTOP (clair) ── -->
+    <div class="hidden lg:flex flex-shrink-0 items-center justify-between px-5 py-4"
          style="border-bottom:1px solid rgba(0,0,0,0.07)">
       <div class="flex items-center gap-3">
-        <!-- Icône panier -->
         <div class="w-9 h-9 rounded-xl flex items-center justify-center"
              style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.2)">
-          <svg class="w-4.5 h-4.5" style="color:#d4af37;width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style="color:#d4af37;width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
           </svg>
         </div>
@@ -824,61 +884,63 @@
       }
 
       @for (item of cartItems; track (item.productId + '-' + (item.variantId ?? 0)); let i = $index) {
-        <div class="group relative rounded-2xl p-4 transition-all duration-200 animate-fade-in"
-             style="background:#fafafa;border:1px solid rgba(0,0,0,0.07)">
-          <div class="flex gap-4">
-            <!-- Image -->
-            <div class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden"
-                 style="box-shadow:0 2px 12px rgba(0,0,0,0.2)">
+        <div class="group relative rounded-2xl transition-all duration-200 animate-fade-in overflow-hidden"
+             style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 2px 12px rgba(0,0,0,0.05)">
+          <div class="flex gap-0">
+            <!-- Image carrée -->
+            <div class="flex-shrink-0 w-24 h-24 overflow-hidden" style="border-radius:0">
               <img [src]="item.imageUrl | mediaUrl"
                    [alt]="item.productName"
                    loading="lazy"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                   (error)="$any($event.target).src='https://placehold.co/80x80/1a1a1a/d4af37?text=SDM'"/>
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                   (error)="$any($event.target).src='https://placehold.co/96x96/1a1a1a/d4af37?text=SDM'"/>
             </div>
             <!-- Infos -->
-            <div class="flex-1 min-w-0">
-              <p class="font-bold text-sm leading-snug mb-0.5 pr-7 line-clamp-2" style="color:#111111">{{ item.productName }}</p>
-              @if (item.selectedColor) {
-                <div class="flex items-center gap-1.5 mb-1">
-                  <span class="w-3 h-3 rounded-full border border-white/50 shadow-sm flex-shrink-0"
-                        [style.background-color]="item.selectedColorHex || '#888'"></span>
-                  <span class="text-[11px] font-semibold" style="color:#6b7280">{{ item.selectedColor }}</span>
-                </div>
-              }
-              <p class="text-xs font-semibold mb-3" style="color:#d4af37">
-                {{ (item.price/1000 ) | number:'1.0-0': 'fr-FR' }}&thinsp;000 FCFA / unité
-              </p>
-              <div class="flex items-center justify-between">
-                <!-- Contrôle quantité -->
+            <div class="flex-1 min-w-0 px-3.5 py-3 flex flex-col justify-between">
+              <div>
+                <p class="font-bold text-sm leading-snug pr-6 line-clamp-2" style="color:#111111">{{ item.productName }}</p>
+                @if (item.selectedColor) {
+                  <div class="flex items-center gap-1.5 mt-1">
+                    <span class="w-2.5 h-2.5 rounded-full border border-black/10 flex-shrink-0"
+                          [style.background-color]="item.selectedColorHex || '#888'"></span>
+                    <span class="text-[10px] font-semibold uppercase tracking-wide" style="color:#9ca3af">{{ item.selectedColor }}</span>
+                  </div>
+                }
+              </div>
+              <div class="flex items-center justify-between mt-2">
+                <!-- Contrôle quantité compact -->
                 <div class="flex items-center rounded-xl overflow-hidden"
-                     style="background:rgba(0,0,0,0.05)">
+                     style="background:rgba(0,0,0,0.05);height:36px">
                   <button (click)="cartService.updateQuantity(item.productId, item.quantity - 1, item.variantId)"
-                    class="w-11 h-11 flex items-center justify-center text-lg font-light transition-colors
-                           hover:bg-black/5"
+                    class="w-9 h-full flex items-center justify-center text-base font-medium transition-colors hover:bg-black/8"
                     style="color:#6b7280">−</button>
-                  <span class="w-8 text-center text-sm font-black" style="color:#111111">{{ item.quantity }}</span>
+                  <span class="w-7 text-center text-sm font-black" style="color:#111111">{{ item.quantity }}</span>
                   <button (click)="cartService.updateQuantity(item.productId, item.quantity + 1, item.variantId)"
                     [disabled]="item.quantity >= item.maxStock"
-                    [title]="item.quantity >= item.maxStock ? 'Stock maximum atteint (' + item.maxStock + ')' : ''"
-                    class="w-11 h-11 flex items-center justify-center text-lg font-light transition-colors
+                    [title]="item.quantity >= item.maxStock ? 'Stock max : ' + item.maxStock : ''"
+                    class="w-9 h-full flex items-center justify-center text-base font-medium transition-colors
                            hover:bg-black/8 disabled:opacity-30 disabled:cursor-not-allowed"
                     style="color:#6b7280">+</button>
                 </div>
-                <!-- Sous-total ligne -->
-                <p class="text-sm font-black" style="color:#d4af37">
-                  {{ (item.price * item.quantity)  | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA
-                </p>
+                <!-- Total ligne -->
+                <div class="text-right">
+                  <p class="text-sm font-black" style="color:#d4af37">
+                    {{ (item.price * item.quantity) | number:'1.0-0':'fr-FR' }}&thinsp;F
+                  </p>
+                  <p class="text-[10px]" style="color:#9ca3af">
+                    {{ (item.price) | number:'1.0-0':'fr-FR' }} / u.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-          <!-- Supprimer -->
+          <!-- Supprimer — toujours visible sur mobile -->
           <button (click)="cartService.removeFromCart(item.productId, item.variantId)"
-            class="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center
-                   transition-all duration-150 text-red-400/50 hover:text-red-400 hover:bg-red-500/10
-                   lg:opacity-0 lg:group-hover:opacity-100">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            class="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center
+                   transition-all duration-150 hover:scale-110"
+            style="background:rgba(239,68,68,0.1);color:#f87171">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
         </div>
@@ -969,13 +1031,13 @@
 
           <!-- Bouton commander -->
           <button (click)="openCheckout()"
-                  class="w-full py-3.5 bg-gold text-black font-black rounded-xl text-sm
-                         flex items-center justify-center gap-2
-                         hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all duration-200">
-            Commander maintenant
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                  class="w-full py-4 bg-gold text-black font-black rounded-2xl text-base
+                         flex items-center justify-center gap-2.5
+                         hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5 active:scale-98 transition-all duration-200">
+            <svg class="w-4.5 h-4.5 flex-shrink-0" style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
+            Commander maintenant
           </button>
         }
 

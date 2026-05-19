@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 export interface CartItem {
   productId: number;
@@ -21,6 +21,9 @@ export class CartService {
   private cartSubject = new BehaviorSubject<CartItem[]>(this.loadCart());
   public cart$ = this.cartSubject.asObservable();
 
+  private _lastAdded = new Subject<CartItem>();
+  readonly lastAdded$ = this._lastAdded.asObservable();
+
   constructor() {}
 
   addToCart(item: CartItem): void {
@@ -38,6 +41,7 @@ export class CartService {
 
     this.saveCart(cart);
     this.cartSubject.next([...cart]);
+    this._lastAdded.next(item);
   }
 
   removeFromCart(productId: number, variantId?: number): void {

@@ -77,6 +77,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private reviewDismissTimer?: ReturnType<typeof setTimeout>;
   isBackoffice = false;
 
+  cartToast: CartItem | null = null;
+  private cartToastTimer?: ReturnType<typeof setTimeout>;
+
+  private swipeStartY = 0;
+  private swipeCurrentY = 0;
+  private swipeDrawerEl: HTMLElement | null = null;
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -153,6 +160,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(items => { this.cartItems = items; this.cdr.detectChanges(); });
 
+    this.cartService.lastAdded$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(item => this._showCartToast(item));
+
     if (this.currentUser) this.loadUnreadCount();
 
     this.webSocketService.notification$
@@ -192,6 +203,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearTimeout(this.reviewDismissTimer);
+    clearTimeout(this.cartToastTimer);
     this.scrollLock.forceUnlock();
     this.destroy$.next();
     this.destroy$.complete();
@@ -544,6 +556,53 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.promoCodeInput = '';
     this.promoCheckResult = null;
     this.promoError = null;
+  }
+
+  // ── Cart toast ──────────────────────────────────────────────────────────────
+
+  private _showCartToast(item: CartItem): void {
+    if (this.showCart) return;
+    clearTimeout(this.cartToastTimer);
+    this.cartToast = item;
+    this.cdr.detectChanges();
+    this.cartToastTimer = setTimeout(() => {
+      this.cartToast = null;
+      this.cdr.detectChanges();
+    }, 2800);
+  }
+
+  // ── Swipe to close cart ─────────────────────────────────────────────────────
+
+  onSwipeStart(e: TouchEvent): void {
+    this.swipeStartY = e.touches[0].clientY;
+    this.swipeCurrentY = e.touches[0].clientY;
+    this.swipeDrawerEl = (e.currentTarget as HTMLElement).closest('.cart-drawer') as HTMLElement;
+    if (this.swipeDrawerEl) this.swipeDrawerEl.style.transition = 'none';
+  }
+
+  onSwipeMove(e: TouchEvent): void {
+    this.swipeCurrentY = e.touches[0].clientY;
+    const delta = this.swipeCurrentY - this.swipeStartY;
+    if (delta > 0 && this.swipeDrawerEl) {
+      this.swipeDrawerEl.style.transform = `translateY(${Math.min(delta, 350)}px)`;
+      this.swipeDrawerEl.style.opacity = `${Math.max(0.3, 1 - delta / 300)}`;
+    }
+  }
+
+  onSwipeEnd(): void {
+    const delta = this.swipeCurrentY - this.swipeStartY;
+    if (this.swipeDrawerEl) {
+      this.swipeDrawerEl.style.transition = '';
+      this.swipeDrawerEl.style.transform = '';
+      this.swipeDrawerEl.style.opacity = '';
+    }
+    this.swipeDrawerEl = null;
+    if (delta > 90) {
+      this.showCart = false;
+      this.scrollLock.forceUnlock();
+      this._resetCheckout();
+      this.cdr.detectChanges();
+    }
   }
 
   // ── Getters ─────────────────────────────────────────────────────────────────
