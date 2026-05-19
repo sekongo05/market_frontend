@@ -24,7 +24,9 @@
     <!-- ── Cartes de contact rapide ───────────────────────────────── -->
     <div class="grid sm:grid-cols-3 gap-4 mb-14">
 
-      <div class="luxury-card rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+      <a href="tel:+2250799250751"
+         class="luxury-card rounded-2xl p-6 text-center flex flex-col items-center gap-3 hover:border-gold/30 transition-colors duration-200"
+         style="border:1px solid transparent">
         <div class="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center">
           <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -36,9 +38,11 @@
           <p class="text-gold font-semibold text-sm mt-1">07 99 25 07 51 / 01 53 76 13 20</p>
           <p class="theme-muted text-xs mt-0.5">Lun – Sam · 8h – 20h</p>
         </div>
-      </div>
+      </a>
 
-      <div class="luxury-card rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+      <a href="mailto:sdmstore05@gmail.com"
+         class="luxury-card rounded-2xl p-6 text-center flex flex-col items-center gap-3 hover:border-gold/30 transition-colors duration-200"
+         style="border:1px solid transparent">
         <div class="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center">
           <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -50,7 +54,7 @@
           <p class="text-gold font-semibold text-sm mt-1">sdmstore05&#64;gmail.com</p>
           <p class="theme-muted text-xs mt-0.5">Réponse sous 24h</p>
         </div>
-      </div>
+      </a>
 
       <div class="luxury-card rounded-2xl p-6 text-center flex flex-col items-center gap-3">
         <div class="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center">
@@ -87,7 +91,8 @@
             </svg>
           </button>
           @if (openFaq === i) {
-            <div class="px-6 pb-5 theme-muted text-sm leading-relaxed border-t theme-border pt-4">
+            <div class="px-6 pb-5 theme-muted text-sm leading-relaxed border-t theme-border pt-4
+                        animate-[fadeInDown_0.2s_ease_both]">
               {{ faq.a }}
             </div>
           }
