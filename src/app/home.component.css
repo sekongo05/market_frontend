@@ -8,13 +8,13 @@
 }
 
 @keyframes word-rise {
-  from { opacity: 0; transform: translateY(110%) skewY(3deg); filter: blur(4px); }
-  to   { opacity: 1; transform: translateY(0) skewY(0deg);   filter: blur(0);   }
+  from { opacity: 0; transform: translateY(110%) skewY(3deg); }
+  to   { opacity: 1; transform: translateY(0) skewY(0deg);   }
 }
 
 @keyframes fade-blur-in {
-  from { opacity: 0; filter: blur(8px);  transform: translateY(14px); }
-  to   { opacity: 1; filter: blur(0);    transform: translateY(0);    }
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
 @keyframes slide-up-fade {
@@ -69,24 +69,29 @@
 ═══════════════════════════════════════════════════════════════════ */
 
 @keyframes shimmer {
-  0%   { background-position:  200% center; }
-  100% { background-position: -200% center; }
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%);  }
 }
 
 .gold-shimmer {
-  background: linear-gradient(
-    90deg,
-    #9a7415 0%,
-    #d4af37 25%,
-    #fef9c3 50%,
-    #d4af37 75%,
-    #9a7415 100%
-  );
-  background-size: 300% auto;
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(90deg, #9a7415 0%, #d4af37 40%, #9a7415 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  overflow: hidden;
+}
+
+.gold-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(254, 249, 195, 0.55), transparent);
+  transform: translateX(-100%);
   animation: shimmer 4s linear 1.5s infinite;
+  will-change: transform;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -174,8 +179,8 @@
 ═══════════════════════════════════════════════════════════════════ */
 
 @keyframes card-appear {
-  from { opacity: 0; transform: translateY(24px); filter: blur(3px); }
-  to   { opacity: 1; transform: translateY(0);    filter: blur(0);   }
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 .card-appear { animation: card-appear 0.75s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
@@ -204,8 +209,8 @@
 ═══════════════════════════════════════════════════════════════════ */
 
 @keyframes stat-glow {
-  0%,  100% { text-shadow: 0 0  0px rgba(212, 175, 55, 0.0); }
-  50%        { text-shadow: 0 0 50px rgba(212, 175, 55, 0.55), 0 0 100px rgba(212, 175, 55, 0.2); }
+  0%, 100% { opacity: 0.8; }
+  50%       { opacity: 1;   }
 }
 
 #stats-row.in-view .stat-num {
@@ -240,8 +245,8 @@
 ═══════════════════════════════════════════════════════════════════ */
 
 @keyframes gold-pulse {
-  0%, 100% { opacity: 0.6; box-shadow: none; }
-  50%       { opacity: 1;   box-shadow: 0 0 12px rgba(212, 175, 55, 0.4); }
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1;   }
 }
 
 .gold-line-pulse { animation: gold-pulse 3s ease-in-out infinite; }

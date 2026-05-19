@@ -71,7 +71,7 @@
 
           <!-- Cart (customers only) -->
           @if (!isManager) {
-            <button (click)="toggleCart()" appTooltip="Mon panier" tooltipPosition="bottom" class="nav-icon-btn relative" [class.active-icon]="showCart">
+            <button (click)="toggleCart()" appTooltip="Mon panier" tooltipPosition="bottom" aria-label="Mon panier" class="nav-icon-btn relative" [class.active-icon]="showCart">
               <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -111,7 +111,7 @@
           @if (currentUser) {
             <!-- Notifications -->
             <div class="relative" data-notif-panel>
-              <button (click)="toggleNotifications()" appTooltip="Notifications" tooltipPosition="bottom" class="nav-icon-btn relative">
+              <button (click)="toggleNotifications()" appTooltip="Notifications" tooltipPosition="bottom" aria-label="Notifications" class="nav-icon-btn relative">
                 <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -136,7 +136,7 @@
                       <!-- Header détail -->
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
                         <button (click)="closeNotificationDetail()"
-                          appTooltip="Retour à la liste" tooltipPosition="bottom"
+                          appTooltip="Retour à la liste" tooltipPosition="bottom" aria-label="Retour à la liste"
                           class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-black/[.06] transition-colors flex-shrink-0">
                           <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -144,7 +144,7 @@
                         </button>
                         <p class="text-base font-bold theme-text truncate flex-1">{{ selectedNotification.subject }}</p>
                         <button (click)="deleteNotification(selectedNotification, $event)"
-                          appTooltip="Supprimer cette notification" tooltipPosition="bottom"
+                          appTooltip="Supprimer cette notification" tooltipPosition="bottom" aria-label="Supprimer cette notification"
                           class="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -283,7 +283,7 @@
 
             <!-- Avatar dropdown -->
             <div class="relative" data-user-menu>
-              <button (click)="toggleUserMenu()" appTooltip="Mon compte" tooltipPosition="bottom"
+              <button (click)="toggleUserMenu()" appTooltip="Mon compte" tooltipPosition="bottom" aria-label="Mon compte"
                 class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl border transition-all duration-200
                        border-transparent hover:border-black/[.08] hover:bg-black/[.04]"
                 [class.border-black/10]="showUserMenu"
@@ -404,6 +404,7 @@
 
           <!-- Bouton recherche -->
           <button (click)="toggleMobileSearch()"
+            [attr.aria-label]="mobileSearchOpen ? 'Fermer la recherche' : 'Ouvrir la recherche'"
             class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0"
             [class]="mobileSearchOpen ? 'text-[#92700c] bg-[rgba(146,112,12,.10)]' : 'text-gray-500 hover:text-[#92700c] hover:bg-[rgba(146,112,12,.09)]'">
             @if (mobileSearchOpen) {
@@ -420,7 +421,7 @@
           <!-- Notifications (mobile, logged-in only) -->
           @if (currentUser) {
             <div class="relative" data-notif-panel>
-              <button (click)="toggleNotifications()" class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 relative text-gray-500 hover:text-[#92700c] hover:bg-[rgba(146,112,12,.09)]">
+              <button (click)="toggleNotifications()" aria-label="Notifications" class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 relative text-gray-500 hover:text-[#92700c] hover:bg-[rgba(146,112,12,.09)]">
                 <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -443,14 +444,14 @@
                     @let notifLinkM = getNotificationLink(selectedNotification.type);
                     <div class="flex flex-col">
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
-                        <button (click)="closeNotificationDetail()"
+                        <button (click)="closeNotificationDetail()" aria-label="Retour à la liste"
                           class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-black/[.06] transition-colors flex-shrink-0">
                           <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                           </svg>
                         </button>
                         <p class="text-base font-bold theme-text truncate flex-1">{{ selectedNotification.subject }}</p>
-                        <button (click)="deleteNotification(selectedNotification, $event)"
+                        <button (click)="deleteNotification(selectedNotification, $event)" aria-label="Supprimer cette notification"
                           class="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -559,6 +560,8 @@
 
           <!-- Hamburger -->
           <button (click)="toggleMobile()"
+            [attr.aria-label]="mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
+            [attr.aria-expanded]="mobileOpen"
             class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
                    text-gray-500 hover:text-gray-700 hover:bg-black/5 flex-shrink-0">
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
