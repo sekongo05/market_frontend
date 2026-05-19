@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { UserResponse } from '../../../core/models/user.models';
+import { UserResponse, UserFullProfileResponse } from '../../../core/models/user.models';
 
 @Component({
   selector: 'app-profile',
@@ -17,6 +17,7 @@ export class ProfileComponent implements OnInit {
   profileForm!: FormGroup;
   passwordForm!: FormGroup;
   user: UserResponse | null = null;
+  fullProfile: UserFullProfileResponse | null = null;
   loading = false;
   saving = false;
   changingPassword = false;
@@ -77,6 +78,11 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  get hasPhone(): boolean {
+    const p = this.user?.phone?.trim();
+    return !!p && p !== '+225' && p.length > 6;
+  }
+
   loadUserProfile(): void {
     this.loading = true;
     this.userService.getProfile().subscribe({
@@ -84,11 +90,24 @@ export class ProfileComponent implements OnInit {
         if (r.success && r.data) {
           this.user = r.data;
           this.profileForm.patchValue({ nom: r.data.nom, prenom: r.data.prenom, phone: r.data.phone });
+          this.loadFullProfile(r.data.id);
         }
         this.loading = false;
         this.cdr.detectChanges();
       },
       error: () => { this.loading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  private loadFullProfile(id: number): void {
+    this.userService.getFullProfile(id).subscribe({
+      next: (r) => {
+        if (r.success && r.data) {
+          this.fullProfile = r.data;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {},
     });
   }
 
