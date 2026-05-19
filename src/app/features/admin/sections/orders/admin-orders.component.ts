@@ -34,6 +34,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
 
   private readonly search$ = new Subject<string>();
 
+  readonly OrderStatus = OrderStatus;
   readonly orderStatuses = Object.values(OrderStatus);
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
     PENDING:   OrderStatus.CONFIRMED,

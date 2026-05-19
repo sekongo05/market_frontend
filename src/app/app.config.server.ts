@@ -1,8 +1,12 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideServerRendering } from '@angular/ssr';
+import { provideServerRendering, withRoutes, RenderMode } from '@angular/ssr';
 
 export const config: ApplicationConfig = {
   providers: [
-    provideServerRendering(),
+    provideServerRendering(
+      withRoutes([
+        { path: '**', renderMode: RenderMode.Client },
+      ])
+    ),
   ],
 };
