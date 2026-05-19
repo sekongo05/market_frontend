@@ -417,23 +417,6 @@
             }
           </button>
 
-          <!-- Cart (customers only) -->
-          @if (!isManager) {
-            <button (click)="toggleCart()" class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 relative text-gray-500 hover:text-[#92700c] hover:bg-[rgba(146,112,12,.09)]">
-              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-              </svg>
-              @if (cartCount > 0) {
-                <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-0.5
-                             bg-gold text-black text-[9px] font-black rounded-full
-                             flex items-center justify-center leading-none">
-                  {{ cartCount > 9 ? '9+' : cartCount }}
-                </span>
-              }
-            </button>
-          }
-
           <!-- Notifications (mobile, logged-in only) -->
           @if (currentUser) {
             <div class="relative" data-notif-panel>
@@ -774,8 +757,10 @@
        (click)="showCart = false"></div>
 
   <!-- Drawer -->
-  <div class="fixed top-0 right-0 h-full w-full max-w-[440px] z-50 flex flex-col animate-drawer-in"
-       style="background:#ffffff;box-shadow:-20px 0 60px rgba(0,0,0,0.12)">
+  <div class="cart-drawer">
+
+    <!-- Drag handle (mobile only) -->
+    <div class="w-12 h-1.5 rounded-full bg-black/10 mx-auto mt-3 mb-0 flex-shrink-0 lg:hidden"></div>
 
     <!-- ── EN-TÊTE ── -->
     <div class="flex-shrink-0 flex items-center justify-between px-5 py-4"

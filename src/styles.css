@@ -115,6 +115,37 @@
 .animate-backdrop-in  { animation: backdropIn 0.25s ease both; }
 .animate-sheet-up     { animation: sheetUp   0.28s cubic-bezier(.22,1,.36,1) both; }
 
+/* Cart drawer — bottom sheet on mobile, side panel on desktop */
+.cart-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 92dvh;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: #ffffff;
+  box-shadow: 0 -16px 60px rgba(0,0,0,0.18);
+  animation: sheetUp 0.28s cubic-bezier(.22,1,.36,1) both;
+}
+@media (min-width: 1024px) {
+  .cart-drawer {
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: 0;
+    height: 100%;
+    max-height: none;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 0;
+    box-shadow: -20px 0 60px rgba(0,0,0,0.12);
+    animation: drawerIn 0.32s cubic-bezier(0.32,0,0.16,1) both;
+  }
+}
+
 /* Stagger delays */
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
