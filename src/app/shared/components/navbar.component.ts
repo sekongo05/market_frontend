@@ -64,15 +64,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   readonly villesInterieur = [
     'Abengourou', 'Aboisso', 'Adzopé', 'Agboville', 'Agnibilékrou',
-    'Bangolo', 'Biankouma', 'Bocanda', 'Bondoukou', 'Bongouanou',
-    'Bouaflé', 'Bouaké', 'Boundiali', 'Dabakala', 'Daloa',
+    , 'Bondoukou', 'Bongouanou',
+    'Bouaflé', 'Bouaké', 'Boundiali',  'Daloa',
     'Danané', 'Daoukro', 'Dimbokro', 'Divo', 'Duékoué',
     'Ferkessédougou', 'Gagnoa', 'Grand-Bassam', 'Grand-Lahou', 'Guiglo',
     'Issia', 'Jacqueville', 'Katiola', 'Korhogo', 'Lakota',
-    'Man', 'Mankono', 'Mbahiakro', 'Odienné', 'Oumé',
-    'Sakassou', 'San-Pédro', 'Sassandra', 'Séguéla', 'Sinfra',
+    'Man', 'Mankono', 'Odienné',
+    , 'San-Pédro', 'Sassandra', 'Séguéla', 'Sinfra',
     'Soubré', 'Tabou', 'Tiassalé', 'Tingrela', 'Touba',
-    'Toumodi', 'Vavoua', 'Yamoussoukro', 'Zuenoula',
+    'Toumodi', 'Vavoua', 'Yamoussoukro',
   ];
   checkoutSuccess = false;
 
@@ -546,7 +546,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (!this.promoCheckResult?.valid) return 0;
     return this.promoCheckResult.discountAmount ?? 0;
   }
-  get shippingFee(): number { return this.deliveryZone === 'interieur' ? 2000 : 0; }
+  get shippingFee(): number { return this.deliveryZone === 'interieur' ? 2000 : 1500; }
   get finalTotal(): number {
     const base = !this.promoCheckResult?.valid ? this.cartTotal : (this.promoCheckResult.finalAmount ?? this.cartTotal);
     return base + this.shippingFee;
