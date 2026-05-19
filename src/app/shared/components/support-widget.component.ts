@@ -9,7 +9,7 @@ import { WhatsappService } from '../../core/services/whatsapp.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (visible) {
-      <div class="wa-widget fixed right-5 z-50 flex flex-col items-end gap-2">
+      <div class="wa-widget fixed right-5 z-50 hidden lg:flex flex-col items-end gap-2">
 
         <!-- Bulle message (desktop uniquement, auto-disparaît) -->
         @if (showBubble()) {
@@ -67,12 +67,6 @@ import { WhatsappService } from '../../core/services/whatsapp.service';
     .wa-widget {
       bottom: 24px;
       animation: wa-slide-in 0.6s cubic-bezier(0.16,1,0.3,1) 1.8s both;
-    }
-
-    @media (max-width: 1023px) {
-      .wa-widget {
-        bottom: calc(var(--bottom-nav-h) + 12px);
-      }
     }
 
     @keyframes wa-slide-in {
