@@ -247,17 +247,15 @@
                 </div>
               }
 
-              <!-- Actions (messages PENDING/CONFIRMED + annulation PENDING uniquement) -->
+              <!-- Actions PENDING / CONFIRMED -->
               @if (order.orderStatus === 'PENDING' || order.orderStatus === 'CONFIRMED') {
                 <div class="border-t theme-border pt-4 space-y-3">
 
-                  <!-- Message statut courant -->
                   @if (order.orderStatus === 'PENDING') {
                     <div class="flex items-start gap-3 p-3 rounded-xl"
                          style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2)">
                       <svg class="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
                       <p class="text-xs text-yellow-300 font-medium">Votre commande est en attente de confirmation par notre équipe.</p>
                     </div>
@@ -266,26 +264,22 @@
                     <div class="flex items-start gap-3 p-3 rounded-xl"
                          style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)">
                       <svg class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
                       <p class="text-xs text-blue-300 font-medium">Votre commande a été confirmée et est en cours de préparation.</p>
                     </div>
                   }
 
-                  <!-- Erreur d'annulation -->
                   @if (cancelErrorOrderId === order.id && cancelError) {
                     <div class="flex items-start gap-3 p-3 rounded-xl"
                          style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">
                       <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
                       <p class="text-xs text-red-400 font-medium">{{ cancelError }}</p>
                     </div>
                   }
 
-                  <!-- Annuler (PENDING uniquement) -->
                   @if (order.orderStatus === 'PENDING') {
                     @if (cancelConfirmId === order.id) {
                       <div class="flex items-center gap-3 p-3 rounded-xl"
@@ -296,9 +290,7 @@
                           class="px-4 py-2.5 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors">
                           @if (cancellingId === order.id) {
                             <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                          } @else {
-                            Oui, annuler
-                          }
+                          } @else { Oui, annuler }
                         </button>
                         <button (click)="cancelConfirmCancel()"
                           class="px-4 py-2.5 luxury-card theme-muted text-xs font-bold rounded-lg hover:theme-text transition-colors">
@@ -314,6 +306,203 @@
                         </svg>
                         Annuler cette commande
                       </button>
+                    }
+                  }
+
+                </div>
+              }
+
+              <!-- ── Section retour (DELIVERED) ──────────────────────────── -->
+              @if (order.orderStatus === 'DELIVERED') {
+                <div class="border-t theme-border pt-4 space-y-3">
+
+                  <!-- Succès juste soumis -->
+                  @if (returnSuccessOrderId === order.id) {
+                    <div class="flex items-start gap-3 p-4 rounded-xl"
+                         style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2)">
+                      <div class="w-8 h-8 rounded-full bg-green-500/15 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-bold text-green-400 mb-0.5">Demande envoyée avec succès</p>
+                        <p class="text-xs text-green-300/70">Notre équipe examine votre demande et vous contacte sous 24h pour la suite.</p>
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Retour déjà existant -->
+                  @if (getExistingReturn(order.id); as ret) {
+                    <div class="rounded-xl overflow-hidden" style="border:1px solid rgba(255,255,255,0.08)">
+                      <div class="flex items-center justify-between px-4 py-3"
+                           style="background:rgba(255,255,255,0.03)">
+                        <div class="flex items-center gap-2.5">
+                          <svg class="w-4 h-4 theme-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                          </svg>
+                          <span class="text-xs font-bold theme-text">Demande de retour</span>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"
+                              [class]="returnStatusClass(ret.status)">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="returnStatusIcon(ret.status)"/>
+                          </svg>
+                          {{ returnStatusLabel(ret.status) }}
+                        </span>
+                      </div>
+                      <div class="px-4 py-3 space-y-1.5">
+                        <div class="flex items-start gap-2">
+                          <span class="text-xs theme-muted flex-shrink-0 w-14">Motif</span>
+                          <span class="text-xs theme-text font-medium">{{ ret.reason }}</span>
+                        </div>
+                        @if (ret.adminNote) {
+                          <div class="flex items-start gap-2">
+                            <span class="text-xs theme-muted flex-shrink-0 w-14">Note</span>
+                            <span class="text-xs theme-text">{{ ret.adminNote }}</span>
+                          </div>
+                        }
+                        <div class="flex items-start gap-2">
+                          <span class="text-xs theme-muted flex-shrink-0 w-14">Le</span>
+                          <span class="text-xs theme-muted">{{ ret.createdAt | date:'dd MMM yyyy' }}</span>
+                        </div>
+                      </div>
+                      @if (ret.status === 'PENDING') {
+                        <div class="px-4 pb-3">
+                          <p class="text-xs theme-muted italic">Notre équipe traite votre demande. Vous serez contacté sous 24h.</p>
+                        </div>
+                      }
+                      @if (ret.status === 'APPROVED') {
+                        <div class="px-4 pb-3 flex items-start gap-2 p-3 rounded-lg mx-4 mb-1"
+                             style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15)">
+                          <svg class="w-3.5 h-3.5 text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                          <p class="text-xs text-green-300">Retour approuvé. Notre équipe vous contactera pour l'organisation du retour et le remboursement.</p>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- Formulaire d'initiation -->
+                  @if (canReturn(order)) {
+                    @if (returnFormOrderId === order.id) {
+
+                      <div class="rounded-2xl overflow-hidden" style="border:1px solid rgba(212,175,55,0.2);background:rgba(212,175,55,0.03)">
+
+                        <!-- En-tête formulaire -->
+                        <div class="flex items-center justify-between px-4 py-3 border-b"
+                             style="border-color:rgba(212,175,55,0.15)">
+                          <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            <span class="text-sm font-bold theme-text">Demande de retour</span>
+                          </div>
+                          <button (click)="closeReturnForm()"
+                            class="w-7 h-7 flex items-center justify-center rounded-lg theme-muted hover:text-gold transition-colors"
+                            style="background:rgba(255,255,255,0.05)">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                          </button>
+                        </div>
+
+                        <div class="px-4 py-4 space-y-4">
+
+                          <!-- Message rassurant -->
+                          <p class="text-xs theme-muted leading-relaxed">
+                            Votre satisfaction est notre priorité. Sélectionnez la raison de votre retour — notre équipe vous recontacte sous 24h.
+                          </p>
+
+                          <!-- Raisons -->
+                          <div>
+                            <p class="text-xs font-semibold theme-muted mb-2">Motif du retour <span class="text-red-400">*</span></p>
+                            <div class="flex flex-wrap gap-2">
+                              @for (reason of returnReasons; track reason) {
+                                <button (click)="returnReason = reason"
+                                  class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-150"
+                                  [ngClass]="returnReason === reason
+                                    ? 'border-gold bg-gold/15 text-gold'
+                                    : 'theme-border theme-muted hover:border-gold/40 hover:text-gold'">
+                                  {{ reason }}
+                                </button>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Champ texte libre si "Autre" -->
+                          @if (returnReason === 'Autre') {
+                            <div>
+                              <textarea [(ngModel)]="returnCustomReason"
+                                placeholder="Décrivez votre problème…"
+                                rows="3"
+                                class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all resize-none"></textarea>
+                            </div>
+                          }
+
+                          <!-- Erreur -->
+                          @if (returnError) {
+                            <div class="flex items-center gap-2 p-3 rounded-xl text-xs text-red-400"
+                                 style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">
+                              <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                              </svg>
+                              {{ returnError }}
+                            </div>
+                          }
+
+                          <!-- Boutons -->
+                          <div class="flex items-center gap-3 pt-1">
+                            <button (click)="submitReturn(order.id)"
+                              [disabled]="returnLoading || !returnReason || (returnReason === 'Autre' && !returnCustomReason.trim())"
+                              class="flex-1 py-3 bg-gold text-black font-black rounded-xl text-sm flex items-center justify-center gap-2
+                                     hover:shadow-lg hover:shadow-yellow-600/20 hover:-translate-y-0.5 transition-all duration-200
+                                     disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none">
+                              @if (returnLoading) {
+                                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                                </svg>
+                                Envoi en cours…
+                              } @else {
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                </svg>
+                                Envoyer la demande
+                              }
+                            </button>
+                            <button (click)="closeReturnForm()"
+                              class="px-4 py-3 luxury-card theme-muted text-xs font-bold rounded-xl hover:theme-text transition-colors">
+                              Annuler
+                            </button>
+                          </div>
+
+                          <!-- Lien politique -->
+                          <p class="text-center text-xs theme-muted">
+                            Consultez notre
+                            <a routerLink="/returns" class="text-gold hover:underline">politique de retour</a>
+                            avant de soumettre.
+                          </p>
+
+                        </div>
+                      </div>
+
+                    } @else {
+
+                      <!-- Bouton déclencheur -->
+                      <button (click)="openReturnForm(order.id)"
+                        class="flex items-center gap-2 text-sm font-semibold theme-muted hover:text-gold transition-colors group">
+                        <svg class="w-4 h-4 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Retourner un article
+                      </button>
+
                     }
                   }
 
