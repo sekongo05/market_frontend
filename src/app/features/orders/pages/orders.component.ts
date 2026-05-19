@@ -167,7 +167,19 @@ export class OrdersComponent implements OnInit, OnDestroy {
   // ── Retours ──────────────────────────────────────────────────────────────
 
   canReturn(order: OrderResponse): boolean {
-    return order.orderStatus === 'DELIVERED' && !this.returnsMap[order.id];
+    if (order.orderStatus !== 'DELIVERED') return false;
+    if (this.returnsMap[order.id]) return false;
+    const daysSince = (Date.now() - new Date(order.updatedAt).getTime()) / 86_400_000;
+    return daysSince >= 7;
+  }
+
+  daysUntilReturn(order: OrderResponse): number {
+    const daysSince = (Date.now() - new Date(order.updatedAt).getTime()) / 86_400_000;
+    return Math.ceil(7 - daysSince);
+  }
+
+  canReview(order: OrderResponse): boolean {
+    return order.orderStatus === 'DELIVERED';
   }
 
   getExistingReturn(orderId: number): ReturnResponse | null {
