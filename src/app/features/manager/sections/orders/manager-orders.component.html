@@ -43,7 +43,8 @@
     }
 
     @if (!ordersLoading && allOrders.length > 0) {
-      <div class="overflow-x-auto">
+      <div class="relative">
+        <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b theme-border">
@@ -127,13 +128,13 @@
                     <div class="flex items-center justify-end gap-2">
                       @if (nextStatusMap[order.orderStatus]) {
                         <button type="button" (click)="advanceOrderStatus(order)"
-                          class="flex items-center gap-1.5 px-3 py-1.5 bg-gold text-black text-xs font-bold rounded-lg hover:shadow-md transition-all">
+                          class="flex items-center gap-1.5 px-3 py-2.5 bg-gold text-black text-xs font-bold rounded-lg hover:shadow-md transition-all">
                           {{ nextStatusLabel(order.orderStatus) }}
                         </button>
                       }
                       @if (order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'DELIVERED') {
                         <button type="button" (click)="cancelOrderByManager(order)"
-                          class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-colors" title="Annuler">
+                          class="w-11 h-11 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-colors" title="Annuler">
                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                           </svg>
@@ -146,6 +147,8 @@
             }
           </tbody>
         </table>
+        </div>
+        <div class="absolute inset-y-0 right-0 w-10 pointer-events-none lg:hidden" style="background:linear-gradient(to left,var(--surface),transparent)"></div>
       </div>
 
       @if (ordersTotalPages > 1) {

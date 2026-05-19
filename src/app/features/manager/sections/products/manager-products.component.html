@@ -12,7 +12,8 @@
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
       </svg>
-      Ajouter un produit
+      <span class="hidden sm:inline">Ajouter un produit</span>
+      <span class="sm:hidden">Ajouter</span>
     </button>
   </div>
 
@@ -94,7 +95,8 @@
     }
 
     @if (!loading && products.length > 0) {
-      <div class="overflow-x-auto">
+      <div class="relative">
+        <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b theme-border">
@@ -202,34 +204,34 @@
                     <div class="flex items-center justify-end gap-2">
                       <span class="text-xs text-orange-400 font-semibold hidden sm:inline">Remise ?</span>
                       <button type="button" (click)="confirmEditDiscount(product)" title="Valider"
-                        class="w-8 h-8 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 flex items-center justify-center transition-colors">
+                        class="w-11 h-11 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 flex items-center justify-center transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                       </button>
                       <button type="button" (click)="cancelEditDiscount()" title="Annuler"
-                        class="w-8 h-8 rounded-lg bg-black/[.04] theme-muted hover:text-gold flex items-center justify-center transition-colors">
+                        class="w-11 h-11 rounded-lg bg-black/[.04] theme-muted hover:text-gold flex items-center justify-center transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                       </button>
                     </div>
                   } @else {
                     <div class="flex items-center justify-end gap-2">
                       <a [routerLink]="['/products', product.id]"
-                         class="w-8 h-8 rounded-lg luxury-card theme-muted flex items-center justify-center hover:text-gold transition-colors" title="Voir">
+                         class="w-11 h-11 rounded-lg luxury-card theme-muted flex items-center justify-center hover:text-gold transition-colors" title="Voir">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
                       </a>
                       <button (click)="startEditDiscount(product)"
-                        class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-xs font-black"
+                        class="w-11 h-11 rounded-lg flex items-center justify-center transition-colors text-xs font-black"
                         [class]="(product.discountPercent && product.discountPercent > 0) ? 'bg-orange-500/20 border border-orange-500/40 text-orange-400 hover:bg-orange-500/30' : 'luxury-card theme-muted hover:text-orange-400'"
                         title="Définir une remise">%</button>
                       <button (click)="openEditDrawer(product)"
-                        class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-600/30 text-yellow-400 flex items-center justify-center hover:bg-yellow-600/20 transition-colors" title="Modifier">
+                        class="w-11 h-11 rounded-lg bg-yellow-500/10 border border-yellow-600/30 text-yellow-400 flex items-center justify-center hover:bg-yellow-600/20 transition-colors" title="Modifier">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
                       </button>
                       <button (click)="startDelete(product.id)"
-                        class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-colors" title="Supprimer">
+                        class="w-11 h-11 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-colors" title="Supprimer">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                         </svg>
@@ -241,6 +243,8 @@
             }
           </tbody>
         </table>
+        </div>
+        <div class="absolute inset-y-0 right-0 w-10 pointer-events-none lg:hidden" style="background:linear-gradient(to left,var(--surface),transparent)"></div>
       </div>
 
       @if (totalPages > 1) {
@@ -438,7 +442,7 @@
                         }
                       }
                       <div class="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/70 text-[10px] font-black text-white flex items-center justify-center">{{ i + 1 }}</div>
-                      <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                      <div class="absolute inset-0 bg-black/60 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                         <div class="flex gap-1">
                           <button type="button" (click)="moveMedia(i, 'up')" [disabled]="i === 0"
                             class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center disabled:opacity-30 transition-colors">
