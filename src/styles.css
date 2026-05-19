@@ -474,6 +474,7 @@ body   { background: #f8f5f0; color: #111111; }
   border-top: 1px solid rgba(0,0,0,0.08);
   box-shadow: 0 -4px 24px rgba(0,0,0,0.07);
   overflow: visible; /* needed for floating cart button */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .bottom-tab-row {
@@ -543,15 +544,16 @@ body   { background: #f8f5f0; color: #111111; }
   box-shadow: 0 3px 10px rgba(184,134,11,0.35);
 }
 
-/* ── Safe area spacer ── */
-.bottom-tab-safe {
-  height: max(6px, env(safe-area-inset-bottom));
-}
+/* ── Safe area spacer (kept for backward compat, height now 0) ── */
+.bottom-tab-safe { height: 0; }
 
-/* ── Main content bottom padding on mobile (hors backoffice) ── */
+/* ── Main content + footer bottom padding on mobile (hors backoffice) ── */
 @media (max-width: 1023px) {
   main.theme-bg:not(.backoffice-main) {
     padding-bottom: calc(var(--bottom-nav-h) + max(8px, env(safe-area-inset-bottom)));
+  }
+  footer {
+    padding-bottom: calc(var(--bottom-nav-h) + max(12px, env(safe-area-inset-bottom)));
   }
 }
 

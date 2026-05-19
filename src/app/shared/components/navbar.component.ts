@@ -63,8 +63,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   promosLoaded = false;
 
   readonly villesInterieur = [
-    'Abengourou', 'Aboisso', 'Adzopé', 'Agboville', 
-    , 'Bondoukou','Bouaflé', 'Bouaké', 'Boundiali',  'Daloa',
+    'Abengourou', 'Aboisso', 'Adzopé', 'Agboville', 'Bondoukou','Bouaflé', 'Bouaké', 'Boundiali',  'Daloa',
     'Danané', 'Dimbokro', 'Divo','Duékoué','Ferkessédougou', 'Gagnoa','Grand-Bassam', 'Grand-Lahou',
     'Issia', 'Jacqueville', 'Katiola', 'Korhogo', 'Lakota',
     'Man', 'Odienné', 'San-Pédro', 'Sassandra', 'Séguéla', 'Sinfra',
