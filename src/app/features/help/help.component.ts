@@ -18,16 +18,8 @@ export class HelpComponent {
       a: 'Parcourez notre collection, sélectionnez l\'article de votre choix et ajoutez-le au panier. Depuis le panier, indiquez votre numéro de téléphone et votre adresse de livraison, puis confirmez. Vous recevez immédiatement un email de confirmation avec votre numéro de commande.'
     },
     {
-      q: 'Puis-je annuler ma commande ?',
-      a: 'Oui, tant que votre commande est en attente (statut "En attente") ou confirmée (statut "Confirmée"), vous pouvez l\'annuler depuis la section "Mes commandes". Une fois la commande expédiée, l\'annulation n\'est plus possible — vous devrez initier un retour après réception.'
-    },
-    {
-      q: 'Puis-je modifier ma commande après l\'avoir passée ?',
-      a: 'Non. Une fois la commande soumise, il n\'est pas possible de modifier les articles ou la quantité. Si vous avez commis une erreur, annulez la commande depuis "Mes commandes" (tant qu\'elle n\'est pas expédiée) et recommandez.'
-    },
-    {
-      q: 'Que signifient les statuts de commande ?',
-      a: 'En attente : votre commande a été reçue et est en cours de vérification. — Confirmée : notre équipe a validé votre commande et prépare vos articles. — Expédiée : votre colis a été remis au livreur. — Livrée : votre commande a été livrée. — Annulée : la commande a été annulée.'
+      q: 'Puis-je annuler ou modifier ma commande ?',
+      a: 'Vous pouvez annuler votre commande tant qu\'elle est au statut "En attente" ou "Confirmée", directement depuis la section "Mes commandes". Si vous souhaitez changer un article ou une quantité, annulez la commande et passez-en une nouvelle — c\'est rapide. Une fois la commande expédiée, il ne sera plus possible d\'intervenir dessus.'
     },
     // ── Livraison
     {
@@ -37,6 +29,10 @@ export class HelpComponent {
     {
       q: 'Y a-t-il des frais de livraison ?',
       a: 'Oui. Les frais de livraison sont de 1 500 FCFA pour Abidjan et de 2 000 FCFA pour l\'intérieur de la Côte d\'Ivoire. Ces frais sont affichés clairement avant la confirmation de votre commande.'
+    },
+    {
+      q: 'Que se passe-t-il si je suis absent lors de la livraison ?',
+      a: 'Notre livreur vous contactera par téléphone avant de se présenter. En cas d\'absence, un nouveau créneau de livraison sera convenu avec vous. Assurez-vous que le numéro de téléphone renseigné lors de la commande est bien joignable.'
     },
     {
       q: 'Comment suivre ma commande ?',
@@ -54,7 +50,7 @@ export class HelpComponent {
     },
     {
       q: 'Que faire si un article est endommagé ou non conforme à la réception ?',
-      a: 'Photographiez immédiatement l\'article et son emballage, puis contactez-nous sous 48h par email (sdmstore05@gmail.com) ou par téléphone en indiquant votre numéro de commande et en joignant les photos.'
+      a: 'Photographiez immédiatement l\'article et son emballage, puis contactez notre service client sous 48h en indiquant votre numéro de commande et en joignant les photos. Nous traitons ce type de situation en priorité.'
     },
     // ── Compte
     {
@@ -64,6 +60,11 @@ export class HelpComponent {
     {
       q: 'Mes données personnelles sont-elles sécurisées ?',
       a: 'Oui. Toutes les communications sont chiffrées via HTTPS. Vos mots de passe sont stockés sous forme hachée et ne sont jamais lisibles. Nous ne partageons jamais vos données avec des tiers à des fins commerciales. Consultez notre politique de confidentialité pour les détails complets.'
+    },
+    // ── Contact
+    {
+      q: 'Comment contacter le service client ?',
+      a: 'Plusieurs options s\'offrent à vous : via le bouton WhatsApp disponible sur toutes les pages pour une réponse rapide, par email via le formulaire de contact, ou directement depuis la section "Mes commandes" pour tout ce qui concerne une commande en cours. Nous répondons dans les meilleurs délais, généralement sous quelques heures.'
     },
   ];
 
