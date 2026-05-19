@@ -20,6 +20,11 @@ export class AdminReviewsComponent implements OnInit, OnDestroy {
   reviewsLoading = false;
   reviewsPage = 0;
   reviewsTotalPages = 0;
+  reviewsTotalElements = 0;
+  ratingFilter: number | undefined = undefined;
+  visibilityFilter: boolean | undefined = undefined;
+  expandedReviewId: number | null = null;
+  deleteConfirmReview: ReviewResponse | null = null;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -46,12 +51,14 @@ export class AdminReviewsComponent implements OnInit, OnDestroy {
 
   loadReviews(page = 0): void {
     this.reviewsLoading = true;
-    this.reviewService.getAllReviews(page, 20).subscribe({
+    this.expandedReviewId = null;
+    this.reviewService.getAllReviews(page, 20, this.ratingFilter, this.visibilityFilter).subscribe({
       next: (r) => {
         if (r.success) {
           const pg = r.data as any as PageResponse<ReviewResponse>;
           this.reviews = pg.content;
           this.reviewsTotalPages = pg.totalPages;
+          this.reviewsTotalElements = pg.totalElements;
           this.reviewsPage = page;
         }
         this.reviewsLoading = false;
@@ -59,6 +66,21 @@ export class AdminReviewsComponent implements OnInit, OnDestroy {
       },
       error: () => { this.reviewsLoading = false; this.cdr.markForCheck(); },
     });
+  }
+
+  setRatingFilter(rating: number | undefined): void {
+    this.ratingFilter = rating;
+    this.loadReviews(0);
+  }
+
+  setVisibilityFilter(v: boolean | undefined): void {
+    this.visibilityFilter = v;
+    this.loadReviews(0);
+  }
+
+  toggleExpand(id: number): void {
+    this.expandedReviewId = this.expandedReviewId === id ? null : id;
+    this.cdr.markForCheck();
   }
 
   toggleReviewVisibility(review: ReviewResponse): void {
@@ -75,8 +97,21 @@ export class AdminReviewsComponent implements OnInit, OnDestroy {
   }
 
   adminDeleteReview(review: ReviewResponse): void {
+    this.deleteConfirmReview = review;
+    this.cdr.markForCheck();
+  }
+
+  confirmDelete(): void {
+    const review = this.deleteConfirmReview;
+    if (!review) return;
+    this.deleteConfirmReview = null;
     this.reviewService.adminDeleteReview(review.id).subscribe({
-      next: () => { this.reviews = this.reviews.filter(rv => rv.id !== review.id); this.toast.show('Avis supprimé'); this.cdr.markForCheck(); },
+      next: () => {
+        this.reviews = this.reviews.filter(rv => rv.id !== review.id);
+        this.reviewsTotalElements = Math.max(0, this.reviewsTotalElements - 1);
+        this.toast.show('Avis supprimé');
+        this.cdr.markForCheck();
+      },
       error: () => { this.toast.show('Erreur de suppression', 'error'); this.cdr.markForCheck(); },
     });
   }

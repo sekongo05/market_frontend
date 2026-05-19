@@ -43,8 +43,11 @@ export class ReviewService {
   }
 
   // Admin
-  getAllReviews(page = 0, size = 20): Observable<ApiResponse<PageResponse<ReviewResponse>>> {
-    return this.apiService.get('/reviews', { page, size });
+  getAllReviews(page = 0, size = 20, rating?: number, visible?: boolean): Observable<ApiResponse<PageResponse<ReviewResponse>>> {
+    const params: Record<string, unknown> = { page, size };
+    if (rating !== undefined) params['rating'] = rating;
+    if (visible !== undefined) params['visible'] = visible;
+    return this.apiService.get('/reviews', params);
   }
 
   toggleVisibility(id: number): Observable<ApiResponse<ReviewResponse>> {
