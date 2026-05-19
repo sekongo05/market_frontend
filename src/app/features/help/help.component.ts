@@ -36,7 +36,7 @@ export class HelpComponent {
     },
     {
       q: 'Y a-t-il des frais de livraison ?',
-      a: 'Non. La livraison est entièrement gratuite pour toutes les commandes, partout en Côte d\'Ivoire. Le prix affiché sur le produit est le prix que vous payez, sans supplément.'
+      a: 'Oui. Les frais de livraison sont de 1 500 FCFA pour Abidjan et de 2 000 FCFA pour l\'intérieur de la Côte d\'Ivoire. Ces frais sont affichés clairement avant la confirmation de votre commande.'
     },
     {
       q: 'Comment suivre ma commande ?',

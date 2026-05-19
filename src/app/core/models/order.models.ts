@@ -35,6 +35,7 @@ export interface OrderResponse {
   customerName: string | null;
   promoCode: string | null;
   discountAmount: number | null;
+  shippingFee: number | null;
   createdAt: string;
   updatedAt: string;
 }
