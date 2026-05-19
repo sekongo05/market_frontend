@@ -3,11 +3,34 @@
   <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
 
     <div class="px-6 py-4 border-b theme-border flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h2 class="text-lg font-bold theme-text">Gestion des commandes</h2>
-        <p class="text-xs theme-muted mt-0.5">{{ allOrders.length }} commande(s) chargée(s)</p>
+      <div class="flex items-center gap-3 flex-wrap">
+        <div>
+          <h2 class="text-lg font-bold theme-text">Gestion des commandes</h2>
+          <p class="text-xs theme-muted mt-0.5">
+            {{ ordersTotalElements }} commande(s) au total
+          </p>
+        </div>
+        @if (pendingCount > 0) {
+          <button (click)="statusFilter = 'PENDING'; loadAllOrders(0)"
+            class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black animate-pulse-slow"
+            style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#f59e0b">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-flex"></span>
+            {{ pendingCount }} en attente
+          </button>
+        }
       </div>
       <div class="flex items-center gap-2 flex-wrap">
+        <!-- Recherche -->
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 theme-muted pointer-events-none"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="text" [(ngModel)]="searchQuery" (input)="onSearchInput()"
+            placeholder="Nom, n° commande…"
+            class="theme-input pl-9 pr-3 py-2 rounded-xl text-sm w-48"/>
+        </div>
         <select [(ngModel)]="statusFilter" (change)="loadAllOrders(0)" class="theme-input px-3 py-2 rounded-xl text-sm">
           <option value="">Tous les statuts</option>
           @for (s of orderStatuses; track s) {
@@ -159,6 +182,36 @@
     }
   </div>
 
+  <!-- Dialog confirmation annulation -->
+  @if (cancelConfirmOrder) {
+    <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-fade-in">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="cancelConfirmOrder = null"></div>
+      <div class="relative w-full max-w-sm theme-surface border theme-border rounded-3xl shadow-2xl p-6 animate-fade-in-up">
+        <div class="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/25 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-base font-black theme-text text-center mb-1">Annuler la commande ?</h3>
+        <p class="text-sm theme-muted text-center mb-1">
+          <span class="font-mono font-bold text-gold">{{ cancelConfirmOrder.orderNumber }}</span>
+        </p>
+        <p class="text-xs theme-muted text-center mb-6">Cette action est irréversible. Le stock sera restitué.</p>
+        <div class="flex gap-3">
+          <button (click)="cancelConfirmOrder = null"
+            class="flex-1 py-2.5 border theme-border theme-muted rounded-xl text-sm font-semibold hover:theme-text transition-colors">
+            Conserver
+          </button>
+          <button (click)="confirmCancel()"
+            class="flex-1 py-2.5 bg-red-500/15 border border-red-500/30 text-red-400 rounded-xl text-sm font-black hover:bg-red-500/25 transition-colors">
+            Confirmer l'annulation
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Modal détail commande -->
   @if (orderDetailOpen && selectedOrder) {
     <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 animate-fade-in">
@@ -191,6 +244,18 @@
               </svg>
               <span class="font-semibold theme-text">{{ selectedOrder.customerName || '—' }}</span>
             </div>
+            @if (selectedOrder.customerPhone) {
+              <a [href]="'https://wa.me/' + selectedOrder.customerPhone.replace(/\D/g,'')"
+                 target="_blank" rel="noopener"
+                 class="flex items-center gap-2 text-sm hover:text-green-400 transition-colors group">
+                <svg class="w-3.5 h-3.5 text-green-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                  <path d="M11.99 2C6.476 2 2 6.477 2 11.99c0 1.882.52 3.642 1.428 5.148L2 22l5.003-1.412A9.96 9.96 0 0011.99 22C17.522 22 22 17.523 22 11.99S17.522 2 11.99 2zm0 18c-1.684 0-3.258-.47-4.6-1.286l-.33-.196-3.42.965.933-3.41-.214-.348A7.95 7.95 0 014 11.99C4 7.58 7.58 4 11.99 4S20 7.58 20 11.99C20 16.42 16.42 20 11.99 20z"/>
+                </svg>
+                <span class="font-semibold">{{ selectedOrder.customerPhone }}</span>
+                <span class="text-xs theme-muted group-hover:text-green-400">WhatsApp →</span>
+              </a>
+            }
             @if (selectedOrder.deliveryAddress) {
               <div class="flex items-center gap-2 text-sm">
                 <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -304,7 +369,7 @@
               </button>
             }
             @if (selectedOrder.orderStatus !== 'CANCELLED' && selectedOrder.orderStatus !== 'DELIVERED') {
-              <button (click)="cancelOrderByManager(selectedOrder); closeOrderDetail()"
+              <button (click)="cancelOrderByManager(selectedOrder)"
                 class="px-5 py-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-bold hover:bg-red-500/20 transition-colors">
                 Annuler
               </button>

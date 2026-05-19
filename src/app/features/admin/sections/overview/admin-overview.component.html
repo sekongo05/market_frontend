@@ -170,8 +170,9 @@
       <div class="theme-surface border theme-border rounded-3xl p-6 animate-fade-in-up">
         <h2 class="text-base font-bold theme-text mb-4">Alertes</h2>
         <div class="space-y-4">
-          <div class="flex items-center justify-between p-3 rounded-2xl transition-colors"
-               [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/8 border border-amber-500/20' : 'bg-black/[.03]'">
+          <a routerLink="/admin/products"
+             class="flex items-center justify-between p-3 rounded-2xl transition-colors group"
+             [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/8 border border-amber-500/20 hover:bg-amber-500/14' : 'bg-black/[.03] hover:bg-black/[.06]'">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
                    [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/20' : 'bg-black/[.06]'">
@@ -185,26 +186,32 @@
                   Stock faible
                 </p>
                 @if (stats.lowStockCount > 0) {
-                  <p class="text-[10px] text-amber-400/70">≤ 5 unités</p>
+                  <p class="text-[10px] text-amber-400/70">≤ 5 unités · Voir les produits →</p>
                 }
               </div>
             </div>
             <span class="text-xl font-black" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'">
               {{ stats.lowStockCount }}
             </span>
-          </div>
+          </a>
 
-          <div class="flex items-center justify-between p-3 rounded-2xl bg-black/[.03]">
+          <a routerLink="/admin/orders"
+             class="flex items-center justify-between p-3 rounded-2xl bg-black/[.03] hover:bg-black/[.06] transition-colors group">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-xl bg-black/[.06] flex items-center justify-center flex-shrink-0">
                 <svg class="w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               </div>
-              <p class="text-xs font-semibold theme-muted">En attente</p>
+              <div>
+                <p class="text-xs font-semibold theme-muted">En attente</p>
+                @if (stats.pendingOrders > 0) {
+                  <p class="text-[10px] theme-muted opacity-60">Traiter les commandes →</p>
+                }
+              </div>
             </div>
             <span class="text-xl font-black theme-text">{{ stats.pendingOrders }}</span>
-          </div>
+          </a>
         </div>
       </div>
     </div>
@@ -246,33 +253,6 @@
         }
       </div>
 
-      @if (topProducts.length > 0) {
-        <div class="theme-surface border theme-border rounded-3xl p-6 animate-fade-in-up">
-          <h2 class="text-base font-bold theme-text mb-4">Top produits</h2>
-          <div class="space-y-3">
-            @for (product of topProducts; track product.productId; let i = $index) {
-              <div class="flex items-center gap-3">
-                <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0"
-                     [ngClass]="i === 0 ? 'bg-gold text-black' : i === 1 ? 'bg-gold/25 text-gold' : 'bg-black/[.06] theme-muted'">
-                  {{ i + 1 }}
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between mb-0.5">
-                    <span class="text-xs font-semibold theme-text truncate">{{ product.productName }}</span>
-                    <span class="text-xs font-black theme-text ml-2 flex-shrink-0">{{ product.totalSold }}</span>
-                  </div>
-                  <div class="h-1 bg-black/[.06] rounded-full overflow-hidden">
-                    <div class="h-full rounded-full transition-all duration-700"
-                         [style.width.%]="(product.totalSold / maxTopProduct) * 100"
-                         [ngClass]="i === 0 ? 'bg-gradient-to-r from-[#b8860b] to-[#d4af37]' : i === 1 ? 'bg-gold/50' : 'bg-white/20'">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
     </div>
 
     <!-- Dernières commandes -->

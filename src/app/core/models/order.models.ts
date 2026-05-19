@@ -34,6 +34,7 @@ export interface OrderResponse {
   deliveryAddress: string;
   trackingNumber: string | null;
   customerName: string | null;
+  customerPhone: string | null;
   promoCode: string | null;
   discountAmount: number | null;
   shippingFee: number | null;
@@ -45,4 +46,5 @@ export interface GetOrdersParams {
   page?: number;
   size?: number;
   status?: OrderStatus;
+  search?: string;
 }

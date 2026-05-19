@@ -213,7 +213,7 @@
               class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
               [class.!border-red-500]="(submitted || f['password'].touched) && f['password'].errors"/>
             <button type="button" (click)="showPwd = !showPwd"
-              class="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors hover:text-gold"
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:text-gold"
               style="color:#6b7280">
               @if (showPwd) {
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,7 +252,7 @@
               class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
               [class.!border-red-500]="(submitted || f['confirmPassword'].touched) && f['confirmPassword'].errors"/>
             <button type="button" (click)="showConfirmPwd = !showConfirmPwd"
-              class="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors hover:text-gold"
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:text-gold"
               style="color:#6b7280">
               @if (showConfirmPwd) {
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

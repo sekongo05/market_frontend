@@ -208,12 +208,18 @@
 .luxury-card:hover {
   border-color: rgba(184,134,11,.40);
   box-shadow: 0 12px 36px rgba(168,128,30,.12);
-  transform: translateY(-4px);
+}
+
+@media (hover: hover) {
+  .luxury-card:hover { transform: translateY(-4px); }
 }
 
 /* ─── Card hover ─────────────────────────────────────────────────────────── */
 .card-hover { transition: transform .3s, box-shadow .3s !important; }
-.card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,.10); }
+.card-hover:hover { box-shadow: 0 20px 40px rgba(0,0,0,.10); }
+@media (hover: hover) {
+  .card-hover:hover { transform: translateY(-6px); }
+}
 
 /* ─── Theme backgrounds ──────────────────────────────────────────────────── */
 .theme-bg        { background: #f8f5f0; }
@@ -554,6 +560,14 @@ body   { background: #f8f5f0; color: #111111; }
   }
   footer {
     padding-bottom: calc(var(--bottom-nav-h) + max(12px, env(safe-area-inset-bottom)));
+  }
+}
+
+/* ─── Review banner — sits above tab bar on mobile ───────────────────────── */
+.review-banner { bottom: 1rem; }
+@media (max-width: 1023px) {
+  .review-banner {
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 12px);
   }
 }
 

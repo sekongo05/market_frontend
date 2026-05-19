@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Subject, interval, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DashboardService, DashboardStats, MonthlyRevenueItem, TopProductItem, DailyCaisseResponse } from '../../../../core/services/dashboard.service';
@@ -18,7 +19,7 @@ export interface Insight {
   selector: 'app-admin-overview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admin-overview.component.html',
 })
 export class AdminOverviewComponent implements OnInit, OnDestroy {
@@ -50,6 +51,7 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadStats();
+    this.loadDailyCaisse();
     this.refreshSub = interval(60_000).subscribe(() => this.loadStats());
     this.wsService.orderEvent$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.loadStats();

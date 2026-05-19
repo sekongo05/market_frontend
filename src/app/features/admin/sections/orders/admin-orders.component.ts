@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OrderService } from '../../../../core/services/order.service';
 import { OrderResponse, GetOrdersParams } from '../../../../core/models/order.models';
@@ -23,10 +23,16 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   ordersLoading = false;
   ordersPage = 0;
   ordersTotalPages = 0;
+  ordersTotalElements = 0;
+  pendingCount = 0;
   statusFilter: OrderStatus | '' = '';
+  searchQuery = '';
   statusUpdatingId: number | null = null;
   selectedOrder: OrderResponse | null = null;
   orderDetailOpen = false;
+  cancelConfirmOrder: OrderResponse | null = null;
+
+  private readonly search$ = new Subject<string>();
 
   readonly orderStatuses = Object.values(OrderStatus);
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
@@ -53,8 +59,15 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadAllOrders(0);
+    this.loadPendingCount();
+    this.search$.pipe(
+      debounceTime(350),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$),
+    ).subscribe(() => this.loadAllOrders(0));
     this.wsService.orderEvent$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.loadAllOrders(0);
+      this.loadAllOrders(this.ordersPage);
+      this.loadPendingCount();
       this.cdr.markForCheck();
     });
     this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe(e => {
@@ -70,6 +83,8 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
 
   get orderPages(): number[] { return Array.from({ length: this.ordersTotalPages }, (_, i) => i); }
 
+  onSearchInput(): void { this.search$.next(this.searchQuery); }
+
   nextStatusLabel(s: string): string {
     const next = this.nextStatusMap[s];
     return next ? `→ ${orderStatusLabel(next)}` : '';
@@ -79,18 +94,30 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     this.ordersLoading = true;
     const params: GetOrdersParams = { page, size: 15 };
     if (this.statusFilter) params.status = this.statusFilter as OrderStatus;
+    if (this.searchQuery.trim()) params.search = this.searchQuery.trim();
     this.orderService.getAllOrders(params).subscribe({
       next: (r) => {
         if (r.success) {
           const pg = r.data as PageResponse<OrderResponse>;
           this.allOrders = pg.content;
           this.ordersTotalPages = pg.totalPages;
+          this.ordersTotalElements = pg.totalElements;
           this.ordersPage = page;
         }
         this.ordersLoading = false;
         this.cdr.markForCheck();
       },
       error: () => { this.ordersLoading = false; this.cdr.markForCheck(); },
+    });
+  }
+
+  loadPendingCount(): void {
+    this.orderService.getAllOrders({ page: 0, size: 1, status: OrderStatus.PENDING }).subscribe({
+      next: (r) => {
+        if (r.success) this.pendingCount = (r.data as PageResponse<OrderResponse>).totalElements;
+        this.cdr.markForCheck();
+      },
+      error: () => {},
     });
   }
 
@@ -133,11 +160,24 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   }
 
   cancelOrderByManager(order: OrderResponse): void {
+    this.cancelConfirmOrder = order;
+    this.cdr.markForCheck();
+  }
+
+  confirmCancel(): void {
+    const order = this.cancelConfirmOrder;
+    if (!order) return;
+    this.cancelConfirmOrder = null;
     this.statusUpdatingId = order.id;
     this.orderService.cancelOrder(order.id).subscribe({
       next: (r) => {
-        if (r.success) { this._patchOrder(order.id, r.data); this.toast.show(`Commande ${order.orderNumber} annulée`); }
+        if (r.success) {
+          this._patchOrder(order.id, r.data);
+          this.toast.show(`Commande ${order.orderNumber} annulée`);
+          if (this.orderDetailOpen && this.selectedOrder?.id === order.id) this.closeOrderDetail();
+        }
         this.statusUpdatingId = null;
+        this.loadPendingCount();
         this.cdr.markForCheck();
       },
       error: (err) => {

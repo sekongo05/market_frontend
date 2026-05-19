@@ -807,7 +807,7 @@
         <div class="flex items-center gap-2">
           @if (cartItems.length > 0) {
             <button (click)="cartService.clearCart()"
-              class="text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-colors"
+              class="text-[11px] font-semibold px-3 py-2.5 rounded-xl transition-colors"
               style="color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.07)">
               Vider
             </button>
@@ -936,7 +936,7 @@
           </div>
           <!-- Supprimer — toujours visible sur mobile -->
           <button (click)="cartService.removeFromCart(item.productId, item.variantId)"
-            class="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center
+            class="absolute top-1.5 right-1.5 w-9 h-9 rounded-full flex items-center justify-center
                    transition-all duration-150 hover:scale-110"
             style="background:rgba(239,68,68,0.1);color:#f87171">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1409,7 +1409,7 @@
 
 <!-- ── Banner demande d'avis (déclenché par WebSocket au statut DELIVERED) ── -->
 @if (reviewRequestBanner) {
-  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] w-full max-w-sm sm:max-w-md px-3 sm:px-0 animate-fade-in-up">
+  <div class="review-banner fixed left-1/2 -translate-x-1/2 z-[60] w-full max-w-sm sm:max-w-md px-3 sm:px-0 animate-fade-in-up">
     <div class="relative rounded-2xl border border-amber-500/30 bg-zinc-900/95 backdrop-blur-xl shadow-2xl shadow-black/60 overflow-hidden">
 
       <!-- Barre dorée top -->
