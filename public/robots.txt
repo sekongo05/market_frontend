@@ -6,4 +6,4 @@ Disallow: /auth/
 Disallow: /profile
 Disallow: /orders
 
-Sitemap: https://sdmstore.ci/sitemap.xml
+Sitemap: https://sdm-store.shop/sitemap.xml

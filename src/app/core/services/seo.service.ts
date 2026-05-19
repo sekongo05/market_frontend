@@ -16,7 +16,7 @@ export interface SeoConfig {
 }
 
 const SITE_NAME = 'SDM STORE';
-const BASE_URL = 'https://sdmstore.ci';
+const BASE_URL = 'https://sdm-store.shop';
 const DEFAULT_IMAGE = `${BASE_URL}/icon-512.png`;
 
 @Injectable({ providedIn: 'root' })
