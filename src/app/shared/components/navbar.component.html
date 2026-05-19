@@ -1229,6 +1229,169 @@
   </div>
 }
 
+<!-- ══════════════════════════════════════════════════════
+     BOTTOM TAB BAR — mobile uniquement
+══════════════════════════════════════════════════════ -->
+<nav class="bottom-tab-bar lg:hidden" aria-label="Navigation principale">
+
+  @if (!isManager) {
+    <!-- ── Clients & visiteurs : 5 onglets + panier flottant ── -->
+    <div class="bottom-tab-row">
+
+      <!-- Accueil -->
+      <a routerLink="/" routerLinkActive="bottom-tab-active" [routerLinkActiveOptions]="{exact:true}"
+         (click)="closeAll()" class="bottom-tab">
+        <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span class="bottom-tab-label">Accueil</span>
+      </a>
+
+      <!-- Collection -->
+      <a routerLink="/products" routerLinkActive="bottom-tab-active"
+         (click)="closeAll()" class="bottom-tab">
+        <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+        </svg>
+        <span class="bottom-tab-label">Collection</span>
+      </a>
+
+      <!-- Panier (flottant au centre) -->
+      <div class="bottom-tab-cart-wrap">
+        <button (click)="toggleCart(); closeAll()" class="bottom-tab-cart-btn" aria-label="Ouvrir le panier">
+          <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+          @if (cartCount > 0) {
+            <span class="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-0.5
+                         bg-red-500 text-white text-[9px] font-black rounded-full
+                         flex items-center justify-center leading-none shadow-sm">
+              {{ cartCount > 9 ? '9+' : cartCount }}
+            </span>
+          }
+        </button>
+        <span class="bottom-tab-label" style="color:#92700c;">Panier</span>
+      </div>
+
+      <!-- Commandes -->
+      @if (currentUser) {
+        <a routerLink="/orders" routerLinkActive="bottom-tab-active"
+           (click)="closeAll()" class="bottom-tab">
+          <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          <span class="bottom-tab-label">Commandes</span>
+        </a>
+      } @else {
+        <a routerLink="/auth/login" class="bottom-tab" style="opacity:0.45;">
+          <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          <span class="bottom-tab-label">Commandes</span>
+        </a>
+      }
+
+      <!-- Compte -->
+      <a [routerLink]="currentUser ? '/profile' : '/auth/login'"
+         routerLinkActive="bottom-tab-active"
+         (click)="closeAll()" class="bottom-tab">
+        <div class="relative">
+          @if (currentUser) {
+            <div class="w-[22px] h-[22px] rounded-md flex items-center justify-center text-[9px] font-black text-black"
+                 style="background: linear-gradient(135deg,#f5d442,#b8941e);">
+              {{ initials }}
+            </div>
+          } @else {
+            <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          }
+          @if (unreadNotifications > 0) {
+            <span class="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-0.5
+                         bg-red-500 text-white text-[8px] font-black rounded-full
+                         flex items-center justify-center leading-none shadow-sm">
+              {{ unreadNotifications > 9 ? '9+' : unreadNotifications }}
+            </span>
+          }
+        </div>
+        <span class="bottom-tab-label">{{ currentUser ? 'Compte' : 'Connexion' }}</span>
+      </a>
+
+    </div>
+    <div class="bottom-tab-safe"></div>
+  }
+
+  @if (isManager) {
+    <!-- ── Managers : 4 onglets ── -->
+    <div class="bottom-tab-row">
+
+      <a routerLink="/" routerLinkActive="bottom-tab-active" [routerLinkActiveOptions]="{exact:true}"
+         (click)="closeAll()" class="bottom-tab">
+        <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span class="bottom-tab-label">Accueil</span>
+      </a>
+
+      <a routerLink="/products" routerLinkActive="bottom-tab-active"
+         (click)="closeAll()" class="bottom-tab">
+        <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+        </svg>
+        <span class="bottom-tab-label">Collection</span>
+      </a>
+
+      <a [routerLink]="currentUser?.role === 'ADMIN' ? '/admin' : '/manager'"
+         routerLinkActive="bottom-tab-active"
+         (click)="closeAll()" class="bottom-tab relative">
+        <div class="relative">
+          <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+              d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+          </svg>
+          @if (pendingOrdersCount > 0) {
+            <span class="absolute -top-1.5 -right-2.5 min-w-[14px] h-[14px] px-0.5
+                         bg-red-500 text-white text-[8px] font-black rounded-full
+                         flex items-center justify-center leading-none">
+              {{ pendingOrdersCount > 9 ? '9+' : pendingOrdersCount }}
+            </span>
+          }
+        </div>
+        <span class="bottom-tab-label">Gestion</span>
+      </a>
+
+      <a routerLink="/profile" routerLinkActive="bottom-tab-active"
+         (click)="closeAll()" class="bottom-tab">
+        <div class="relative">
+          <div class="w-[22px] h-[22px] rounded-md flex items-center justify-center text-[9px] font-black text-black"
+               style="background: linear-gradient(135deg,#f5d442,#b8941e);">
+            {{ initials }}
+          </div>
+          @if (unreadNotifications > 0) {
+            <span class="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-0.5
+                         bg-red-500 text-white text-[8px] font-black rounded-full
+                         flex items-center justify-center leading-none">
+              {{ unreadNotifications > 9 ? '9+' : unreadNotifications }}
+            </span>
+          }
+        </div>
+        <span class="bottom-tab-label">Compte</span>
+      </a>
+
+    </div>
+    <div class="bottom-tab-safe"></div>
+  }
+
+</nav>
+
 <!-- ── Banner demande d'avis (déclenché par WebSocket au statut DELIVERED) ── -->
 @if (reviewRequestBanner) {
   <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] w-full max-w-sm sm:max-w-md px-3 sm:px-0 animate-fade-in-up">

@@ -179,6 +179,7 @@
 /* ─── CSS custom properties ───────────────────────────────────────────────── */
 :root {
   --navbar-h: 75px;
+  --bottom-nav-h: 60px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -389,6 +390,100 @@ body   { background: #f8f5f0; color: #111111; }
 .notif-body p:last-child { margin-bottom: 0; }
 
 .notif-body span[style] { border-radius: 4px; }
+
+/* ─── Bottom Tab Bar ─────────────────────────────────────────────────────── */
+.bottom-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 45;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.07);
+  overflow: visible; /* needed for floating cart button */
+}
+
+.bottom-tab-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: var(--bottom-nav-h);
+  padding: 0 2px;
+}
+
+.bottom-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding-bottom: 8px;
+  flex: 1;
+  min-height: var(--bottom-nav-h);
+  color: #9ca3af;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .2s;
+  border-radius: 10px;
+}
+
+.bottom-tab:active { opacity: 0.7; }
+
+.bottom-tab-label {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.015em;
+}
+
+.bottom-tab-active { color: #92700c !important; }
+
+/* ── Cart floating button ── */
+.bottom-tab-cart-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 8px;
+  gap: 4px;
+}
+
+.bottom-tab-cart-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f5d442, #b8941e);
+  box-shadow: 0 6px 20px rgba(184,134,11,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transform: translateY(-14px);
+  transition: transform .15s, box-shadow .15s;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.bottom-tab-cart-btn:active {
+  transform: translateY(-10px);
+  box-shadow: 0 3px 10px rgba(184,134,11,0.35);
+}
+
+/* ── Safe area spacer ── */
+.bottom-tab-safe {
+  height: max(6px, env(safe-area-inset-bottom));
+}
+
+/* ── Main content bottom padding on mobile ── */
+@media (max-width: 1023px) {
+  main.theme-bg {
+    padding-bottom: calc(var(--bottom-nav-h) + max(8px, env(safe-area-inset-bottom)));
+  }
+}
 
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 footer {
