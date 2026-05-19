@@ -391,6 +391,20 @@ body   { background: #f8f5f0; color: #111111; }
 
 .notif-body span[style] { border-radius: 4px; }
 
+/* ─── Route loading bar ──────────────────────────────────────────────────── */
+.route-loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  height: 3px;
+  background: linear-gradient(90deg, #7a5c0a, #b8941e, #f5d442, #b8941e, #7a5c0a);
+  background-size: 300% 100%;
+  animation: goldShine 1s linear infinite, fadeIn 0.15s ease-out both;
+  pointer-events: none;
+}
+
 /* ─── Bottom Tab Bar ─────────────────────────────────────────────────────── */
 .bottom-tab-bar {
   position: fixed;

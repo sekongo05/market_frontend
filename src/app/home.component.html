@@ -64,13 +64,13 @@
       <!-- Titre — chaque mot sort du bas (word-rise) -->
       <h1 class="font-black leading-[0.85] tracking-tight text-white mb-9 sm:mb-11">
         <span class="hero-wrap">
-          <span class="hero-word" style="font-size:clamp(3.8rem,13vw,7rem);animation-delay:0.38s">L'HEURE</span>
+          <span class="hero-word" style="font-size:clamp(2.9rem,11vw,7rem);animation-delay:0.38s">L'HEURE</span>
         </span>
         <span class="hero-wrap">
-          <span class="hero-word gold-shimmer" style="font-size:clamp(3.8rem,13vw,7rem);animation-delay:0.62s">DU</span>
+          <span class="hero-word gold-shimmer" style="font-size:clamp(2.9rem,11vw,7rem);animation-delay:0.62s">DU</span>
         </span>
         <span class="hero-wrap">
-          <span class="hero-word" style="font-size:clamp(3.8rem,13vw,7rem);animation-delay:0.88s">PRESTIGE.</span>
+          <span class="hero-word" style="font-size:clamp(2.9rem,11vw,7rem);animation-delay:0.88s">PRESTIGE.</span>
         </span>
       </h1>
 
@@ -477,6 +477,11 @@
       </div>
 
       <div class="relative">
+        <!-- Connecteur vertical (mobile uniquement) -->
+        <div class="sm:hidden absolute pointer-events-none"
+             style="left:27px;top:28px;bottom:28px;width:1px;
+                    background:linear-gradient(to bottom,rgba(212,175,55,0.06),rgba(212,175,55,0.45) 18%,rgba(212,175,55,0.45) 82%,rgba(212,175,55,0.06));"></div>
+
         <!-- Ligne connectrice (desktop) -->
         <div class="r-line absolute hidden sm:block"
              style="top:28px;left:28px;right:28px;height:1px;
@@ -555,7 +560,7 @@
             style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">L'EXCELLENCE<br>PARTOUT</h2>
       </div>
 
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-1">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
         @for (p of [
           { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',     title: 'Livraison rapide',        desc: '24–48h Abidjan · 72h intérieur CI.' },
           { icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', title: 'Retour 3 jours', desc: 'Remboursement garanti sans friction.' },
