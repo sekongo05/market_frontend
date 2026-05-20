@@ -1,28 +1,23 @@
 <div class="min-h-screen theme-bg flex">
 
-  <!-- ── Overlay mobile ────────────────────────────────────────────────── -->
-  @if (mobileNavOpen) {
-    <div class="fixed inset-0 bg-black/50 z-[50] lg:hidden" (click)="mobileNavOpen = false"></div>
+  <!-- ── Overlay bottom-sheet ──────────────────────────────────────── -->
+  @if (moreSheetOpen) {
+    <div class="fixed inset-0 bg-black/60 z-[60] lg:hidden" (click)="moreSheetOpen = false"></div>
   }
 
-  <!-- ── Sidebar ───────────────────────────────────────────────────── -->
-  <aside class="fixed lg:sticky top-0 left-0 h-screen z-[55] w-64 flex-shrink-0 theme-surface border-r theme-border flex flex-col transition-transform duration-300 lg:translate-x-0"
-         [class.-translate-x-full]="!mobileNavOpen"
-         [class.translate-x-0]="mobileNavOpen">
+  <!-- ── Sidebar (desktop uniquement) ─────────────────────────────── -->
+  <aside class="hidden lg:flex sticky top-0 h-screen z-[55] w-64 flex-shrink-0 theme-surface border-r theme-border flex-col">
 
-    <!-- Logo / titre -->
     <div class="px-6 py-5 border-b theme-border">
       <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-0.5">Administration</p>
       <h1 class="text-xl font-black theme-text">SDM Store</h1>
     </div>
 
-    <!-- Navigation -->
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
       @for (item of navItems; track item.route) {
         <a [routerLink]="item.route" routerLinkActive="bg-gold/10 text-gold border-gold/30"
            [routerLinkActiveOptions]="{exact: item.route === 'overview'}"
-           (click)="mobileNavOpen = false"
-           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium theme-muted hover:text-gold hover:bg-gold/8 border border-transparent transition-all duration-150 group relative">
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium theme-muted hover:text-gold hover:bg-gold/8 border border-transparent transition-all duration-150 active:scale-[0.97] active:opacity-70 group">
           <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"/>
           </svg>
@@ -36,10 +31,9 @@
       }
     </nav>
 
-    <!-- Pied de sidebar -->
     <div class="px-4 py-4 border-t theme-border">
-      <a routerLink="/" (click)="mobileNavOpen = false"
-         class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm theme-muted hover:text-gold hover:bg-gold/8 transition-colors duration-150">
+      <a routerLink="/"
+         class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm theme-muted hover:text-gold hover:bg-gold/8 transition-colors duration-150 active:scale-[0.97] active:opacity-70">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -50,18 +44,22 @@
 
   <!-- ── Contenu principal ─────────────────────────────────────────── -->
   <main class="flex-1 min-w-0 pb-16 lg:pb-0">
+
     <!-- Mobile top bar -->
     <div class="lg:hidden flex items-center gap-3 px-4 py-3 theme-surface border-b theme-border sticky top-0 z-30">
-      <button (click)="mobileNavOpen = true" class="min-w-[44px] min-h-[44px] p-2.5 rounded-xl theme-muted hover:text-gold transition-colors flex items-center justify-center">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      </button>
-      <span class="font-bold theme-text text-sm">Administration</span>
+      <div class="w-7 h-7 bg-gold/15 rounded-lg flex items-center justify-center flex-shrink-0">
+        <span class="text-gold font-black text-xs">S</span>
+      </div>
+      <span class="font-bold theme-text text-sm flex-1 truncate">{{ currentRouteLabel }}</span>
       @if (pendingOrdersCount > 0) {
-        <span class="ml-auto bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">{{ pendingOrdersCount }}</span>
+        <a routerLink="orders"
+           class="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-xl active:scale-[0.97] active:opacity-70 transition-transform">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping inline-block"></span>
+          {{ pendingOrdersCount }}
+        </a>
       }
     </div>
+
     <router-outlet/>
   </main>
 
@@ -84,12 +82,12 @@
     }
   </div>
 
-  <!-- ── Bottom navigation (mobile) ──────────────────────────────────── -->
+  <!-- ── Bottom navigation (mobile) ────────────────────────────────── -->
   <nav class="fixed bottom-0 left-0 right-0 z-40 lg:hidden theme-surface border-t theme-border flex items-stretch"
        style="padding-bottom: env(safe-area-inset-bottom)">
 
     <a routerLink="overview" routerLinkActive #rlaOverview="routerLinkActive"
-       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors active:scale-[0.97] active:opacity-70"
        [class.text-gold]="rlaOverview.isActive" [class.theme-muted]="!rlaOverview.isActive">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -98,7 +96,7 @@
     </a>
 
     <a routerLink="orders" routerLinkActive #rlaOrders="routerLinkActive"
-       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors relative"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors active:scale-[0.97] active:opacity-70"
        [class.text-gold]="rlaOrders.isActive" [class.theme-muted]="!rlaOrders.isActive">
       <div class="relative">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +112,7 @@
     </a>
 
     <a routerLink="products" routerLinkActive #rlaProducts="routerLinkActive"
-       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors active:scale-[0.97] active:opacity-70"
        [class.text-gold]="rlaProducts.isActive" [class.theme-muted]="!rlaProducts.isActive">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -122,23 +120,96 @@
       <span class="text-[10px] font-semibold">Produits</span>
     </a>
 
-    <a routerLink="delivery" routerLinkActive #rlaDelivery="routerLinkActive"
-       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors"
-       [class.text-gold]="rlaDelivery.isActive" [class.theme-muted]="!rlaDelivery.isActive">
+    <a routerLink="returns" routerLinkActive #rlaReturns="routerLinkActive"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors active:scale-[0.97] active:opacity-70"
+       [class.text-gold]="rlaReturns.isActive" [class.theme-muted]="!rlaReturns.isActive">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
       </svg>
-      <span class="text-[10px] font-semibold">Livraisons</span>
+      <span class="text-[10px] font-semibold">Retours</span>
     </a>
 
-    <button (click)="mobileNavOpen = true"
-       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] theme-muted transition-colors">
+    <button (click)="moreSheetOpen = true"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] theme-muted transition-colors active:scale-[0.97] active:opacity-70">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h7"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"/>
       </svg>
       <span class="text-[10px] font-semibold">Plus</span>
     </button>
 
   </nav>
+
+  <!-- ── Bottom sheet "Plus" ───────────────────────────────────────── -->
+  @if (moreSheetOpen) {
+    <div class="fixed bottom-0 left-0 right-0 z-[65] lg:hidden"
+         style="padding-bottom: env(safe-area-inset-bottom)">
+      <div class="theme-surface border-t theme-border rounded-t-3xl px-5 pt-4 pb-6 shadow-2xl">
+        <div class="w-10 h-1 bg-black/20 rounded-full mx-auto mb-5"></div>
+        <div class="grid grid-cols-3 gap-3">
+
+          <a routerLink="delivery" (click)="moreSheetOpen = false"
+             class="flex flex-col items-center gap-2 p-3.5 rounded-2xl border theme-border hover:bg-gold/8 transition-colors active:scale-[0.97] active:opacity-70">
+            <div class="w-10 h-10 bg-blue-500/12 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+              </svg>
+            </div>
+            <span class="text-[11px] font-semibold theme-text">Livraisons</span>
+          </a>
+
+          <a routerLink="reviews" (click)="moreSheetOpen = false"
+             class="flex flex-col items-center gap-2 p-3.5 rounded-2xl border theme-border hover:bg-gold/8 transition-colors active:scale-[0.97] active:opacity-70">
+            <div class="w-10 h-10 bg-yellow-500/12 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+              </svg>
+            </div>
+            <span class="text-[11px] font-semibold theme-text">Avis</span>
+          </a>
+
+          <a routerLink="promos" (click)="moreSheetOpen = false"
+             class="flex flex-col items-center gap-2 p-3.5 rounded-2xl border theme-border hover:bg-gold/8 transition-colors active:scale-[0.97] active:opacity-70">
+            <div class="w-10 h-10 bg-pink-500/12 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+              </svg>
+            </div>
+            <span class="text-[11px] font-semibold theme-text">Promos</span>
+          </a>
+
+          <a routerLink="users" (click)="moreSheetOpen = false"
+             class="flex flex-col items-center gap-2 p-3.5 rounded-2xl border theme-border hover:bg-gold/8 transition-colors active:scale-[0.97] active:opacity-70">
+            <div class="w-10 h-10 bg-teal-500/12 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+              </svg>
+            </div>
+            <span class="text-[11px] font-semibold theme-text">Utilisateurs</span>
+          </a>
+
+          <a routerLink="categories" (click)="moreSheetOpen = false"
+             class="flex flex-col items-center gap-2 p-3.5 rounded-2xl border theme-border hover:bg-gold/8 transition-colors active:scale-[0.97] active:opacity-70">
+            <div class="w-10 h-10 bg-indigo-500/12 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+            </div>
+            <span class="text-[11px] font-semibold theme-text">Catégories</span>
+          </a>
+
+          <a routerLink="/" (click)="moreSheetOpen = false"
+             class="flex flex-col items-center gap-2 p-3.5 rounded-2xl border theme-border hover:bg-gold/8 transition-colors active:scale-[0.97] active:opacity-70">
+            <div class="w-10 h-10 bg-gold/12 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+              </svg>
+            </div>
+            <span class="text-[11px] font-semibold theme-text">Voir site</span>
+          </a>
+
+        </div>
+      </div>
+    </div>
+  }
 
 </div>

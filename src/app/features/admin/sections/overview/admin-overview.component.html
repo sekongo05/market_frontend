@@ -1,5 +1,44 @@
 <div class="p-4 md:p-6 lg:p-8 animate-fade-in-up space-y-4 md:space-y-5">
 
+  <!-- Quick nav (mobile uniquement) -->
+  <div class="grid grid-cols-4 gap-2 lg:hidden">
+    <a routerLink="/admin/orders"
+       class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-amber-500/8 border border-amber-500/20 active:scale-[0.97] active:opacity-70 transition-transform">
+      <div class="relative">
+        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        @if (stats?.pendingOrders && stats!.pendingOrders > 0) {
+          <span class="absolute -top-1.5 -right-1.5 bg-amber-400 text-black text-[8px] font-black px-1 rounded-full min-w-[14px] text-center leading-tight">
+            {{ stats!.pendingOrders }}
+          </span>
+        }
+      </div>
+      <span class="text-[10px] font-bold text-amber-400">Commandes</span>
+    </a>
+    <a routerLink="/admin/products"
+       class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-violet-500/8 border border-violet-500/20 active:scale-[0.97] active:opacity-70 transition-transform">
+      <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+      </svg>
+      <span class="text-[10px] font-bold text-violet-400">Produits</span>
+    </a>
+    <a routerLink="/admin/returns"
+       class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-red-500/8 border border-red-500/20 active:scale-[0.97] active:opacity-70 transition-transform">
+      <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+      </svg>
+      <span class="text-[10px] font-bold text-red-400">Retours</span>
+    </a>
+    <a routerLink="/admin/delivery"
+       class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-blue-500/8 border border-blue-500/20 active:scale-[0.97] active:opacity-70 transition-transform">
+      <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+      </svg>
+      <span class="text-[10px] font-bold text-blue-400">Livraisons</span>
+    </a>
+  </div>
+
   @if (error) {
     <div class="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/25 rounded-2xl text-red-400 animate-fade-in">
       <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +98,7 @@
     <!-- KPI Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
-      <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-5 text-white shadow-xl shadow-indigo-500/20 card-hover animate-fade-in-up">
+      <div routerLink="/admin/orders" class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-5 text-white shadow-xl shadow-indigo-500/20 card-hover animate-fade-in-up cursor-pointer active:scale-[0.97] active:opacity-70 transition-transform">
         <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +115,7 @@
         <p class="text-white/70 text-xs mt-1.5 font-medium">Commandes totales</p>
       </div>
 
-      <div class="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-3xl p-5 text-white shadow-xl shadow-teal-500/20 card-hover animate-fade-in-up">
+      <div routerLink="/admin/users" class="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-3xl p-5 text-white shadow-xl shadow-teal-500/20 card-hover animate-fade-in-up cursor-pointer active:scale-[0.97] active:opacity-70 transition-transform">
         <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,7 +132,7 @@
         <p class="text-white/70 text-xs mt-1.5 font-medium">Utilisateurs inscrits</p>
       </div>
 
-      <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-3xl p-5 text-white shadow-xl shadow-violet-500/20 card-hover animate-fade-in-up">
+      <div routerLink="/admin/products" class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-3xl p-5 text-white shadow-xl shadow-violet-500/20 card-hover animate-fade-in-up cursor-pointer active:scale-[0.97] active:opacity-70 transition-transform">
         <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +145,7 @@
         <p class="text-white/70 text-xs mt-1.5 font-medium">Produits actifs</p>
       </div>
 
-      <div class="theme-surface border theme-border rounded-3xl p-5 card-hover animate-fade-in-up">
+      <div routerLink="/admin/delivery" class="theme-surface border theme-border rounded-3xl p-5 card-hover animate-fade-in-up cursor-pointer active:scale-[0.97] active:opacity-70 transition-transform">
         <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                [ngClass]="completionRate >= 80 ? 'bg-emerald-500/15' : completionRate >= 50 ? 'bg-amber-500/15' : 'bg-red-500/15'">

@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { filter, takeUntil, take } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { AdminToastService } from '../shared/admin-toast.service';
+import { DashboardService } from '../../../core/services/dashboard.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -16,8 +17,20 @@ import { AdminToastService } from '../shared/admin-toast.service';
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
   pendingOrdersCount = 0;
-  mobileNavOpen = false;
+  moreSheetOpen = false;
+  currentRouteLabel = 'Administration';
   private readonly destroy$ = new Subject<void>();
+  private readonly routeLabels: Record<string, string> = {
+    overview:   'Tableau de bord',
+    orders:     'Commandes',
+    products:   'Produits',
+    delivery:   'Livraisons',
+    returns:    'Retours',
+    reviews:    'Avis',
+    promos:     'Promotions',
+    users:      'Utilisateurs',
+    categories: 'Catégories',
+  };
 
   readonly navItems = [
     { route: 'overview',    label: 'Tableau de bord', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -37,6 +50,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     public toastService: AdminToastService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private dashboardService: DashboardService,
   ) {}
 
   ngOnInit(): void {
@@ -51,10 +65,34 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
         this.pendingOrdersCount = event.pendingCount;
         this.cdr.markForCheck();
       });
+
+    const url = this.router.url;
+    if (url.includes('overview') || url === '/admin' || url === '/admin/') {
+      this.dashboardService.getStats().pipe(take(1)).subscribe(r => {
+        if (r.success && r.data?.pendingOrders > 0) {
+          this.router.navigate(['/admin/orders']);
+        }
+      });
+    }
+
+    this.updateRouteLabel(this.router.url);
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      takeUntil(this.destroy$)
+    ).subscribe((e: any) => {
+      this.updateRouteLabel(e.urlAfterRedirects);
+      this.moreSheetOpen = false;
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private updateRouteLabel(url: string): void {
+    const segment = url.split('/').pop()?.split('?')[0] ?? '';
+    this.currentRouteLabel = this.routeLabels[segment] ?? 'Administration';
   }
 }
