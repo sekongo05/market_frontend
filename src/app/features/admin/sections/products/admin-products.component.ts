@@ -10,7 +10,7 @@ import { CategoryService } from '../../../../core/services/category.service';
 import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
-import { ProductResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender } from '../../../../core/models/product.models';
+import { ProductResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender, SortOption } from '../../../../core/models/product.models';
 import { CategoryResponse } from '../../../../core/models/category.models';
 import { PageResponse } from '../../../../core/models/common.models';
 import { stockClass } from '../../shared/admin-status.helpers';
@@ -27,7 +27,15 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   productsLoading = false;
   productsPage = 0;
   productsTotalPages = 0;
+  productsTotalElements = 0;
   productSearchQuery = '';
+
+  /* ── Filtres ── */
+  filterGender: string   = '';
+  filterStock: '' | 'inStock' | 'outOfStock' = '';
+  filterActive: '' | 'active' | 'inactive'   = '';
+  filterCategoryId: number | '' = '';
+  sortBy: string = 'newest';
 
   drawerOpen = false;
   editingProduct: ProductResponse | null = null;
@@ -112,6 +120,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadProducts(0);
     this.initProductForm();
+    this.loadProductCategories();
     this.searchSubject.pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => this.loadProducts(0));
     this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe(e => {
@@ -126,6 +135,31 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
 
   get productPages(): number[] { return Array.from({ length: this.productsTotalPages }, (_, i) => i); }
+
+  get hasActiveFilters(): boolean {
+    return !!this.productSearchQuery || !!this.filterGender || !!this.filterStock
+        || !!this.filterActive || !!this.filterCategoryId || this.sortBy !== 'newest';
+  }
+
+  clearFilters(): void {
+    this.productSearchQuery = '';
+    this.filterGender       = '';
+    this.filterStock        = '';
+    this.filterActive       = '';
+    this.filterCategoryId   = '';
+    this.sortBy             = 'newest';
+    this.loadProducts(0);
+  }
+
+  applyProductFilter(): void { this.loadProducts(0); }
+
+  isNewProduct(p: ProductResponse): boolean {
+    return (Date.now() - new Date(p.createdAt).getTime()) / 86_400_000 < 7;
+  }
+
+  isLowStock(p: ProductResponse): boolean {
+    return p.stock > 0 && p.stock <= 3;
+  }
   get isStep1Valid(): boolean {
     const f = this.productForm;
     return !!(f.get('name')?.valid && f.get('description')?.valid && f.get('categoryId')?.value && f.get('gender')?.value);
@@ -146,14 +180,22 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   loadProducts(page = 0): void {
     this.productsLoading = true;
     const params: GetProductsParams = { page, size: 12 };
-    if (this.productSearchQuery) params.search = this.productSearchQuery;
+    if (this.productSearchQuery)  params.search     = this.productSearchQuery;
+    if (this.filterGender)        params.gender     = this.filterGender as Gender;
+    if (this.filterCategoryId)    params.categoryId = +this.filterCategoryId;
+    if (this.sortBy)              params.sort       = this.sortBy as SortOption;
+    if (this.filterStock === 'inStock')   params.inStock = true;
+    if (this.filterStock === 'outOfStock') params.inStock = false;
+    if (this.filterActive === 'active')   params.active  = true;
+    if (this.filterActive === 'inactive') params.active  = false;
     this.productService.getProducts(params).subscribe({
       next: (r) => {
         if (r.success) {
           const pg = r.data as PageResponse<ProductResponse>;
-          this.products = pg.content;
-          this.productsTotalPages = pg.totalPages;
-          this.productsPage = page;
+          this.products             = pg.content;
+          this.productsTotalPages   = pg.totalPages;
+          this.productsTotalElements = pg.totalElements;
+          this.productsPage         = page;
         }
         this.productsLoading = false;
         this.cdr.markForCheck();
@@ -235,7 +277,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.mediaColorError = null;
   }
 
-  private loadProductCategories(): void {
+  loadProductCategories(): void {
     this.categoryService.getCategories().subscribe({
       next: (r) => { if (r.success) this.productCategories = r.data; this.cdr.markForCheck(); },
       error: () => {},

@@ -62,4 +62,5 @@ export interface GetProductsParams {
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;
+  active?: boolean;
 }

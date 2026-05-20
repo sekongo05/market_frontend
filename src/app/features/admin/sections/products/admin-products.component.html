@@ -1,19 +1,115 @@
-<div class="p-6 lg:p-8 animate-fade-in-up">
+<div class="p-6 lg:p-8 animate-fade-in-up space-y-5">
 
-  <!-- Header -->
-  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
-    <div class="flex items-center gap-3 flex-1 min-w-0">
-      <input [ngModel]="productSearchQuery" (ngModelChange)="onProductSearchChange($event)"
-        type="text" placeholder="Rechercher un produit…"
-        class="theme-input px-4 py-2.5 rounded-xl text-sm flex-1 max-w-sm"/>
+  <!-- ── Barre de filtres ───────────────────────────────────────────────── -->
+  <div class="theme-surface border theme-border rounded-2xl p-4 space-y-3">
+
+    <!-- Ligne 1 : recherche + nouveau produit -->
+    <div class="flex gap-3 flex-wrap items-center">
+      <div class="relative flex-1 min-w-48">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 theme-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input [ngModel]="productSearchQuery" (ngModelChange)="onProductSearchChange($event)"
+          type="text" placeholder="Rechercher un produit…"
+          class="theme-input w-full pl-9 pr-4 py-2.5 rounded-xl text-sm transition-all"/>
+        @if (productSearchQuery) {
+          <button (click)="onProductSearchChange('')"
+            class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        }
+      </div>
+      <button (click)="openCreateDrawer()"
+        class="flex items-center gap-2 px-4 py-2.5 bg-gold text-black font-bold text-sm rounded-xl hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nouveau produit
+      </button>
     </div>
-    <button (click)="openCreateDrawer()"
-      class="flex items-center gap-2 px-4 py-2.5 bg-gold text-black font-bold text-sm rounded-xl hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 transition-all">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-      </svg>
-      Nouveau produit
-    </button>
+
+    <!-- Ligne 2 : genre + statut + stock -->
+    <div class="flex gap-2 flex-wrap items-center">
+
+      <!-- Genre -->
+      <div class="flex gap-1">
+        @for (g of [{ val: '', label: 'Tous' }, { val: 'HOMME', label: 'Homme' }, { val: 'FEMME', label: 'Femme' }, { val: 'UNISEX', label: 'Unisexe' }]; track g.val) {
+          <button (click)="filterGender = g.val; applyProductFilter()"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            [ngClass]="filterGender === g.val ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
+            {{ g.label }}
+          </button>
+        }
+      </div>
+
+      <div class="w-px h-4 bg-white/10 self-center"></div>
+
+      <!-- Statut -->
+      <div class="flex gap-1">
+        @for (s of [{ val: '', label: 'Tous' }, { val: 'active', label: 'Actifs' }, { val: 'inactive', label: 'Inactifs' }]; track s.val) {
+          <button (click)="filterActive = $any(s.val); applyProductFilter()"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            [ngClass]="filterActive === s.val
+              ? (s.val === 'inactive' ? 'bg-red-500 text-white' : 'bg-gold text-black')
+              : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
+            {{ s.label }}
+          </button>
+        }
+      </div>
+
+      <div class="w-px h-4 bg-white/10 self-center"></div>
+
+      <!-- Stock -->
+      <div class="flex gap-1">
+        @for (st of [{ val: '', label: 'Tout stock' }, { val: 'inStock', label: 'En stock' }, { val: 'outOfStock', label: 'Épuisés' }]; track st.val) {
+          <button (click)="filterStock = $any(st.val); applyProductFilter()"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            [ngClass]="filterStock === st.val
+              ? (st.val === 'outOfStock' ? 'bg-red-500 text-white' : 'bg-gold text-black')
+              : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
+            {{ st.label }}
+          </button>
+        }
+      </div>
+
+      @if (hasActiveFilters) {
+        <button (click)="clearFilters()"
+          class="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/15 transition-colors">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Réinitialiser
+        </button>
+      }
+    </div>
+
+    <!-- Ligne 3 : catégorie + tri -->
+    <div class="flex gap-3 flex-wrap items-center">
+      <select [(ngModel)]="filterCategoryId" (change)="applyProductFilter()"
+        class="theme-input px-3 py-1.5 rounded-xl text-xs font-semibold transition-all min-w-36">
+        <option value="">Toutes catégories</option>
+        @for (cat of productCategories; track cat.id) {
+          <option [value]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+
+      <select [(ngModel)]="sortBy" (change)="applyProductFilter()"
+        class="theme-input px-3 py-1.5 rounded-xl text-xs font-semibold transition-all min-w-36">
+        <option value="newest">Trier : Plus récents</option>
+        <option value="price_asc">Prix croissant</option>
+        <option value="price_desc">Prix décroissant</option>
+        <option value="name_asc">Nom A → Z</option>
+      </select>
+
+      @if (!productsLoading) {
+        <span class="text-xs theme-muted ml-auto">
+          {{ productsTotalElements }} produit{{ productsTotalElements > 1 ? 's' : '' }}
+          @if (hasActiveFilters) { <span class="text-gold">(filtrés)</span> }
+        </span>
+      }
+    </div>
   </div>
 
   @if (productsLoading) {
@@ -42,6 +138,29 @@
             @if (!product.active) {
               <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <span class="text-xs font-bold text-white bg-red-500/80 px-2 py-1 rounded-lg">Inactif</span>
+              </div>
+            }
+            <!-- Badges coin haut-gauche -->
+            <div class="absolute top-2 left-2 flex flex-col gap-1">
+              @if (isNewProduct(product)) {
+                <span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-blue-500/80 text-white backdrop-blur-sm">Nouveau</span>
+              }
+              @if (product.stock === 0) {
+                <span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-red-500/80 text-white backdrop-blur-sm">Épuisé</span>
+              } @else if (isLowStock(product)) {
+                <span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-orange-500/80 text-white backdrop-blur-sm">Stock faible</span>
+              }
+            </div>
+            <!-- Nombre de variantes coin haut-droit -->
+            @if (product.variants && product.variants.length > 0) {
+              <div class="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-sm">
+                <div class="flex -space-x-1">
+                  @for (v of product.variants.slice(0,3); track v.id) {
+                    <span class="w-2.5 h-2.5 rounded-full border border-white/20 flex-shrink-0"
+                          [style.background-color]="v.colorHex"></span>
+                  }
+                </div>
+                <span class="text-[9px] font-bold text-white/80">{{ product.variants.length }}</span>
               </div>
             }
           </div>
@@ -145,11 +264,14 @@
     </div>
 
     @if (products.length === 0) {
-      <div class="py-20 text-center">
-        <svg class="w-12 h-12 text-gold/20 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="py-20 text-center space-y-3">
+        <svg class="w-12 h-12 text-gold/20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
         </svg>
         <p class="theme-muted font-semibold">Aucun produit trouvé</p>
+        @if (hasActiveFilters) {
+          <button (click)="clearFilters()" class="text-xs text-gold hover:underline">Réinitialiser les filtres</button>
+        }
       </div>
     }
 
