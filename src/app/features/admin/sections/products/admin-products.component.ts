@@ -830,6 +830,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.pendingCreationFile = null;
     this.pendingCreationPreview = null;
     this.pendingCreationColorError = null;
+    this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
     this.cdr.markForCheck();
   }
 
