@@ -110,12 +110,12 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   private readonly CAT_CHAUSSURES = { id: 4, name: 'Chaussures', slug: 'chaussures', description: '', imageUrl: '', active: true, createdAt: '', updatedAt: '' };
 
   private readonly mockProducts: ProductResponse[] = [
-    { id: 1, name: 'Rolex Submariner',    slug: 'rolex-submariner',    description: 'Montre automatique Rolex Submariner Date.',    price: 4200000, stock: 5,  gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80', category: this.CAT_MONTRES,    active: true, createdAt: '', updatedAt: '' },
-    { id: 2, name: 'Cartier Panthère',    slug: 'cartier-panthere',    description: 'Montre Cartier Panthère, boîtier or rose 25mm.', price: 5800000, stock: 3,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1461595383984-b56f78f9223f?w=400&q=80', category: this.CAT_MONTRES,    active: true, createdAt: '', updatedAt: '' },
-    { id: 3, name: 'Chevalière Or 18K',   slug: 'chevaliere-or-18k',   description: 'Chevalière homme en or jaune 18 carats.',       price: 650000,  stock: 10, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80', category: this.CAT_BAGUES,     active: true, createdAt: '', updatedAt: '' },
-    { id: 4, name: 'Solitaire Diamant',   slug: 'solitaire-diamant',   description: 'Bague solitaire or blanc 18K, diamant 0.50ct.', price: 1850000, stock: 6,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&q=80', category: this.CAT_BAGUES,     active: true, createdAt: '', updatedAt: '' },
-    { id: 5, name: 'Chaîne Gourmette Or', slug: 'chaine-gourmette-or', description: 'Chaîne gourmette homme or jaune 18K.',         price: 780000,  stock: 10, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80', category: this.CAT_COLLIERS,   active: true, createdAt: '', updatedAt: '' },
-    { id: 6, name: 'Derby Cuir Italiens',  slug: 'derby-cuir',          description: 'Derbies cuir veau grainé marron.',             price: 185000,  stock: 15, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80', category: this.CAT_CHAUSSURES, active: true, createdAt: '', updatedAt: '' },
+    { id: 1, name: 'Rolex Submariner',    slug: 'rolex-submariner',    description: 'Montre automatique Rolex Submariner Date.',    price: 4200000, stock: 5,  gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80', category: this.CAT_MONTRES,    active: true, featured: false, createdAt: '', updatedAt: '' },
+    { id: 2, name: 'Cartier Panthère',    slug: 'cartier-panthere',    description: 'Montre Cartier Panthère, boîtier or rose 25mm.', price: 5800000, stock: 3,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1461595383984-b56f78f9223f?w=400&q=80', category: this.CAT_MONTRES,    active: true, featured: false, createdAt: '', updatedAt: '' },
+    { id: 3, name: 'Chevalière Or 18K',   slug: 'chevaliere-or-18k',   description: 'Chevalière homme en or jaune 18 carats.',       price: 650000,  stock: 10, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80', category: this.CAT_BAGUES,     active: true, featured: false, createdAt: '', updatedAt: '' },
+    { id: 4, name: 'Solitaire Diamant',   slug: 'solitaire-diamant',   description: 'Bague solitaire or blanc 18K, diamant 0.50ct.', price: 1850000, stock: 6,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&q=80', category: this.CAT_BAGUES,     active: true, featured: false, createdAt: '', updatedAt: '' },
+    { id: 5, name: 'Chaîne Gourmette Or', slug: 'chaine-gourmette-or', description: 'Chaîne gourmette homme or jaune 18K.',         price: 780000,  stock: 10, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80', category: this.CAT_COLLIERS,   active: true, featured: false, createdAt: '', updatedAt: '' },
+    { id: 6, name: 'Derby Cuir Italiens',  slug: 'derby-cuir',          description: 'Derbies cuir veau grainé marron.',             price: 185000,  stock: 15, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80', category: this.CAT_CHAUSSURES, active: true, featured: false, createdAt: '', updatedAt: '' },
   ];
 
   private readonly searchSubject = new Subject<string>();
@@ -541,7 +541,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
       this.toast.show('Produit mis à jour ✓');
     } else {
       const newId = Math.max(...this.products.map(p => p.id), 0) + 1;
-      this.products = [{ id: newId, name: data.name, slug: data.name.toLowerCase().replace(/\s+/g, '-'), description: data.description, price: +data.price, stock: +data.stock, gender: data.gender, imageUrl: data.imageUrl, category, active: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }, ...this.products];
+      this.products = [{ id: newId, name: data.name, slug: data.name.toLowerCase().replace(/\s+/g, '-'), description: data.description, price: +data.price, stock: +data.stock, gender: data.gender, imageUrl: data.imageUrl, category, active: true, featured: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }, ...this.products];
       this.toast.show('Produit ajouté ✓');
     }
     this._computeStats();
