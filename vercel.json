@@ -1,8 +1,19 @@
 {
+  "buildCommand": "npm run build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "outputDirectory": "dist/market-frontend/browser",
+  "framework": null,
+  "functions": {
+    "api/ssr.mjs": {
+      "memory": 1024,
+      "maxDuration": 30,
+      "includeFiles": "dist/market-frontend/server/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/((?!.*\\.).*)",
-      "destination": "/index.html"
+      "destination": "/api/ssr"
     }
   ]
 }
