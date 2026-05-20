@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ReturnService } from '../../../../core/services/return.service';
-import { ReturnResponse, ReturnDecisionRequest } from '../../../../core/models/return.models';
+import { ReturnResponse, ReturnDecisionRequest, ReturnStatus } from '../../../../core/models/return.models';
+import { PageResponse } from '../../../../core/models/common.models';
 import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
@@ -22,9 +23,18 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
   returnsLoading = false;
   returnsPage = 0;
   returnsTotalPages = 0;
+  returnsTotalElements = 0;
+  pendingCount = 0;
+
+  /* ── Filtres ── */
+  filterStatus: ReturnStatus | '' = '';
+  searchQuery = '';
+  private readonly search$ = new Subject<string>();
+
+  /* ── Décision ── */
   returnDecisionModal = false;
   returnDecisionItem: ReturnResponse | null = null;
-  returnDecision: 'APPROVED' | 'REJECTED' | 'COMPLETED' = 'APPROVED';
+  returnDecision: ReturnStatus = 'APPROVED';
   returnDecisionNote = '';
   returnDecisionLoading = false;
 
@@ -43,8 +53,11 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadReturns(0);
+    this.loadPendingCount();
+    this.search$.pipe(debounceTime(350), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => this.loadReturns(0));
     this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe(e => {
-      if (e.module === 'returns') this.loadReturns(0);
+      if (e.module === 'returns') { this.loadReturns(0); this.loadPendingCount(); }
     });
   }
 
@@ -56,14 +69,37 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
 
   get returnPages(): number[] { return Array.from({ length: this.returnsTotalPages }, (_, i) => i); }
 
+  get hasActiveFilters(): boolean { return !!this.filterStatus || !!this.searchQuery; }
+
+  onSearchChange(): void { this.search$.next(this.searchQuery); }
+
+  applyFilter(): void { this.loadReturns(0); }
+
+  clearFilters(): void {
+    this.filterStatus = '';
+    this.searchQuery  = '';
+    this.loadReturns(0);
+  }
+
+  isUrgentReturn(ret: ReturnResponse): boolean {
+    return ret.status === 'PENDING'
+      && (Date.now() - new Date(ret.createdAt).getTime()) / 3_600_000 > 48;
+  }
+
   loadReturns(page = 0): void {
     this.returnsLoading = true;
-    this.returnService.getAllReturns(undefined, page, 15).subscribe({
+    this.returnService.getAllReturns(
+      this.filterStatus || undefined,
+      page,
+      15,
+      this.searchQuery.trim() || undefined,
+    ).subscribe({
       next: (r) => {
         if (r.success) {
-          const pg = r.data as any;
-          this.returns = pg.content;
-          this.returnsTotalPages = pg.totalPages;
+          const pg = r.data as PageResponse<ReturnResponse>;
+          this.returns             = pg.content;
+          this.returnsTotalPages   = pg.totalPages;
+          this.returnsTotalElements = pg.totalElements;
           this.returnsPage = page;
         }
         this.returnsLoading = false;
@@ -73,9 +109,19 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadPendingCount(): void {
+    this.returnService.getAllReturns('PENDING', 0, 1).subscribe({
+      next: (r) => {
+        if (r.success) this.pendingCount = (r.data as PageResponse<ReturnResponse>).totalElements;
+        this.cdr.markForCheck();
+      },
+      error: () => {},
+    });
+  }
+
   openReturnDecisionModal(ret: ReturnResponse): void {
     this.returnDecisionItem = ret;
-    this.returnDecision = 'APPROVED';
+    this.returnDecision     = 'APPROVED';
     this.returnDecisionNote = '';
     this.returnDecisionModal = true;
     this.scrollLock.lock();
@@ -84,7 +130,7 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
 
   closeReturnDecisionModal(): void {
     this.returnDecisionModal = false;
-    this.returnDecisionItem = null;
+    this.returnDecisionItem  = null;
     this.scrollLock.unlock();
     this.cdr.markForCheck();
   }
@@ -93,7 +139,7 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
     if (!this.returnDecisionItem) return;
     this.returnDecisionLoading = true;
     const data: ReturnDecisionRequest = {
-      decision: this.returnDecision,
+      decision:  this.returnDecision,
       adminNote: this.returnDecisionNote.trim() || undefined,
     };
     this.returnService.processDecision(this.returnDecisionItem.id, data).subscribe({
@@ -101,7 +147,8 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
         if (r.success) {
           const idx = this.returns.findIndex(ret => ret.id === this.returnDecisionItem!.id);
           if (idx !== -1) { this.returns = [...this.returns]; this.returns[idx] = r.data; }
-          this.toast.show('Décision enregistrée ✓');
+          this.toast.show('Décision enregistrée');
+          this.loadPendingCount();
           this.closeReturnDecisionModal();
         }
         this.returnDecisionLoading = false;

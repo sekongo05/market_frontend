@@ -19,9 +19,10 @@ export class ReturnService {
   }
 
   // Admin/Manager
-  getAllReturns(status?: ReturnStatus, page = 0, size = 10): Observable<ApiResponse<PageResponse<ReturnResponse>>> {
+  getAllReturns(status?: ReturnStatus, page = 0, size = 10, search?: string): Observable<ApiResponse<PageResponse<ReturnResponse>>> {
     const params: any = { page, size };
     if (status) params['status'] = status;
+    if (search) params['search'] = search;
     return this.apiService.get('/returns', params);
   }
 
