@@ -50,9 +50,9 @@ import { CommonModule } from '@angular/common';
            class="flex flex-col justify-center"
            style="border-left: 1px solid rgba(201,162,75,.35); padding-left: 0.75em;">
         <span class="block leading-none font-semibold tracking-widest uppercase text-[9px] sm:text-[11px]"
-              style="color:#c9a24b;">Le luxe</span>
+              style="color:#7a5c00;">Le luxe</span>
         <span class="block leading-none font-medium tracking-widest uppercase text-[9px] sm:text-[11px]"
-              style="color:#9ca3af; margin-top:0.35em;">à portée de main</span>
+              style="color:#6b7280; margin-top:0.35em;">à portée de main</span>
       </div>
 
     </div>
