@@ -615,7 +615,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (!this.promoCheckResult?.valid) return 0;
     return this.promoCheckResult.discountAmount ?? 0;
   }
-  get shippingFee(): number { return this.deliveryZone === 'interieur' ? 2000 : 1500; }
+  get shippingFee(): number { return this.deliveryZone === 'interieur' ? 2000 : 0; }
   get finalTotal(): number {
     const base = !this.promoCheckResult?.valid ? this.cartTotal : (this.promoCheckResult.finalAmount ?? this.cartTotal);
     return base + this.shippingFee;
