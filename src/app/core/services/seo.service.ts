@@ -41,7 +41,7 @@ export class SeoService {
     this.meta.updateTag({ property: 'og:description', content: config.description });
     this.meta.updateTag({ property: 'og:image', content: image });
     this.meta.updateTag({ property: 'og:url', content: url });
-    this.meta.updateTag({ property: 'og:type', content: config.type === 'product' ? 'og:product' : 'website' });
+    this.meta.updateTag({ property: 'og:type', content: config.type === 'product' ? 'product' : 'website' });
     this.meta.updateTag({ property: 'og:site_name', content: SITE_NAME });
     this.meta.updateTag({ property: 'og:locale', content: 'fr_CI' });
 

@@ -613,7 +613,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         brand: { '@type': 'Brand', name: 'SDM STORE' },
         offers: {
           '@type': 'Offer',
-          url: `https://sdmstore.ci/products/${slug}`,
+          url: `https://sdm-store.shop/products/${slug}`,
           priceCurrency: 'XOF',
           price: price,
           availability: p.stock > 0

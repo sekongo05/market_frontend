@@ -68,10 +68,4 @@
     <priority>0.3</priority>
   </url>
 
-  <!--
-    NOTE : Les pages produits individuelles (/products/:id) doivent être
-    générées dynamiquement par le serveur SSR à partir du catalogue.
-    À implémenter via un endpoint /sitemap-products.xml côté backend.
-  -->
-
 </urlset>

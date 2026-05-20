@@ -88,7 +88,30 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.seo.setDefault();
+    this.seo.set({
+      title: 'Mode, Montres & Lifestyle en Côte d\'Ivoire',
+      description: 'SDM STORE : boutique en ligne de mode, montres, bijoux, beauté et lifestyle. Livraison 24–48h partout en Côte d\'Ivoire.',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'ClothingStore',
+        name: 'SDM STORE',
+        url: 'https://sdm-store.shop',
+        logo: 'https://sdm-store.shop/icon-512.png',
+        image: 'https://sdm-store.shop/icon-512.png',
+        description: 'Boutique en ligne de mode, montres, bijoux et lifestyle. Livraison 24–48h en Côte d\'Ivoire.',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Abidjan',
+          addressCountry: 'CI',
+        },
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer service',
+          availableLanguage: 'French',
+        },
+        sameAs: [],
+      },
+    });
     this._loadPublicStats();
     this._loadProducts();
     this._loadReviews();
