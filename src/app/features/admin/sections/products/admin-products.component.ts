@@ -82,6 +82,10 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   discountEditingId: number | null = null;
   discountEditValue = 0;
   discountSavingId: number | null = null;
+  toggleActivatingId: number | null = null;
+  priceEditingId: number | null = null;
+  priceEditValue = 0;
+  priceSavingId: number | null = null;
 
   productCategories: CategoryResponse[] = [];
   readonly genders: { value: Gender; label: string }[] = [
@@ -445,6 +449,56 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
 
   cancelEditDiscount(): void { this.discountEditingId = null; this.cdr.markForCheck(); }
+
+  toggleProductActive(product: ProductResponse): void {
+    this.toggleActivatingId = product.id;
+    this.productService.toggleActive(product.id).subscribe({
+      next: (r) => {
+        if (r.success) {
+          const idx = this.products.findIndex(p => p.id === product.id);
+          if (idx !== -1) { this.products = [...this.products]; this.products[idx] = r.data; }
+          this.toast.show(`"${product.name}" ${r.data.active ? 'activé' : 'désactivé'}`);
+        }
+        this.toggleActivatingId = null;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.toggleActivatingId = null; this.cdr.markForCheck(); },
+    });
+  }
+
+  startEditPrice(product: ProductResponse): void {
+    this.priceEditingId = product.id;
+    this.priceEditValue = product.price;
+    this.cdr.markForCheck();
+  }
+
+  confirmEditPrice(product: ProductResponse): void {
+    const newPrice = Math.max(1, Math.round(+this.priceEditValue || 1));
+    this.priceEditingId = null;
+    if (newPrice === product.price) { this.cdr.markForCheck(); return; }
+    this.priceSavingId = product.id;
+    const fd = new FormData();
+    fd.append('name', product.name);
+    if (product.description) fd.append('description', product.description);
+    fd.append('price', newPrice.toString());
+    fd.append('stock', product.stock.toString());
+    fd.append('gender', product.gender);
+    if (product.category?.id) fd.append('categoryId', product.category.id.toString());
+    this.productService.updateProduct(product.id, fd).subscribe({
+      next: (r) => {
+        if (r.success) {
+          const idx = this.products.findIndex(p => p.id === product.id);
+          if (idx !== -1) { this.products = [...this.products]; this.products[idx] = { ...this.products[idx], price: newPrice }; }
+          this.toast.show(`Prix mis à jour : ${newPrice.toLocaleString('fr-FR')} FCFA`);
+        }
+        this.priceSavingId = null;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.priceSavingId = null; this.cdr.markForCheck(); },
+    });
+  }
+
+  cancelEditPrice(): void { this.priceEditingId = null; this.cdr.markForCheck(); }
 
   loadMedia(productId: number): void {
     this.mediaLoading = true;

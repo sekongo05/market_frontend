@@ -42,6 +42,10 @@ export class ProductService {
     return this.apiService.patch(`/products/${id}/discount${param}`);
   }
 
+  toggleActive(id: number): Observable<ApiResponse<ProductResponse>> {
+    return this.apiService.patch(`/products/${id}/toggle-active`);
+  }
+
   deleteProduct(id: number): Observable<ApiResponse<null>> {
     return this.apiService.delete(`/products/${id}`);
   }
