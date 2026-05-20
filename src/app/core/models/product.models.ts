@@ -8,6 +8,7 @@ export interface ProductMediaItem {
   url: string;
   mediaType: MediaType;
   position: number;
+  altText?: string;
 }
 
 export interface ProductVariant {
@@ -25,6 +26,7 @@ export interface ProductResponse {
   slug: string;
   description: string;
   price: number;
+  compareAtPrice?: number;
   discountPercent?: number;
   salePrice?: number;
   stock: number;
@@ -34,6 +36,9 @@ export interface ProductResponse {
   variants?: ProductVariant[];
   category: CategoryResponse;
   active: boolean;
+  featured: boolean;
+  metaTitle?: string;
+  metaDescription?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,4 +68,5 @@ export interface GetProductsParams {
   maxPrice?: number;
   inStock?: boolean;
   active?: boolean;
+  featured?: boolean;
 }

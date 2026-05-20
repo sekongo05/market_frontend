@@ -34,6 +34,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   filterGender: string   = '';
   filterStock: '' | 'inStock' | 'outOfStock' = '';
   filterActive: '' | 'active' | 'inactive'   = '';
+  filterFeatured = false;
   filterCategoryId: number | '' = '';
   sortBy: string = 'newest';
 
@@ -50,6 +51,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   pendingMediaFile: File | null = null;
   pendingMediaPreview: string | null = null;
   pendingMediaColor = { colorName: '', colorHex: '#000000', stock: 0 };
+  pendingMediaIsVariant = false;
+  pendingMediaAltText = '';
   mediaColorError: string | null = null;
 
   productVariants: ProductVariant[] = [];
@@ -83,6 +86,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   discountEditValue = 0;
   discountSavingId: number | null = null;
   toggleActivatingId: number | null = null;
+  toggleFeaturedId: number | null = null;
   priceEditingId: number | null = null;
   priceEditValue = 0;
   priceSavingId: number | null = null;
@@ -142,7 +146,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   get hasActiveFilters(): boolean {
     return !!this.productSearchQuery || !!this.filterGender || !!this.filterStock
-        || !!this.filterActive || !!this.filterCategoryId || this.sortBy !== 'newest';
+        || !!this.filterActive || !!this.filterCategoryId || this.sortBy !== 'newest' || this.filterFeatured;
   }
 
   clearFilters(): void {
@@ -150,6 +154,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.filterGender       = '';
     this.filterStock        = '';
     this.filterActive       = '';
+    this.filterFeatured     = false;
     this.filterCategoryId   = '';
     this.sortBy             = 'newest';
     this.loadProducts(0);
@@ -174,14 +179,22 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
   get creationTotalStock(): number { return this.creationItems.reduce((s, i) => s + i.stock, 0); }
 
+  compareAtSavings(compareAtPrice: number | undefined, price: number): number {
+    if (!compareAtPrice || compareAtPrice <= price) return 0;
+    return Math.round((compareAtPrice - price) / compareAtPrice * 100);
+  }
+
   private initProductForm(product?: ProductResponse): void {
     this.productForm = this.fb.group({
-      name:        [product?.name        ?? '', Validators.required],
-      description: [product?.description ?? '', Validators.required],
-      price:       [product?.price       ?? null, [Validators.required, Validators.min(1)]],
-      stock:       [product?.stock       ?? null, [Validators.required, Validators.min(0)]],
-      gender:      [product?.gender      ?? 'UNISEX', Validators.required],
-      categoryId:  [product?.category?.id ?? null, Validators.required],
+      name:            [product?.name             ?? '', Validators.required],
+      description:     [product?.description      ?? '', Validators.required],
+      price:           [product?.price            ?? null, [Validators.required, Validators.min(1)]],
+      compareAtPrice:  [product?.compareAtPrice   ?? null, [Validators.min(0)]],
+      stock:           [product?.stock            ?? null, [Validators.required, Validators.min(0)]],
+      gender:          [product?.gender           ?? 'UNISEX', Validators.required],
+      categoryId:      [product?.category?.id    ?? null, Validators.required],
+      metaTitle:       [product?.metaTitle        ?? ''],
+      metaDescription: [product?.metaDescription  ?? ''],
     });
   }
 
@@ -196,6 +209,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     if (this.filterStock === 'outOfStock') params.inStock = false;
     if (this.filterActive === 'active')   params.active  = true;
     if (this.filterActive === 'inactive') params.active  = false;
+    if (this.filterFeatured)              params.featured = true;
     this.productService.getProducts(params).subscribe({
       next: (r) => {
         if (r.success) {
@@ -282,6 +296,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.newVariantPreview = null;
     this.pendingMediaFile = null;
     this.pendingMediaPreview = null;
+    this.pendingMediaIsVariant = false;
+    this.pendingMediaAltText = '';
     this.mediaColorError = null;
   }
 
@@ -309,6 +325,9 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     if (this.editingProduct) {
       if (this.selectedImageFile) fd.append('mainImage', this.selectedImageFile);
       if (this.selectedVideo) fd.append('video', this.selectedVideo);
+      if (v.metaTitle?.trim()) fd.append('metaTitle', v.metaTitle.trim());
+      if (v.metaDescription?.trim()) fd.append('metaDescription', v.metaDescription.trim());
+      if (v.compareAtPrice && +v.compareAtPrice > 0) fd.append('compareAtPrice', v.compareAtPrice.toString());
       req$ = this.productService.updateProduct(this.editingProduct.id, fd);
     } else {
       if (this.hasVariantsToggle && this.creationItems.length > 0) {
@@ -474,6 +493,22 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     });
   }
 
+  toggleProductFeatured(product: ProductResponse): void {
+    this.toggleFeaturedId = product.id;
+    this.productService.toggleFeatured(product.id).subscribe({
+      next: (r) => {
+        if (r.success) {
+          const idx = this.products.findIndex(p => p.id === product.id);
+          if (idx !== -1) { this.products = [...this.products]; this.products[idx] = r.data; }
+          this.toast.show(`"${product.name}" ${r.data.featured ? 'en vedette ⭐' : 'retiré des vedettes'}`);
+        }
+        this.toggleFeaturedId = null;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.toggleFeaturedId = null; this.cdr.markForCheck(); },
+    });
+  }
+
   startEditPrice(product: ProductResponse): void {
     this.priceEditingId = product.id;
     this.priceEditValue = product.price;
@@ -508,6 +543,10 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   cancelEditPrice(): void { this.priceEditingId = null; this.cdr.markForCheck(); }
 
+  getVariantForMedia(mediaUrl: string): ProductVariant | undefined {
+    return this.productVariants.find(v => v.imageUrl === mediaUrl);
+  }
+
   loadMedia(productId: number): void {
     this.mediaLoading = true;
     this.productMediaService.getAll(productId).subscribe({
@@ -532,31 +571,44 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.pendingMediaFile = null;
     this.pendingMediaPreview = null;
     this.mediaColorError = null;
+    this.pendingMediaIsVariant = false;
+    this.pendingMediaAltText = '';
+    this.pendingMediaColor = { colorName: '', colorHex: '#000000', stock: 0 };
     this.cdr.markForCheck();
   }
 
   confirmMediaUpload(): void {
     if (!this.pendingMediaFile || !this.editingProduct) return;
-    if (!this.pendingMediaColor.colorName.trim()) { this.mediaColorError = 'Le nom de la couleur est requis'; return; }
-    if (!/^#[0-9A-Fa-f]{6}$/.test(this.pendingMediaColor.colorHex)) { this.mediaColorError = 'Code couleur invalide (ex: #FF5733)'; return; }
+    if (this.pendingMediaIsVariant) {
+      if (!this.pendingMediaColor.colorName.trim()) { this.mediaColorError = 'Le nom de la couleur est requis'; return; }
+      if (!/^#[0-9A-Fa-f]{6}$/.test(this.pendingMediaColor.colorHex)) { this.mediaColorError = 'Code couleur invalide (ex: #FF5733)'; return; }
+    }
     this.mediaColorError = null;
     this.mediaUploading = true;
     this.cdr.markForCheck();
     const file = this.pendingMediaFile;
+    const altText = this.pendingMediaAltText.trim();
+    const isVariant = this.pendingMediaIsVariant;
     const color = { ...this.pendingMediaColor };
     this.pendingMediaFile = null;
     this.pendingMediaPreview = null;
-    this.productMediaService.upload(this.editingProduct.id, file).subscribe({
+    this.pendingMediaAltText = '';
+    this.pendingMediaIsVariant = false;
+    this.productMediaService.upload(this.editingProduct.id, file, altText || undefined).subscribe({
       next: (r) => {
         if (r.success) {
           this.productMedia = [...this.productMedia, r.data];
-          this.productVariantService.addVariant(this.editingProduct!.id, {
-            colorName: color.colorName.trim(), colorHex: color.colorHex, imageUrl: r.data.url, stock: color.stock || 0,
-          }).subscribe({
-            next: (vr: any) => { if (vr.success) this.productVariants = [...this.productVariants, vr.data]; this.cdr.markForCheck(); },
-            error: () => {},
-          });
-          this.toast.show('Photo & couleur ajoutées ✓');
+          if (isVariant && color.colorName.trim()) {
+            this.productVariantService.addVariant(this.editingProduct!.id, {
+              colorName: color.colorName.trim(), colorHex: color.colorHex, imageUrl: r.data.url, stock: color.stock || 0,
+            }).subscribe({
+              next: (vr: any) => { if (vr.success) this.productVariants = [...this.productVariants, vr.data]; this.cdr.markForCheck(); },
+              error: () => {},
+            });
+            this.toast.show('Photo & couleur ajoutées ✓');
+          } else {
+            this.toast.show('Photo ajoutée ✓');
+          }
         }
         this.mediaUploading = false;
         this.cdr.markForCheck();

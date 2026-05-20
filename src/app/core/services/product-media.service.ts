@@ -14,12 +14,20 @@ export class ProductMediaService {
     private http: HttpClient
   ) {}
 
-  upload(productId: number, file: File): Observable<ApiResponse<ProductMediaItem>> {
+  upload(productId: number, file: File, altText?: string): Observable<ApiResponse<ProductMediaItem>> {
     const formData = new FormData();
     formData.append('file', file);
+    if (altText?.trim()) formData.append('altText', altText.trim());
     return this.http.post<ApiResponse<ProductMediaItem>>(
       `${this.apiService.getBaseUrl()}/products/${productId}/media`,
       formData
+    );
+  }
+
+  updateAltText(productId: number, mediaId: number, altText: string): Observable<ApiResponse<ProductMediaItem>> {
+    return this.http.patch<ApiResponse<ProductMediaItem>>(
+      `${this.apiService.getBaseUrl()}/products/${productId}/media/${mediaId}/alt-text?altText=${encodeURIComponent(altText)}`,
+      null
     );
   }
 

@@ -74,6 +74,18 @@
         }
       </div>
 
+      <div class="w-px h-4 bg-white/10 self-center"></div>
+
+      <!-- Vedettes -->
+      <button (click)="filterFeatured = !filterFeatured; applyProductFilter()"
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+        [ngClass]="filterFeatured ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40' : 'bg-black/[.06] theme-muted hover:bg-yellow-500/10 hover:text-yellow-400'">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        Vedettes
+      </button>
+
       @if (hasActiveFilters) {
         <button (click)="clearFilters()"
           class="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/15 transition-colors">
@@ -142,6 +154,12 @@
             }
             <!-- Badges coin haut-gauche -->
             <div class="absolute top-2 left-2 flex flex-col gap-1">
+              @if (product.featured) {
+                <span class="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-yellow-500/85 text-black backdrop-blur-sm">
+                  <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  Vedette
+                </span>
+              }
               @if (isNewProduct(product)) {
                 <span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-blue-500/80 text-white backdrop-blur-sm">Nouveau</span>
               }
@@ -210,6 +228,21 @@
                 <div class="flex items-baseline gap-1 group cursor-pointer" (click)="startEditPrice(product)" title="Modifier le prix">
                   <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
                   <span class="font-black text-orange-400 text-base">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
+                  <span class="text-xs theme-muted">FCFA</span>
+                  <svg class="w-3 h-3 theme-muted opacity-0 group-hover:opacity-60 transition-opacity flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                  </svg>
+                </div>
+              } @else if (product.compareAtPrice && product.compareAtPrice > product.price) {
+                <div class="flex items-center gap-1.5 mb-0.5">
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400">
+                    -{{ compareAtSavings(product.compareAtPrice, product.price) }}%
+                  </span>
+                  <span class="text-xs theme-muted">vs prix public</span>
+                </div>
+                <div class="flex items-baseline gap-1 group cursor-pointer" (click)="startEditPrice(product)" title="Modifier le prix">
+                  <span class="text-xs theme-muted line-through">{{ product.compareAtPrice | number:'1.0-0':'fr-FR' }}</span>
+                  <span class="font-black text-gold text-base">{{ formatCurrency(product.price) }}</span>
                   <span class="text-xs theme-muted">FCFA</span>
                   <svg class="w-3 h-3 theme-muted opacity-0 group-hover:opacity-60 transition-opacity flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -292,6 +325,27 @@
                   </button>
                 }
 
+                <!-- Toggle vedette -->
+                @if (toggleFeaturedId === product.id) {
+                  <button disabled class="py-2 px-2.5 rounded-xl bg-white/6">
+                    <svg class="w-3.5 h-3.5 text-yellow-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                  </button>
+                } @else {
+                  <button (click)="toggleProductFeatured(product)"
+                    class="py-2 px-2.5 text-xs font-bold rounded-xl transition-colors"
+                    [ngClass]="product.featured
+                      ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                      : 'bg-white/6 theme-muted hover:bg-yellow-500/10 hover:text-yellow-400'"
+                    [title]="product.featured ? 'Retirer des vedettes' : 'Mettre en vedette'">
+                    <svg class="w-3.5 h-3.5" [attr.fill]="product.featured ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  </button>
+                }
+
                 <button (click)="openEditDrawer(product)"
                   class="flex-1 py-2 text-xs font-bold rounded-xl bg-white/6 theme-muted hover:bg-gold/10 hover:text-gold transition-colors">
                   Modifier
@@ -352,7 +406,7 @@
           <div>
             <h3 class="text-lg font-black theme-text">{{ editingProduct ? 'Modifier le produit' : 'Nouveau produit' }}</h3>
             <p class="text-xs theme-muted mt-0.5">
-              {{ editingProduct ? editingProduct.name : 'Étape ' + wizardStep + ' sur 3' }}
+              {{ editingProduct ? editingProduct.name : 'Étape ' + wizardStep + ' sur 2' }}
             </p>
           </div>
           <button (click)="closeDrawer()" class="w-9 h-9 rounded-xl luxury-card theme-muted flex items-center justify-center hover:text-gold transition-colors">
@@ -437,34 +491,62 @@
                 <div class="flex items-center gap-3">
                   <img [src]="pendingMediaPreview" class="w-20 h-20 rounded-xl object-cover flex-shrink-0 border theme-border"/>
                   <div class="flex-1 min-w-0">
-                    <p class="text-xs font-black theme-text uppercase tracking-wider mb-1">Définir la couleur</p>
-                    <p class="text-xs theme-muted">Chaque photo doit avoir une couleur associée.</p>
+                    <p class="text-xs font-black theme-text uppercase tracking-wider mb-1">Configurer la photo</p>
+                    <p class="text-xs theme-muted">Texte alternatif pour Google Images, couleur en option.</p>
                   </div>
                 </div>
+
                 @if (mediaColorError) {
                   <p class="text-xs text-red-400 font-semibold">{{ mediaColorError }}</p>
                 }
-                <div class="grid grid-cols-2 gap-3">
-                  <div class="space-y-1.5">
-                    <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Nom de la couleur *</label>
-                    <input type="text" [(ngModel)]="pendingMediaColor.colorName" placeholder="ex: Rouge, Bleu marine…"
-                      class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none"/>
+
+                <!-- Texte alternatif SEO -->
+                <div class="space-y-1.5">
+                  <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Texte alternatif <span class="font-normal normal-case text-green-400">SEO</span></label>
+                  <input type="text" [(ngModel)]="pendingMediaAltText" maxlength="125"
+                    placeholder="ex: Sneaker Nike Air Max 270 coloris rouge vue de côté"
+                    class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none"/>
+                  <p class="text-[10px] theme-muted">Décrit l'image pour Google Images. Idéal : 50–125 caractères.</p>
+                </div>
+
+                <!-- Toggle couleur -->
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/[.04] border theme-border">
+                  <div>
+                    <p class="text-xs font-bold theme-text">Associer à une couleur</p>
+                    <p class="text-[10px] theme-muted mt-0.5">Crée une variante de couleur automatiquement</p>
                   </div>
-                  <div class="space-y-1.5">
-                    <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Couleur *</label>
-                    <div class="flex items-center gap-2">
-                      <input type="color" [(ngModel)]="pendingMediaColor.colorHex"
-                        class="w-10 h-9 rounded-lg cursor-pointer border theme-border bg-transparent p-0.5"/>
-                      <input type="text" [(ngModel)]="pendingMediaColor.colorHex" maxlength="7" placeholder="#000000"
-                        class="flex-1 px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm font-mono focus:border-gold/50 focus:outline-none"/>
+                  <button type="button" (click)="pendingMediaIsVariant = !pendingMediaIsVariant; mediaColorError = null"
+                    class="relative w-10 h-5 rounded-full transition-all duration-300 flex-shrink-0"
+                    [class]="pendingMediaIsVariant ? 'bg-gold' : 'bg-white/20'">
+                    <span class="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all duration-300"
+                          [class]="pendingMediaIsVariant ? 'left-5' : 'left-0.5'"></span>
+                  </button>
+                </div>
+
+                @if (pendingMediaIsVariant) {
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                      <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Nom de la couleur *</label>
+                      <input type="text" [(ngModel)]="pendingMediaColor.colorName" placeholder="ex: Rouge, Bleu marine…"
+                        class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none"/>
+                    </div>
+                    <div class="space-y-1.5">
+                      <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Couleur *</label>
+                      <div class="flex items-center gap-2">
+                        <input type="color" [(ngModel)]="pendingMediaColor.colorHex"
+                          class="w-10 h-9 rounded-lg cursor-pointer border theme-border bg-transparent p-0.5"/>
+                        <input type="text" [(ngModel)]="pendingMediaColor.colorHex" maxlength="7" placeholder="#000000"
+                          class="flex-1 px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm font-mono focus:border-gold/50 focus:outline-none"/>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="space-y-1.5">
-                  <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Stock pour cette couleur</label>
-                  <input type="number" [(ngModel)]="pendingMediaColor.stock" min="0" placeholder="0"
-                    class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm focus:border-gold/50 focus:outline-none"/>
-                </div>
+                  <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Stock pour cette couleur</label>
+                    <input type="number" [(ngModel)]="pendingMediaColor.stock" min="0" placeholder="0"
+                      class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm focus:border-gold/50 focus:outline-none"/>
+                  </div>
+                }
+
                 <div class="flex gap-2">
                   <button type="button" (click)="cancelPendingMedia()"
                     class="flex-1 py-2.5 rounded-xl border theme-border theme-muted text-sm font-semibold hover:theme-text transition-all">
@@ -507,15 +589,24 @@
               <div class="grid grid-cols-2 gap-3">
                 @for (media of productMedia; track media.id; let i = $index) {
                   <div class="relative group rounded-xl overflow-hidden aspect-square luxury-card">
-                    <img [src]="media.url" [alt]="'Photo ' + (i + 1)" class="w-full h-full object-cover"
+                    <img [src]="media.url" [alt]="media.altText || ('Photo ' + (i + 1))" class="w-full h-full object-cover"
                          (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
-                    @for (v of productVariants; track v.id) {
-                      @if (v.imageUrl && v.imageUrl === media.url) {
-                        <div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
-                          <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" [style.background-color]="v.colorHex"></span>
-                          <span class="text-[10px] font-bold text-white">{{ v.colorName }}</span>
-                        </div>
-                      }
+                    <!-- Couleur associée ou badge Libre -->
+                    @if (getVariantForMedia(media.url); as matchedVariant) {
+                      <div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
+                        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" [style.background-color]="matchedVariant.colorHex"></span>
+                        <span class="text-[10px] font-bold text-white">{{ matchedVariant.colorName }}</span>
+                      </div>
+                    } @else {
+                      <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-indigo-600/80 backdrop-blur-sm">
+                        <span class="text-[10px] font-bold text-white">Libre</span>
+                      </div>
+                    }
+                    <!-- Indicateur alt text SEO -->
+                    @if (media.altText) {
+                      <div class="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-green-600/80 backdrop-blur-sm">
+                        <span class="text-[9px] font-bold text-white">SEO</span>
+                      </div>
                     }
                     <div class="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/70 text-[10px] font-black text-white flex items-center justify-center">
                       {{ i + 1 }}
@@ -549,7 +640,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   </svg>
                 </div>
-                <p class="theme-muted text-sm">Aucune photo — chaque photo que vous ajoutez créera automatiquement une variante de couleur.</p>
+                <p class="theme-muted text-sm">Ajoutez des photos libres (lifestyle, packshot) ou liées à une variante de couleur.</p>
               </div>
             }
           </div>
@@ -706,7 +797,7 @@
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix (FCFA) *</label>
+                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix de vente (FCFA) *</label>
                 <input formControlName="price" type="number" min="1" placeholder="45000"
                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
                   [class.border-red-500]="productForm.get('price')?.touched && productForm.get('price')?.invalid"/>
@@ -715,21 +806,30 @@
                 }
               </div>
               <div>
-                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Stock *</label>
-                @if (productVariants.length > 0) {
-                  <div class="px-4 py-3 rounded-xl bg-black/[.04] border theme-border">
-                    <p class="text-sm font-black text-gold">{{ editingProduct?.stock ?? 0 }}</p>
-                    <p class="text-[10px] theme-muted mt-0.5">Calculé depuis {{ productVariants.length }} couleur{{ productVariants.length > 1 ? 's' : '' }}</p>
-                  </div>
-                } @else {
-                  <input formControlName="stock" type="number" min="0" placeholder="10"
-                    class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
-                    [class.border-red-500]="productForm.get('stock')?.touched && productForm.get('stock')?.invalid"/>
-                  @if (productForm.get('stock')?.touched && productForm.get('stock')?.invalid) {
-                    <p class="text-red-400 text-xs mt-1">Le stock est requis (min 0)</p>
-                  }
-                }
+                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">
+                  Prix de comparaison <span class="font-normal normal-case text-gold">(optionnel)</span>
+                </label>
+                <input formControlName="compareAtPrice" type="number" min="0" placeholder="65000"
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                <p class="text-[10px] theme-muted mt-1">Prix public ou boutique — affiché barré à côté du prix.</p>
               </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Stock *</label>
+              @if (productVariants.length > 0) {
+                <div class="px-4 py-3 rounded-xl bg-black/[.04] border theme-border">
+                  <p class="text-sm font-black text-gold">{{ editingProduct?.stock ?? 0 }}</p>
+                  <p class="text-[10px] theme-muted mt-0.5">Calculé depuis {{ productVariants.length }} couleur{{ productVariants.length > 1 ? 's' : '' }}</p>
+                </div>
+              } @else {
+                <input formControlName="stock" type="number" min="0" placeholder="10"
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
+                  [class.border-red-500]="productForm.get('stock')?.touched && productForm.get('stock')?.invalid"/>
+                @if (productForm.get('stock')?.touched && productForm.get('stock')?.invalid) {
+                  <p class="text-red-400 text-xs mt-1">Le stock est requis (min 0)</p>
+                }
+              }
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -807,6 +907,42 @@
                   {{ uploadError }}
                 </p>
               }
+            </div>
+
+            <!-- SEO -->
+            <div class="rounded-2xl border theme-border p-4 space-y-4">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <p class="text-xs font-black theme-text uppercase tracking-wider">Référencement Google (SEO)</p>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Titre SEO</label>
+                  <span class="text-[10px]" [class]="(productForm.get('metaTitle')?.value?.length ?? 0) > 60 ? 'text-red-400' : 'theme-muted'">
+                    {{ productForm.get('metaTitle')?.value?.length ?? 0 }}/60
+                  </span>
+                </div>
+                <input formControlName="metaTitle" type="text" maxlength="70"
+                  placeholder="ex: Nike Air Max 270 | Livraison rapide en Afrique"
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                <p class="text-[10px] theme-muted mt-1">Affiché dans les résultats Google. Idéalement 50–60 caractères.</p>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Description SEO</label>
+                  <span class="text-[10px]" [class]="(productForm.get('metaDescription')?.value?.length ?? 0) > 160 ? 'text-red-400' : 'theme-muted'">
+                    {{ productForm.get('metaDescription')?.value?.length ?? 0 }}/160
+                  </span>
+                </div>
+                <textarea formControlName="metaDescription" rows="3" maxlength="200"
+                  placeholder="ex: Découvrez les Nike Air Max 270 disponibles en plusieurs coloris. Livraison rapide."
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all resize-none"></textarea>
+                <p class="text-[10px] theme-muted mt-1">Résumé affiché sous le titre dans Google. Idéalement 120–160 caractères.</p>
+              </div>
             </div>
 
           </form>

@@ -46,6 +46,10 @@ export class ProductService {
     return this.apiService.patch(`/products/${id}/toggle-active`);
   }
 
+  toggleFeatured(id: number): Observable<ApiResponse<ProductResponse>> {
+    return this.apiService.patch(`/products/${id}/toggle-featured`);
+  }
+
   deleteProduct(id: number): Observable<ApiResponse<null>> {
     return this.apiService.delete(`/products/${id}`);
   }
