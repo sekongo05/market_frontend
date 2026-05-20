@@ -43,6 +43,22 @@ export const ADMIN_ROUTES: Routes = [
         path: 'categories',
         loadComponent: () => import('./sections/categories/admin-categories.component').then(m => m.AdminCategoriesComponent),
       },
+      {
+        path: 'suppliers',
+        loadComponent: () => import('./sections/suppliers/admin-suppliers.component').then(m => m.AdminSuppliersComponent),
+      },
+      {
+        path: 'purchase-orders',
+        loadComponent: () => import('./sections/purchase-orders/admin-purchase-orders.component').then(m => m.AdminPurchaseOrdersComponent),
+      },
+      {
+        path: 'expenses',
+        loadComponent: () => import('./sections/expenses/admin-expenses.component').then(m => m.AdminExpensesComponent),
+      },
+      {
+        path: 'finance',
+        loadComponent: () => import('./sections/finance/admin-finance.component').then(m => m.AdminFinanceComponent),
+      },
     ],
   },
 ];

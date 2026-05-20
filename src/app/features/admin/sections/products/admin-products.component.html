@@ -253,6 +253,17 @@
               }
             </div>
 
+            @if (product.marginPercent !== null && product.marginPercent !== undefined) {
+              <div class="flex items-center gap-1.5 mb-2">
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border"
+                      [class]="product.marginPercent >= 50 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
+                               product.marginPercent >= 30 ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' :
+                                                             'bg-red-500/10 border-red-500/30 text-red-400'">
+                  Marge {{ product.marginPercent | number:'1.0-0' }}%
+                </span>
+              </div>
+            }
+
             <div class="flex items-center justify-between mb-3">
               @if (editingStockId === product.id) {
                 <div class="flex items-center gap-1">
@@ -815,6 +826,21 @@
                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
                 <p class="text-[10px] theme-muted mt-1">Prix public ou boutique — affiché barré à côté du prix.</p>
               </div>
+              <div>
+                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">
+                  Prix d'achat <span class="font-normal normal-case text-emerald-400">(finance)</span>
+                </label>
+                <input formControlName="costPrice" type="number" min="0" placeholder="25000"
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                @if (productForm.get('costPrice')?.value > 0 && productForm.get('price')?.value > 0) {
+                  <p class="text-[10px] text-emerald-400 mt-1 font-semibold">
+                    Marge estimée :
+                    {{ ((productForm.get('price')?.value - productForm.get('costPrice')?.value) / productForm.get('price')?.value * 100) | number:'1.0-0' }}%
+                  </p>
+                } @else {
+                  <p class="text-[10px] theme-muted mt-1">Coût d'achat pour calcul des marges.</p>
+                }
+              </div>
             </div>
 
             <div>
@@ -948,6 +974,118 @@
             </div>
 
           </form>
+
+          <!-- ── Section Fournisseurs (mode édition uniquement) ── -->
+          <div class="px-6 pb-6">
+            <div class="border-t theme-border pt-5">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold theme-muted uppercase tracking-wider">Fournisseurs</h3>
+                <button (click)="openSupplierForm()"
+                        class="flex items-center gap-1.5 text-xs font-semibold text-gold hover:underline active:scale-[0.97] transition-transform">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  Lier un fournisseur
+                </button>
+              </div>
+
+              @if (!productSuppliers.length) {
+                <p class="text-xs theme-muted italic">Aucun fournisseur lié. Ajoutez-en un pour calculer le coût réel.</p>
+              } @else {
+                <div class="space-y-2">
+                  @for (ps of productSuppliers; track ps.id) {
+                    <div class="flex items-center gap-3 p-3 rounded-xl border theme-border bg-black/[.03]">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5">
+                          <span class="text-sm font-bold theme-text truncate">{{ ps.supplierName }}</span>
+                          @if (ps.isDefault) {
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/25">Défaut</span>
+                          }
+                          @if (ps.supplierCountry) {
+                            <span class="text-[10px] theme-muted">{{ ps.supplierCountry }}</span>
+                          }
+                        </div>
+                        <div class="flex gap-3 text-xs theme-muted">
+                          <span>Achat : <strong class="theme-text">{{ ps.purchasePrice | number:'1.0-0':'fr-FR' }}</strong> FCFA</span>
+                          @if (ps.transportCostPerUnit > 0) {
+                            <span>Transport : <strong class="theme-text">{{ ps.transportCostPerUnit | number:'1.0-0':'fr-FR' }}</strong> FCFA</span>
+                          }
+                          <span class="text-emerald-400 font-semibold">Coût réel : {{ ps.realCost | number:'1.0-0':'fr-FR' }} FCFA</span>
+                        </div>
+                      </div>
+                      <div class="flex gap-1.5">
+                        <button (click)="openSupplierForm(ps)" class="p-1.5 rounded-lg theme-muted hover:text-gold hover:bg-gold/8 transition-colors active:scale-[0.97]">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                          </svg>
+                        </button>
+                        <button (click)="removeSupplierLink(ps.id)" class="p-1.5 rounded-lg theme-muted hover:text-red-400 hover:bg-red-500/8 transition-colors active:scale-[0.97]">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Mini-formulaire liaison fournisseur -->
+              @if (supplierFormOpen) {
+                <div class="mt-3 p-4 rounded-2xl border border-gold/30 bg-gold/5 space-y-3">
+                  <h4 class="text-xs font-bold text-gold uppercase tracking-wider">
+                    {{ editingSupplierLinkId ? 'Modifier la liaison' : 'Lier un fournisseur' }}
+                  </h4>
+                  @if (supplierFormError) {
+                    <p class="text-xs text-red-400">{{ supplierFormError }}</p>
+                  }
+                  <div>
+                    <label class="block text-xs theme-muted mb-1">Fournisseur *</label>
+                    <select [(ngModel)]="supplierFormSupplierId"
+                            class="theme-input w-full px-3 py-2.5 rounded-xl text-sm">
+                      <option [ngValue]="null" disabled>Sélectionner…</option>
+                      @for (s of availableSuppliersForForm; track s.id) {
+                        <option [ngValue]="s.id">{{ s.name }} {{ s.country ? '(' + s.country + ')' : '' }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block text-xs theme-muted mb-1">Prix d'achat * (FCFA)</label>
+                      <input [(ngModel)]="supplierFormPurchasePrice" type="number" min="0" placeholder="25000"
+                             class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+                    </div>
+                    <div>
+                      <label class="block text-xs theme-muted mb-1">Transport/unité (FCFA)</label>
+                      <input [(ngModel)]="supplierFormTransport" type="number" min="0" placeholder="0"
+                             class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+                    </div>
+                  </div>
+                  @if (supplierFormPurchasePrice && supplierFormPurchasePrice > 0) {
+                    <p class="text-xs text-emerald-400 font-semibold">
+                      Coût réel : {{ (supplierFormPurchasePrice + supplierFormTransport) | number:'1.0-0':'fr-FR' }} FCFA
+                    </p>
+                  }
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" [(ngModel)]="supplierFormDefault" class="w-4 h-4 accent-gold"/>
+                    <span class="text-xs theme-text">Fournisseur principal (met à jour le coût de revient)</span>
+                  </label>
+                  <div class="flex gap-2">
+                    <button (click)="closeSupplierForm()"
+                            class="flex-1 py-2 rounded-xl text-xs font-semibold theme-muted border theme-border active:scale-[0.97]">
+                      Annuler
+                    </button>
+                    <button (click)="saveSupplierLink()" [disabled]="supplierFormLoading"
+                            class="flex-1 py-2 rounded-xl text-xs font-bold bg-gold text-black active:scale-[0.97] transition-transform disabled:opacity-40">
+                      @if (supplierFormLoading) { <span class="flex justify-center"><span class="w-3.5 h-3.5 border-2 border-black/40 border-t-black rounded-full animate-spin"></span></span> }
+                      @else { Enregistrer }
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
         }
 
         <!-- Mode création — Wizard -->

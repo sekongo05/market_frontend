@@ -8,9 +8,12 @@
   <!-- ── Sidebar (desktop uniquement) ─────────────────────────────── -->
   <aside class="hidden lg:flex sticky top-0 h-screen z-[55] w-64 flex-shrink-0 theme-surface border-r theme-border flex-col">
 
-    <div class="px-6 py-5 border-b theme-border">
-      <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-0.5">Administration</p>
-      <h1 class="text-xl font-black theme-text">SDM Store</h1>
+    <div class="px-6 py-5 border-b theme-border flex items-center justify-between">
+      <div>
+        <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-0.5">Administration</p>
+        <h1 class="text-xl font-black theme-text">SDM Store</h1>
+      </div>
+      <app-notification-bell/>
     </div>
 
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
@@ -58,6 +61,7 @@
           {{ pendingOrdersCount }}
         </a>
       }
+      <app-notification-bell/>
     </div>
 
     <router-outlet/>
@@ -195,6 +199,26 @@
               </svg>
             </div>
             <span class="text-[11px] font-semibold theme-text">Catégories</span>
+          </a>
+
+          <a routerLink="suppliers" (click)="moreSheetOpen = false"
+             class="flex flex-col items-center gap-2 p-3.5 rounded-2xl border theme-border hover:bg-gold/8 transition-colors active:scale-[0.97] active:opacity-70">
+            <div class="w-10 h-10 bg-orange-500/12 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+            </div>
+            <span class="text-[11px] font-semibold theme-text">Fournisseurs</span>
+          </a>
+
+          <a routerLink="finance" (click)="moreSheetOpen = false"
+             class="flex flex-col items-center gap-2 p-3.5 rounded-2xl border theme-border hover:bg-gold/8 transition-colors active:scale-[0.97] active:opacity-70">
+            <div class="w-10 h-10 bg-emerald-500/12 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </div>
+            <span class="text-[11px] font-semibold theme-text">Finance</span>
           </a>
 
           <a routerLink="/" (click)="moreSheetOpen = false"

@@ -1,0 +1,652 @@
+<div class="min-h-screen theme-bg">
+
+  @switch (view()) {
+
+    @case ('loading') {
+      <div class="flex items-center justify-center min-h-[60vh]">
+        <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }
+
+    @case ('setup') { <app-pin-setup (setupDone)="onSetupDone()"/> }
+
+    @case ('pin')   { <app-pin-gate (unlocked)="onUnlocked()"/> }
+
+    @case ('dashboard') {
+      <div class="p-4 lg:p-8 max-w-5xl mx-auto">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-black theme-text">Finance</h1>
+            <p class="text-sm theme-muted mt-0.5">Données confidentielles</p>
+          </div>
+          <button (click)="lock()"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold theme-muted border theme-border hover:text-red-400 hover:border-red-400/30 transition-colors active:scale-[0.97]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            Verrouiller
+          </button>
+        </div>
+
+        <!-- Onglets -->
+        <div class="flex gap-1 p-1 rounded-2xl bg-black/[.06] border theme-border mb-6 flex-wrap">
+          <button (click)="setTab('report')"
+                  class="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                  [class.bg-gold]="activeTab() === 'report'"
+                  [class.text-black]="activeTab() === 'report'"
+                  [class.theme-muted]="activeTab() !== 'report'">
+            Rapport P&amp;L
+          </button>
+          <button (click)="setTab('margins')"
+                  class="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                  [class.bg-gold]="activeTab() === 'margins'"
+                  [class.text-black]="activeTab() === 'margins'"
+                  [class.theme-muted]="activeTab() !== 'margins'">
+            Marges produits
+          </button>
+          <button (click)="setTab('stock')"
+                  class="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                  [class.bg-gold]="activeTab() === 'stock'"
+                  [class.text-black]="activeTab() === 'stock'"
+                  [class.theme-muted]="activeTab() !== 'stock'">
+            Stock
+          </button>
+          <button (click)="setTab('cashflow')"
+                  class="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                  [class.bg-gold]="activeTab() === 'cashflow'"
+                  [class.text-black]="activeTab() === 'cashflow'"
+                  [class.theme-muted]="activeTab() !== 'cashflow'">
+            Trésorerie
+          </button>
+        </div>
+
+        <!-- ── Onglet Rapport CA ── -->
+        @if (activeTab() === 'report') {
+
+          <!-- Sélecteur de période -->
+          <div class="flex gap-2 flex-wrap mb-6">
+            @for (p of periods; track p.days) {
+              <button (click)="setPeriod(p.days)"
+                      class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border active:scale-[0.97]"
+                      [class.bg-gold]="selectedPeriod() === p.days"
+                      [class.text-black]="selectedPeriod() === p.days"
+                      [class.border-gold]="selectedPeriod() === p.days"
+                      [class.theme-muted]="selectedPeriod() !== p.days"
+                      [class.theme-border]="selectedPeriod() !== p.days">
+                {{ p.label }}
+              </button>
+            }
+          </div>
+
+          @if (dashboardLoading()) {
+            <div class="flex justify-center py-16">
+              <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          } @else if (dashboard()) {
+
+            <!-- KPI Cards — Compte de résultat OHADA -->
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Chiffre d'affaires</p>
+                <p class="text-xl font-black text-gold">{{ formatAmount(dashboard()!.revenue) }}</p>
+                <p class="text-[10px] theme-muted mt-0.5">FCFA · {{ dashboard()!.deliveredOrderCount }} commandes</p>
+              </div>
+
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Coût des ventes</p>
+                <p class="text-xl font-black text-orange-400">{{ formatAmount(dashboard()!.cogs) }}</p>
+                <p class="text-[10px] theme-muted mt-0.5">FCFA</p>
+              </div>
+
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Bénéfice brut</p>
+                <p class="text-xl font-black"
+                   [class.text-emerald-400]="dashboard()!.grossProfit >= 0"
+                   [class.text-red-400]="dashboard()!.grossProfit < 0">
+                  {{ formatAmount(dashboard()!.grossProfit) }}
+                </p>
+                <p class="text-[10px] theme-muted mt-0.5">Marge {{ dashboard()!.grossMarginPercent | number:'1.1-1' }}%</p>
+              </div>
+
+            </div>
+
+            <!-- Ligne P&L nette -->
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+
+              <div class="theme-surface border border-red-500/20 rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Charges opérationnelles</p>
+                <p class="text-xl font-black text-red-400">− {{ formatAmount(dashboard()!.totalExpenses) }}</p>
+                <p class="text-[10px] theme-muted mt-0.5">
+                  <a routerLink="/admin/expenses" class="text-gold hover:underline">Voir le détail →</a>
+                </p>
+              </div>
+
+              <div class="col-span-2 lg:col-span-2 theme-surface border-2 rounded-2xl p-4"
+                   [class.border-emerald-500]="dashboard()!.netProfit >= 0"
+                   [class.border-red-500]="dashboard()!.netProfit < 0">
+                <p class="text-xs font-bold uppercase tracking-wider mb-1"
+                   [class.text-emerald-400]="dashboard()!.netProfit >= 0"
+                   [class.text-red-400]="dashboard()!.netProfit < 0">
+                  Résultat net (OHADA)
+                </p>
+                <p class="text-3xl font-black"
+                   [class.text-emerald-400]="dashboard()!.netProfit >= 0"
+                   [class.text-red-400]="dashboard()!.netProfit < 0">
+                  {{ formatAmount(dashboard()!.netProfit) }} F
+                </p>
+                <p class="text-sm theme-muted mt-1">
+                  Taux de marge nette :
+                  <span class="font-bold"
+                        [class.text-emerald-400]="dashboard()!.netMarginPercent >= 0"
+                        [class.text-red-400]="dashboard()!.netMarginPercent < 0">
+                    {{ dashboard()!.netMarginPercent | number:'1.1-1' }}%
+                  </span>
+                </p>
+              </div>
+
+            </div>
+
+            <!-- Répartition charges par catégorie -->
+            @if (dashboard()!.expensesByCategory?.length) {
+              <div class="theme-surface border theme-border rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-bold theme-text mb-4">Charges par catégorie</h3>
+                <div class="space-y-2">
+                  @for (stat of dashboard()!.expensesByCategory; track stat.category) {
+                    <div class="flex items-center gap-3">
+                      <span class="text-xs theme-muted w-24 flex-shrink-0">{{ stat.category }}</span>
+                      <div class="flex-1 h-2 rounded-full bg-black/10 overflow-hidden">
+                        <div class="h-full rounded-full bg-red-400/60 transition-all"
+                             [style.width.%]="stat.percent"></div>
+                      </div>
+                      <span class="text-xs font-semibold text-red-400 w-20 text-right flex-shrink-0">
+                        {{ formatAmount(stat.total) }} F
+                      </span>
+                      <span class="text-[10px] theme-muted w-10 text-right flex-shrink-0">{{ stat.percent }}%</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Alerte données manquantes -->
+            @if (dashboard()!.itemsWithoutCost > 0) {
+              <div class="bg-amber-500/8 border border-amber-500/25 rounded-2xl px-4 py-3 mb-6 flex items-start gap-3">
+                <svg class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <p class="text-sm text-amber-300">
+                  <strong>{{ dashboard()!.itemsWithoutCost }}</strong> article(s) vendu(s) sans prix d'achat —
+                  le bénéfice est sous-estimé.
+                  <a routerLink="/admin/products" class="text-gold underline ml-1">Corriger →</a>
+                </p>
+              </div>
+            }
+
+            <!-- Graphique évolution mensuelle -->
+            @if (dashboard()!.monthly?.length) {
+              <div class="theme-surface border theme-border rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-bold theme-text mb-5">Évolution mensuelle</h3>
+                <div class="flex items-end gap-2 h-32 overflow-x-auto pb-2">
+                  @for (m of dashboard()!.monthly; track m.monthLabel) {
+                    <div class="flex flex-col items-center gap-1 flex-shrink-0 min-w-[40px]">
+                      <div class="flex items-end gap-0.5 h-24">
+                        <!-- CA -->
+                        <div class="w-4 rounded-t-lg bg-gold/70 transition-all"
+                             [style.height.%]="barHeight(m.revenue)"
+                             [title]="'CA : ' + formatAmount(m.revenue) + ' FCFA'">
+                        </div>
+                        <!-- Coût -->
+                        <div class="w-4 rounded-t-lg bg-orange-500/50 transition-all"
+                             [style.height.%]="barHeight(m.cogs)"
+                             [title]="'Coût : ' + formatAmount(m.cogs) + ' FCFA'">
+                        </div>
+                      </div>
+                      <span class="text-[9px] theme-muted text-center leading-tight">{{ m.monthLabel }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="flex gap-4 mt-3">
+                  <span class="flex items-center gap-1.5 text-xs theme-muted">
+                    <span class="w-3 h-3 rounded bg-gold/70 inline-block"></span>CA
+                  </span>
+                  <span class="flex items-center gap-1.5 text-xs theme-muted">
+                    <span class="w-3 h-3 rounded bg-orange-500/50 inline-block"></span>Coût
+                  </span>
+                </div>
+              </div>
+            }
+
+            <!-- Répartition par catégorie -->
+            @if (dashboard()!.byCategory?.length) {
+              <div class="theme-surface border theme-border rounded-2xl p-5">
+                <h3 class="text-sm font-bold theme-text mb-4">Répartition par catégorie</h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr class="border-b theme-border">
+                        <th class="text-left pb-2 text-xs font-semibold theme-muted">Catégorie</th>
+                        <th class="text-right pb-2 text-xs font-semibold theme-muted">CA</th>
+                        <th class="text-right pb-2 text-xs font-semibold theme-muted">Coût</th>
+                        <th class="text-right pb-2 text-xs font-semibold theme-muted">Bénéfice</th>
+                        <th class="text-right pb-2 text-xs font-semibold theme-muted">Marge</th>
+                        <th class="text-right pb-2 text-xs font-semibold theme-muted">Qté</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y theme-border">
+                      @for (cat of dashboard()!.byCategory; track cat.category) {
+                        <tr>
+                          <td class="py-2.5 font-semibold theme-text">{{ cat.category }}</td>
+                          <td class="py-2.5 text-right text-gold font-semibold">{{ formatAmount(cat.revenue) }}</td>
+                          <td class="py-2.5 text-right theme-muted">{{ formatAmount(cat.cogs) }}</td>
+                          <td class="py-2.5 text-right font-semibold"
+                              [class.text-emerald-400]="cat.grossProfit >= 0"
+                              [class.text-red-400]="cat.grossProfit < 0">
+                            {{ formatAmount(cat.grossProfit) }}
+                          </td>
+                          <td class="py-2.5 text-right font-bold" [class]="marginColor(cat.marginPercent)">
+                            {{ cat.marginPercent | number:'1.0-0' }}%
+                          </td>
+                          <td class="py-2.5 text-right theme-muted">{{ cat.quantity }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            } @else {
+              <div class="theme-surface border theme-border rounded-2xl p-8 text-center theme-muted">
+                <p class="text-sm font-semibold">Aucune commande livrée sur cette période</p>
+                <p class="text-xs mt-1 opacity-60">Les données apparaîtront dès les premières livraisons.</p>
+              </div>
+            }
+
+          }
+
+        }
+
+        <!-- ── Onglet Marges produits ── -->
+        @if (activeTab() === 'margins') {
+
+          @if (productsLoading()) {
+            <div class="flex justify-center py-16">
+              <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          } @else {
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Produits actifs</p>
+                <p class="text-2xl font-black theme-text">{{ products().length }}</p>
+              </div>
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Avec coût renseigné</p>
+                <p class="text-2xl font-black text-emerald-400">{{ productsWithMargin.length }}</p>
+              </div>
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Sans coût</p>
+                <p class="text-2xl font-black text-amber-400">{{ productsWithoutCost.length }}</p>
+              </div>
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Marge moy.</p>
+                <p class="text-2xl font-black" [class]="marginColor(avgMargin)">{{ avgMargin }}%</p>
+              </div>
+            </div>
+
+            @if (productsWithoutCost.length > 0) {
+              <div class="bg-amber-500/8 border border-amber-500/25 rounded-2xl px-4 py-3 mb-6 flex items-start gap-3">
+                <svg class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <div>
+                  <p class="text-sm font-semibold text-amber-300">{{ productsWithoutCost.length }} produit(s) sans prix d'achat</p>
+                  <p class="text-xs text-amber-400/70 mt-0.5">Renseignez-les dans la section Produits ou via les Fournisseurs.</p>
+                </div>
+              </div>
+            }
+
+            <div class="grid lg:grid-cols-2 gap-6">
+              <div class="theme-surface border theme-border rounded-2xl p-5">
+                <h3 class="text-sm font-bold theme-text mb-4 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>Meilleures marges
+                </h3>
+                @if (!topMarginProducts.length) {
+                  <p class="text-sm theme-muted text-center py-4">Aucune donnée</p>
+                } @else {
+                  <div class="space-y-3">
+                    @for (p of topMarginProducts; track p.id) {
+                      <div class="flex items-center gap-3">
+                        @if (p.imageUrl) {
+                          <img [src]="p.imageUrl" [alt]="p.name" class="w-9 h-9 rounded-xl object-cover flex-shrink-0">
+                        } @else {
+                          <div class="w-9 h-9 rounded-xl border theme-border flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                          </div>
+                        }
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-semibold theme-text truncate">{{ p.name }}</p>
+                          <p class="text-xs theme-muted">{{ p.price | number:'1.0-0':'fr-FR' }} FCFA</p>
+                        </div>
+                        <span class="text-sm font-black" [class]="marginColor(p.marginPercent ?? 0)">
+                          {{ p.marginPercent | number:'1.1-1' }}%
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <div class="theme-surface border theme-border rounded-2xl p-5">
+                <h3 class="text-sm font-bold theme-text mb-4 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-red-400"></span>Marges les plus faibles
+                </h3>
+                @if (!bottomMarginProducts.length) {
+                  <p class="text-sm theme-muted text-center py-4">Aucune donnée</p>
+                } @else {
+                  <div class="space-y-3">
+                    @for (p of bottomMarginProducts; track p.id) {
+                      <div class="flex items-center gap-3">
+                        @if (p.imageUrl) {
+                          <img [src]="p.imageUrl" [alt]="p.name" class="w-9 h-9 rounded-xl object-cover flex-shrink-0">
+                        } @else {
+                          <div class="w-9 h-9 rounded-xl border theme-border flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                          </div>
+                        }
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-semibold theme-text truncate">{{ p.name }}</p>
+                          <p class="text-xs theme-muted">{{ p.price | number:'1.0-0':'fr-FR' }} FCFA</p>
+                        </div>
+                        <span class="text-sm font-black" [class]="marginColor(p.marginPercent ?? 0)">
+                          {{ p.marginPercent | number:'1.1-1' }}%
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            @if (productsWithoutCost.length > 0) {
+              <div class="mt-6 text-center">
+                <a routerLink="/admin/products"
+                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gold/10 border border-gold/25 text-gold text-sm font-semibold active:scale-[0.97] transition-transform">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                  Renseigner les prix d'achat
+                </a>
+              </div>
+            }
+
+          }
+
+        }
+
+        <!-- ── Onglet Stock ── -->
+        @if (activeTab() === 'stock') {
+
+          @if (stockLoading()) {
+            <div class="flex justify-center py-16">
+              <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          } @else if (stockValue()) {
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Valeur du stock</p>
+                <p class="text-xl font-black text-gold">{{ formatAmount(stockValue()!.totalStockValue) }}</p>
+                <p class="text-[10px] theme-muted mt-0.5">FCFA</p>
+              </div>
+
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Produits actifs</p>
+                <p class="text-xl font-black theme-text">{{ stockValue()!.totalActiveProducts }}</p>
+                <p class="text-[10px] theme-muted mt-0.5">{{ stockValue()!.productsWithCost }} avec coût</p>
+              </div>
+
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Rupture totale</p>
+                <p class="text-xl font-black text-red-400">{{ stockValue()!.outOfStockCount }}</p>
+                <p class="text-[10px] theme-muted mt-0.5">stock = 0</p>
+              </div>
+
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Stock bas</p>
+                <p class="text-xl font-black text-amber-400">{{ stockValue()!.lowStockCount }}</p>
+                <p class="text-[10px] theme-muted mt-0.5">≤ {{ stockValue()!.lowStockThreshold }} unités</p>
+              </div>
+
+            </div>
+
+            <!-- Alerte produits sans coût -->
+            @if (stockValue()!.productsWithoutCost > 0) {
+              <div class="bg-amber-500/8 border border-amber-500/25 rounded-2xl px-4 py-3 mb-6 flex items-start gap-3">
+                <svg class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <p class="text-sm text-amber-300">
+                  <strong>{{ stockValue()!.productsWithoutCost }}</strong> produit(s) sans prix d'achat — valeur stock sous-estimée.
+                  <a routerLink="/admin/products" class="text-gold underline ml-1">Corriger →</a>
+                </p>
+              </div>
+            }
+
+            <!-- Répartition par catégorie -->
+            @if (stockValue()!.byCategory?.length) {
+              <div class="theme-surface border theme-border rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-bold theme-text mb-4">Valeur par catégorie</h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr class="border-b theme-border">
+                        <th class="text-left pb-2 text-xs font-semibold theme-muted">Catégorie</th>
+                        <th class="text-right pb-2 text-xs font-semibold theme-muted">Produits</th>
+                        <th class="text-right pb-2 text-xs font-semibold theme-muted">Stock</th>
+                        <th class="text-right pb-2 text-xs font-semibold theme-muted">Valeur</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y theme-border">
+                      @for (cat of stockValue()!.byCategory; track cat.category) {
+                        <tr>
+                          <td class="py-2.5 font-semibold theme-text">{{ cat.category }}</td>
+                          <td class="py-2.5 text-right theme-muted">{{ cat.productCount }}</td>
+                          <td class="py-2.5 text-right theme-muted">{{ cat.totalStock }}</td>
+                          <td class="py-2.5 text-right font-bold text-gold">{{ formatAmount(cat.stockValue) }} FCFA</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+            <!-- Alertes rupture & stock bas -->
+            <div class="grid lg:grid-cols-2 gap-6">
+
+              <!-- Rupture totale -->
+              <div class="theme-surface border theme-border rounded-2xl p-5">
+                <h3 class="text-sm font-bold theme-text mb-4 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-red-400"></span>Rupture de stock
+                  @if (stockValue()!.outOfStockCount > 0) {
+                    <span class="ml-auto text-xs font-bold text-red-400 bg-red-400/10 px-2 py-0.5 rounded-full">
+                      {{ stockValue()!.outOfStockCount }}
+                    </span>
+                  }
+                </h3>
+                @if (!stockValue()!.outOfStock?.length) {
+                  <p class="text-sm theme-muted text-center py-4">Aucune rupture</p>
+                } @else {
+                  <div class="space-y-3">
+                    @for (p of stockValue()!.outOfStock; track p.id) {
+                      <div class="flex items-center gap-3">
+                        @if (p.imageUrl) {
+                          <img [src]="p.imageUrl" [alt]="p.name" class="w-9 h-9 rounded-xl object-cover flex-shrink-0">
+                        } @else {
+                          <div class="w-9 h-9 rounded-xl border theme-border flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                          </div>
+                        }
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-semibold theme-text truncate">{{ p.name }}</p>
+                          <p class="text-xs theme-muted">{{ p.categoryName ?? '—' }} · {{ p.price | number:'1.0-0':'fr-FR' }} FCFA</p>
+                        </div>
+                        <span class="text-xs font-bold text-red-400 bg-red-400/10 px-2 py-0.5 rounded-full whitespace-nowrap">
+                          0 unité
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Stock bas -->
+              <div class="theme-surface border theme-border rounded-2xl p-5">
+                <h3 class="text-sm font-bold theme-text mb-4 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>Stock bas
+                  @if (stockValue()!.lowStockCount > 0) {
+                    <span class="ml-auto text-xs font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full">
+                      {{ stockValue()!.lowStockCount }}
+                    </span>
+                  }
+                </h3>
+                @if (!stockValue()!.lowStock?.length) {
+                  <p class="text-sm theme-muted text-center py-4">Aucun stock bas</p>
+                } @else {
+                  <div class="space-y-3">
+                    @for (p of stockValue()!.lowStock; track p.id) {
+                      <div class="flex items-center gap-3">
+                        @if (p.imageUrl) {
+                          <img [src]="p.imageUrl" [alt]="p.name" class="w-9 h-9 rounded-xl object-cover flex-shrink-0">
+                        } @else {
+                          <div class="w-9 h-9 rounded-xl border theme-border flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                          </div>
+                        }
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-semibold theme-text truncate">{{ p.name }}</p>
+                          <p class="text-xs theme-muted">{{ p.categoryName ?? '—' }} · {{ p.price | number:'1.0-0':'fr-FR' }} FCFA</p>
+                        </div>
+                        <span class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full whitespace-nowrap">
+                          {{ p.stock }} unité{{ p.stock > 1 ? 's' : '' }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+
+            </div>
+
+          } @else {
+            <div class="theme-surface border theme-border rounded-2xl p-8 text-center theme-muted">
+              <p class="text-sm font-semibold">Données stock indisponibles</p>
+              <p class="text-xs mt-1 opacity-60">Impossible de charger la valeur du stock.</p>
+            </div>
+          }
+
+        }
+
+        <!-- ── Onglet Trésorerie ── -->
+        @if (activeTab() === 'cashflow') {
+
+          @if (cashFlowLoading()) {
+            <div class="flex justify-center py-16">
+              <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          } @else if (cashFlow()) {
+
+            <!-- KPI Trésorerie -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Encaissements</p>
+                <p class="text-xl font-black text-emerald-400">{{ formatAmount(cashFlow()!.totalRevenue) }} F</p>
+                <p class="text-[10px] theme-muted mt-0.5">CA encaissé</p>
+              </div>
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Décaissements opé</p>
+                <p class="text-xl font-black text-red-400">{{ formatAmount(cashFlow()!.totalExpenses) }} F</p>
+                <p class="text-[10px] theme-muted mt-0.5">Charges saisies</p>
+              </div>
+              <div class="theme-surface border theme-border rounded-2xl p-4">
+                <p class="text-xs theme-muted font-semibold mb-1">Achats stock</p>
+                <p class="text-xl font-black text-orange-400">{{ formatAmount(cashFlow()!.totalStockPurchases) }} F</p>
+                <p class="text-[10px] theme-muted mt-0.5">Bons de commande reçus</p>
+              </div>
+              <div class="theme-surface border-2 rounded-2xl p-4"
+                   [class.border-emerald-500]="cashFlow()!.netCashFlow >= 0"
+                   [class.border-red-500]="cashFlow()!.netCashFlow < 0">
+                <p class="text-xs font-bold uppercase tracking-wider mb-1"
+                   [class.text-emerald-400]="cashFlow()!.netCashFlow >= 0"
+                   [class.text-red-400]="cashFlow()!.netCashFlow < 0">Flux net</p>
+                <p class="text-xl font-black"
+                   [class.text-emerald-400]="cashFlow()!.netCashFlow >= 0"
+                   [class.text-red-400]="cashFlow()!.netCashFlow < 0">
+                  {{ formatAmount(cashFlow()!.netCashFlow) }} F
+                </p>
+              </div>
+            </div>
+
+            <!-- Graphique mensuel cash flow -->
+            @if (cashFlow()!.monthly?.length) {
+              <div class="theme-surface border theme-border rounded-2xl p-5">
+                <h3 class="text-sm font-bold theme-text mb-5">Évolution mensuelle</h3>
+                <div class="flex items-end gap-2 h-32 overflow-x-auto pb-2">
+                  @for (m of cashFlow()!.monthly; track m.monthLabel) {
+                    <div class="flex flex-col items-center gap-1 flex-shrink-0 min-w-[44px]">
+                      <div class="flex items-end gap-0.5 h-24">
+                        <div class="w-4 rounded-t-lg bg-emerald-500/60 transition-all"
+                             [style.height.%]="cfBarHeight(m.revenue)"
+                             [title]="'Encaissé : ' + formatAmount(m.revenue)">
+                        </div>
+                        <div class="w-4 rounded-t-lg bg-red-500/50 transition-all"
+                             [style.height.%]="cfBarHeight(m.expenses)"
+                             [title]="'Charges : ' + formatAmount(m.expenses)">
+                        </div>
+                      </div>
+                      <span class="text-[9px] theme-muted text-center leading-tight">{{ m.monthLabel }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="flex gap-4 mt-3">
+                  <span class="flex items-center gap-1.5 text-xs theme-muted">
+                    <span class="w-3 h-3 rounded bg-emerald-500/60 inline-block"></span>Encaissements
+                  </span>
+                  <span class="flex items-center gap-1.5 text-xs theme-muted">
+                    <span class="w-3 h-3 rounded bg-red-500/50 inline-block"></span>Charges opé
+                  </span>
+                </div>
+              </div>
+            }
+
+          } @else {
+            <div class="theme-surface border theme-border rounded-2xl p-8 text-center theme-muted">
+              <p class="text-sm font-semibold">Aucune donnée de trésorerie</p>
+              <p class="text-xs mt-1 opacity-60">Saisissez des dépenses pour voir le flux.</p>
+            </div>
+          }
+
+        }
+
+      </div>
+    }
+
+  }
+
+</div>

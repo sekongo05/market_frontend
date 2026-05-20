@@ -41,6 +41,8 @@ export interface ProductResponse {
   metaDescription?: string;
   createdAt: string;
   updatedAt: string;
+  costPrice?: number;
+  marginPercent?: number;
 }
 
 export interface CreateProductRequest {

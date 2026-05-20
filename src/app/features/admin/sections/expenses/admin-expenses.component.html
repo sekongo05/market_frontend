@@ -1,0 +1,222 @@
+<div class="p-4 lg:p-8 max-w-4xl mx-auto">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-black theme-text">Dépenses opérationnelles</h1>
+      <p class="text-sm theme-muted mt-0.5">Charges fixes et variables</p>
+    </div>
+    <button (click)="openCreate()"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gold text-black text-sm font-bold active:scale-[0.97] transition-transform">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Saisir
+    </button>
+  </div>
+
+  <!-- Récap par catégorie -->
+  @if (!loading() && statsByCategory().length) {
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+      @for (stat of statsByCategory(); track stat.category) {
+        <div class="theme-surface border theme-border rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border {{ categoryClass(stat.category) }}">
+              {{ categoryLabel(stat.category) }}
+            </span>
+            <span class="text-[10px] theme-muted">{{ stat.percent }}%</span>
+          </div>
+          <p class="text-lg font-black theme-text mt-1">{{ formatAmount(stat.total) }}</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Filtres -->
+  <div class="flex gap-2 flex-wrap mb-5">
+    @for (cat of categories; track cat.value) {
+      <button (click)="setFilter(cat.value)"
+              class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all active:scale-[0.97]"
+              [class.bg-gold]="categoryFilter() === cat.value"
+              [class.text-black]="categoryFilter() === cat.value"
+              [class.border-gold]="categoryFilter() === cat.value"
+              [class.theme-muted]="categoryFilter() !== cat.value"
+              [class.theme-border]="categoryFilter() !== cat.value">
+        {{ cat.label }}
+      </button>
+    }
+  </div>
+
+  @if (filteredExpenses().length) {
+    <div class="flex justify-between items-center mb-3">
+      <p class="text-xs theme-muted">{{ filteredExpenses().length }} dépense(s)</p>
+      <p class="text-sm font-bold text-red-400">Total : {{ formatAmount(totalFiltered()) }}</p>
+    </div>
+  }
+
+  <!-- Liste -->
+  @if (loading()) {
+    <div class="flex justify-center py-20">
+      <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  } @else if (!filteredExpenses().length) {
+    <div class="flex flex-col items-center justify-center py-20 theme-muted">
+      <svg class="w-12 h-12 mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+      </svg>
+      <p class="text-sm font-semibold">Aucune dépense</p>
+    </div>
+  } @else {
+    <div class="space-y-2">
+      @for (e of filteredExpenses(); track e.id) {
+        <div class="theme-surface border theme-border rounded-2xl p-4">
+
+          @if (deleteConfirmId === e.id) {
+            <div class="flex items-center justify-between gap-3">
+              <p class="text-sm font-semibold theme-text">
+                Supprimer <span class="text-red-400">{{ e.description }}</span> ?
+              </p>
+              <div class="flex gap-2">
+                <button (click)="cancelDelete()"
+                        class="px-3 py-1.5 rounded-xl text-xs font-semibold theme-muted border theme-border active:scale-[0.97]">
+                  Non
+                </button>
+                <button (click)="doDelete(e.id)"
+                        class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-red-500/15 text-red-400 border border-red-500/30 active:scale-[0.97]">
+                  Oui
+                </button>
+              </div>
+            </div>
+
+          } @else {
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                  <p class="font-bold theme-text truncate">{{ e.description }}</p>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border {{ categoryClass(e.category) }} flex-shrink-0">
+                    {{ categoryLabel(e.category) }}
+                  </span>
+                </div>
+                <div class="flex flex-wrap gap-3 text-xs theme-muted">
+                  <span>{{ e.expenseDate | date:'dd/MM/yyyy' }}</span>
+                  <span>{{ paymentLabel(e.paymentMethod) }}</span>
+                  @if (e.reference) { <span class="italic">Réf: {{ e.reference }}</span> }
+                  <span class="theme-muted">par {{ e.createdByName }}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 flex-shrink-0">
+                <p class="text-lg font-black text-red-400">{{ formatAmount(e.amount) }}</p>
+                <div class="flex gap-1">
+                  <button (click)="openEdit(e)"
+                          class="p-2 rounded-xl theme-muted hover:text-gold hover:bg-gold/8 transition-colors active:scale-[0.97]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                  </button>
+                  <button (click)="confirmDelete(e.id)"
+                          class="p-2 rounded-xl theme-muted hover:text-red-400 hover:bg-red-500/8 transition-colors active:scale-[0.97]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- ── Drawer ── -->
+@if (drawerOpen) {
+  <div class="fixed inset-0 bg-black/60 z-[60]" (click)="closeDrawer()"></div>
+  <div class="fixed right-0 top-0 bottom-0 w-full max-w-md z-[65] theme-surface border-l theme-border flex flex-col shadow-2xl">
+
+    <div class="flex items-center justify-between px-5 py-4 border-b theme-border">
+      <h2 class="font-black theme-text">{{ editingExpense ? 'Modifier la dépense' : 'Nouvelle dépense' }}</h2>
+      <button (click)="closeDrawer()" class="p-1.5 rounded-xl theme-muted hover:text-gold active:scale-[0.97]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-5 space-y-4">
+
+      @if (drawerError) {
+        <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">
+          {{ drawerError }}
+        </div>
+      }
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Date *</label>
+          <input [(ngModel)]="form.expenseDate" type="date"
+                 class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Montant (F) *</label>
+          <input [(ngModel)]="form.amount" type="number" min="0" placeholder="0"
+                 class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Description *</label>
+        <input [(ngModel)]="form.description" type="text" placeholder="Ex: Loyer boutique mars 2025"
+               class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Catégorie *</label>
+          <select [(ngModel)]="form.category" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
+            @for (cat of categories; track cat.value) {
+              @if (cat.value !== 'ALL') {
+                <option [value]="cat.value">{{ cat.label }}</option>
+              }
+            }
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Mode de paiement</label>
+          <select [(ngModel)]="form.paymentMethod" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
+            @for (m of paymentMethods; track m.value) {
+              <option [value]="m.value">{{ m.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Référence / N° facture</label>
+        <input [(ngModel)]="form.reference" type="text" placeholder="Optionnel"
+               class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+      </div>
+
+    </div>
+
+    <div class="px-5 py-4 border-t theme-border">
+      <button (click)="save()" [disabled]="drawerLoading"
+              class="w-full py-3.5 rounded-2xl bg-gold text-black font-bold text-sm active:scale-[0.98] transition-transform disabled:opacity-40">
+        @if (drawerLoading) {
+          <span class="flex items-center justify-center gap-2">
+            <span class="w-4 h-4 border-2 border-black/40 border-t-black rounded-full animate-spin"></span>
+            Enregistrement…
+          </span>
+        } @else {
+          {{ editingExpense ? 'Mettre à jour' : 'Enregistrer la dépense' }}
+        }
+      </button>
+    </div>
+
+  </div>
+}

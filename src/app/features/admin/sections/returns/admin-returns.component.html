@@ -201,7 +201,7 @@
   @if (returnDecisionModal && returnDecisionItem) {
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeReturnDecisionModal()"></div>
-      <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl p-6 animate-scale-in">
+      <div class="relative w-full max-w-lg theme-surface border theme-border rounded-3xl shadow-2xl p-6 animate-scale-in">
 
         <div class="flex items-start justify-between mb-4">
           <div>
@@ -219,11 +219,52 @@
           </button>
         </div>
 
-        <!-- Motif -->
-        <div class="p-3 bg-black/[.04] rounded-xl mb-5">
-          <p class="text-xs font-bold theme-muted uppercase tracking-wider mb-1">Motif du retour</p>
-          <p class="text-sm theme-text">{{ returnDecisionItem.reason }}</p>
+        <!-- Livraison + motif -->
+        <div class="space-y-2 mb-5">
+          @if (returnDecisionItem.deliveredAt) {
+            <div class="flex items-center gap-2 text-xs theme-muted">
+              <svg class="w-3.5 h-3.5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              Livré le {{ returnDecisionItem.deliveredAt | date:'dd/MM/yyyy' }}
+            </div>
+          }
+          <div class="p-3 bg-black/[.04] rounded-xl">
+            <p class="text-xs font-bold theme-muted uppercase tracking-wider mb-1">Motif du retour</p>
+            <p class="text-sm theme-text">{{ returnDecisionItem.reason }}</p>
+          </div>
         </div>
+
+        <!-- Articles de la commande -->
+        @if (returnDecisionItem.orderItems?.length) {
+          <div class="mb-5">
+            <p class="text-xs font-bold theme-muted uppercase tracking-wider mb-2">Articles concernés</p>
+            <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+              @for (item of returnDecisionItem.orderItems; track item.productId) {
+                <div class="flex items-center gap-3 p-2 bg-black/[.04] rounded-xl">
+                  @if (item.imageUrl) {
+                    <img [src]="item.imageUrl" [alt]="item.productName"
+                      class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-white/10">
+                  } @else {
+                    <div class="w-10 h-10 rounded-lg bg-black/10 flex-shrink-0 flex items-center justify-center">
+                      <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                      </svg>
+                    </div>
+                  }
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold theme-text truncate">{{ item.productName }}</p>
+                    <p class="text-[10px] theme-muted">
+                      Qté {{ item.quantity }}
+                      @if (item.selectedColor) { · {{ item.selectedColor }} }
+                    </p>
+                  </div>
+                  <span class="text-xs font-bold theme-text flex-shrink-0">{{ item.subtotal | number:'1.0-0' }} F</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
 
         <!-- Décision radio buttons -->
         <p class="text-xs font-bold theme-muted uppercase tracking-wider mb-3">Décision *</p>

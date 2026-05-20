@@ -7,12 +7,14 @@ import { ProductService } from '../../../../core/services/product.service';
 import { ProductMediaService } from '../../../../core/services/product-media.service';
 import { ProductVariantService, ProductVariantRequest } from '../../../../core/services/product-variant.service';
 import { CategoryService } from '../../../../core/services/category.service';
+import { SupplierService } from '../../../../core/services/supplier.service';
 import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
 import { ProductResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender, SortOption } from '../../../../core/models/product.models';
 import { CategoryResponse } from '../../../../core/models/category.models';
 import { PageResponse } from '../../../../core/models/common.models';
+import { SupplierResponse, ProductSupplierResponse } from '../../../../core/models/supplier.models';
 import { stockClass } from '../../shared/admin-status.helpers';
 
 @Component({
@@ -92,6 +94,19 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   priceSavingId: number | null = null;
 
   productCategories: CategoryResponse[] = [];
+
+  /* ── Fournisseurs ── */
+  allSuppliers: SupplierResponse[] = [];
+  productSuppliers: ProductSupplierResponse[] = [];
+  supplierFormOpen = false;
+  supplierFormSupplierId: number | null = null;
+  supplierFormPurchasePrice: number | null = null;
+  supplierFormTransport: number = 0;
+  supplierFormDefault = false;
+  supplierFormNotes = '';
+  supplierFormLoading = false;
+  supplierFormError: string | null = null;
+  editingSupplierLinkId: number | null = null;
   readonly genders: { value: Gender; label: string }[] = [
     { value: 'HOMME',  label: 'Homme'   },
     { value: 'FEMME',  label: 'Femme'   },
@@ -118,6 +133,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     private productMediaService: ProductMediaService,
     private productVariantService: ProductVariantService,
     private categoryService: CategoryService,
+    private supplierService: SupplierService,
     private wsService: WebSocketService,
     private toast: AdminToastService,
     private scrollLock: ScrollLockService,
@@ -190,6 +206,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       description:     [product?.description      ?? '', Validators.required],
       price:           [product?.price            ?? null, [Validators.required, Validators.min(1)]],
       compareAtPrice:  [product?.compareAtPrice   ?? null, [Validators.min(0)]],
+      costPrice:       [product?.costPrice        ?? null, [Validators.min(0)]],
       stock:           [product?.stock            ?? null, [Validators.required, Validators.min(0)]],
       gender:          [product?.gender           ?? 'UNISEX', Validators.required],
       categoryId:      [product?.category?.id    ?? null, Validators.required],
@@ -255,6 +272,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.scrollLock.lock();
     this.loadMedia(product.id);
     this.loadVariants(product.id);
+    this.loadProductSuppliers(product.id);
+    this.loadAllSuppliers();
     this.cdr.markForCheck();
     setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
   }
@@ -274,6 +293,15 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   private _resetDrawer(): void {
     this.drawerError = null;
+    this.productSuppliers = [];
+    this.supplierFormOpen = false;
+    this.supplierFormSupplierId = null;
+    this.supplierFormPurchasePrice = null;
+    this.supplierFormTransport = 0;
+    this.supplierFormDefault = false;
+    this.supplierFormNotes = '';
+    this.supplierFormError = null;
+    this.editingSupplierLinkId = null;
     this.wizardStep = 1;
     this.hasVariantsToggle = false;
     this.creationItems = [];
@@ -328,6 +356,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       if (v.metaTitle?.trim()) fd.append('metaTitle', v.metaTitle.trim());
       if (v.metaDescription?.trim()) fd.append('metaDescription', v.metaDescription.trim());
       if (v.compareAtPrice && +v.compareAtPrice > 0) fd.append('compareAtPrice', v.compareAtPrice.toString());
+      if (v.costPrice && +v.costPrice > 0) fd.append('costPrice', v.costPrice.toString());
       req$ = this.productService.updateProduct(this.editingProduct.id, fd);
     } else {
       if (this.hasVariantsToggle && this.creationItems.length > 0) {
@@ -837,5 +866,108 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.pendingCreationColorError = null;
     if (!this.hasVariantsToggle) this.productForm.patchValue({ stock: null });
     this.cdr.markForCheck();
+  }
+
+  // ── Fournisseurs (dans le drawer produit) ─────────────────────────
+
+  loadProductSuppliers(productId: number): void {
+    this.supplierService.getSuppliersForProduct(productId).subscribe({
+      next: (r) => { if (r.success) { this.productSuppliers = r.data ?? []; this.cdr.markForCheck(); } },
+      error: () => {},
+    });
+  }
+
+  loadAllSuppliers(): void {
+    if (this.allSuppliers.length) return;
+    this.supplierService.getAll().subscribe({
+      next: (r) => { if (r.success) { this.allSuppliers = r.data ?? []; this.cdr.markForCheck(); } },
+      error: () => {},
+    });
+  }
+
+  openSupplierForm(link?: ProductSupplierResponse): void {
+    this.editingSupplierLinkId = link?.id ?? null;
+    this.supplierFormSupplierId = link?.supplierId ?? null;
+    this.supplierFormPurchasePrice = link?.purchasePrice ?? null;
+    this.supplierFormTransport = link?.transportCostPerUnit ?? 0;
+    this.supplierFormDefault = link?.isDefault ?? false;
+    this.supplierFormNotes = link?.notes ?? '';
+    this.supplierFormError = null;
+    this.supplierFormOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  closeSupplierForm(): void {
+    this.supplierFormOpen = false;
+    this.editingSupplierLinkId = null;
+    this.supplierFormError = null;
+    this.cdr.markForCheck();
+  }
+
+  saveSupplierLink(): void {
+    if (!this.supplierFormSupplierId || !this.supplierFormPurchasePrice) {
+      this.supplierFormError = 'Fournisseur et prix d\'achat sont obligatoires';
+      return;
+    }
+    if (!this.editingProduct) return;
+
+    this.supplierFormLoading = true;
+    this.supplierFormError = null;
+
+    const req = {
+      supplierId: this.supplierFormSupplierId,
+      purchasePrice: this.supplierFormPurchasePrice,
+      transportCostPerUnit: this.supplierFormTransport ?? 0,
+      isDefault: this.supplierFormDefault,
+      notes: this.supplierFormNotes,
+    };
+
+    const req$ = this.editingSupplierLinkId
+      ? this.supplierService.updateLink(this.editingProduct.id, this.editingSupplierLinkId, req)
+      : this.supplierService.linkSupplier(this.editingProduct.id, req);
+
+    req$.subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.productSuppliers = r.data ?? [];
+          this.toast.show('Fournisseur enregistré', 'success');
+          this.closeSupplierForm();
+          if (this.supplierFormDefault && this.editingProduct) {
+            this.productForm.patchValue({ costPrice: (this.supplierFormPurchasePrice ?? 0) + (this.supplierFormTransport ?? 0) });
+          }
+        } else {
+          this.supplierFormError = r.message ?? 'Erreur';
+        }
+        this.supplierFormLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.supplierFormError = err?.error?.message ?? 'Erreur serveur';
+        this.supplierFormLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  removeSupplierLink(linkId: number): void {
+    if (!this.editingProduct) return;
+    this.supplierService.unlinkSupplier(this.editingProduct.id, linkId).subscribe({
+      next: () => {
+        this.productSuppliers = this.productSuppliers.filter(s => s.id !== linkId);
+        this.toast.show('Fournisseur retiré', 'success');
+        this.cdr.markForCheck();
+      },
+      error: () => this.toast.show('Erreur lors de la suppression', 'error'),
+    });
+  }
+
+  get availableSuppliersForForm(): SupplierResponse[] {
+    const linked = new Set(this.productSuppliers.map(ps => ps.supplierId));
+    if (this.editingSupplierLinkId) return this.allSuppliers;
+    return this.allSuppliers.filter(s => !linked.has(s.id));
+  }
+
+  supplierRealCost(ps: ProductSupplierResponse): number {
+    return ps.purchasePrice + ps.transportCostPerUnit;
   }
 }

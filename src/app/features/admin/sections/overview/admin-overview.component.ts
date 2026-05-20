@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subject, interval, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DashboardService, DashboardStats, MonthlyRevenueItem, TopProductItem, DailyCaisseResponse } from '../../../../core/services/dashboard.service';
+import { DashboardService, DashboardStats, MonthlyRevenueItem, TopProductItem, DailyCaisseResponse, DailyActivityItem } from '../../../../core/services/dashboard.service';
 import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import { orderStatusLabel, orderStatusClass, formatAmount, timeAgo } from '../../shared/admin-status.helpers';
@@ -33,6 +33,8 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
   dailyCaisse: DailyCaisseResponse | null = null;
   dailyCaisseLoading = false;
   caisseDate = new Date().toISOString().split('T')[0];
+  weeklyActivity: DailyActivityItem[] = [];
+  hoveredDayIndex: number | null = null;
 
   readonly formatAmount = formatAmount;
   readonly timeAgo = timeAgo;
@@ -87,6 +89,10 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
       next: (r) => { if (r.success) this.topProducts = r.data; this.cdr.markForCheck(); },
       error: () => {},
     });
+    this.dashboardService.getWeeklyActivity().subscribe({
+      next: (r) => { if (r.success) this.weeklyActivity = r.data; this.cdr.markForCheck(); },
+      error: () => {},
+    });
   }
 
   changeYear(delta: number): void {
@@ -135,12 +141,22 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
     if (this.stats.newUsersThisMonth > 0) list.push({ type: 'info', message: `${this.stats.newUsersThisMonth} nouvel${this.stats.newUsersThisMonth > 1 ? 'aux' : ''} utilisateur${this.stats.newUsersThisMonth > 1 ? 's' : ''} ce mois` });
     if (this.completionRate >= 80) list.push({ type: 'success', message: `Excellent taux de livraison : ${this.completionRate}%` });
     else if (this.completionRate > 0 && this.completionRate < 60) list.push({ type: 'warning', message: `Taux de livraison faible : ${this.completionRate}%`, detail: 'Vérifier les commandes annulées' });
+    const cancel = this.cancellationRate;
+    if (cancel >= 20) list.push({ type: 'danger', message: `Taux d'annulation élevé : ${cancel}%`, detail: 'Plus d\'1 commande sur 5 annulée' });
+    else if (cancel >= 10) list.push({ type: 'warning', message: `Taux d'annulation : ${cancel}%`, detail: 'À surveiller' });
+    if (this.stats.ordersToday > 0) list.push({ type: 'info', message: `${this.stats.ordersToday} commande${this.stats.ordersToday > 1 ? 's' : ''} aujourd'hui`, detail: `${formatAmount(this.stats.revenueToday)} FCFA encaissés` });
     return list;
+  }
+
+  get cancellationRate(): number {
+    if (!this.stats?.totalOrders) return 0;
+    return Math.round((this.stats.cancelledOrdersCount / this.stats.totalOrders) * 100);
   }
 
   get currentCalendarMonth(): number { return new Date().getMonth() + 1; }
   get maxMonthlyRevenue(): number { return Math.max(...this.monthlyRevenue.map(m => Number(m.revenue)), 1); }
   get maxTopProduct(): number { return Math.max(...this.topProducts.map(p => p.totalSold), 1); }
+  get maxWeeklyOrders(): number { return Math.max(...this.weeklyActivity.map(d => d.orderCount), 1); }
 
   get bestMonthIndex(): number {
     if (!this.monthlyRevenue.length) return -1;

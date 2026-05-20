@@ -1,0 +1,555 @@
+<div class="p-4 lg:p-8 max-w-5xl mx-auto">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-black theme-text">Bons de commande</h1>
+      <p class="text-sm theme-muted mt-0.5">Achats fournisseurs · mise à jour stock & CMUP</p>
+    </div>
+    <button (click)="openCreate()"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gold text-black text-sm font-bold active:scale-[0.97] transition-transform">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nouveau bon
+    </button>
+  </div>
+
+  <!-- Filtres statut -->
+  <div class="flex gap-2 flex-wrap mb-5">
+    @for (opt of statusOptions; track opt.value) {
+      <button (click)="setFilter(opt.value)"
+              class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all active:scale-[0.97]"
+              [class.bg-gold]="statusFilter() === opt.value"
+              [class.text-black]="statusFilter() === opt.value"
+              [class.border-gold]="statusFilter() === opt.value"
+              [class.theme-muted]="statusFilter() !== opt.value"
+              [class.theme-border]="statusFilter() !== opt.value">
+        {{ opt.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Liste -->
+  @if (loading()) {
+    <div class="flex justify-center py-20">
+      <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  } @else if (!filteredOrders().length) {
+    <div class="flex flex-col items-center justify-center py-20 theme-muted">
+      <svg class="w-12 h-12 mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+      <p class="text-sm font-semibold">Aucun bon de commande</p>
+    </div>
+  } @else {
+    <div class="space-y-3">
+      @for (o of filteredOrders(); track o.id) {
+        <div class="theme-surface border theme-border rounded-2xl p-4">
+
+          @if (cancelConfirmId === o.id) {
+            <div class="flex items-center justify-between gap-3">
+              <p class="text-sm font-semibold theme-text">
+                Annuler le bon <span class="text-red-400">#{{ o.id }}</span> ?
+              </p>
+              <div class="flex gap-2">
+                <button (click)="abortCancel()"
+                        class="px-3 py-1.5 rounded-xl text-xs font-semibold theme-muted border theme-border active:scale-[0.97]">
+                  Non
+                </button>
+                <button (click)="doCancel(o.id)"
+                        class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-red-500/15 text-red-400 border border-red-500/30 active:scale-[0.97]">
+                  Confirmer
+                </button>
+              </div>
+            </div>
+
+          } @else {
+            <div class="flex items-start justify-between gap-3">
+              <button (click)="openDetail(o)" class="flex-1 min-w-0 text-left">
+                <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                  <span class="font-bold theme-text">#{{ o.id }} — {{ o.supplierName }}</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border {{ statusClass(o.status) }}">
+                    {{ statusLabel(o.status) }}
+                  </span>
+                  @if (o.supplierCountry) {
+                    <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                      {{ o.supplierCountry }}
+                    </span>
+                  }
+                </div>
+                <div class="flex flex-wrap gap-4 text-xs theme-muted">
+                  <span>Commandé le {{ o.orderDate | date:'dd/MM/yyyy' }}</span>
+                  @if (o.expectedDeliveryDate) {
+                    <span>Livraison prévue {{ o.expectedDeliveryDate | date:'dd/MM/yyyy' }}</span>
+                  }
+                  <span class="font-semibold text-gold">{{ formatAmount(o.totalAmount) }}</span>
+                </div>
+                @if (o.receipt) {
+                  <p class="text-[10px] theme-muted mt-1">
+                    Reçu le {{ o.receipt.receivedDate | date:'dd/MM/yyyy' }} par {{ o.receipt.receivedBy }}
+                  </p>
+                }
+              </button>
+
+              <div class="flex gap-1 flex-shrink-0">
+                @if (canReceive(o.status)) {
+                  <button (click)="openDetail(o)"
+                          class="p-2 rounded-xl text-emerald-400 hover:bg-emerald-500/8 transition-colors active:scale-[0.97]"
+                          title="Réceptionner">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </button>
+                }
+                @if (canCancel(o.status)) {
+                  <button (click)="confirmCancel(o.id)"
+                          class="p-2 rounded-xl theme-muted hover:text-red-400 hover:bg-red-500/8 transition-colors active:scale-[0.97]"
+                          title="Annuler">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Overlay commun                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+@if (drawerMode) {
+  <div class="fixed inset-0 bg-black/60 z-[60]" (click)="closeDrawer()"></div>
+  <div class="fixed right-0 top-0 bottom-0 w-full max-w-lg z-[65] theme-surface border-l theme-border flex flex-col shadow-2xl">
+
+    <!-- ── Drawer Création ── -->
+    @if (drawerMode === 'create') {
+
+      <div class="flex items-center justify-between px-5 py-4 border-b theme-border">
+        <h2 class="font-black theme-text">Nouveau bon de commande</h2>
+        <button (click)="closeDrawer()" class="p-1.5 rounded-xl theme-muted hover:text-gold active:scale-[0.97]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-5 space-y-5">
+
+        @if (drawerError) {
+          <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">
+            {{ drawerError }}
+          </div>
+        }
+
+        <!-- Fournisseur -->
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Fournisseur *</label>
+          <select [(ngModel)]="form.supplierId"
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
+            <option [ngValue]="0" disabled>Sélectionner…</option>
+            @for (s of suppliers(); track s.id) {
+              <option [ngValue]="s.id">{{ s.name }}{{ s.country ? ' — ' + s.country : '' }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Dates + statut -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Date commande *</label>
+            <input [(ngModel)]="form.orderDate" type="date"
+                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Livraison prévue</label>
+            <input [(ngModel)]="form.expectedDeliveryDate" type="date"
+                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Statut</label>
+            <select [(ngModel)]="form.status" class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
+              <option value="DRAFT">Brouillon</option>
+              <option value="ORDERED">Commandé</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Notes</label>
+            <input [(ngModel)]="form.notes" type="text" placeholder="Remarques…"
+                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+          </div>
+        </div>
+
+        <!-- Articles -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-xs font-bold theme-muted uppercase tracking-wider">Articles</label>
+            <button (click)="addingProduct = !addingProduct; productSearch = ''"
+                    class="text-xs font-bold text-gold hover:opacity-80 flex items-center gap-1 active:scale-[0.97]">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Ajouter
+            </button>
+          </div>
+
+          @if (addingProduct) {
+            <div class="theme-surface border theme-border rounded-2xl p-4 space-y-3 mb-3">
+
+              <!-- Recherche produit -->
+              <div class="relative">
+                <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Produit *</label>
+                <input [(ngModel)]="productSearch"
+                       (ngModelChange)="addingProduct = true"
+                       type="text" placeholder="Rechercher un produit…"
+                       class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                @if (productSearch && !newItem.productId) {
+                  <div class="absolute z-10 mt-1 w-full theme-surface border theme-border rounded-xl shadow-xl max-h-40 overflow-y-auto">
+                    @for (p of filteredProducts; track p.id) {
+                      <button (click)="selectProduct(p)"
+                              class="w-full text-left px-4 py-2.5 text-sm theme-text hover:bg-gold/8 flex items-center justify-between gap-2">
+                        <span class="truncate">{{ p.name }}</span>
+                        @if (p.costPrice) {
+                          <span class="text-[10px] text-gold flex-shrink-0">CMUP {{ formatAmount(p.costPrice) }}</span>
+                        }
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Quantité + prix -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Qté *</label>
+                  <input [(ngModel)]="newItem.quantity" type="number" min="1"
+                         class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix achat/u (F) *</label>
+                  <input [(ngModel)]="newItem.unitPurchasePrice" type="number" min="0"
+                         class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                </div>
+              </div>
+
+              <!-- Frais -->
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Transport (F)</label>
+                  <input [(ngModel)]="newItem.transportCost" type="number" min="0"
+                         class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Douane (F)</label>
+                  <input [(ngModel)]="newItem.customsDuty" type="number" min="0"
+                         class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Autres (F)</label>
+                  <input [(ngModel)]="newItem.otherCosts" type="number" min="0"
+                         class="theme-input w-full px-3 py-2.5 rounded-xl text-sm transition-all"/>
+                </div>
+              </div>
+
+              <button (click)="addItem()"
+                      [disabled]="!newItem.productId || !newItem.quantity || !newItem.unitPurchasePrice"
+                      class="w-full py-2.5 rounded-xl bg-gold/15 text-gold text-sm font-bold border border-gold/30 active:scale-[0.98] transition-transform disabled:opacity-40">
+                Confirmer l'article
+              </button>
+            </div>
+          }
+
+          <!-- Liste des articles saisis -->
+          @if (!draftItems.length) {
+            <p class="text-xs theme-muted text-center py-4 border border-dashed theme-border rounded-xl">
+              Aucun article — cliquez sur Ajouter
+            </p>
+          } @else {
+            <div class="space-y-2">
+              @for (item of draftItems; track $index) {
+                <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-black/[.04] border theme-border">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold theme-text truncate">{{ item.productName }}</p>
+                    <p class="text-xs theme-muted">
+                      {{ item.quantity }} × {{ formatAmount(item.unitPurchasePrice) }}
+                      → PR unit. <span class="text-gold font-semibold">{{ formatAmount(item.unitCostPreview) }}</span>
+                    </p>
+                  </div>
+                  <button (click)="removeItem($index)"
+                          class="p-1.5 theme-muted hover:text-red-400 transition-colors active:scale-[0.97]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+              }
+              <div class="flex justify-between px-4 py-2 text-xs font-bold">
+                <span class="theme-muted">Total estimé</span>
+                <span class="text-gold">{{ formatAmount(draftTotal) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="px-5 py-4 border-t theme-border">
+        <button (click)="saveCreate()" [disabled]="drawerLoading"
+                class="w-full py-3.5 rounded-2xl bg-gold text-black font-bold text-sm active:scale-[0.98] transition-transform disabled:opacity-40">
+          @if (drawerLoading) {
+            <span class="flex items-center justify-center gap-2">
+              <span class="w-4 h-4 border-2 border-black/40 border-t-black rounded-full animate-spin"></span>
+              Création…
+            </span>
+          } @else { Créer le bon de commande }
+        </button>
+      </div>
+    }
+
+    <!-- ── Drawer Détail ── -->
+    @if (drawerMode === 'detail' && selectedOrder) {
+
+      <div class="flex items-center justify-between px-5 py-4 border-b theme-border">
+        <div>
+          <h2 class="font-black theme-text">Bon #{{ selectedOrder.id }}</h2>
+          <span class="text-xs font-bold px-2 py-0.5 rounded-full border {{ statusClass(selectedOrder.status) }}">
+            {{ statusLabel(selectedOrder.status) }}
+          </span>
+        </div>
+        <button (click)="closeDrawer()" class="p-1.5 rounded-xl theme-muted hover:text-gold active:scale-[0.97]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-5 space-y-5">
+
+        @if (detailLoading) {
+          <div class="flex justify-center py-10">
+            <div class="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        } @else {
+
+          <!-- Infos générales -->
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="theme-surface border theme-border rounded-xl p-3">
+              <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-0.5">Fournisseur</p>
+              <p class="font-semibold theme-text">{{ selectedOrder.supplierName }}</p>
+              @if (selectedOrder.supplierCountry) {
+                <p class="text-xs theme-muted">{{ selectedOrder.supplierCountry }}</p>
+              }
+            </div>
+            <div class="theme-surface border theme-border rounded-xl p-3">
+              <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-0.5">Montant total</p>
+              <p class="font-bold text-gold">{{ formatAmount(selectedOrder.totalAmount) }}</p>
+            </div>
+            <div class="theme-surface border theme-border rounded-xl p-3">
+              <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-0.5">Date commande</p>
+              <p class="font-semibold theme-text">{{ selectedOrder.orderDate | date:'dd/MM/yyyy' }}</p>
+            </div>
+            @if (selectedOrder.expectedDeliveryDate) {
+              <div class="theme-surface border theme-border rounded-xl p-3">
+                <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-0.5">Livraison prévue</p>
+                <p class="font-semibold theme-text">{{ selectedOrder.expectedDeliveryDate | date:'dd/MM/yyyy' }}</p>
+              </div>
+            }
+          </div>
+
+          @if (selectedOrder.notes) {
+            <p class="text-sm theme-muted italic px-1">{{ selectedOrder.notes }}</p>
+          }
+
+          <!-- Réception enregistrée -->
+          @if (selectedOrder.receipt) {
+            <div class="bg-emerald-500/8 border border-emerald-500/20 rounded-xl p-4">
+              <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Réception enregistrée</p>
+              <p class="text-sm theme-text">Le {{ selectedOrder.receipt.receivedDate | date:'dd/MM/yyyy' }} par
+                <span class="font-semibold">{{ selectedOrder.receipt.receivedBy }}</span>
+              </p>
+              @if (selectedOrder.receipt.notes) {
+                <p class="text-xs theme-muted mt-0.5">{{ selectedOrder.receipt.notes }}</p>
+              }
+            </div>
+          }
+
+          <!-- Articles -->
+          <div>
+            <p class="text-xs font-bold theme-muted uppercase tracking-wider mb-3">Articles</p>
+            <div class="space-y-2">
+              @for (item of selectedOrder.items; track item.id) {
+                <div class="theme-surface border theme-border rounded-xl p-3">
+                  <div class="flex items-center justify-between gap-2 mb-1">
+                    <p class="text-sm font-semibold theme-text truncate">{{ item.productName }}</p>
+                    @if (item.fullyReceived) {
+                      <span class="text-[10px] font-bold text-emerald-400 flex-shrink-0">✓ Reçu</span>
+                    } @else {
+                      <span class="text-[10px] font-bold text-yellow-400 flex-shrink-0">
+                        {{ item.receivedQuantity }}/{{ item.quantity }}
+                      </span>
+                    }
+                  </div>
+                  <div class="grid grid-cols-3 gap-2 text-[11px] theme-muted">
+                    <div>
+                      <span class="block">Achat/u</span>
+                      <span class="font-semibold theme-text">{{ formatAmount(item.unitPurchasePrice) }}</span>
+                    </div>
+                    <div>
+                      <span class="block">PR/u (CMUP)</span>
+                      <span class="font-semibold text-gold">{{ formatAmount(item.unitCostPrice) }}</span>
+                    </div>
+                    <div>
+                      <span class="block">Total ligne</span>
+                      <span class="font-semibold theme-text">{{ formatAmount(item.lineTotal) }}</span>
+                    </div>
+                  </div>
+                  @if (item.transportCost > 0 || item.customsDuty > 0 || item.otherCosts > 0) {
+                    <div class="flex gap-3 mt-1 text-[10px] theme-muted">
+                      @if (item.transportCost > 0) { <span>Transport: {{ formatAmount(item.transportCost) }}</span> }
+                      @if (item.customsDuty > 0)   { <span>Douane: {{ formatAmount(item.customsDuty) }}</span> }
+                      @if (item.otherCosts > 0)    { <span>Autres: {{ formatAmount(item.otherCosts) }}</span> }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+        }
+      </div>
+
+      <!-- Actions bas du drawer -->
+      <div class="px-5 py-4 border-t theme-border flex gap-3">
+        @if (canReceive(selectedOrder.status)) {
+          <button (click)="openReceive()"
+                  class="flex-1 py-3 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold text-sm active:scale-[0.98] transition-transform">
+            Réceptionner la marchandise
+          </button>
+        }
+        @if (canCancel(selectedOrder.status)) {
+          <button (click)="confirmCancel(selectedOrder.id)"
+                  class="py-3 px-4 rounded-2xl bg-red-500/10 text-red-400 border border-red-500/20 text-sm font-semibold active:scale-[0.98] transition-transform">
+            Annuler
+          </button>
+        }
+      </div>
+
+      @if (cancelConfirmId === selectedOrder.id) {
+        <div class="px-5 pb-4 flex gap-3">
+          <button (click)="abortCancel()" class="flex-1 py-2.5 rounded-xl text-sm theme-muted border theme-border active:scale-[0.97]">Non</button>
+          <button (click)="doCancel(selectedOrder.id)"
+                  class="flex-1 py-2.5 rounded-xl text-sm bg-red-500/15 text-red-400 border border-red-500/30 font-bold active:scale-[0.97]">
+            Oui, annuler
+          </button>
+        </div>
+      }
+    }
+
+    <!-- ── Drawer Réception ── -->
+    @if (drawerMode === 'receive' && selectedOrder) {
+
+      <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
+        <button (click)="backToDetail()" class="p-1.5 rounded-xl theme-muted hover:text-gold active:scale-[0.97]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div>
+          <h2 class="font-black theme-text">Réception — Bon #{{ selectedOrder.id }}</h2>
+          <p class="text-xs theme-muted">Stock + CMUP mis à jour automatiquement</p>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-5 space-y-5">
+
+        @if (drawerError) {
+          <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">
+            {{ drawerError }}
+          </div>
+        }
+
+        <!-- Infos réception -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Date de réception *</label>
+            <input [(ngModel)]="receiveForm.receivedDate" type="date"
+                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Réceptionné par *</label>
+            <input [(ngModel)]="receiveForm.receivedBy" type="text" placeholder="Votre nom"
+                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Notes</label>
+          <input [(ngModel)]="receiveForm.notes" type="text" placeholder="État des colis, remarques…"
+                 class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+        </div>
+
+        <!-- Quantités reçues -->
+        <div>
+          <p class="text-xs font-bold theme-muted uppercase tracking-wider mb-3">Quantités reçues</p>
+          <div class="space-y-3">
+            @for (line of receiveLines; track line.item.id) {
+              <div class="theme-surface border theme-border rounded-xl p-3">
+                <div class="flex items-center justify-between gap-3 mb-2">
+                  <p class="text-sm font-semibold theme-text truncate">{{ line.item.productName }}</p>
+                  <span class="text-xs theme-muted flex-shrink-0">
+                    Restant : {{ line.item.quantity - line.item.receivedQuantity }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <p class="text-[11px] theme-muted flex-1">
+                    PR unit. <span class="text-gold font-semibold">{{ formatAmount(line.item.unitCostPrice) }}</span>
+                  </p>
+                  <div class="flex items-center gap-2">
+                    <label class="text-[10px] font-bold theme-muted uppercase">Qté reçue</label>
+                    <input [(ngModel)]="line.qty"
+                           type="number" min="0"
+                           [max]="line.item.quantity - line.item.receivedQuantity"
+                           class="theme-input w-20 px-3 py-2 rounded-xl text-sm text-center font-bold transition-all"/>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Rappel CMUP -->
+        <div class="bg-blue-500/8 border border-blue-500/20 rounded-xl p-4">
+          <p class="text-xs font-bold text-blue-400 mb-1">Calcul CMUP automatique (OHADA)</p>
+          <p class="text-[11px] theme-muted leading-relaxed">
+            À la validation, le <span class="font-semibold">Coût Moyen Unitaire Pondéré</span> de chaque produit
+            sera recalculé et le stock mis à jour en temps réel.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="px-5 py-4 border-t theme-border">
+        <button (click)="saveReceive()" [disabled]="drawerLoading"
+                class="w-full py-3.5 rounded-2xl bg-emerald-500 text-black font-bold text-sm active:scale-[0.98] transition-transform disabled:opacity-40">
+          @if (drawerLoading) {
+            <span class="flex items-center justify-center gap-2">
+              <span class="w-4 h-4 border-2 border-black/40 border-t-black rounded-full animate-spin"></span>
+              Validation en cours…
+            </span>
+          } @else { Valider la réception }
+        </button>
+      </div>
+    }
+
+  </div>
+}

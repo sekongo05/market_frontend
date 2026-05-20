@@ -135,6 +135,26 @@ export class NotificationTemplateService {
       borderClass: 'border-yellow-500/30',
       bannerClass: 'bg-yellow-500/8',
     },
+
+    [NotificationType.STOCK_ALERT]: {
+      label: 'Rupture de stock',
+      iconPath: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z',
+      iconViewBox: '0 0 24 24',
+      colorClass: 'text-red-400',
+      bgClass: 'bg-red-500/15',
+      borderClass: 'border-red-500/30',
+      bannerClass: 'bg-red-500/8',
+    },
+
+    [NotificationType.STOCK_LOW]: {
+      label: 'Stock bas',
+      iconPath: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z',
+      iconViewBox: '0 0 24 24',
+      colorClass: 'text-amber-400',
+      bgClass: 'bg-amber-500/15',
+      borderClass: 'border-amber-500/30',
+      bannerClass: 'bg-amber-500/8',
+    },
   };
 
   get(type: NotificationType): NotifTemplate {

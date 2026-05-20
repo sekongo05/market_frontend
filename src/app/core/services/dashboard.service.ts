@@ -10,7 +10,7 @@ export interface DashboardStats {
   completedOrdersCount: number;
   pendingOrders: number;
   newOrdersThisMonth: number;
-  // Revenu (basé sur les paiements validés)
+  // Revenu
   totalRevenue: number;
   currentMonthRevenue: number;
   previousMonthRevenue: number;
@@ -23,6 +23,20 @@ export interface DashboardStats {
   // Détails
   recentOrders: RecentOrder[];
   ordersByStatus: OrderByStatus[];
+  // Aujourd'hui
+  ordersToday: number;
+  revenueToday: number;
+  newCustomersToday: number;
+  // Métriques complémentaires
+  avgOrderValue: number;
+  cancelledOrdersCount: number;
+}
+
+export interface DailyActivityItem {
+  date: string;
+  dayLabel: string;
+  orderCount: number;
+  revenue: number;
 }
 
 export interface RecentOrder {
@@ -97,6 +111,10 @@ export class DashboardService {
   getDailyCaisse(date?: string): Observable<ApiResponse<DailyCaisseResponse>> {
     const params = date ? { date } : {};
     return this.apiService.get('/dashboard/caisse-journaliere', params);
+  }
+
+  getWeeklyActivity(): Observable<ApiResponse<DailyActivityItem[]>> {
+    return this.apiService.get('/dashboard/weekly-activity');
   }
 
   getPublicStats(): Observable<ApiResponse<PublicStats>> {

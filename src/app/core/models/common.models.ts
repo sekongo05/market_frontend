@@ -51,6 +51,8 @@ export enum NotificationType {
   REVIEW_RECEIVED      = 'REVIEW_RECEIVED',
   REVIEW_REQUEST       = 'REVIEW_REQUEST',
   WELCOME              = 'WELCOME',
+  STOCK_LOW            = 'STOCK_LOW',
+  STOCK_ALERT          = 'STOCK_ALERT',
 }
 
 export enum StockMovementType {
