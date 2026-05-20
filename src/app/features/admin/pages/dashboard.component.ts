@@ -1491,6 +1491,19 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   get returnPages(): number[] { return Array.from({ length: this.returnsTotalPages }, (_, i) => i); }
 
+  get pendingReturnsCount(): number {
+    return this.returns.filter(r => r.status === 'PENDING').length;
+  }
+
+  get tabLabel(): string {
+    const labels: Record<string, string> = {
+      stats: 'Statistiques', orders: 'Commandes', products: 'Produits',
+      delivery: 'Livraisons', returns: 'Retours', reviews: 'Avis',
+      promos: 'Promos', users: 'Utilisateurs', categories: 'Catégories',
+    };
+    return labels[this.activeTab] ?? '';
+  }
+
   // ── Stats helpers ──────────────────────────────────────────────────────────
 
   get revenueGrowthPct(): number {

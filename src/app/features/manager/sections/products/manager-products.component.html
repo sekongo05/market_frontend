@@ -290,7 +290,12 @@
 @if (drawerOpen) {
   <div class="fixed inset-0 z-50 flex justify-end">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="closeDrawer()"></div>
-    <div class="relative w-full max-w-xl h-full theme-surface border-l theme-border shadow-2xl flex flex-col drawer-panel">
+    <div class="admin-product-drawer theme-surface md:border-l md:theme-border md:shadow-2xl">
+
+      <!-- Drag handle (mobile uniquement) -->
+      <div class="md:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
+        <div class="w-10 h-1 rounded-full bg-white/20"></div>
+      </div>
 
       <!-- Header -->
       <div class="flex-shrink-0">

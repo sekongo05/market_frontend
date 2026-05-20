@@ -370,18 +370,21 @@
     }
 
     @if (productsTotalPages > 1) {
-      <div class="flex justify-center items-center gap-2 mt-6">
-        <button (click)="loadProducts(productsPage - 1)" [disabled]="productsPage === 0"
-          class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">← Préc.</button>
-        @for (page of productPages; track page) {
-          <button (click)="loadProducts(page)"
-            class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
-            [ngClass]="page === productsPage ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
-            {{ page + 1 }}
-          </button>
-        }
-        <button (click)="loadProducts(productsPage + 1)" [disabled]="productsPage >= productsTotalPages - 1"
-          class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">Suiv. →</button>
+      <div class="flex items-center gap-3 mt-6">
+        <span class="text-xs theme-muted shrink-0">{{ productsPage + 1 }}/{{ productsTotalPages }}</span>
+        <div class="flex gap-1.5 overflow-x-auto" style="-webkit-overflow-scrolling:touch;scrollbar-width:none">
+          <button (click)="loadProducts(productsPage - 1)" [disabled]="productsPage === 0"
+            class="shrink-0 px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">← Préc.</button>
+          @for (page of productPages; track page) {
+            <button (click)="loadProducts(page)"
+              class="shrink-0 w-8 h-8 rounded-lg text-xs font-bold transition-all"
+              [ngClass]="page === productsPage ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
+              {{ page + 1 }}
+            </button>
+          }
+          <button (click)="loadProducts(productsPage + 1)" [disabled]="productsPage >= productsTotalPages - 1"
+            class="shrink-0 px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">Suiv. →</button>
+        </div>
       </div>
     }
   }
@@ -392,7 +395,12 @@
 @if (drawerOpen) {
   <div class="fixed inset-0 z-50 flex animate-fade-in">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="closeDrawer()"></div>
-    <div id="admin-drawer-panel" class="relative ml-auto w-full max-w-xl h-full theme-surface border-l theme-border shadow-2xl flex flex-col overflow-hidden animate-slide-in-right">
+    <div id="admin-drawer-panel" class="admin-product-drawer theme-surface md:border-l md:theme-border md:shadow-2xl">
+
+      <!-- Drag handle (mobile uniquement) -->
+      <div class="md:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
+        <div class="w-10 h-1 rounded-full bg-white/20"></div>
+      </div>
 
       <!-- Header -->
       <div class="flex-shrink-0">
