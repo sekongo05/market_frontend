@@ -60,14 +60,14 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
       <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-5 text-white shadow-xl shadow-indigo-500/20 card-hover animate-fade-in-up">
-        <div class="flex items-start justify-between mb-3">
+        <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
           </div>
           @if (stats.newOrdersThisMonth > 0) {
-            <span class="text-white/80 text-xs font-bold bg-white/15 px-2 py-0.5 rounded-lg">
+            <span class="text-white/80 text-[10px] font-bold bg-white/15 px-1.5 py-0.5 rounded-lg self-start">
               +{{ stats.newOrdersThisMonth }} ce mois
             </span>
           }
@@ -77,14 +77,14 @@
       </div>
 
       <div class="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-3xl p-5 text-white shadow-xl shadow-teal-500/20 card-hover animate-fade-in-up">
-        <div class="flex items-start justify-between mb-3">
+        <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
           </div>
           @if (stats.newUsersThisMonth > 0) {
-            <span class="text-white/80 text-xs font-bold bg-white/15 px-2 py-0.5 rounded-lg">
+            <span class="text-white/80 text-[10px] font-bold bg-white/15 px-1.5 py-0.5 rounded-lg self-start">
               +{{ stats.newUsersThisMonth }} ce mois
             </span>
           }
@@ -94,20 +94,20 @@
       </div>
 
       <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-3xl p-5 text-white shadow-xl shadow-violet-500/20 card-hover animate-fade-in-up">
-        <div class="flex items-start justify-between mb-3">
+        <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
           </div>
-          <span class="text-white/80 text-xs font-bold bg-white/15 px-2 py-0.5 rounded-lg">En ligne</span>
+          <span class="text-white/80 text-[10px] font-bold bg-white/15 px-1.5 py-0.5 rounded-lg self-start">En ligne</span>
         </div>
         <p class="text-3xl font-black leading-none">{{ stats.totalActiveProducts }}</p>
         <p class="text-white/70 text-xs mt-1.5 font-medium">Produits actifs</p>
       </div>
 
       <div class="theme-surface border theme-border rounded-3xl p-5 card-hover animate-fade-in-up">
-        <div class="flex items-start justify-between mb-3">
+        <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                [ngClass]="completionRate >= 80 ? 'bg-emerald-500/15' : completionRate >= 50 ? 'bg-amber-500/15' : 'bg-red-500/15'">
             <svg class="w-4 h-4" [ngClass]="completionRate >= 80 ? 'text-emerald-400' : completionRate >= 50 ? 'text-amber-400' : 'text-red-400'"
@@ -115,7 +115,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
             </svg>
           </div>
-          <span class="text-xs font-bold px-2 py-0.5 rounded-lg"
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-lg self-start"
                 [ngClass]="completionRate >= 80 ? 'bg-emerald-500/15 text-emerald-400' : completionRate >= 50 ? 'bg-amber-500/15 text-amber-400' : 'bg-red-500/15 text-red-400'">
             Livraison
           </span>
@@ -262,15 +262,39 @@
           <h2 class="text-base font-bold theme-text">Dernières commandes</h2>
           <p class="text-xs theme-muted mt-0.5">5 commandes les plus récentes</p>
         </div>
-        <div class="overflow-x-auto">
+        <!-- Mobile cards -->
+        <div class="block md:hidden divide-y theme-border">
+          @for (order of stats.recentOrders; track order.orderNumber) {
+            <div class="px-4 py-3 flex items-center gap-3">
+              <div class="w-9 h-9 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center text-white text-xs font-black shrink-0">
+                {{ order.customerName[0]?.toUpperCase() }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-mono text-xs font-semibold theme-text truncate">{{ order.orderNumber }}</span>
+                  <span class="inline-flex px-2 py-0.5 rounded-lg text-[10px] font-bold shrink-0" [ngClass]="statusColor(order.orderStatus)">
+                    {{ statusLabel(order.orderStatus) }}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between gap-2 mt-0.5">
+                  <span class="text-xs theme-muted truncate">{{ order.customerName }}</span>
+                  <span class="text-xs font-bold text-gold shrink-0">{{ formatAmount(order.totalAmount) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Desktop table -->
+        <div class="overflow-x-auto hidden md:block">
           <table class="w-full">
             <thead>
               <tr class="theme-surface-2">
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">N° commande</th>
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Client</th>
-                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden sm:table-cell">Montant</th>
+                <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Montant</th>
                 <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
-                <th class="text-right text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Date</th>
+                <th class="text-right text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -287,7 +311,7 @@
                       <span class="text-sm theme-muted font-medium truncate max-w-[120px]">{{ order.customerName }}</span>
                     </div>
                   </td>
-                  <td class="px-5 py-3.5 hidden sm:table-cell">
+                  <td class="px-5 py-3.5">
                     <span class="font-bold text-sm text-gold">{{ formatAmount(order.totalAmount) }}</span>
                   </td>
                   <td class="px-5 py-3.5">
@@ -295,7 +319,7 @@
                       {{ statusLabel(order.orderStatus) }}
                     </span>
                   </td>
-                  <td class="px-5 py-3.5 text-right hidden md:table-cell">
+                  <td class="px-5 py-3.5 text-right">
                     <span class="text-xs theme-muted">{{ timeAgo(order.createdAt) }}</span>
                   </td>
                 </tr>
@@ -355,7 +379,8 @@
             @for (item of monthlyRevenue; track item.month; let idx = $index) {
               <div class="flex-1 flex flex-col items-center gap-1 cursor-pointer group"
                    (mouseenter)="hoveredMonthIndex = idx"
-                   (mouseleave)="hoveredMonthIndex = null">
+                   (mouseleave)="hoveredMonthIndex = null"
+                   (click)="hoveredMonthIndex = hoveredMonthIndex === idx ? null : idx">
                 <div class="w-full rounded-t-md transition-all duration-500 min-h-[3px]"
                      [style.height.%]="(item.revenue / maxMonthlyRevenue) * 100"
                      [ngClass]="{
@@ -436,24 +461,24 @@
         </div>
       </div>
       @if (dailyCaisse) {
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          <div class="p-4 bg-black/[.03] rounded-2xl text-center">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div class="p-3 bg-black/[.03] rounded-2xl text-center">
             <p class="text-2xl font-black theme-text">{{ dailyCaisse.ordersCount }}</p>
             <p class="text-xs theme-muted mt-1">Commandes</p>
           </div>
-          <div class="p-4 bg-green-500/8 rounded-2xl text-center">
+          <div class="p-3 bg-green-500/8 rounded-2xl text-center">
             <p class="text-2xl font-black text-green-400">{{ dailyCaisse.paidOrdersCount }}</p>
             <p class="text-xs theme-muted mt-1">Payées</p>
           </div>
-          <div class="p-4 bg-gold/8 border border-gold/15 rounded-2xl text-center">
-            <p class="text-xl font-black text-gold">{{ formatAmount(dailyCaisse.totalRevenue) }}</p>
+          <div class="p-3 bg-gold/8 border border-gold/15 rounded-2xl text-center">
+            <p class="text-base sm:text-xl font-black text-gold truncate">{{ formatAmount(dailyCaisse.totalRevenue) }}</p>
             <p class="text-xs theme-muted mt-1">CA validé</p>
           </div>
-          <div class="p-4 bg-black/[.03] rounded-2xl text-center">
-            <p class="text-xl font-black theme-text">{{ formatAmount(dailyCaisse.pendingRevenue) }}</p>
+          <div class="p-3 bg-black/[.03] rounded-2xl text-center">
+            <p class="text-base sm:text-xl font-black theme-text truncate">{{ formatAmount(dailyCaisse.pendingRevenue) }}</p>
             <p class="text-xs theme-muted mt-1">CA en attente</p>
           </div>
-          <div class="p-4 bg-violet-500/8 rounded-2xl text-center">
+          <div class="p-3 bg-violet-500/8 rounded-2xl text-center">
             <p class="text-2xl font-black text-violet-400">{{ dailyCaisse.newCustomersCount }}</p>
             <p class="text-xs theme-muted mt-1">Nouveaux clients</p>
           </div>
