@@ -360,22 +360,22 @@
 
       <!-- Pagination -->
       @if (ordersTotalPages > 1) {
-        <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
-          <span class="text-xs theme-muted">Page {{ ordersPage + 1 }} / {{ ordersTotalPages }}</span>
-          <div class="flex gap-2">
+        <div class="px-4 py-4 border-t theme-border flex items-center gap-3">
+          <span class="text-xs theme-muted shrink-0">{{ ordersPage + 1 }}/{{ ordersTotalPages }}</span>
+          <div class="flex gap-1.5 overflow-x-auto" style="-webkit-overflow-scrolling:touch;scrollbar-width:none">
             <button (click)="loadAllOrders(ordersPage - 1)" [disabled]="ordersPage === 0"
-              class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
+              class="shrink-0 px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
               ← Préc.
             </button>
             @for (page of orderPages; track page) {
               <button (click)="loadAllOrders(page)"
-                class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                class="shrink-0 w-8 h-8 rounded-lg text-xs font-bold transition-all"
                 [ngClass]="page === ordersPage ? 'bg-gold text-black' : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
                 {{ page + 1 }}
               </button>
             }
             <button (click)="loadAllOrders(ordersPage + 1)" [disabled]="ordersPage >= ordersTotalPages - 1"
-              class="px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
+              class="shrink-0 px-3 py-1.5 rounded-lg bg-black/[.06] text-xs font-semibold theme-muted hover:bg-gold/15 hover:text-gold disabled:opacity-30 transition-all">
               Suiv. →
             </button>
           </div>
@@ -548,7 +548,7 @@
           <div class="px-6 pb-5 space-y-3">
             @for (item of selectedOrder.items; track item.productId) {
               <div class="flex gap-4 p-4 rounded-2xl luxury-card border theme-border hover:border-gold/20 transition-colors">
-                <div class="flex-shrink-0 w-28 h-28 rounded-2xl overflow-hidden border theme-border bg-black/[.04]">
+                <div class="flex-shrink-0 w-20 h-20 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border theme-border bg-black/[.04]">
                   @if (item.imageUrl) {
                     <img [src]="item.imageUrl" [alt]="item.productName" class="w-full h-full object-cover"
                       (error)="$any($event.target).src='https://placehold.co/112x112/1a1a1a/d4af37?text=?'"/>
@@ -560,30 +560,29 @@
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                   <div>
-                    <p class="font-bold theme-text text-base leading-snug line-clamp-2">{{ item.productName }}</p>
+                    <p class="font-bold theme-text text-sm sm:text-base leading-snug line-clamp-2">{{ item.productName }}</p>
                     @if (item.selectedColor) {
-                      <div class="flex items-center gap-2 mt-2">
-                        <span class="w-4 h-4 rounded-full border-2 border-white/20 flex-shrink-0 shadow-sm"
+                      <div class="flex items-center gap-2 mt-1.5">
+                        <span class="w-3.5 h-3.5 rounded-full border-2 border-white/20 flex-shrink-0 shadow-sm"
                               [style.background-color]="item.selectedColorHex"></span>
-                        <span class="text-sm font-semibold theme-muted">{{ item.selectedColor }}</span>
+                        <span class="text-xs font-semibold theme-muted">{{ item.selectedColor }}</span>
                       </div>
                     }
                   </div>
-                  <div class="flex items-end justify-between gap-2 mt-3">
+                  <div class="mt-2 pt-2 border-t theme-border grid grid-cols-3 gap-1 text-center">
                     <div>
-                      <p class="text-xs theme-muted mb-0.5">Prix unitaire</p>
-                      <p class="text-sm font-bold theme-text">{{ formatCurrency(item.unitPrice) }} <span class="text-xs font-normal theme-muted">FCFA</span></p>
+                      <p class="text-[10px] theme-muted mb-0.5">P.U.</p>
+                      <p class="text-xs font-bold theme-text leading-tight">{{ formatCurrency(item.unitPrice) }}<span class="text-[9px] font-normal theme-muted"> F</span></p>
                     </div>
-                    <div class="text-center">
-                      <p class="text-xs theme-muted mb-0.5">Qté</p>
-                      <div class="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center">
-                        <span class="text-sm font-black text-gold">{{ item.quantity }}</span>
+                    <div>
+                      <p class="text-[10px] theme-muted mb-0.5">Qté</p>
+                      <div class="w-7 h-7 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center mx-auto">
+                        <span class="text-xs font-black text-gold">{{ item.quantity }}</span>
                       </div>
                     </div>
-                    <div class="text-right">
-                      <p class="text-xs theme-muted mb-0.5">Sous-total</p>
-                      <p class="text-lg font-black text-gold leading-none">{{ formatCurrency(item.subtotal) }}</p>
-                      <p class="text-[10px] theme-muted">FCFA</p>
+                    <div>
+                      <p class="text-[10px] theme-muted mb-0.5">Total</p>
+                      <p class="text-sm font-black text-gold leading-tight">{{ formatCurrency(item.subtotal) }}<span class="text-[9px] font-normal theme-muted"> F</span></p>
                     </div>
                   </div>
                 </div>
