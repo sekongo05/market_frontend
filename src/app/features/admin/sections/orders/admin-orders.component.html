@@ -1,51 +1,95 @@
-<div class="p-6 lg:p-8 animate-fade-in-up">
+<div class="p-6 lg:p-8 animate-fade-in-up space-y-5">
 
-  <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
+  <!-- ── Barre de filtres ───────────────────────────────────────────────── -->
+  <div class="theme-surface border theme-border rounded-2xl p-4 space-y-3">
 
-    <div class="px-6 py-4 border-b theme-border flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3 flex-wrap">
-        <div>
-          <h2 class="text-lg font-bold theme-text">Gestion des commandes</h2>
-          <p class="text-xs theme-muted mt-0.5">
-            {{ ordersTotalElements }} commande(s) au total
-          </p>
-        </div>
-        @if (pendingCount > 0) {
-          <button (click)="statusFilter = OrderStatus.PENDING; loadAllOrders(0)"
-            class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black animate-pulse-slow"
-            style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#f59e0b">
-            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-flex"></span>
-            {{ pendingCount }} en attente
+    <!-- Ligne 1 : recherche + alerte en attente + actualiser -->
+    <div class="flex gap-3 flex-wrap items-center">
+
+      <div class="relative flex-1 min-w-48">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 theme-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery" (input)="onSearchInput()"
+          placeholder="Nom client, n° commande…"
+          class="theme-input w-full pl-9 pr-4 py-2.5 rounded-xl text-sm transition-all"/>
+        @if (searchQuery) {
+          <button (click)="searchQuery = ''; onSearchInput()"
+            class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
           </button>
         }
       </div>
-      <div class="flex items-center gap-2 flex-wrap">
-        <!-- Recherche -->
-        <div class="relative">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 theme-muted pointer-events-none"
-               fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-          <input type="text" [(ngModel)]="searchQuery" (input)="onSearchInput()"
-            placeholder="Nom, n° commande…"
-            class="theme-input pl-9 pr-3 py-2 rounded-xl text-sm w-48"/>
-        </div>
-        <select [(ngModel)]="statusFilter" (change)="loadAllOrders(0)" class="theme-input px-3 py-2 rounded-xl text-sm">
-          <option value="">Tous les statuts</option>
-          @for (s of orderStatuses; track s) {
-            <option [value]="s">{{ orderStatusLabel(s) }}</option>
-          }
-        </select>
-        <button (click)="loadAllOrders(0)"
-          class="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
-          Actualiser
+
+      @if (pendingCount > 0) {
+        <button (click)="statusFilter = OrderStatus.PENDING; applyFilter()"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black animate-pulse-slow"
+          style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#f59e0b">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-flex"></span>
+          {{ pendingCount }} en attente
         </button>
-      </div>
+      }
+
+      <button (click)="loadAllOrders(ordersPage)"
+        class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Actualiser
+      </button>
     </div>
+
+    <!-- Ligne 2 : filtre statut -->
+    <div class="flex gap-1 flex-wrap items-center">
+      <span class="text-xs theme-muted font-semibold mr-1">Statut :</span>
+      @for (s of [{ val: '', label: 'Tous' }, { val: 'PENDING', label: 'En attente' }, { val: 'CONFIRMED', label: 'Confirmées' }, { val: 'SHIPPED', label: 'Expédiées' }, { val: 'DELIVERED', label: 'Livrées' }, { val: 'CANCELLED', label: 'Annulées' }]; track s.val) {
+        <button (click)="statusFilter = $any(s.val); applyFilter()"
+          class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+          [ngClass]="statusFilter === s.val
+            ? (s.val === 'CANCELLED' ? 'bg-red-500 text-white' : s.val === 'DELIVERED' ? 'bg-green-600 text-white' : 'bg-gold text-black')
+            : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
+          {{ s.label }}
+        </button>
+      }
+    </div>
+
+    <!-- Ligne 3 : filtre date -->
+    <div class="flex gap-1 flex-wrap items-center">
+      <span class="text-xs theme-muted font-semibold mr-1">Période :</span>
+      @for (d of [{ val: '', label: 'Toutes' }, { val: 'today', label: "Aujourd'hui" }, { val: 'week', label: 'Cette semaine' }, { val: 'month', label: 'Ce mois' }]; track d.val) {
+        <button (click)="dateRange = $any(d.val); applyFilter()"
+          class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+          [ngClass]="dateRange === d.val
+            ? 'bg-gold text-black'
+            : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
+          {{ d.label }}
+        </button>
+      }
+
+      @if (hasActiveFilters) {
+        <button (click)="clearFilters()"
+          class="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/15 transition-colors">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Réinitialiser
+        </button>
+      }
+    </div>
+
+    <!-- Compteur -->
+    @if (!ordersLoading) {
+      <p class="text-xs theme-muted">
+        {{ ordersTotalElements }} commande{{ ordersTotalElements > 1 ? 's' : '' }}
+        @if (hasActiveFilters) { <span class="text-gold">(filtrées)</span> }
+      </p>
+    }
+  </div>
+
+  <!-- ── Tableau ─────────────────────────────────────────────────────────── -->
+  <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
 
     @if (ordersLoading) {
       <div class="p-8 flex justify-center">
@@ -71,16 +115,33 @@
           </thead>
           <tbody>
             @for (order of allOrders; track order.id) {
-              <tr class="border-t theme-border hover:bg-black/[.02] transition-colors">
+              @let urgent = isUrgentOrder(order);
+              @let badges = getOrderBadges(order);
+              <tr class="border-t theme-border hover:bg-black/[.02] transition-colors relative"
+                  [class.border-l-2]="urgent"
+                  [style.border-left-color]="urgent ? 'rgba(239,68,68,0.6)' : null">
+
+                <!-- N° commande + date + badges -->
                 <td class="px-5 py-3.5">
-                  <button (click)="openOrderDetail(order)" class="text-left group">
+                  <button (click)="openOrderDetail(order)" class="text-left group w-full">
                     <p class="font-mono text-xs font-semibold text-gold group-hover:underline underline-offset-2 transition-colors">{{ order.orderNumber }}</p>
                     <p class="text-[10px] theme-muted mt-0.5">{{ order.createdAt | date:'dd/MM/yy HH:mm' }}</p>
                   </button>
+                  @if (badges.length > 0) {
+                    <div class="flex flex-wrap gap-1 mt-1.5">
+                      @for (b of badges; track b.label) {
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold {{ b.classes }}">{{ b.label }}</span>
+                      }
+                    </div>
+                  }
                 </td>
+
+                <!-- Client -->
                 <td class="px-5 py-3.5 hidden md:table-cell">
                   <p class="text-sm theme-text font-medium">{{ order.customerName }}</p>
                 </td>
+
+                <!-- Articles -->
                 <td class="px-5 py-3.5 hidden lg:table-cell">
                   <div class="flex items-center gap-2">
                     <div class="flex -space-x-2">
@@ -116,14 +177,20 @@
                     </div>
                   </div>
                 </td>
+
+                <!-- Statut -->
                 <td class="px-5 py-3.5">
                   <span class="inline-flex px-2 py-0.5 rounded-lg text-xs font-bold" [class]="orderStatusClass(order.orderStatus)">
                     {{ orderStatusLabel(order.orderStatus) }}
                   </span>
                 </td>
+
+                <!-- Montant -->
                 <td class="px-5 py-3.5 hidden lg:table-cell">
                   <span class="font-bold text-sm text-gold">{{ formatCurrency(order.totalAmount) }} FCFA</span>
                 </td>
+
+                <!-- Actions -->
                 <td class="px-5 py-3.5 text-right">
                   <div class="flex items-center justify-end gap-1.5">
                     @if (statusUpdatingId === order.id) {
@@ -147,12 +214,14 @@
                     }
                   </div>
                 </td>
+
               </tr>
             }
           </tbody>
         </table>
       </div>
 
+      <!-- Pagination -->
       @if (ordersTotalPages > 1) {
         <div class="px-6 py-4 border-t theme-border flex items-center justify-between">
           <span class="text-xs theme-muted">Page {{ ordersPage + 1 }} / {{ ordersTotalPages }}</span>
@@ -178,19 +247,26 @@
     }
 
     @if (!ordersLoading && allOrders.length === 0) {
-      <div class="py-16 text-center"><p class="theme-muted font-semibold">Aucune commande trouvée</p></div>
+      <div class="py-16 text-center space-y-3">
+        <svg class="w-10 h-10 mx-auto theme-muted opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <p class="theme-muted font-semibold">Aucune commande trouvée</p>
+        @if (hasActiveFilters) {
+          <button (click)="clearFilters()" class="text-xs text-gold hover:underline">Réinitialiser les filtres</button>
+        }
+      </div>
     }
   </div>
 
-  <!-- Dialog confirmation annulation -->
+  <!-- ── Dialog confirmation annulation ───────────────────────────────── -->
   @if (cancelConfirmOrder) {
     <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="cancelConfirmOrder = null"></div>
       <div class="relative w-full max-w-sm theme-surface border theme-border rounded-3xl shadow-2xl p-6 animate-fade-in-up">
         <div class="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/25 flex items-center justify-center mx-auto mb-4">
           <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
         </div>
         <h3 class="text-base font-black theme-text text-center mb-1">Annuler la commande ?</h3>
@@ -212,12 +288,13 @@
     </div>
   }
 
-  <!-- Modal détail commande -->
+  <!-- ── Modal détail commande ─────────────────────────────────────────── -->
   @if (orderDetailOpen && selectedOrder) {
     <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeOrderDetail()"></div>
       <div class="relative w-full sm:max-w-2xl max-h-[95dvh] theme-surface border theme-border rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden" style="animation:slideUp .25s ease">
 
+        <!-- Header -->
         <div class="flex-shrink-0 px-6 pt-6 pb-4 border-b theme-border">
           <div class="flex items-start justify-between gap-4">
             <div class="min-w-0">
@@ -237,6 +314,8 @@
               </button>
             </div>
           </div>
+
+          <!-- Infos client -->
           <div class="flex flex-wrap gap-x-6 gap-y-1.5 mt-4">
             <div class="flex items-center gap-2 text-sm">
               <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,8 +355,56 @@
           </div>
         </div>
 
+        <!-- Corps scrollable -->
         <div class="flex-1 overflow-y-auto overscroll-contain">
-          <div class="px-6 pt-5 pb-3 flex items-center gap-2">
+
+          <!-- ── Timeline ── -->
+          @if (selectedOrder.orderStatus !== 'CANCELLED') {
+            <div class="px-6 pt-5 pb-4">
+              <p class="text-[10px] font-black theme-muted uppercase tracking-widest mb-4">Progression</p>
+              <div class="flex items-center gap-0">
+                @for (step of getTimeline(selectedOrder); track step.status; let last = $last) {
+                  <!-- Étape -->
+                  <div class="flex flex-col items-center flex-1 min-w-0">
+                    <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
+                         [ngClass]="step.done   ? 'bg-green-500 border-2 border-green-500'
+                                  : step.active ? 'bg-gold border-2 border-gold shadow-lg shadow-yellow-600/30'
+                                  : 'bg-black/[.06] border-2 theme-border'">
+                      @if (step.done) {
+                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                        </svg>
+                      } @else if (step.active) {
+                        <span class="w-2 h-2 rounded-full bg-black"></span>
+                      } @else {
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
+                      }
+                    </div>
+                    <p class="text-[9px] font-bold mt-1.5 text-center leading-tight px-0.5"
+                       [ngClass]="step.done ? 'text-green-400' : step.active ? 'text-gold' : 'theme-muted opacity-50'">
+                      {{ step.label }}
+                    </p>
+                  </div>
+                  <!-- Connecteur -->
+                  @if (!last) {
+                    <div class="h-0.5 flex-1 -mt-4 transition-colors"
+                         [ngClass]="step.done ? 'bg-green-500' : 'bg-white/10'">
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="mx-6 mt-5 p-3 bg-red-500/10 border border-red-500/25 rounded-2xl flex items-center gap-3">
+              <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+              </svg>
+              <p class="text-xs font-semibold text-red-400">Commande annulée — le stock a été restitué.</p>
+            </div>
+          }
+
+          <!-- Articles -->
+          <div class="px-6 pt-4 pb-3 flex items-center gap-2">
             <p class="text-[10px] font-black theme-muted uppercase tracking-widest">Articles commandés</p>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-gold/15 text-gold">{{ selectedOrder.items.length }}</span>
           </div>
@@ -327,6 +454,7 @@
             }
           </div>
 
+          <!-- Récapitulatif financier -->
           <div class="mx-6 mb-6 rounded-2xl overflow-hidden border theme-border">
             <div class="px-5 py-3 flex justify-between items-center text-sm border-b theme-border">
               <span class="theme-muted">Sous-total</span>
@@ -346,8 +474,10 @@
               <span class="font-black text-gold text-xl">{{ formatCurrency(selectedOrder.totalAmount) }} <span class="text-sm font-semibold">FCFA</span></span>
             </div>
           </div>
-        </div>
 
+        </div><!-- fin scrollable -->
+
+        <!-- Footer actions -->
         <div class="flex-shrink-0 flex gap-3 px-6 py-4 border-t theme-border">
           <button (click)="closeOrderDetail()"
             class="flex-1 py-3 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
@@ -376,7 +506,9 @@
             }
           }
         </div>
+
       </div>
     </div>
   }
+
 </div>

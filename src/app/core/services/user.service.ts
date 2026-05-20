@@ -22,8 +22,18 @@ export class UserService {
     return this.apiService.patch('/users/me/password', data);
   }
 
-  getAllUsers(page: number = 0, size: number = 10): Observable<ApiResponse<PageResponse<UserResponse>>> {
-    return this.apiService.get('/users', { page, size });
+  getAllUsers(
+    page: number = 0,
+    size: number = 15,
+    search?: string,
+    role?: string,
+    enabled?: boolean,
+  ): Observable<ApiResponse<PageResponse<UserResponse>>> {
+    const params: Record<string, unknown> = { page, size };
+    if (search)             params['search']  = search;
+    if (role)               params['role']    = role;
+    if (enabled !== undefined) params['enabled'] = enabled;
+    return this.apiService.get('/users', params);
   }
 
   getUserById(id: number): Observable<ApiResponse<UserResponse>> {

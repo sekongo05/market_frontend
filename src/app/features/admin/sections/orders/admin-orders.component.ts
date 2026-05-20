@@ -11,6 +11,16 @@ import { AdminToastService } from '../../shared/admin-toast.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
 import { orderStatusLabel, orderStatusClass, formatAmount } from '../../shared/admin-status.helpers';
 
+export interface OrderBadge { label: string; classes: string; }
+
+export interface TimelineStep {
+  status: OrderStatus;
+  label: string;
+  done: boolean;
+  active: boolean;
+  cancelled: boolean;
+}
+
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
@@ -25,8 +35,13 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   ordersTotalPages = 0;
   ordersTotalElements = 0;
   pendingCount = 0;
+
+  /* ── Filtres ── */
   statusFilter: OrderStatus | '' = '';
+  dateRange: 'today' | 'week' | 'month' | '' = '';
   searchQuery = '';
+
+  /* ── Actions ── */
   statusUpdatingId: number | null = null;
   selectedOrder: OrderResponse | null = null;
   orderDetailOpen = false;
@@ -46,7 +61,8 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
 
   readonly orderStatusLabel = orderStatusLabel;
   readonly orderStatusClass = orderStatusClass;
-  readonly formatCurrency = (v: number | null | undefined) => `${Number(v ?? 0).toLocaleString('fr-FR')}`;
+  readonly formatAmount     = formatAmount;
+  readonly formatCurrency   = (v: number | null | undefined) => `${Number(v ?? 0).toLocaleString('fr-FR')}`;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -61,11 +77,13 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadAllOrders(0);
     this.loadPendingCount();
+
     this.search$.pipe(
       debounceTime(350),
       distinctUntilChanged(),
       takeUntil(this.destroy$),
     ).subscribe(() => this.loadAllOrders(0));
+
     this.wsService.orderEvent$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.loadAllOrders(this.ordersPage);
       this.loadPendingCount();
@@ -84,26 +102,90 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
 
   get orderPages(): number[] { return Array.from({ length: this.ordersTotalPages }, (_, i) => i); }
 
+  get hasActiveFilters(): boolean {
+    return !!this.searchQuery || !!this.statusFilter || !!this.dateRange;
+  }
+
   onSearchInput(): void { this.search$.next(this.searchQuery); }
+
+  applyFilter(): void { this.loadAllOrders(0); }
+
+  clearFilters(): void {
+    this.searchQuery  = '';
+    this.statusFilter = '';
+    this.dateRange    = '';
+    this.loadAllOrders(0);
+  }
 
   nextStatusLabel(s: string): string {
     const next = this.nextStatusMap[s];
     return next ? `→ ${orderStatusLabel(next)}` : '';
   }
 
+  /* ── Badges urgence ── */
+  getOrderBadges(order: OrderResponse): OrderBadge[] {
+    const badges: OrderBadge[] = [];
+    const hoursOld = (Date.now() - new Date(order.createdAt).getTime()) / 3_600_000;
+    const hoursSinceUpdate = (Date.now() - new Date(order.updatedAt).getTime()) / 3_600_000;
+
+    if (order.orderStatus === 'PENDING' && hoursOld > 24)
+      badges.push({ label: 'Urgent', classes: 'bg-red-500/15 text-red-400 border border-red-500/25' });
+
+    if (order.orderStatus === 'CONFIRMED' && hoursSinceUpdate > 48)
+      badges.push({ label: 'Retard', classes: 'bg-orange-500/15 text-orange-400 border border-orange-500/25' });
+
+    if (order.promoCode)
+      badges.push({ label: 'Promo', classes: 'bg-purple-500/15 text-purple-400 border border-purple-500/25' });
+
+    return badges;
+  }
+
+  isUrgentOrder(order: OrderResponse): boolean {
+    if (order.orderStatus === 'PENDING') {
+      return (Date.now() - new Date(order.createdAt).getTime()) / 3_600_000 > 24;
+    }
+    if (order.orderStatus === 'CONFIRMED') {
+      return (Date.now() - new Date(order.updatedAt).getTime()) / 3_600_000 > 48;
+    }
+    return false;
+  }
+
+  /* ── Timeline ── */
+  getTimeline(order: OrderResponse): TimelineStep[] {
+    const steps: Array<{ status: OrderStatus; label: string }> = [
+      { status: OrderStatus.PENDING,   label: 'En attente'  },
+      { status: OrderStatus.CONFIRMED, label: 'Confirmée'   },
+      { status: OrderStatus.SHIPPED,   label: 'Expédiée'    },
+      { status: OrderStatus.DELIVERED, label: 'Livrée'      },
+    ];
+
+    const statusOrder = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
+    const currentIdx  = statusOrder.indexOf(order.orderStatus);
+    const cancelled   = order.orderStatus === 'CANCELLED';
+
+    return steps.map((s, i) => ({
+      ...s,
+      done:      !cancelled && i < currentIdx,
+      active:    !cancelled && i === currentIdx,
+      cancelled: cancelled && i === 0,
+    }));
+  }
+
+  /* ── Chargement ── */
   loadAllOrders(page = 0): void {
     this.ordersLoading = true;
     const params: GetOrdersParams = { page, size: 15 };
-    if (this.statusFilter) params.status = this.statusFilter as OrderStatus;
-    if (this.searchQuery.trim()) params.search = this.searchQuery.trim();
+    if (this.statusFilter)         params.status    = this.statusFilter as OrderStatus;
+    if (this.searchQuery.trim())   params.search    = this.searchQuery.trim();
+    if (this.dateRange)            params.dateRange  = this.dateRange;
     this.orderService.getAllOrders(params).subscribe({
       next: (r) => {
         if (r.success) {
           const pg = r.data as PageResponse<OrderResponse>;
-          this.allOrders = pg.content;
-          this.ordersTotalPages = pg.totalPages;
-          this.ordersTotalElements = pg.totalElements;
-          this.ordersPage = page;
+          this.allOrders            = pg.content;
+          this.ordersTotalPages     = pg.totalPages;
+          this.ordersTotalElements  = pg.totalElements;
+          this.ordersPage           = page;
         }
         this.ordersLoading = false;
         this.cdr.markForCheck();
@@ -122,6 +204,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
+  /* ── Détail ── */
   openOrderDetail(order: OrderResponse): void {
     this.selectedOrder = order;
     this.orderDetailOpen = true;
@@ -136,6 +219,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  /* ── Avancement statut ── */
   advanceOrderStatus(order: OrderResponse): void {
     const next = this.nextStatusMap[order.orderStatus];
     if (!next) return;
@@ -148,6 +232,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
         if (r.success) {
           this._patchOrder(order.id, r.data);
           this.toast.show(`Commande ${order.orderNumber} → ${orderStatusLabel(next)}`);
+          this.loadPendingCount();
         }
         this.statusUpdatingId = null;
         this.cdr.markForCheck();
@@ -168,8 +253,8 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   confirmCancel(): void {
     const order = this.cancelConfirmOrder;
     if (!order) return;
-    this.cancelConfirmOrder = null;
-    this.statusUpdatingId = order.id;
+    this.cancelConfirmOrder  = null;
+    this.statusUpdatingId    = order.id;
     this.orderService.cancelOrder(order.id).subscribe({
       next: (r) => {
         if (r.success) {

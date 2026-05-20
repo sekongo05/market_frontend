@@ -47,4 +47,5 @@ export interface GetOrdersParams {
   size?: number;
   status?: OrderStatus;
   search?: string;
+  dateRange?: 'today' | 'week' | 'month';
 }
