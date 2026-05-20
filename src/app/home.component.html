@@ -9,7 +9,11 @@
 
     <!-- Image avec parallaxe souris + Ken Burns -->
     <div class="hero-parallax absolute inset-0">
-      <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=95"
+      <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1200&q=80&fm=webp"
+           srcset="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=800&q=80&fm=webp 800w,
+                   https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1200&q=80&fm=webp 1200w,
+                   https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=80&fm=webp 1920w"
+           sizes="100vw"
            alt="Montre de prestige SDM Store"
            class="hero-img absolute inset-0 w-full h-full object-cover"
            style="object-position:65% center"
@@ -190,10 +194,10 @@
     <div class="flex flex-col lg:flex-row gap-1 px-1">
 
       <!-- Montres — hero large -->
-      <a (click)="goToCategory('montres')"
+      <a href="/products?categorie=montres" (click)="goToCategory('montres'); $event.preventDefault()"
          class="glint-card bracket-card group relative overflow-hidden cursor-pointer block lg:flex-[58] r-scale"
          style="height:clamp(260px,58vw,680px);transition-delay:200ms;">
-        <img src="https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=900&q=85"
+        <img src="https://images.unsplash.com/photo-1548169874-53e85f753f1e?w=700&q=80&fm=webp"
              alt="Montres" loading="lazy"
              class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-1000 ease-out"/>
         <div class="absolute inset-0 bg-gradient-to-t from-black/92 via-black/10 to-transparent"></div>
@@ -215,9 +219,9 @@
       <!-- Colonne droite : Bijoux + Mode -->
       <div class="flex flex-row lg:flex-col gap-1 lg:flex-[42] r-scale" style="transition-delay:340ms;">
 
-        <a (click)="goToCategory('bijoux')"
+        <a href="/products?categorie=bijoux" (click)="goToCategory('bijoux'); $event.preventDefault()"
            class="glint-card bracket-card group relative overflow-hidden cursor-pointer block flex-1 h-[42vw] lg:h-0 lg:flex-1">
-          <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=700&q=85"
+          <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=500&q=80&fm=webp"
                alt="Bijoux" loading="lazy"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-1000 ease-out"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/88 via-black/10 to-transparent"></div>
@@ -229,9 +233,9 @@
           </div>
         </a>
 
-        <a (click)="goToCategory('mode')"
+        <a href="/products?categorie=mode-vetements" (click)="goToCategory('mode'); $event.preventDefault()"
            class="glint-card bracket-card group relative overflow-hidden cursor-pointer block flex-1 h-[42vw] lg:h-0 lg:flex-1">
-          <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&q=85"
+          <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=500&q=80&fm=webp"
                alt="Mode" loading="lazy"
                class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-1000 ease-out"/>
           <div class="absolute inset-0 bg-gradient-to-t from-black/88 via-black/10 to-transparent"></div>
@@ -407,7 +411,7 @@
 
         <!-- Image — glisse de gauche -->
         <div class="r-left relative lg:flex-[52] overflow-hidden" style="min-height:clamp(320px,55vw,640px);transition-delay:100ms;">
-          <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200&q=90"
+          <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=900&q=80&fm=webp"
                alt="Éditorial SDM Store" loading="lazy"
                class="absolute inset-0 w-full h-full object-cover object-center hover:scale-[1.04] transition-transform duration-1000 ease-out"/>
           <div class="absolute inset-0" style="background:linear-gradient(to bottom,transparent 55%,rgba(6,6,6,0.55) 100%)"></div>

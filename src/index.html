@@ -26,8 +26,12 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <!-- Preload hero image pour améliorer le LCP -->
   <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="preconnect" href="https://market-app-backend-sx0s.onrender.com" crossorigin>
   <link rel="preload" as="image"
-        href="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=95"
+        imagesrcset="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=800&q=80&fm=webp 800w,
+                     https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1200&q=80&fm=webp 1200w,
+                     https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=80&fm=webp 1920w"
+        imagesizes="100vw"
         fetchpriority="high">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
