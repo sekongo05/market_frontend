@@ -1,4 +1,4 @@
-<div class="p-6 lg:p-8 animate-fade-in-up space-y-5">
+<div class="p-4 md:p-6 lg:p-8 animate-fade-in-up space-y-4 md:space-y-5">
 
   <!-- ── KPI Cards ─────────────────────────────────────────────────────── -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -81,11 +81,11 @@
     </div>
 
     <!-- Ligne 2 : filtre statut -->
-    <div class="flex gap-1 flex-wrap items-center">
-      <span class="text-xs theme-muted font-semibold mr-1">Statut :</span>
+    <div class="flex gap-1 items-center overflow-x-auto pb-0.5" style="-webkit-overflow-scrolling:touch;scrollbar-width:none">
+      <span class="text-xs theme-muted font-semibold shrink-0 mr-1">Statut :</span>
       @for (s of [{ val: '', label: 'Tous' }, { val: 'PENDING', label: 'En attente' }, { val: 'CONFIRMED', label: 'Confirmées' }, { val: 'SHIPPED', label: 'Expédiées' }, { val: 'DELIVERED', label: 'Livrées' }, { val: 'CANCELLED', label: 'Annulées' }]; track s.val) {
         <button (click)="statusFilter = $any(s.val); applyFilter()"
-          class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+          class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap"
           [ngClass]="statusFilter === s.val
             ? (s.val === 'CANCELLED' ? 'bg-red-500 text-white' : s.val === 'DELIVERED' ? 'bg-green-600 text-white' : 'bg-gold text-black')
             : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
@@ -95,11 +95,11 @@
     </div>
 
     <!-- Ligne 3 : filtre date -->
-    <div class="flex gap-1 flex-wrap items-center">
-      <span class="text-xs theme-muted font-semibold mr-1">Période :</span>
+    <div class="flex gap-1 items-center overflow-x-auto pb-0.5" style="-webkit-overflow-scrolling:touch;scrollbar-width:none">
+      <span class="text-xs theme-muted font-semibold shrink-0 mr-1">Période :</span>
       @for (d of [{ val: '', label: 'Toutes' }, { val: 'today', label: "Aujourd'hui" }, { val: 'week', label: 'Cette semaine' }, { val: 'month', label: 'Ce mois' }]; track d.val) {
         <button (click)="dateRange = $any(d.val); applyFilter()"
-          class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+          class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap"
           [ngClass]="dateRange === d.val
             ? 'bg-gold text-black'
             : 'bg-black/[.06] theme-muted hover:bg-gold/15 hover:text-gold'">
@@ -140,7 +140,89 @@
     }
 
     @if (!ordersLoading && allOrders.length > 0) {
-      <div class="overflow-x-auto">
+
+      <!-- ── Vue cards (mobile uniquement) ──────────────────────────── -->
+      <div class="block md:hidden divide-y theme-border">
+        @for (order of allOrders; track order.id) {
+          @let urgent = isUrgentOrder(order);
+          @let isPending = order.orderStatus === 'PENDING';
+          @let badges = getOrderBadges(order);
+          <div class="p-4 transition-colors border-l-4"
+               [class.bg-amber-500/[.04]]="isPending"
+               [style.border-left-color]="urgent ? 'rgba(239,68,68,0.6)' : isPending ? 'rgba(245,158,11,0.7)' : 'transparent'">
+
+            <!-- Ligne 1 : numéro + statut -->
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <button (click)="openOrderDetail(order)" class="text-left min-w-0">
+                <p class="font-mono text-xs font-bold text-gold">{{ order.orderNumber }}</p>
+                <p class="text-[10px] theme-muted">{{ order.createdAt | date:'dd/MM/yy HH:mm' }}</p>
+              </button>
+              <span class="flex-shrink-0 inline-flex px-2 py-0.5 rounded-lg text-xs font-bold" [class]="orderStatusClass(order.orderStatus)">
+                {{ orderStatusLabel(order.orderStatus) }}
+              </span>
+            </div>
+
+            <!-- Badges -->
+            @if (badges.length > 0) {
+              <div class="flex flex-wrap gap-1 mb-2">
+                @for (b of badges; track b.label) {
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-bold {{ b.classes }}">{{ b.label }}</span>
+                }
+              </div>
+            }
+
+            <!-- Ligne 2 : client + montant -->
+            <div class="flex items-center justify-between mb-3">
+              <div class="min-w-0">
+                <p class="text-sm font-semibold theme-text truncate">{{ order.customerName }}</p>
+                @if (order.customerPhone) {
+                  <a [href]="'https://wa.me/' + order.customerPhone.replace(/\D/g,'')"
+                     target="_blank" rel="noopener" (click)="$event.stopPropagation()"
+                     class="inline-flex items-center gap-1 mt-0.5 text-[10px] text-green-400">
+                    <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
+                      <path d="M11.99 2C6.476 2 2 6.477 2 11.99c0 1.882.52 3.642 1.428 5.148L2 22l5.003-1.412A9.96 9.96 0 0011.99 22C17.522 22 22 17.523 22 11.99S17.522 2 11.99 2zm0 18c-1.684 0-3.258-.47-4.6-1.286l-.33-.196-3.42.965.933-3.41-.214-.348A7.95 7.95 0 014 11.99C4 7.58 7.58 4 11.99 4S20 7.58 20 11.99C20 16.42 16.42 20 11.99 20z"/>
+                    </svg>
+                    {{ order.customerPhone }}
+                  </a>
+                }
+              </div>
+              <span class="font-black text-sm text-gold flex-shrink-0 ml-3">{{ formatCurrency(order.totalAmount) }} FCFA</span>
+            </div>
+
+            <!-- Ligne 3 : actions -->
+            @if (statusUpdatingId === order.id) {
+              <div class="flex justify-center py-1">
+                <svg class="w-5 h-5 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+              </div>
+            } @else {
+              <div class="flex gap-2">
+                @if (nextStatusMap[order.orderStatus]) {
+                  <button (click)="advanceOrderStatus(order)"
+                    class="flex-1 py-3 text-sm font-black rounded-xl transition-all"
+                    [ngClass]="isPending
+                      ? 'bg-gold text-black shadow-md shadow-amber-500/25'
+                      : 'bg-gold/10 border border-gold/25 text-gold'">
+                    {{ nextStatusLabel(order.orderStatus) }}
+                  </button>
+                }
+                @if (order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'DELIVERED') {
+                  <button (click)="cancelOrderByManager(order)"
+                    class="px-4 py-3 bg-red-500/10 border border-red-500/25 text-red-400 text-sm font-bold rounded-xl">
+                    Annuler
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ── Vue tableau (tablette et desktop) ──────────────────────── -->
+      <div class="overflow-x-auto hidden md:block">
         <table class="w-full">
           <thead>
             <tr class="theme-surface-2">

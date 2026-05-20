@@ -49,7 +49,7 @@
   </aside>
 
   <!-- ── Contenu principal ─────────────────────────────────────────── -->
-  <main class="flex-1 min-w-0">
+  <main class="flex-1 min-w-0 pb-16 lg:pb-0">
     <!-- Mobile top bar -->
     <div class="lg:hidden flex items-center gap-3 px-4 py-3 theme-surface border-b theme-border sticky top-0 z-30">
       <button (click)="mobileNavOpen = true" class="min-w-[44px] min-h-[44px] p-2.5 rounded-xl theme-muted hover:text-gold transition-colors flex items-center justify-center">
@@ -59,14 +59,14 @@
       </button>
       <span class="font-bold theme-text text-sm">Administration</span>
       @if (pendingOrdersCount > 0) {
-        <span class="ml-auto bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full">{{ pendingOrdersCount }}</span>
+        <span class="ml-auto bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">{{ pendingOrdersCount }}</span>
       }
     </div>
     <router-outlet/>
   </main>
 
   <!-- ── Toasts ────────────────────────────────────────────────────── -->
-  <div class="fixed bottom-6 right-6 z-[999] flex flex-col gap-2 pointer-events-none">
+  <div class="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-[999] flex flex-col gap-2 pointer-events-none">
     @for (t of toastService.toasts(); track t.id) {
       <div class="pointer-events-auto flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl text-sm font-semibold animate-fade-in-up border"
            [ngClass]="t.type === 'success'
@@ -83,5 +83,62 @@
       </div>
     }
   </div>
+
+  <!-- ── Bottom navigation (mobile) ──────────────────────────────────── -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 lg:hidden theme-surface border-t theme-border flex items-stretch"
+       style="padding-bottom: env(safe-area-inset-bottom)">
+
+    <a routerLink="overview" routerLinkActive #rlaOverview="routerLinkActive"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors"
+       [class.text-gold]="rlaOverview.isActive" [class.theme-muted]="!rlaOverview.isActive">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      <span class="text-[10px] font-semibold">Tableau</span>
+    </a>
+
+    <a routerLink="orders" routerLinkActive #rlaOrders="routerLinkActive"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors relative"
+       [class.text-gold]="rlaOrders.isActive" [class.theme-muted]="!rlaOrders.isActive">
+      <div class="relative">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        @if (pendingOrdersCount > 0) {
+          <span class="absolute -top-2 -right-2 bg-gold text-black text-[9px] font-black px-1.5 py-px rounded-full min-w-[18px] text-center leading-tight">
+            {{ pendingOrdersCount }}
+          </span>
+        }
+      </div>
+      <span class="text-[10px] font-semibold">Commandes</span>
+    </a>
+
+    <a routerLink="products" routerLinkActive #rlaProducts="routerLinkActive"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors"
+       [class.text-gold]="rlaProducts.isActive" [class.theme-muted]="!rlaProducts.isActive">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+      </svg>
+      <span class="text-[10px] font-semibold">Produits</span>
+    </a>
+
+    <a routerLink="delivery" routerLinkActive #rlaDelivery="routerLinkActive"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors"
+       [class.text-gold]="rlaDelivery.isActive" [class.theme-muted]="!rlaDelivery.isActive">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+      </svg>
+      <span class="text-[10px] font-semibold">Livraisons</span>
+    </a>
+
+    <button (click)="mobileNavOpen = true"
+       class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] theme-muted transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h7"/>
+      </svg>
+      <span class="text-[10px] font-semibold">Plus</span>
+    </button>
+
+  </nav>
 
 </div>
