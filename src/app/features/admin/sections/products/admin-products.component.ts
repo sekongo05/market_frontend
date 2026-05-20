@@ -61,7 +61,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   newVariantFile: File | null = null;
   newVariantPreview: string | null = null;
 
-  wizardStep: 1 | 2 | 3 = 1;
+  wizardStep: 1 | 2 = 1;
   hasVariantsToggle = false;
   creationItems: { file: File; preview: string; colorName: string; colorHex: string; stock: number }[] = [];
   pendingCreationFile: File | null = null;
@@ -166,7 +166,11 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
   get isStep1Valid(): boolean {
     const f = this.productForm;
-    return !!(f.get('name')?.valid && f.get('description')?.valid && f.get('categoryId')?.value && f.get('gender')?.value);
+    return !!(
+      f.get('name')?.valid && f.get('description')?.valid &&
+      f.get('categoryId')?.value && f.get('gender')?.value &&
+      f.get('price')?.valid && f.get('stock')?.valid
+    );
   }
   get creationTotalStock(): number { return this.creationItems.reduce((s, i) => s + i.stock, 0); }
 
@@ -362,8 +366,12 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
           processItem(0);
         } else {
           this.drawerLoading = false;
+          if (r.data) {
+            this.editingProduct = r.data;
+            this.initProductForm(r.data);
+            this.imagePreview = r.data.imageUrl || null;
+          }
           this.toast.show('Produit mis à jour ✓');
-          this.closeDrawer();
           this.cdr.markForCheck();
         }
       },
@@ -751,11 +759,11 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   goToNextStep(): void {
     if (this.wizardStep === 1) {
-      ['name', 'description', 'categoryId', 'gender'].forEach(f => this.productForm.get(f)?.markAsTouched());
+      ['name', 'description', 'categoryId', 'gender', 'price', 'stock'].forEach(f => this.productForm.get(f)?.markAsTouched());
       if (!this.isStep1Valid) { this.cdr.markForCheck(); return; }
     }
-    if (this.wizardStep < 3) {
-      this.wizardStep = (this.wizardStep + 1) as 1 | 2 | 3;
+    if (this.wizardStep < 2) {
+      this.wizardStep = (this.wizardStep + 1) as 1 | 2;
       document.getElementById('admin-drawer-panel')?.scrollTo(0, 0);
       this.cdr.markForCheck();
     }
@@ -763,7 +771,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   goToPrevStep(): void {
     if (this.wizardStep > 1) {
-      this.wizardStep = (this.wizardStep - 1) as 1 | 2 | 3;
+      this.wizardStep = (this.wizardStep - 1) as 1 | 2;
       document.getElementById('admin-drawer-panel')?.scrollTo(0, 0);
       this.cdr.markForCheck();
     }

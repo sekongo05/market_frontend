@@ -398,7 +398,7 @@
         @if (!editingProduct) {
           <div class="px-6 py-4 border-b theme-border">
             <div class="flex items-center gap-0">
-              @for (step of [1, 2, 3]; track step) {
+              @for (step of [1, 2]; track step) {
                 <div class="flex flex-col items-center flex-shrink-0">
                   <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black transition-all duration-200"
                        [class]="wizardStep > step ? 'bg-gold text-black' : wizardStep === step ? 'bg-gold text-black ring-4 ring-gold/20' : 'luxury-card theme-muted'">
@@ -412,10 +412,10 @@
                   </div>
                   <span class="text-[10px] mt-1.5 font-semibold transition-colors"
                         [class]="wizardStep >= step ? 'text-gold' : 'theme-muted'">
-                    {{ step === 1 ? 'Infos' : step === 2 ? 'Médias' : 'Prix' }}
+                    {{ step === 1 ? 'Infos & Prix' : 'Médias' }}
                   </span>
                 </div>
-                @if (step < 3) {
+                @if (step < 2) {
                   <div class="flex-1 h-0.5 mx-3 mb-5 rounded-full transition-all duration-300"
                        [class]="wizardStep > step ? 'bg-gold' : 'bg-white/10'"></div>
                 }
@@ -687,25 +687,48 @@
             <div>
               <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Nom du produit *</label>
               <input formControlName="name" type="text" placeholder="Ex: iPhone 15 Pro 256Go"
-                class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
+                [class.border-red-500]="productForm.get('name')?.touched && productForm.get('name')?.invalid"/>
+              @if (productForm.get('name')?.touched && productForm.get('name')?.invalid) {
+                <p class="text-red-400 text-xs mt-1">Le nom est requis</p>
+              }
             </div>
 
             <div>
               <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Description *</label>
               <textarea formControlName="description" rows="3" placeholder="Décrivez le produit en quelques mots…"
-                class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all resize-none"></textarea>
+                class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all resize-none"
+                [class.border-red-500]="productForm.get('description')?.touched && productForm.get('description')?.invalid"></textarea>
+              @if (productForm.get('description')?.touched && productForm.get('description')?.invalid) {
+                <p class="text-red-400 text-xs mt-1">La description est requise</p>
+              }
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix (FCFA) *</label>
-                <input formControlName="price" type="number" min="0" placeholder="45000"
-                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                <input formControlName="price" type="number" min="1" placeholder="45000"
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
+                  [class.border-red-500]="productForm.get('price')?.touched && productForm.get('price')?.invalid"/>
+                @if (productForm.get('price')?.touched && productForm.get('price')?.invalid) {
+                  <p class="text-red-400 text-xs mt-1">Le prix doit être supérieur à 0</p>
+                }
               </div>
               <div>
                 <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Stock *</label>
-                <input formControlName="stock" type="number" min="0" placeholder="10"
-                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                @if (productVariants.length > 0) {
+                  <div class="px-4 py-3 rounded-xl bg-black/[.04] border theme-border">
+                    <p class="text-sm font-black text-gold">{{ editingProduct?.stock ?? 0 }}</p>
+                    <p class="text-[10px] theme-muted mt-0.5">Calculé depuis {{ productVariants.length }} couleur{{ productVariants.length > 1 ? 's' : '' }}</p>
+                  </div>
+                } @else {
+                  <input formControlName="stock" type="number" min="0" placeholder="10"
+                    class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
+                    [class.border-red-500]="productForm.get('stock')?.touched && productForm.get('stock')?.invalid"/>
+                  @if (productForm.get('stock')?.touched && productForm.get('stock')?.invalid) {
+                    <p class="text-red-400 text-xs mt-1">Le stock est requis (min 0)</p>
+                  }
+                }
               </div>
             </div>
 
@@ -835,6 +858,32 @@
                   </select>
                 </div>
               </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix (FCFA) *</label>
+                  <div class="relative">
+                    <input formControlName="price" type="number" min="1" placeholder="45 000"
+                      class="theme-input w-full pl-4 pr-16 py-3 rounded-xl text-sm transition-all"
+                      [class.border-red-500]="productForm.get('price')?.touched && productForm.get('price')?.invalid"/>
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold theme-muted pointer-events-none">FCFA</span>
+                  </div>
+                  @if (productForm.get('price')?.touched && productForm.get('price')?.invalid) {
+                    <p class="text-red-400 text-xs mt-1">Le prix doit être supérieur à 0</p>
+                  }
+                </div>
+                <div>
+                  <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Stock initial *</label>
+                  <input formControlName="stock" type="number" min="0" placeholder="10"
+                    class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
+                    [class.border-red-500]="productForm.get('stock')?.touched && productForm.get('stock')?.invalid"/>
+                  @if (productForm.get('stock')?.touched && productForm.get('stock')?.invalid) {
+                    <p class="text-red-400 text-xs mt-1">Le stock est requis (min 0)</p>
+                  }
+                  <p class="text-[10px] theme-muted mt-1">Si vous ajoutez des couleurs, ce champ sera recalculé automatiquement.</p>
+                </div>
+              </div>
+
             </form>
           }
 
@@ -1023,68 +1072,6 @@
             </div>
           }
 
-          <!-- Étape 3 : Prix & Stock -->
-          @if (wizardStep === 3) {
-            <div class="p-6 space-y-5">
-
-              @if (drawerError) {
-                <div class="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">
-                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  {{ drawerError }}
-                </div>
-              }
-
-              @if (hasVariantsToggle && creationItems.length > 0) {
-                <div class="p-4 rounded-2xl bg-gold/8 border border-gold/20 space-y-2">
-                  <p class="text-xs font-bold text-gold uppercase tracking-wider mb-1">Récapitulatif des couleurs</p>
-                  @for (item of creationItems; track $index) {
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-4 h-4 rounded-full flex-shrink-0 border border-white/10" [style.background-color]="item.colorHex"></div>
-                      <span class="text-sm theme-text flex-1 truncate">{{ item.colorName }}</span>
-                      <span class="text-xs theme-muted">{{ item.stock }} unité{{ item.stock > 1 ? 's' : '' }}</span>
-                    </div>
-                  }
-                  <div class="border-t theme-border pt-2 mt-2 flex items-center justify-between">
-                    <span class="text-xs font-bold theme-muted">Stock total</span>
-                    <span class="font-black text-gold">{{ creationTotalStock }}</span>
-                  </div>
-                </div>
-              }
-
-              <form [formGroup]="productForm" (ngSubmit)="saveProduct()" id="adminProductForm" class="space-y-5">
-                <div>
-                  <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix (FCFA) *</label>
-                  <div class="relative">
-                    <input formControlName="price" type="number" min="0" placeholder="45 000"
-                      class="theme-input w-full pl-4 pr-20 py-3.5 rounded-xl text-sm transition-all"/>
-                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold theme-muted pointer-events-none">FCFA</span>
-                  </div>
-                  @if (productForm.get('price')?.touched && productForm.get('price')?.invalid) {
-                    <p class="text-red-400 text-xs mt-1">Le prix doit être supérieur à 0</p>
-                  }
-                </div>
-
-                <div>
-                  <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">
-                    Stock
-                    @if (hasVariantsToggle) { <span class="font-normal normal-case text-gold ml-1">· calculé depuis les couleurs</span> }
-                    @else { * }
-                  </label>
-                  @if (hasVariantsToggle) {
-                    <div class="flex items-center justify-between px-4 py-3.5 rounded-xl bg-black/[.04] border theme-border opacity-60 cursor-not-allowed">
-                      <span class="text-sm theme-muted">Total des couleurs</span>
-                      <span class="font-black text-gold">{{ creationTotalStock }} unité{{ creationTotalStock > 1 ? 's' : '' }}</span>
-                    </div>
-                  } @else {
-                    <input formControlName="stock" type="number" min="0" placeholder="10"
-                      class="theme-input w-full px-4 py-3.5 rounded-xl text-sm transition-all"/>
-                  }
-                </div>
-              </form>
-
-            </div>
-          }
-
         }
 
       </div>
@@ -1112,7 +1099,7 @@
 
         @if (editingProduct && (drawerTab === 'media' || drawerTab === 'variants')) {
           <button type="button" (click)="closeDrawer()"
-            class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-yellow-600/20 transition-all">
+            class="flex-1 py-3 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
             Fermer
           </button>
         }
@@ -1135,21 +1122,8 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
             Retour
           </button>
-          <button type="button" (click)="goToNextStep()"
-            class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-yellow-600/20 transition-all flex items-center justify-center gap-2">
-            Suivant
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-          </button>
-        }
-
-        @if (!editingProduct && wizardStep === 3) {
-          <button type="button" (click)="goToPrevStep()"
-            class="flex-1 py-3 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-            Retour
-          </button>
-          <button type="submit" form="adminProductForm"
-            [disabled]="productForm.get('price')?.invalid || (!hasVariantsToggle && productForm.get('stock')?.invalid) || drawerLoading"
+          <button type="button" (click)="saveProduct()"
+            [disabled]="productForm.invalid || drawerLoading"
             class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-yellow-600/20 transition-all">
             @if (drawerLoading) {
               <span class="flex items-center justify-center gap-2">
