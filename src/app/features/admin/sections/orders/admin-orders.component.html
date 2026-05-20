@@ -1,5 +1,44 @@
 <div class="p-6 lg:p-8 animate-fade-in-up space-y-5">
 
+  <!-- ── KPI Cards ─────────────────────────────────────────────────────── -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+
+    <button (click)="statusFilter = OrderStatus.PENDING; applyFilter()"
+      class="theme-surface border rounded-2xl p-4 text-left transition-all hover:scale-[1.02]"
+      [ngClass]="pendingCount > 0 ? 'border-amber-500/40 shadow-lg shadow-amber-500/10' : 'theme-border'">
+      <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">En attente</p>
+      <p class="text-3xl font-black leading-none" [ngClass]="pendingCount > 0 ? 'text-amber-400' : 'theme-text'">{{ pendingCount }}</p>
+      @if (pendingCount > 0) {
+        <span class="inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold text-amber-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+          Action requise
+        </span>
+      }
+    </button>
+
+    <button (click)="statusFilter = OrderStatus.CONFIRMED; applyFilter()"
+      class="theme-surface border theme-border rounded-2xl p-4 text-left transition-all hover:scale-[1.02] hover:border-blue-500/40">
+      <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Confirmées</p>
+      <p class="text-3xl font-black leading-none text-blue-400">{{ confirmedCount }}</p>
+      <p class="text-[10px] theme-muted mt-1.5">En préparation</p>
+    </button>
+
+    <button (click)="statusFilter = OrderStatus.SHIPPED; applyFilter()"
+      class="theme-surface border theme-border rounded-2xl p-4 text-left transition-all hover:scale-[1.02] hover:border-indigo-500/40">
+      <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Expédiées</p>
+      <p class="text-3xl font-black leading-none text-indigo-400">{{ shippedCount }}</p>
+      <p class="text-[10px] theme-muted mt-1.5">En transit</p>
+    </button>
+
+    <button (click)="statusFilter = OrderStatus.DELIVERED; applyFilter()"
+      class="theme-surface border theme-border rounded-2xl p-4 text-left transition-all hover:scale-[1.02] hover:border-green-500/40">
+      <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Livrées</p>
+      <p class="text-3xl font-black leading-none text-green-400">{{ deliveredCount }}</p>
+      <p class="text-[10px] theme-muted mt-1.5">Finalisées</p>
+    </button>
+
+  </div>
+
   <!-- ── Barre de filtres ───────────────────────────────────────────────── -->
   <div class="theme-surface border theme-border rounded-2xl p-4 space-y-3">
 
@@ -116,10 +155,12 @@
           <tbody>
             @for (order of allOrders; track order.id) {
               @let urgent = isUrgentOrder(order);
+              @let isPending = order.orderStatus === 'PENDING';
               @let badges = getOrderBadges(order);
-              <tr class="border-t theme-border hover:bg-black/[.02] transition-colors relative"
-                  [class.border-l-2]="urgent"
-                  [style.border-left-color]="urgent ? 'rgba(239,68,68,0.6)' : null">
+              <tr class="border-t theme-border transition-colors relative"
+                  [ngClass]="isPending ? 'bg-amber-500/[.04] hover:bg-amber-500/[.07]' : 'hover:bg-black/[.02]'"
+                  [class.border-l-2]="urgent || isPending"
+                  [style.border-left-color]="urgent ? 'rgba(239,68,68,0.6)' : isPending ? 'rgba(245,158,11,0.7)' : null">
 
                 <!-- N° commande + date + badges -->
                 <td class="px-5 py-3.5">
@@ -139,6 +180,17 @@
                 <!-- Client -->
                 <td class="px-5 py-3.5 hidden md:table-cell">
                   <p class="text-sm theme-text font-medium">{{ order.customerName }}</p>
+                  @if (order.customerPhone) {
+                    <a [href]="'https://wa.me/' + order.customerPhone.replace(/\D/g,'')"
+                       target="_blank" rel="noopener" (click)="$event.stopPropagation()"
+                       class="inline-flex items-center gap-1 mt-0.5 text-[10px] text-green-400 hover:text-green-300 transition-colors">
+                      <svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
+                        <path d="M11.99 2C6.476 2 2 6.477 2 11.99c0 1.882.52 3.642 1.428 5.148L2 22l5.003-1.412A9.96 9.96 0 0011.99 22C17.522 22 22 17.523 22 11.99S17.522 2 11.99 2zm0 18c-1.684 0-3.258-.47-4.6-1.286l-.33-.196-3.42.965.933-3.41-.214-.348A7.95 7.95 0 014 11.99C4 7.58 7.58 4 11.99 4S20 7.58 20 11.99C20 16.42 16.42 20 11.99 20z"/>
+                      </svg>
+                      {{ order.customerPhone }}
+                    </a>
+                  }
                 </td>
 
                 <!-- Articles -->
@@ -201,7 +253,10 @@
                     } @else {
                       @if (nextStatusMap[order.orderStatus]) {
                         <button (click)="advanceOrderStatus(order)"
-                          class="px-2.5 py-1 bg-gold/10 border border-gold/25 text-gold text-xs font-bold rounded-lg hover:bg-gold/20 transition-colors">
+                          class="text-xs font-bold rounded-lg transition-all"
+                          [ngClass]="isPending
+                            ? 'px-3 py-1.5 bg-gold text-black hover:bg-amber-400 shadow-md shadow-amber-500/25 hover:shadow-amber-500/40'
+                            : 'px-2.5 py-1 bg-gold/10 border border-gold/25 text-gold hover:bg-gold/20'">
                           {{ nextStatusLabel(order.orderStatus) }}
                         </button>
                       }

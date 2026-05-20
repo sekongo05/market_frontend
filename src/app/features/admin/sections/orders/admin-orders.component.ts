@@ -34,7 +34,10 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   ordersPage = 0;
   ordersTotalPages = 0;
   ordersTotalElements = 0;
-  pendingCount = 0;
+  pendingCount   = 0;
+  confirmedCount = 0;
+  shippedCount   = 0;
+  deliveredCount = 0;
 
   /* ── Filtres ── */
   statusFilter: OrderStatus | '' = '';
@@ -76,7 +79,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadAllOrders(0);
-    this.loadPendingCount();
+    this.loadStatusCounts();
 
     this.search$.pipe(
       debounceTime(350),
@@ -86,7 +89,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
 
     this.wsService.orderEvent$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.loadAllOrders(this.ordersPage);
-      this.loadPendingCount();
+      this.loadStatusCounts();
       this.cdr.markForCheck();
     });
     this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe(e => {
@@ -183,6 +186,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
         if (r.success) {
           const pg = r.data as PageResponse<OrderResponse>;
           this.allOrders            = pg.content;
+          this.sortByUrgency();
           this.ordersTotalPages     = pg.totalPages;
           this.ordersTotalElements  = pg.totalElements;
           this.ordersPage           = page;
@@ -201,6 +205,23 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: () => {},
+    });
+  }
+
+  loadStatusCounts(): void {
+    this.loadPendingCount();
+    ([OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.DELIVERED] as OrderStatus[]).forEach(status => {
+      this.orderService.getAllOrders({ page: 0, size: 1, status }).subscribe({
+        next: (r) => {
+          if (!r.success) return;
+          const count = (r.data as PageResponse<OrderResponse>).totalElements;
+          if (status === OrderStatus.CONFIRMED) this.confirmedCount = count;
+          if (status === OrderStatus.SHIPPED)   this.shippedCount   = count;
+          if (status === OrderStatus.DELIVERED) this.deliveredCount = count;
+          this.cdr.markForCheck();
+        },
+        error: () => {},
+      });
     });
   }
 
@@ -232,7 +253,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
         if (r.success) {
           this._patchOrder(order.id, r.data);
           this.toast.show(`Commande ${order.orderNumber} → ${orderStatusLabel(next)}`);
-          this.loadPendingCount();
+          this.loadStatusCounts();
         }
         this.statusUpdatingId = null;
         this.cdr.markForCheck();
@@ -263,7 +284,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
           if (this.orderDetailOpen && this.selectedOrder?.id === order.id) this.closeOrderDetail();
         }
         this.statusUpdatingId = null;
-        this.loadPendingCount();
+        this.loadStatusCounts();
         this.cdr.markForCheck();
       },
       error: (err) => {
@@ -272,6 +293,12 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  private sortByUrgency(): void {
+    const rank = (o: OrderResponse) =>
+      this.isUrgentOrder(o) ? 0 : o.orderStatus === 'PENDING' ? 1 : 2;
+    this.allOrders = [...this.allOrders].sort((a, b) => rank(a) - rank(b));
   }
 
   private _patchOrder(id: number, updated: OrderResponse): void {
