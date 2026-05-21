@@ -93,7 +93,53 @@
 
   @if (!promosLoading) {
     <div class="theme-surface border theme-border rounded-3xl overflow-hidden">
-      <div class="overflow-x-auto">
+      <!-- Mobile cards -->
+      <div class="block md:hidden">
+        @for (promo of promos; track promo.id) {
+          <div class="p-4 border-b theme-border last:border-0">
+            <div class="flex items-start justify-between gap-3 mb-1.5">
+              <div class="min-w-0">
+                <span class="font-mono font-bold text-gold text-sm">{{ promo.code }}</span>
+                @if (promo.description) {
+                  <p class="text-xs theme-muted mt-0.5 line-clamp-1">{{ promo.description }}</p>
+                }
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold flex-shrink-0"
+                [ngClass]="promo.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'">
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="promo.active ? 'bg-green-600' : 'bg-red-500'"></span>
+                {{ promo.active ? 'Actif' : 'Inactif' }}
+              </span>
+            </div>
+            <div class="flex items-center gap-3 mb-2.5 flex-wrap">
+              <span class="font-bold theme-text text-lg">{{ promo.discountPercent }}%</span>
+              <span class="text-xs theme-muted">{{ promo.usedCount }}{{ promo.maxUses ? ' / ' + promo.maxUses : ' / ∞' }} util.</span>
+              @if (promo.expiresAt) {
+                <span class="text-xs theme-muted">Expire {{ promo.expiresAt | date:'dd/MM/yyyy' }}</span>
+              }
+              @if (promo.firstOrderOnly) {
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-violet-100 text-violet-700">1er achat</span>
+              }
+            </div>
+            <div class="flex items-center gap-2">
+              <button (click)="togglePromo(promo)"
+                class="text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors"
+                [ngClass]="promo.active ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-green-100 text-green-700 hover:bg-green-200'">
+                {{ promo.active ? 'Désactiver' : 'Activer' }}
+              </button>
+              <button (click)="deletePromo(promo)" class="p-1.5 rounded-lg text-red-400/50 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        }
+        @if (promos.length === 0) {
+          <div class="py-16 text-center theme-muted"><p class="text-sm font-semibold">Aucun code promo</p></div>
+        }
+      </div>
+      <!-- Desktop table -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full">
           <thead>
             <tr class="theme-surface-2">
