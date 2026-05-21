@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FinanceService, FinanceDashboardResponse, StockValueResponse } from '../../../../core/services/finance.service';
@@ -15,7 +15,7 @@ import { PinSetupComponent } from './pin-setup.component';
   imports: [CommonModule, RouterLink, PinGateComponent, PinSetupComponent],
   templateUrl: './admin-finance.component.html',
 })
-export class AdminFinanceComponent implements OnInit {
+export class AdminFinanceComponent implements OnInit, OnDestroy {
   view = signal<'loading' | 'setup' | 'pin' | 'dashboard'>('loading');
   activeTab = signal<'report' | 'margins' | 'stock' | 'cashflow'>('report');
 
@@ -48,6 +48,11 @@ export class AdminFinanceComponent implements OnInit {
     private productService: ProductService,
     private cdr: ChangeDetectorRef,
   ) {}
+
+  ngOnDestroy(): void {
+    // Verrouille automatiquement dès qu'on quitte la page
+    this.financeService.clearFinanceSession();
+  }
 
   ngOnInit(): void {
     if (this.financeService.hasValidFinanceSession()) {
@@ -152,9 +157,7 @@ export class AdminFinanceComponent implements OnInit {
   }
 
   formatAmount(v: number): string {
-    if (v >= 1_000_000) return (v / 1_000_000).toFixed(1) + 'M';
-    if (v >= 1_000)     return (v / 1_000).toFixed(0) + 'k';
-    return v.toFixed(0);
+    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(v));
   }
 
   // ── Loaders ───────────────────────────────────────────────────────
