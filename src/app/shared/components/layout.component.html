@@ -49,7 +49,7 @@
             <li><a routerLink="/orders" class="hover:text-gold transition-colors duration-150">Mes commandes</a></li>
           }
           <li><a routerLink="/profile" class="hover:text-gold transition-colors duration-150">Mon profil</a></li>
-          @if (isManager) {
+          @if (isManagerOnly) {
             <li><a routerLink="/manager" class="hover:text-gold transition-colors duration-150">Espace Gestion</a></li>
           }
         </ul>

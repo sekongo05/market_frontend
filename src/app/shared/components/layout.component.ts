@@ -58,4 +58,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
     const role = this.authService.getCurrentUser()?.role;
     return role === 'MANAGER' || role === 'ADMIN';
   }
+
+  get isManagerOnly(): boolean {
+    return this.authService.getCurrentUser()?.role === 'MANAGER';
+  }
 }
