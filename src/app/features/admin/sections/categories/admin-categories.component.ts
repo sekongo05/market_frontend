@@ -9,6 +9,7 @@ import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
 import { TooltipDirective } from '../../../../shared/directives/tooltip.directive';
+import { UploadService } from '../../../../core/services/upload.service';
 
 @Component({
   selector: 'app-admin-categories',
@@ -26,6 +27,9 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0 };
   categoryFormLoading = false;
   categoryFormError: string | null = null;
+  imageUploading = false;
+  imagePreview: string | null = null;
+  imageDragOver = false;
 
   // Confirmation dialog before deactivating
   pendingToggleCat: CategoryResponse | null = null;
@@ -38,6 +42,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     private wsService: WebSocketService,
     private toast: AdminToastService,
     private scrollLock: ScrollLockService,
+    private uploadService: UploadService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -69,6 +74,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     this.editingCategory = null;
     this.categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0 };
     this.categoryFormError = null;
+    this.imagePreview = null;
     this.showCategoryForm = true;
     this.scrollLock.lock();
     this.cdr.markForCheck();
@@ -83,6 +89,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       displayOrder: cat.displayOrder ?? 0,
     };
     this.categoryFormError = null;
+    this.imagePreview = cat.imageUrl || null;
     this.showCategoryForm = true;
     this.scrollLock.lock();
     this.cdr.markForCheck();
@@ -92,8 +99,57 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     this.showCategoryForm = false;
     this.editingCategory = null;
     this.categoryFormError = null;
+    this.imagePreview = null;
     this.scrollLock.unlock();
     this.cdr.markForCheck();
+  }
+
+  onImageFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) this.uploadCategoryImage(input.files[0]);
+  }
+
+  onImageDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.imageDragOver = false;
+    const file = event.dataTransfer?.files?.[0];
+    if (file && file.type.startsWith('image/')) this.uploadCategoryImage(file);
+    this.cdr.markForCheck();
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.imageDragOver = true;
+    this.cdr.markForCheck();
+  }
+
+  onDragLeave(): void {
+    this.imageDragOver = false;
+    this.cdr.markForCheck();
+  }
+
+  removeImage(): void {
+    this.categoryForm.imageUrl = '';
+    this.imagePreview = null;
+    this.cdr.markForCheck();
+  }
+
+  private uploadCategoryImage(file: File): void {
+    this.imageUploading = true;
+    this.cdr.markForCheck();
+    this.uploadService.uploadCategoryImage(file).subscribe({
+      next: (url) => {
+        this.categoryForm.imageUrl = url;
+        this.imagePreview = url;
+        this.imageUploading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.categoryFormError = err?.error?.message || "Erreur lors de l'upload de l'image";
+        this.imageUploading = false;
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   submitCategory(): void {

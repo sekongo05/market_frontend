@@ -28,4 +28,15 @@ export class UploadService {
         return `${serverRoot}/${response.data}`;
       }));
   }
+
+  uploadCategoryImage(file: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http
+      .post<ApiResponse<string>>(
+        `${this.apiService.getBaseUrl()}/upload/category-image`,
+        formData
+      )
+      .pipe(map((response) => response.data));
+  }
 }
