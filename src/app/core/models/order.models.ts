@@ -1,4 +1,4 @@
-import { OrderStatus, DeliveryStatus } from './common.models';
+import { OrderStatus, DeliveryStatus, DeliveryZone } from './common.models';
 
 export interface OrderItem {
   productId: number;
@@ -9,6 +9,7 @@ export interface OrderItem {
 export interface CreateOrderRequest {
   items: OrderItem[];
   deliveryAddress: string;
+  deliveryZone: DeliveryZone;
   promoCode?: string;
 }
 

@@ -61,3 +61,8 @@ export enum StockMovementType {
   ADJUSTMENT = 'ADJUSTMENT',
   RETURN = 'RETURN',
 }
+
+export enum DeliveryZone {
+  ABIDJAN  = 'ABIDJAN',
+  INTERIOR = 'INTERIOR',
+}

@@ -463,6 +463,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
         ...(i.variantId != null ? { variantId: i.variantId } : {}),
       })),
       deliveryAddress: fullAddress,
+      deliveryZone: this.deliveryZone === 'interieur' ? 'INTERIOR' : 'ABIDJAN',
     };
     if (this.promoCheckResult?.valid && this.promoCheckResult.code) {
       payload.promoCode = this.promoCheckResult.code;
