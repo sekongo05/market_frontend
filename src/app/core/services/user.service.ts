@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiResponse, PageResponse, UserRole } from '../models/common.models';
-import { UserResponse, UpdateProfileRequest, ChangePasswordRequest, AdminCreateUserRequest, UserFullProfileResponse } from '../models/user.models';
+import { UserResponse, UpdateProfileRequest, ChangePasswordRequest, AdminCreateUserRequest, UserFullProfileResponse, Address, AddressRequest } from '../models/user.models';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -54,5 +54,25 @@ export class UserService {
 
   getFullProfile(id: number): Observable<ApiResponse<UserFullProfileResponse>> {
     return this.apiService.get(`/users/${id}/full-profile`);
+  }
+
+  getAddresses(): Observable<ApiResponse<Address[]>> {
+    return this.apiService.get('/users/me/addresses');
+  }
+
+  createAddress(data: AddressRequest): Observable<ApiResponse<Address>> {
+    return this.apiService.post('/users/me/addresses', data);
+  }
+
+  updateAddress(id: number, data: AddressRequest): Observable<ApiResponse<Address>> {
+    return this.apiService.put(`/users/me/addresses/${id}`, data);
+  }
+
+  deleteAddress(id: number): Observable<ApiResponse<null>> {
+    return this.apiService.delete(`/users/me/addresses/${id}`);
+  }
+
+  setDefaultAddress(id: number): Observable<ApiResponse<Address>> {
+    return this.apiService.patch(`/users/me/addresses/${id}/default`, {});
   }
 }

@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { UserResponse, UserFullProfileResponse } from '../../../core/models/user.models';
+import { UserResponse, UserFullProfileResponse, Address, AddressRequest } from '../../../core/models/user.models';
 
 @Component({
   selector: 'app-profile',
@@ -24,10 +24,19 @@ export class ProfileComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
 
-  activeTab: 'profile' | 'security' = 'profile';
+  activeTab: 'profile' | 'security' | 'addresses' = 'profile';
   showOldPwd     = false;
   showNewPwd     = false;
   showConfirmPwd = false;
+
+  addresses: Address[] = [];
+  loadingAddresses = false;
+  savingAddress = false;
+  showAddressForm = false;
+  editingAddress: Address | null = null;
+  addressForm!: FormGroup;
+  readonly ADDRESS_LABELS = ['Domicile', 'Bureau', 'Autre'];
+  readonly MAX_ADDRESSES = 5;
 
   constructor(
     private fb: FormBuilder,
@@ -46,6 +55,17 @@ export class ProfileComponent implements OnInit {
       oldPassword:     ['', [Validators.required, Validators.minLength(6)]],
       newPassword:     ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
+    });
+    this.addressForm = this.fb.group({
+      label:      ['Domicile', Validators.required],
+      nom:        ['', Validators.required],
+      prenom:     ['', Validators.required],
+      phone:      ['+225', [Validators.required, Validators.pattern(/^(\+225|00225)?\s?[0-9]{10}$/)]],
+      quartier:   ['', Validators.required],
+      ville:      ['', Validators.required],
+      pays:       ['Côte d\'Ivoire', Validators.required],
+      complement: [''],
+      isDefault:  [false],
     });
     this.loadUserProfile();
   }
@@ -162,6 +182,74 @@ export class ProfileComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err: any) => { this._showError(err?.error?.message || 'Erreur lors du changement de mot de passe'); this.changingPassword = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  loadAddresses(): void {
+    this.loadingAddresses = true;
+    this.userService.getAddresses().subscribe({
+      next: (r) => { if (r.success) this.addresses = r.data; this.loadingAddresses = false; this.cdr.detectChanges(); },
+      error: () => { this.loadingAddresses = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  openAddressForm(address?: Address): void {
+    this.editingAddress = address ?? null;
+    this.showAddressForm = true;
+    this.clearMessages();
+    if (address) {
+      this.addressForm.patchValue(address);
+    } else {
+      this.addressForm.reset({ label: 'Domicile', pays: 'Côte d\'Ivoire', phone: '+225', isDefault: false });
+    }
+  }
+
+  closeAddressForm(): void {
+    this.showAddressForm = false;
+    this.editingAddress = null;
+  }
+
+  saveAddress(): void {
+    if (this.addressForm.invalid) return;
+    this.savingAddress = true;
+    this.clearMessages();
+    const payload: AddressRequest = this.addressForm.value;
+    const obs = this.editingAddress
+      ? this.userService.updateAddress(this.editingAddress.id, payload)
+      : this.userService.createAddress(payload);
+    obs.subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.loadAddresses();
+          this.closeAddressForm();
+          this._showSuccess(this.editingAddress ? 'Adresse mise à jour' : 'Adresse ajoutée');
+        }
+        this.savingAddress = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this._showError(err?.error?.message || 'Erreur lors de la sauvegarde');
+        this.savingAddress = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  deleteAddress(id: number): void {
+    if (!confirm('Supprimer cette adresse ?')) return;
+    this.userService.deleteAddress(id).subscribe({
+      next: () => { this.loadAddresses(); this._showSuccess('Adresse supprimée'); this.cdr.detectChanges(); },
+      error: () => { this._showError('Erreur lors de la suppression'); this.cdr.detectChanges(); },
+    });
+  }
+
+  setDefaultAddress(id: number): void {
+    this.userService.setDefaultAddress(id).subscribe({
+      next: (r) => {
+        if (r.success) { this.loadAddresses(); this._showSuccess('Adresse par défaut mise à jour'); }
+        this.cdr.detectChanges();
+      },
+      error: () => { this._showError('Erreur'); this.cdr.detectChanges(); },
     });
   }
 

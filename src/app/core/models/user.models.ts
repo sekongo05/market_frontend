@@ -46,6 +46,32 @@ export interface UserFullProfileResponse {
   }[];
 }
 
+export interface Address {
+  id: number;
+  label: string;
+  nom: string;
+  prenom: string;
+  phone: string;
+  quartier: string;
+  ville: string;
+  pays: string;
+  complement?: string;
+  isDefault: boolean;
+  createdAt: string;
+}
+
+export interface AddressRequest {
+  label: string;
+  nom: string;
+  prenom: string;
+  phone: string;
+  quartier: string;
+  ville: string;
+  pays: string;
+  complement?: string;
+  isDefault: boolean;
+}
+
 export interface AdminCreateUserRequest {
   nom: string;
   prenom: string;
