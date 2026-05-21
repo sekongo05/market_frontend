@@ -1,90 +1,114 @@
-<div class="p-6 lg:p-8 animate-fade-in-up space-y-6">
+<div class="p-4 sm:p-6 lg:p-8 animate-fade-in-up space-y-4 sm:space-y-6">
 
   <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <div class="flex items-center justify-between">
     <div>
-      <h2 class="text-lg font-bold theme-text">Dashboard</h2>
+      <h2 class="text-base sm:text-lg font-bold theme-text">Dashboard</h2>
       <p class="text-xs theme-muted mt-0.5">Vos statistiques personnelles</p>
     </div>
     <button (click)="loadManagerStats()"
-      class="flex items-center gap-2 px-4 py-2.5 luxury-card theme-muted rounded-xl font-bold text-sm hover:text-gold transition-all">
+      class="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 luxury-card theme-muted rounded-xl font-bold text-xs sm:text-sm hover:text-gold transition-all">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
       </svg>
-      Actualiser
+      <span class="hidden sm:inline">Actualiser</span>
     </button>
   </div>
 
+  <!-- ── Skeleton ─────────────────────────────────────────────────────────── -->
   @if (managerStatsLoading) {
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 gap-3">
       @for (i of [1,2,3,4]; track i) {
-        <div class="luxury-card rounded-2xl p-5 animate-pulse h-24"></div>
+        <div class="luxury-card rounded-2xl p-4 sm:p-5 animate-pulse h-20 sm:h-24"></div>
       }
     </div>
+    <div class="luxury-card rounded-2xl p-4 sm:p-6 animate-pulse h-40"></div>
   }
 
+  <!-- ── Contenu ──────────────────────────────────────────────────────────── -->
   @if (!managerStatsLoading && managerStats) {
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-      <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
-        <div class="w-11 h-11 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
-          <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    <!-- KPI Cards — 2 colonnes sur mobile et desktop -->
+    <div class="grid grid-cols-2 gap-3">
+
+      <div class="luxury-card rounded-2xl p-4 sm:p-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+        <div class="w-9 h-9 sm:w-11 sm:h-11 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
         </div>
         <div>
-          <p class="text-2xl font-black theme-text">{{ formatCurrency(managerStats.totalValidatedRevenue) }}</p>
-          <p class="text-xs theme-muted font-semibold">Revenus validés</p>
+          <p class="text-lg sm:text-2xl font-black theme-text leading-none">{{ formatCurrency(managerStats.totalValidatedRevenue) }}</p>
+          <p class="text-[11px] sm:text-xs theme-muted font-semibold mt-0.5">Revenus validés</p>
         </div>
       </div>
 
-      <div class="luxury-card rounded-2xl p-5 flex items-center gap-4">
-        <div class="w-11 h-11 bg-blue-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
-          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      <div class="luxury-card rounded-2xl p-4 sm:p-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+        <div class="w-9 h-9 sm:w-11 sm:h-11 bg-blue-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
           </svg>
         </div>
         <div>
-          <p class="text-2xl font-black theme-text">{{ managerStats.totalOrders ?? '—' }}</p>
-          <p class="text-xs theme-muted font-semibold">Commandes</p>
+          <p class="text-lg sm:text-2xl font-black theme-text leading-none">{{ managerStats.totalOrders ?? '—' }}</p>
+          <p class="text-[11px] sm:text-xs theme-muted font-semibold mt-0.5">Commandes</p>
         </div>
       </div>
 
     </div>
 
-    <!-- Quick access -->
-    <div class="luxury-card rounded-2xl p-6">
-      <h3 class="text-sm font-bold theme-muted uppercase tracking-wider mb-4">Accès rapide</h3>
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <!-- Accès rapide -->
+    <div class="luxury-card rounded-2xl p-4 sm:p-6">
+      <h3 class="text-xs font-bold theme-muted uppercase tracking-wider mb-3 sm:mb-4">Accès rapide</h3>
+      <div class="grid grid-cols-3 gap-2 sm:gap-3">
+
         <a routerLink="/manager/orders"
-          class="flex flex-col items-center gap-2 p-4 luxury-card rounded-xl hover:border-gold/50 transition-all border border-transparent cursor-pointer">
-          <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          class="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 luxury-card rounded-xl
+                 hover:border-gold/50 active:scale-95 transition-all border border-transparent">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
           </svg>
-          <span class="text-xs font-bold theme-text">Commandes</span>
+          <span class="text-[11px] sm:text-xs font-bold theme-text text-center leading-tight">Commandes</span>
         </a>
+
         <a routerLink="/manager/delivery"
-          class="flex flex-col items-center gap-2 p-4 luxury-card rounded-xl hover:border-gold/50 transition-all border border-transparent cursor-pointer">
-          <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          class="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 luxury-card rounded-xl
+                 hover:border-gold/50 active:scale-95 transition-all border border-transparent">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
           </svg>
-          <span class="text-xs font-bold theme-text">Livraisons</span>
+          <span class="text-[11px] sm:text-xs font-bold theme-text text-center leading-tight">Livraisons</span>
         </a>
+
         <a routerLink="/manager/products"
-          class="flex flex-col items-center gap-2 p-4 luxury-card rounded-xl hover:border-gold/50 transition-all border border-transparent cursor-pointer">
-          <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          class="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 luxury-card rounded-xl
+                 hover:border-gold/50 active:scale-95 transition-all border border-transparent">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
           </svg>
-          <span class="text-xs font-bold theme-text">Catalogue</span>
+          <span class="text-[11px] sm:text-xs font-bold theme-text text-center leading-tight">Catalogue</span>
         </a>
+
       </div>
     </div>
+
   }
 
+  <!-- ── État vide ─────────────────────────────────────────────────────────── -->
   @if (!managerStatsLoading && !managerStats) {
-    <div class="luxury-card rounded-2xl p-12 text-center">
-      <button (click)="loadManagerStats()" class="text-gold underline text-sm">Charger les statistiques</button>
+    <div class="luxury-card rounded-2xl p-10 sm:p-12 text-center">
+      <svg class="w-10 h-10 text-white/10 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+      <p class="text-sm theme-muted mb-3">Impossible de charger les statistiques</p>
+      <button (click)="loadManagerStats()" class="text-gold underline text-sm font-semibold">Réessayer</button>
     </div>
   }
 

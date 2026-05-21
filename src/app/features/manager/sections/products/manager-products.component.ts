@@ -104,19 +104,6 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     'bordeaux': '#800020', 'marine': '#001F5B', 'kaki': '#78866B',
   };
 
-  private readonly CAT_MONTRES    = { id: 1, name: 'Montres',    slug: 'montres',    description: '', imageUrl: '', active: true, createdAt: '', updatedAt: '' };
-  private readonly CAT_BAGUES     = { id: 2, name: 'Bagues',     slug: 'bagues',     description: '', imageUrl: '', active: true, createdAt: '', updatedAt: '' };
-  private readonly CAT_COLLIERS   = { id: 3, name: 'Colliers',   slug: 'colliers',   description: '', imageUrl: '', active: true, createdAt: '', updatedAt: '' };
-  private readonly CAT_CHAUSSURES = { id: 4, name: 'Chaussures', slug: 'chaussures', description: '', imageUrl: '', active: true, createdAt: '', updatedAt: '' };
-
-  private readonly mockProducts: ProductResponse[] = [
-    { id: 1, name: 'Rolex Submariner',    slug: 'rolex-submariner',    description: 'Montre automatique Rolex Submariner Date.',    price: 4200000, stock: 5,  gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80', category: this.CAT_MONTRES,    active: true, featured: false, createdAt: '', updatedAt: '' },
-    { id: 2, name: 'Cartier Panthère',    slug: 'cartier-panthere',    description: 'Montre Cartier Panthère, boîtier or rose 25mm.', price: 5800000, stock: 3,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1461595383984-b56f78f9223f?w=400&q=80', category: this.CAT_MONTRES,    active: true, featured: false, createdAt: '', updatedAt: '' },
-    { id: 3, name: 'Chevalière Or 18K',   slug: 'chevaliere-or-18k',   description: 'Chevalière homme en or jaune 18 carats.',       price: 650000,  stock: 10, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80', category: this.CAT_BAGUES,     active: true, featured: false, createdAt: '', updatedAt: '' },
-    { id: 4, name: 'Solitaire Diamant',   slug: 'solitaire-diamant',   description: 'Bague solitaire or blanc 18K, diamant 0.50ct.', price: 1850000, stock: 6,  gender: 'FEMME', imageUrl: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&q=80', category: this.CAT_BAGUES,     active: true, featured: false, createdAt: '', updatedAt: '' },
-    { id: 5, name: 'Chaîne Gourmette Or', slug: 'chaine-gourmette-or', description: 'Chaîne gourmette homme or jaune 18K.',         price: 780000,  stock: 10, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80', category: this.CAT_COLLIERS,   active: true, featured: false, createdAt: '', updatedAt: '' },
-    { id: 6, name: 'Derby Cuir Italiens',  slug: 'derby-cuir',          description: 'Derbies cuir veau grainé marron.',             price: 185000,  stock: 15, gender: 'HOMME', imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80', category: this.CAT_CHAUSSURES, active: true, featured: false, createdAt: '', updatedAt: '' },
-  ];
 
   private readonly searchSubject = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
@@ -194,10 +181,10 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
       next: (r) => {
         if (r.success) {
           const pg = r.data as PageResponse<ProductResponse>;
-          this.products   = pg.content.length > 0 ? pg.content : this._filteredMocks();
-          this.totalPages = pg.content.length > 0 ? pg.totalPages : 1;
+          this.products   = pg.content;
+          this.totalPages = pg.totalPages;
         } else {
-          this.products = this._filteredMocks(); this.totalPages = 1;
+          this.products = []; this.totalPages = 1;
         }
         this.currentPage = page;
         this._computeStats();
@@ -205,7 +192,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: () => {
-        this.products = this._filteredMocks(); this.totalPages = 1; this.currentPage = 0;
+        this.products = []; this.totalPages = 1; this.currentPage = 0;
         this._computeStats(); this.loading = false;
         this.cdr.markForCheck();
       },
@@ -215,17 +202,11 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   private loadCategories(): void {
     this.categoryService.getCategories().subscribe({
       next: (r) => {
-        this.categories = (r.success && Array.isArray(r.data)) ? r.data : [this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS, this.CAT_CHAUSSURES];
+        this.categories = (r.success && Array.isArray(r.data)) ? r.data : [];
         this.cdr.markForCheck();
       },
-      error: () => { this.categories = [this.CAT_MONTRES, this.CAT_BAGUES, this.CAT_COLLIERS, this.CAT_CHAUSSURES]; this.cdr.markForCheck(); },
+      error: () => { this.categories = []; this.cdr.markForCheck(); },
     });
-  }
-
-  private _filteredMocks(): ProductResponse[] {
-    if (!this.searchQuery) return this.mockProducts;
-    const q = this.searchQuery.toLowerCase();
-    return this.mockProducts.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
   }
 
   onSearchChange(value: string): void { this.searchQuery = value; this.searchSubject.next(value); }
