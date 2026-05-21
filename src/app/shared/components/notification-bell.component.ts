@@ -16,7 +16,7 @@ import { NotificationResponse } from '../../core/models/notification.models';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
-    <div class="relative">
+    <div class="relative inline-flex">
 
       <!-- Bell button -->
       <button (click)="toggle($event)"

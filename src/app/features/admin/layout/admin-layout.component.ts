@@ -20,12 +20,15 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   pendingOrdersCount = 0;
   moreSheetOpen = false;
   currentRouteLabel = 'Administration';
-  isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+  private readonly lgQuery = typeof window !== 'undefined'
+    ? window.matchMedia('(min-width: 1024px)')
+    : null;
+  isDesktop = this.lgQuery?.matches ?? false;
 
   @HostListener('window:resize')
   onResize(): void {
     const was = this.isDesktop;
-    this.isDesktop = window.innerWidth >= 1024;
+    this.isDesktop = this.lgQuery?.matches ?? false;
     if (was !== this.isDesktop) this.cdr.markForCheck();
   }
   private readonly destroy$ = new Subject<void>();
