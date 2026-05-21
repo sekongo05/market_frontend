@@ -3,7 +3,6 @@ import { Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationErr
 
 import { Subscription } from 'rxjs';
 import { NavbarComponent } from './navbar.component';
-import { SupportWidgetComponent } from './support-widget.component';
 import { ToastComponent } from './toast.component';
 import { AuthService } from '../../core/services/auth.service';
 import { SdmLogoComponent } from './logo.component';
@@ -11,7 +10,7 @@ import { SdmLogoComponent } from './logo.component';
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterModule, NavbarComponent, SupportWidgetComponent, ToastComponent, SdmLogoComponent],
+  imports: [RouterModule, NavbarComponent, ToastComponent, SdmLogoComponent],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
