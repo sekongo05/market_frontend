@@ -18,7 +18,7 @@
     <div class="theme-surface border theme-border rounded-3xl p-6 mb-6 animate-fade-in">
       <h3 class="font-bold theme-text mb-4">Créer un code promo</h3>
       @if (promoFormError) {
-        <div class="p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm mb-4">{{ promoFormError }}</div>
+        <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm mb-4">{{ promoFormError }}</div>
       }
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
@@ -40,18 +40,33 @@
           <input [(ngModel)]="promoForm.maxUses" type="number" min="1" placeholder="Illimité"
             class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
         </div>
+        <div>
+          <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Montant min du panier (FCFA)</label>
+          <input [(ngModel)]="promoForm.minCartAmount" type="number" min="0" placeholder="Aucun minimum"
+            class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+        </div>
       </div>
       <div class="mb-4">
         <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Description</label>
         <input [(ngModel)]="promoForm.description" type="text" placeholder="Ex: Promo de Noël"
           class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
       </div>
-      <div class="flex items-center gap-3 mb-4 p-3 bg-gold/5 border border-gold/15 rounded-xl">
-        <input type="checkbox" [(ngModel)]="promoForm.publicVisible" id="publicVisible"
-          class="w-4 h-4 rounded accent-yellow-500 cursor-pointer"/>
-        <div class="flex-1">
-          <label for="publicVisible" class="text-sm font-bold theme-text cursor-pointer">Afficher dans la boutique</label>
-          <p class="text-xs theme-muted mt-0.5">Les clients verront ce code directement dans leur panier</p>
+      <div class="flex flex-col gap-3 mb-4">
+        <div class="flex items-center gap-3 p-3 bg-gold/5 border border-gold/15 rounded-xl">
+          <input type="checkbox" [(ngModel)]="promoForm.publicVisible" id="publicVisible"
+            class="w-4 h-4 rounded accent-yellow-500 cursor-pointer flex-shrink-0"/>
+          <div class="flex-1">
+            <label for="publicVisible" class="text-sm font-bold theme-text cursor-pointer">Afficher dans la boutique</label>
+            <p class="text-xs theme-muted mt-0.5">Les clients verront ce code directement dans leur panier</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+          <input type="checkbox" [(ngModel)]="promoForm.firstOrderOnly" id="firstOrderOnly"
+            class="w-4 h-4 rounded accent-blue-500 cursor-pointer flex-shrink-0"/>
+          <div class="flex-1">
+            <label for="firstOrderOnly" class="text-sm font-bold theme-text cursor-pointer">Premier achat uniquement</label>
+            <p class="text-xs theme-muted mt-0.5">Réservé aux clients qui n'ont jamais commandé</p>
+          </div>
         </div>
       </div>
       <div class="flex gap-3">
@@ -111,25 +126,35 @@
                 </td>
                 <td class="px-5 py-4">
                   <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
-                    [ngClass]="promo.active ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'">
-                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="promo.active ? 'bg-green-400' : 'bg-red-400'"></span>
+                    [ngClass]="promo.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="promo.active ? 'bg-green-600' : 'bg-red-500'"></span>
                     {{ promo.active ? 'Actif' : 'Inactif' }}
                   </span>
                 </td>
                 <td class="px-5 py-4 hidden md:table-cell">
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
-                    [ngClass]="promo.publicVisible ? 'bg-blue-500/15 text-blue-400' : 'bg-black/[.06] text-gray-500'">
-                    {{ promo.publicVisible ? 'Visible' : 'Masqué' }}
-                  </span>
+                  <div class="flex flex-col gap-1">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold w-fit"
+                      [ngClass]="promo.publicVisible ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'">
+                      {{ promo.publicVisible ? 'Visible' : 'Masqué' }}
+                    </span>
+                    @if (promo.firstOrderOnly) {
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-violet-100 text-violet-700 w-fit">
+                        1er achat
+                      </span>
+                    }
+                    @if (promo.minCartAmount) {
+                      <span class="text-[10px] theme-muted">min {{ promo.minCartAmount | number:'1.0-0' }} FCFA</span>
+                    }
+                  </div>
                 </td>
                 <td class="px-5 py-4">
                   <div class="flex items-center gap-2">
                     <button (click)="togglePromo(promo)"
                       class="text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors"
-                      [ngClass]="promo.active ? 'bg-orange-500/10 text-orange-400 hover:bg-orange-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'">
+                      [ngClass]="promo.active ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-green-100 text-green-700 hover:bg-green-200'">
                       {{ promo.active ? 'Désactiver' : 'Activer' }}
                     </button>
-                    <button (click)="deletePromo(promo)" class="text-red-400/60 hover:text-red-400 transition-colors p-1">
+                    <button (click)="deletePromo(promo)" class="text-red-400 hover:text-red-600 transition-colors p-1">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                       </svg>

@@ -19,7 +19,7 @@ export class AdminPromosComponent implements OnInit, OnDestroy {
   promos: PromoResponse[] = [];
   promosLoading = false;
   showPromoForm = false;
-  promoForm: CreatePromoRequest = { code: '', discountPercent: 10, publicVisible: false };
+  promoForm: CreatePromoRequest = { code: '', discountPercent: 10, publicVisible: false, firstOrderOnly: false, minCartAmount: undefined };
   promoFormLoading = false;
   promoFormError: string | null = null;
 
@@ -53,7 +53,7 @@ export class AdminPromosComponent implements OnInit, OnDestroy {
   }
 
   openPromoForm(): void {
-    this.promoForm = { code: '', discountPercent: 10, publicVisible: false };
+    this.promoForm = { code: '', discountPercent: 10, publicVisible: false, firstOrderOnly: false, minCartAmount: undefined };
     this.promoFormError = null;
     this.showPromoForm = true;
     this.cdr.markForCheck();

@@ -1017,17 +1017,25 @@
                 @for (promo of activePromos; track promo.code) {
                   <button (click)="applyPromoFromBadge(promo.code)"
                     class="w-full flex items-center justify-between px-3 py-2.5 hover:bg-[#b8941e]/5 transition-colors text-left">
-                    <div class="min-w-0">
-                      <div class="flex items-center gap-2">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
                         <span class="font-mono font-black text-gold text-sm">{{ promo.code }}</span>
                         <span class="text-xs font-bold px-1.5 py-0.5 bg-gold/15 text-gold rounded-md">-{{ promo.discountPercent }}%</span>
+                        @if (promo.firstOrderOnly) {
+                          <span class="text-[10px] font-bold px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded-md">1er achat</span>
+                        }
                       </div>
                       @if (promo.description) {
                         <p class="text-xs mt-0.5 truncate" style="color:#9ca3af">{{ promo.description }}</p>
                       }
-                      @if (promo.expiresAt) {
-                        <p class="text-xs mt-0.5" style="color:#6b7280">Expire le {{ promo.expiresAt | date:'dd/MM/yyyy' }}</p>
-                      }
+                      <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                        @if (promo.minCartAmount) {
+                          <p class="text-xs" style="color:#6b7280">Panier min. {{ promo.minCartAmount | number:'1.0-0':'fr-FR' }} FCFA</p>
+                        }
+                        @if (promo.expiresAt) {
+                          <p class="text-xs" style="color:#6b7280">· Expire le {{ promo.expiresAt | date:'dd/MM/yyyy' }}</p>
+                        }
+                      </div>
                     </div>
                     <span class="text-xs text-gold/60 flex-shrink-0 ml-2">Appliquer →</span>
                   </button>

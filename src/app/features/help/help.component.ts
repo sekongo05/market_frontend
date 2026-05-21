@@ -19,7 +19,7 @@ export class HelpComponent {
     },
     {
       q: 'Puis-je annuler ou modifier ma commande ?',
-      a: 'Vous pouvez annuler votre commande tant qu\'elle est au statut "En attente" ou "Confirmée", directement depuis la section "Mes commandes". Si vous souhaitez changer un article ou une quantité, annulez la commande et passez-en une nouvelle — c\'est rapide. Une fois la commande expédiée, il ne sera plus possible d\'intervenir dessus.'
+      a: 'Vous pouvez annuler votre commande uniquement lorsqu\'elle est au statut "En attente de confirmation", directement depuis la section "Mes commandes". Une fois confirmée par notre équipe, l\'annulation n\'est plus possible depuis votre espace — contactez notre service client dans ce cas. Pour changer un article ou une quantité sur une commande en attente, annulez-la et passez-en une nouvelle. Une fois expédiée, toute intervention est impossible.'
     },
     // ── Livraison
     {
@@ -28,7 +28,7 @@ export class HelpComponent {
     },
     {
       q: 'Y a-t-il des frais de livraison ?',
-      a: 'Oui. Les frais de livraison sont de 1 500 FCFA pour Abidjan et de 2 000 FCFA pour l\'intérieur de la Côte d\'Ivoire. Ces frais sont affichés clairement avant la confirmation de votre commande.'
+      a: 'La livraison est offerte pour toutes les commandes à Abidjan. Pour l\'intérieur de la Côte d\'Ivoire, des frais de 2 000 FCFA s\'appliquent. Le montant exact est affiché clairement avant la confirmation de votre commande.'
     },
     {
       q: 'Que se passe-t-il si je suis absent lors de la livraison ?',
@@ -41,12 +41,21 @@ export class HelpComponent {
     // ── Paiement
     {
       q: 'Quels modes de paiement sont acceptés ?',
-      a: 'Nous acceptons le paiement via Wave CI. Le règlement s\'effectue au moment de la livraison — vous payez lorsque vous recevez votre commande entre les mains du livreur.'
+      a: 'Nous acceptons le paiement en ligne via Wave CI. Le règlement est sécurisé et s\'effectue au moment de la confirmation de votre commande. Aucun paiement à la porte — vous payez avant la livraison via l\'interface Wave.'
+    },
+    // ── Codes promo
+    {
+      q: 'Comment utiliser un code promo ?',
+      a: 'Ouvrez votre panier et saisissez votre code dans le champ prévu à cet effet, puis cliquez sur "Appliquer". La réduction est calculée sur le total de votre panier et déduite automatiquement. Si des codes promotionnels sont disponibles, ils apparaissent directement dans votre panier — cliquez dessus pour les appliquer en un instant.'
+    },
+    {
+      q: 'Pourquoi mon code promo n\'est-il pas accepté ?',
+      a: 'Plusieurs raisons peuvent bloquer un code : il est peut-être expiré, désactivé, ou a atteint son nombre maximum d\'utilisations. Certains codes sont réservés aux nouveaux clients (premier achat uniquement) — si vous avez déjà passé une commande confirmée, ce type de code ne vous sera plus accessible. D\'autres codes exigent un montant minimum de panier ; si c\'est le cas, le message d\'erreur vous indiquera le montant requis.'
     },
     // ── Retours
     {
       q: 'Puis-je retourner un article ?',
-      a: 'Oui. Vous disposez de 24 heures après la date de réception pour initier un retour. L\'article doit être non utilisé, dans son emballage d\'origine. Connectez-vous, allez dans "Mes commandes", sélectionnez la commande concernée et cliquez sur "Retourner un article". Consultez notre politique de retour complète pour les conditions détaillées.'
+      a: 'Oui. Vous disposez de 3 jours après la date de réception pour initier un retour. L\'article doit être non utilisé, dans son emballage d\'origine. Connectez-vous, allez dans "Mes commandes", sélectionnez la commande concernée et cliquez sur "Retourner un article". Consultez notre politique de retour complète pour les conditions détaillées.'
     },
     {
       q: 'Que faire si un article est endommagé ou non conforme à la réception ?',

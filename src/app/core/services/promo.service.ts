@@ -14,8 +14,8 @@ export class PromoService {
     return this.apiService.get('/promos/active');
   }
 
-  checkPromo(code: string, minItemPrice: number, cartTotal: number): Observable<ApiResponse<PromoCheckResponse>> {
-    return this.apiService.get(`/promos/check?code=${encodeURIComponent(code)}&minItemPrice=${minItemPrice}&cartTotal=${cartTotal}`);
+  checkPromo(code: string, cartTotal: number): Observable<ApiResponse<PromoCheckResponse>> {
+    return this.apiService.get(`/promos/check?code=${encodeURIComponent(code)}&cartTotal=${cartTotal}`);
   }
 
   getAllPromos(): Observable<ApiResponse<PromoResponse[]>> {

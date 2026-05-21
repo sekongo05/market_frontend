@@ -520,10 +520,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.promoChecking = true;
     this.promoError = null;
     this.promoCheckResult = null;
-    const minItemPrice = this.cartItems.length > 0
-      ? Math.min(...this.cartItems.map(i => i.price))
-      : this.cartTotal;
-    this.promoService.checkPromo(this.promoCodeInput.trim(), minItemPrice, this.cartTotal).subscribe({
+    this.promoService.checkPromo(this.promoCodeInput.trim(), this.cartTotal).subscribe({
       next: (r) => {
         if (r.success) {
           this.promoCheckResult = r.data;

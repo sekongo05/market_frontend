@@ -8,6 +8,8 @@ export interface PromoResponse {
   usedCount: number;
   description: string | null;
   publicVisible: boolean;
+  firstOrderOnly: boolean;
+  minCartAmount: number | null;
   createdAt: string;
 }
 
@@ -25,6 +27,8 @@ export interface PublicPromoResponse {
   discountPercent: number;
   description: string | null;
   expiresAt: string | null;
+  firstOrderOnly: boolean;
+  minCartAmount: number | null;
 }
 
 export interface CreatePromoRequest {
@@ -34,4 +38,6 @@ export interface CreatePromoRequest {
   maxUses?: number;
   description?: string;
   publicVisible?: boolean;
+  firstOrderOnly?: boolean;
+  minCartAmount?: number;
 }
