@@ -24,6 +24,8 @@ export interface ReturnResponse {
   updatedAt: string;
   deliveredAt: string | null;
   orderItems: ReturnItemDto[];
+  orderTotalAmount: number | null;
+  refundAmount: number | null;
 }
 
 export interface CreateReturnRequest {
@@ -34,4 +36,5 @@ export interface CreateReturnRequest {
 export interface ReturnDecisionRequest {
   decision: ReturnStatus;
   adminNote?: string;
+  refundAmount?: number;
 }

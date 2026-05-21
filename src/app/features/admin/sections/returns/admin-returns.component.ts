@@ -36,6 +36,7 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
   returnDecisionItem: ReturnResponse | null = null;
   returnDecision: ReturnStatus = 'APPROVED';
   returnDecisionNote = '';
+  returnRefundAmount: number | null = null;
   returnDecisionLoading = false;
 
   readonly returnStatusLabel = returnStatusLabel;
@@ -120,9 +121,10 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
   }
 
   openReturnDecisionModal(ret: ReturnResponse): void {
-    this.returnDecisionItem = ret;
-    this.returnDecision     = 'APPROVED';
-    this.returnDecisionNote = '';
+    this.returnDecisionItem  = ret;
+    this.returnDecision      = 'APPROVED';
+    this.returnDecisionNote  = '';
+    this.returnRefundAmount  = null;
     this.returnDecisionModal = true;
     this.scrollLock.lock();
     this.cdr.markForCheck();
@@ -135,12 +137,24 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  onDecisionChange(): void {
+    if (this.returnDecision === 'COMPLETED') {
+      this.returnRefundAmount = this.returnDecisionItem?.orderTotalAmount ?? null;
+    } else {
+      this.returnRefundAmount = null;
+    }
+    this.cdr.markForCheck();
+  }
+
   submitReturnDecision(): void {
     if (!this.returnDecisionItem) return;
     this.returnDecisionLoading = true;
     const data: ReturnDecisionRequest = {
-      decision:  this.returnDecision,
-      adminNote: this.returnDecisionNote.trim() || undefined,
+      decision:     this.returnDecision,
+      adminNote:    this.returnDecisionNote.trim() || undefined,
+      refundAmount: this.returnDecision === 'COMPLETED' && this.returnRefundAmount != null
+                      ? this.returnRefundAmount
+                      : undefined,
     };
     this.returnService.processDecision(this.returnDecisionItem.id, data).subscribe({
       next: (r) => {

@@ -98,6 +98,7 @@
               <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Client</th>
               <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden lg:table-cell">Motif</th>
               <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3">Statut</th>
+              <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Remboursement</th>
               <th class="text-left text-xs font-bold theme-muted uppercase tracking-wide px-5 py-3 hidden md:table-cell">Date</th>
               <th class="px-5 py-3"></th>
             </tr>
@@ -136,6 +137,17 @@
                     [ngClass]="returnStatusClass(ret.status)">
                     {{ returnStatusLabel(ret.status) }}
                   </span>
+                </td>
+
+                <!-- Remboursement -->
+                <td class="px-5 py-4 hidden md:table-cell">
+                  @if (ret.status === 'COMPLETED' && ret.refundAmount != null) {
+                    <span class="text-sm font-bold text-green-400">{{ ret.refundAmount | number:'1.0-0' }} F</span>
+                  } @else if (ret.status === 'REJECTED') {
+                    <span class="text-xs theme-muted">—</span>
+                  } @else {
+                    <span class="text-xs theme-muted">En attente</span>
+                  }
                 </td>
 
                 <!-- Date -->
@@ -274,13 +286,28 @@
             { val: 'REJECTED',  label: 'Refuser',   bg: 'bg-red-500/15 border-red-500/40 text-red-400',     active: 'bg-red-500 border-red-500 text-white' },
             { val: 'COMPLETED', label: 'Traité',    bg: 'bg-blue-500/15 border-blue-500/40 text-blue-400',  active: 'bg-blue-500 border-blue-500 text-white' }
           ]; track d.val) {
-            <button type="button" (click)="returnDecision = $any(d.val)"
+            <button type="button" (click)="returnDecision = $any(d.val); onDecisionChange()"
               class="py-2.5 rounded-xl border text-xs font-bold transition-all"
               [ngClass]="returnDecision === d.val ? d.active : d.bg">
               {{ d.label }}
             </button>
           }
         </div>
+
+        <!-- Montant remboursé (visible uniquement si décision = Traité) -->
+        @if (returnDecision === 'COMPLETED') {
+          <div class="mb-4 p-3 bg-blue-500/8 border border-blue-500/20 rounded-xl">
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">
+              Montant remboursé (FCFA)
+              <span class="font-normal normal-case ml-1">— Commande : {{ returnDecisionItem.orderTotalAmount | number:'1.0-0' }} F</span>
+            </label>
+            <input type="number" [(ngModel)]="returnRefundAmount" min="0"
+              [max]="returnDecisionItem.orderTotalAmount ?? undefined"
+              placeholder="Montant en FCFA"
+              class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
+            <p class="text-[10px] theme-muted mt-1.5">Laissez vide pour rembourser la totalité ({{ returnDecisionItem.orderTotalAmount | number:'1.0-0' }} F)</p>
+          </div>
+        }
 
         <!-- Note admin -->
         <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Note pour le client <span class="font-normal normal-case">(optionnel)</span></label>

@@ -828,11 +828,14 @@
               </div>
               <div>
                 <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">
-                  Prix d'achat <span class="font-normal normal-case text-emerald-400">(finance)</span>
+                  Prix d'achat *
                 </label>
-                <input formControlName="costPrice" type="number" min="0" placeholder="25000"
-                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
-                @if (productForm.get('costPrice')?.value > 0 && productForm.get('price')?.value > 0) {
+                <input formControlName="costPrice" type="number" min="1" placeholder="25000"
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
+                  [class.border-red-500]="productForm.get('costPrice')?.invalid && productForm.get('costPrice')?.touched"/>
+                @if (productForm.get('costPrice')?.invalid && productForm.get('costPrice')?.touched) {
+                  <p class="text-[10px] text-red-400 mt-1 font-semibold">Le prix d'achat est obligatoire et doit être positif.</p>
+                } @else if (productForm.get('costPrice')?.value > 0 && productForm.get('price')?.value > 0) {
                   <p class="text-[10px] text-emerald-400 mt-1 font-semibold">
                     Marge estimée :
                     {{ ((productForm.get('price')?.value - productForm.get('costPrice')?.value) / productForm.get('price')?.value * 100) | number:'1.0-0' }}%

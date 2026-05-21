@@ -206,7 +206,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       description:     [product?.description      ?? '', Validators.required],
       price:           [product?.price            ?? null, [Validators.required, Validators.min(1)]],
       compareAtPrice:  [product?.compareAtPrice   ?? null, [Validators.min(0)]],
-      costPrice:       [product?.costPrice        ?? null, [Validators.min(0)]],
+      costPrice:       [product?.costPrice        ?? null, [Validators.required, Validators.min(1)]],
       stock:           [product?.stock            ?? null, [Validators.required, Validators.min(0)]],
       gender:          [product?.gender           ?? 'UNISEX', Validators.required],
       categoryId:      [product?.category?.id    ?? null, Validators.required],
@@ -359,6 +359,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       if (v.costPrice && +v.costPrice > 0) fd.append('costPrice', v.costPrice.toString());
       req$ = this.productService.updateProduct(this.editingProduct.id, fd);
     } else {
+      fd.append('costPrice', v.costPrice.toString());
       if (this.hasVariantsToggle && this.creationItems.length > 0) {
         fd.append('images', this.creationItems[0].file);
       } else if (!this.hasVariantsToggle && this.selectedImageFile) {
