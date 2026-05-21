@@ -16,7 +16,7 @@
     </button>
   </div>
 
-  <!-- Modal création / édition -->
+  <!-- ─── Modal création / édition ─────────────────────────────────────── -->
   @if (showCategoryForm) {
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeCategoryForm()"></div>
@@ -33,26 +33,50 @@
             </svg>
           </button>
         </div>
+
         <div class="px-6 py-5 space-y-4">
           @if (categoryFormError) {
             <div class="p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-red-400 text-sm">{{ categoryFormError }}</div>
           }
+
+          <!-- Nom -->
           <div>
             <label class="block text-xs font-semibold theme-muted mb-1.5">Nom <span class="text-red-400">*</span></label>
             <input [(ngModel)]="categoryForm.name" type="text" placeholder="ex: Montres"
               class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
           </div>
+
+          <!-- Description (textarea) -->
           <div>
             <label class="block text-xs font-semibold theme-muted mb-1.5">Description</label>
-            <input [(ngModel)]="categoryForm.description" type="text" placeholder="Courte description…"
-              class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
+            <textarea [(ngModel)]="categoryForm.description" rows="3" placeholder="Courte description…"
+              class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all resize-none"></textarea>
           </div>
+
+          <!-- URL image + prévisualisation -->
           <div>
             <label class="block text-xs font-semibold theme-muted mb-1.5">URL de l'image</label>
             <input [(ngModel)]="categoryForm.imageUrl" type="text" placeholder="https://…"
               class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
+            @if (categoryForm.imageUrl.trim()) {
+              <div class="mt-2 rounded-xl overflow-hidden h-32 bg-black/20">
+                <img [src]="categoryForm.imageUrl" alt="Aperçu" class="w-full h-full object-cover"
+                  onerror="this.style.display='none'"/>
+              </div>
+            }
+          </div>
+
+          <!-- Ordre d'affichage -->
+          <div>
+            <label class="block text-xs font-semibold theme-muted mb-1.5">
+              Ordre d'affichage
+              <span class="font-normal opacity-60 ml-1">— position sur la page d'accueil (0 = premier)</span>
+            </label>
+            <input [(ngModel)]="categoryForm.displayOrder" type="number" min="0" step="1" placeholder="0"
+              class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
           </div>
         </div>
+
         <div class="flex gap-3 px-6 py-4 border-t theme-border">
           <button (click)="submitCategory()" [disabled]="categoryFormLoading"
             class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gold text-black font-bold text-sm rounded-xl hover:shadow-lg hover:shadow-yellow-600/25 hover:-translate-y-0.5 disabled:opacity-50 disabled:translate-y-0 transition-all">
@@ -73,6 +97,36 @@
     </div>
   }
 
+  <!-- ─── Dialog confirmation désactivation ────────────────────────────── -->
+  @if (confirmToggleCat && pendingToggleCat) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+      <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="cancelDeactivate()"></div>
+      <div class="relative w-full max-w-sm theme-surface border theme-border rounded-3xl shadow-2xl animate-scale-in p-6 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-orange-500/15 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-base font-bold theme-text mb-1">Désactiver la catégorie ?</h3>
+        <p class="text-sm theme-muted mb-5">
+          <span class="font-semibold theme-text">{{ pendingToggleCat.name }}</span> ne sera plus visible sur la boutique.
+          Les produits de cette catégorie resteront actifs.
+        </p>
+        <div class="flex gap-3">
+          <button (click)="confirmDeactivate()"
+            class="flex-1 py-2.5 bg-orange-500 text-white font-bold text-sm rounded-xl hover:bg-orange-600 transition-colors">
+            Désactiver
+          </button>
+          <button (click)="cancelDeactivate()"
+            class="flex-1 py-2.5 bg-black/[.06] theme-muted font-semibold text-sm rounded-xl hover:bg-white/12 transition-colors">
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ─── Chargement ────────────────────────────────────────────────────── -->
   @if (categoriesLoading) {
     <div class="flex justify-center py-16">
       <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
@@ -82,10 +136,13 @@
     </div>
   }
 
+  <!-- ─── Grille des catégories ─────────────────────────────────────────── -->
   @if (!categoriesLoading) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       @for (cat of categories; track cat.id) {
         <div class="luxury-card rounded-2xl overflow-hidden transition-shadow" [class.opacity-50]="!cat.active">
+
+          <!-- Image ou placeholder -->
           @if (cat.imageUrl) {
             <div class="h-32 overflow-hidden">
               <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy" class="w-full h-full object-cover"/>
@@ -97,20 +154,40 @@
               </svg>
             </div>
           }
+
           <div class="p-4">
             <div class="flex items-start justify-between gap-2">
               <div class="min-w-0 flex-1">
+
+                <!-- Nom + badge statut -->
                 <div class="flex items-center gap-2 mb-1">
                   <p class="font-bold theme-text text-sm truncate">{{ cat.name }}</p>
                   @if (!cat.active) {
                     <span class="flex-shrink-0 text-xs font-bold px-2 py-0.5 bg-red-500/15 text-red-400 rounded-lg">Inactif</span>
                   }
                 </div>
+
+                <!-- Description -->
                 @if (cat.description) {
-                  <p class="text-xs theme-muted leading-snug line-clamp-2">{{ cat.description }}</p>
+                  <p class="text-xs theme-muted leading-snug line-clamp-2 mb-1.5">{{ cat.description }}</p>
                 }
-                <p class="text-xs theme-muted opacity-50 mt-1.5 font-mono">{{ cat.slug }}</p>
+
+                <!-- Slug -->
+                <p class="text-xs theme-muted opacity-50 font-mono">{{ cat.slug }}</p>
+
+                <!-- Meta : nb produits + ordre -->
+                <div class="flex items-center gap-3 mt-2">
+                  <span class="flex items-center gap-1 text-xs font-semibold text-gold/70">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                    </svg>
+                    {{ cat.productCount }} produit{{ cat.productCount !== 1 ? 's' : '' }}
+                  </span>
+                  <span class="text-xs theme-muted opacity-50">ordre {{ cat.displayOrder }}</span>
+                </div>
               </div>
+
+              <!-- Actions -->
               <div class="flex flex-col gap-1 flex-shrink-0">
                 <button (click)="openEditCategoryForm(cat)"
                   appTooltip="Modifier la catégorie" tooltipPosition="left"
@@ -119,7 +196,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                   </svg>
                 </button>
-                <button (click)="toggleCategory(cat)" [disabled]="categoryToggleId === cat.id"
+                <button (click)="requestToggleCategory(cat)" [disabled]="categoryToggleId === cat.id"
                   [appTooltip]="cat.active ? 'Désactiver la catégorie' : 'Activer la catégorie'" tooltipPosition="left"
                   class="w-8 h-8 flex items-center justify-center rounded-xl transition-colors disabled:opacity-40"
                   [ngClass]="cat.active ? 'text-orange-400 hover:bg-orange-500/10' : 'text-green-400 hover:bg-green-500/10'">

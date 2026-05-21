@@ -23,9 +23,13 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   categoryToggleId: number | null = null;
   showCategoryForm = false;
   editingCategory: CategoryResponse | null = null;
-  categoryForm = { name: '', description: '', imageUrl: '' };
+  categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0 };
   categoryFormLoading = false;
   categoryFormError: string | null = null;
+
+  // Confirmation dialog before deactivating
+  pendingToggleCat: CategoryResponse | null = null;
+  confirmToggleCat = false;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -63,7 +67,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
   openCategoryForm(): void {
     this.editingCategory = null;
-    this.categoryForm = { name: '', description: '', imageUrl: '' };
+    this.categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0 };
     this.categoryFormError = null;
     this.showCategoryForm = true;
     this.scrollLock.lock();
@@ -72,7 +76,12 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
   openEditCategoryForm(cat: CategoryResponse): void {
     this.editingCategory = cat;
-    this.categoryForm = { name: cat.name, description: cat.description ?? '', imageUrl: cat.imageUrl ?? '' };
+    this.categoryForm = {
+      name: cat.name,
+      description: cat.description ?? '',
+      imageUrl: cat.imageUrl ?? '',
+      displayOrder: cat.displayOrder ?? 0,
+    };
     this.categoryFormError = null;
     this.showCategoryForm = true;
     this.scrollLock.lock();
@@ -91,19 +100,23 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     if (!this.categoryForm.name.trim()) { this.categoryFormError = 'Le nom est obligatoire'; return; }
     this.categoryFormLoading = true;
     this.categoryFormError = null;
+    // Capture isEditing before any null assignment
+    const isEditing = !!this.editingCategory;
+    const editingId  = this.editingCategory?.id;
     const payload = {
       name: this.categoryForm.name.trim(),
       description: this.categoryForm.description.trim() || undefined,
       imageUrl: this.categoryForm.imageUrl.trim() || undefined,
+      displayOrder: this.categoryForm.displayOrder,
     };
-    const req$ = this.editingCategory
-      ? this.categoryService.updateCategory(this.editingCategory.id, payload)
+    const req$ = isEditing
+      ? this.categoryService.updateCategory(editingId!, payload)
       : this.categoryService.createCategory(payload);
     req$.subscribe({
       next: (r) => {
         if (r.success) {
-          if (this.editingCategory) {
-            const idx = this.categories.findIndex(c => c.id === this.editingCategory!.id);
+          if (isEditing) {
+            const idx = this.categories.findIndex(c => c.id === editingId);
             if (idx !== -1) { this.categories = [...this.categories]; this.categories[idx] = r.data; }
           } else {
             this.categories = [...this.categories, r.data];
@@ -111,7 +124,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
           this.showCategoryForm = false;
           this.editingCategory = null;
           this.scrollLock.unlock();
-          this.toast.show(this.editingCategory ? 'Catégorie mise à jour ✓' : 'Catégorie créée ✓');
+          this.toast.show(isEditing ? 'Catégorie mise à jour ✓' : 'Catégorie créée ✓');
         }
         this.categoryFormLoading = false;
         this.cdr.markForCheck();
@@ -124,7 +137,33 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleCategory(cat: CategoryResponse): void {
+  requestToggleCategory(cat: CategoryResponse): void {
+    if (cat.active) {
+      // Ask for confirmation before deactivating
+      this.pendingToggleCat = cat;
+      this.confirmToggleCat = true;
+      this.cdr.markForCheck();
+    } else {
+      this.executeToggle(cat);
+    }
+  }
+
+  confirmDeactivate(): void {
+    if (this.pendingToggleCat) {
+      this.executeToggle(this.pendingToggleCat);
+    }
+    this.pendingToggleCat = null;
+    this.confirmToggleCat = false;
+    this.cdr.markForCheck();
+  }
+
+  cancelDeactivate(): void {
+    this.pendingToggleCat = null;
+    this.confirmToggleCat = false;
+    this.cdr.markForCheck();
+  }
+
+  private executeToggle(cat: CategoryResponse): void {
     this.categoryToggleId = cat.id;
     this.categoryService.toggleCategoryActive(cat.id).subscribe({
       next: (r) => {

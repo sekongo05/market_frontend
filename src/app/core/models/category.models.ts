@@ -5,6 +5,8 @@ export interface CategoryResponse {
   description: string;
   imageUrl: string;
   active: boolean;
+  displayOrder: number;
+  productCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -13,6 +15,7 @@ export interface CreateCategoryRequest {
   name: string;
   description?: string;
   imageUrl?: string;
+  displayOrder?: number;
 }
 
 export interface UpdateCategoryRequest extends CreateCategoryRequest {}
