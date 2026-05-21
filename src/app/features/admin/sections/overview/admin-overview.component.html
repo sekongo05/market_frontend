@@ -100,41 +100,41 @@
         </svg>
         <h2 class="text-xs font-bold theme-muted uppercase tracking-widest">Aujourd'hui</h2>
       </div>
-      <div class="grid grid-cols-3 gap-3">
+      <div class="grid grid-cols-3 gap-2.5">
 
-        <div class="theme-surface border theme-border rounded-2xl p-4 flex items-center gap-3">
-          <div class="w-9 h-9 bg-indigo-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
+        <div class="theme-surface border theme-border rounded-2xl p-3 sm:p-4 flex flex-col gap-2">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 bg-indigo-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
           </div>
-          <div class="min-w-0">
-            <p class="text-[10px] theme-muted font-semibold uppercase tracking-wide">Commandes</p>
+          <div>
+            <p class="text-[10px] theme-muted font-semibold uppercase tracking-wide leading-tight">Cmdes</p>
             <p class="text-2xl font-black theme-text leading-none">{{ stats.ordersToday }}</p>
           </div>
         </div>
 
-        <div class="theme-surface border theme-border rounded-2xl p-4 flex items-center gap-3">
-          <div class="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+        <div class="theme-surface border theme-border rounded-2xl p-3 sm:p-4 flex flex-col gap-2">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </div>
-          <div class="min-w-0">
-            <p class="text-[10px] theme-muted font-semibold uppercase tracking-wide">CA livré</p>
-            <p class="text-lg font-black text-gold leading-none truncate">{{ formatAmount(stats.revenueToday) }}</p>
+          <div>
+            <p class="text-[10px] theme-muted font-semibold uppercase tracking-wide leading-tight">CA livré</p>
+            <p class="text-base sm:text-lg font-black text-gold leading-none truncate">{{ formatAmount(stats.revenueToday) }}</p>
             <p class="text-[10px] theme-muted">FCFA</p>
           </div>
         </div>
 
-        <div class="theme-surface border theme-border rounded-2xl p-4 flex items-center gap-3">
-          <div class="w-9 h-9 bg-teal-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
+        <div class="theme-surface border theme-border rounded-2xl p-3 sm:p-4 flex flex-col gap-2">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 bg-teal-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
             </svg>
           </div>
-          <div class="min-w-0">
-            <p class="text-[10px] theme-muted font-semibold uppercase tracking-wide">Nouveaux clients</p>
+          <div>
+            <p class="text-[10px] theme-muted font-semibold uppercase tracking-wide leading-tight">Nouveaux</p>
             <p class="text-2xl font-black text-teal-400 leading-none">{{ stats.newCustomersToday }}</p>
           </div>
         </div>
@@ -338,40 +338,40 @@
       <div class="grid grid-cols-2 gap-3">
 
         <a routerLink="/admin/products"
-           class="flex items-center justify-between p-4 rounded-2xl transition-colors"
+           class="flex flex-col gap-3 p-4 rounded-2xl transition-colors active:scale-[0.97]"
            [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/8 border border-amber-500/30 hover:bg-amber-500/14' : 'theme-surface border theme-border hover:bg-black/[.03]'">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          <div class="flex items-center justify-between">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                  [ngClass]="stats.lowStockCount > 0 ? 'bg-amber-500/20' : 'bg-black/[.06]'">
               <svg class="w-5 h-5" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'"
                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
               </svg>
             </div>
-            <div>
-              <p class="text-sm font-bold" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-text'">Stock faible</p>
-              <p class="text-xs theme-muted opacity-70">≤ 5 unités</p>
-            </div>
+            <span class="text-3xl font-black" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'">
+              {{ stats.lowStockCount }}
+            </span>
           </div>
-          <span class="text-3xl font-black" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-muted'">
-            {{ stats.lowStockCount }}
-          </span>
+          <div>
+            <p class="text-sm font-bold leading-tight" [ngClass]="stats.lowStockCount > 0 ? 'text-amber-400' : 'theme-text'">Stock faible</p>
+            <p class="text-xs theme-muted opacity-70">≤ 5 unités</p>
+          </div>
         </a>
 
         <a routerLink="/admin/orders"
-           class="flex items-center justify-between p-4 rounded-2xl transition-colors theme-surface border theme-border hover:bg-black/[.03]">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center flex-shrink-0">
+           class="flex flex-col gap-3 p-4 rounded-2xl transition-colors theme-surface border theme-border hover:bg-black/[.03] active:scale-[0.97]">
+          <div class="flex items-center justify-between">
+            <div class="w-9 h-9 rounded-xl bg-indigo-500/15 flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
               </svg>
             </div>
-            <div>
-              <p class="text-sm font-bold theme-text">Répartition commandes</p>
-              <p class="text-xs theme-muted opacity-70">Voir le détail →</p>
-            </div>
+            <span class="text-3xl font-black theme-text">{{ stats.totalOrders }}</span>
           </div>
-          <span class="text-3xl font-black theme-text">{{ stats.totalOrders }}</span>
+          <div>
+            <p class="text-sm font-bold theme-text leading-tight">Répartition</p>
+            <p class="text-xs theme-muted opacity-70">Voir le détail →</p>
+          </div>
         </a>
 
       </div>
