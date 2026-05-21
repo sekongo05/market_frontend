@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
@@ -20,6 +20,14 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   pendingOrdersCount = 0;
   moreSheetOpen = false;
   currentRouteLabel = 'Administration';
+  isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+
+  @HostListener('window:resize')
+  onResize(): void {
+    const was = this.isDesktop;
+    this.isDesktop = window.innerWidth >= 1024;
+    if (was !== this.isDesktop) this.cdr.markForCheck();
+  }
   private readonly destroy$ = new Subject<void>();
   private readonly routeLabels: Record<string, string> = {
     overview:   'Tableau de bord',

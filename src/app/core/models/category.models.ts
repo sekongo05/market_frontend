@@ -5,8 +5,8 @@ export interface CategoryResponse {
   description: string;
   imageUrl: string;
   active: boolean;
-  displayOrder: number;
-  productCount: number;
+  displayOrder?: number;
+  productCount?: number;
   createdAt: string;
   updatedAt: string;
 }
