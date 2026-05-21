@@ -41,7 +41,7 @@ export class HelpComponent {
     // ── Paiement
     {
       q: 'Quels modes de paiement sont acceptés ?',
-      a: 'Nous acceptons le paiement en ligne via Wave CI. Le règlement est sécurisé et s\'effectue au moment de la confirmation de votre commande. Aucun paiement à la porte — vous payez avant la livraison via l\'interface Wave.'
+      a: 'Nous acceptons le paiement par Wave, Orange Money ou en espèces à la livraison.'
     },
     // ── Codes promo
     {
