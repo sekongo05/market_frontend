@@ -51,6 +51,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   // Category filter
   selectedCategoryId: number | null = null;
   private pendingCategorySlug: string | null = null;
+  featuredOnly = false;
 
   // Sort & price filter
   sortOption: SortOption = 'newest';
@@ -251,8 +252,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
       url: '/products',
     });
     this.initForm();
-    const slugParam   = this.route.snapshot.queryParamMap.get('categorie');
-    const searchParam = this.route.snapshot.queryParamMap.get('search');
+    const slugParam     = this.route.snapshot.queryParamMap.get('categorie');
+    const searchParam   = this.route.snapshot.queryParamMap.get('search');
+    const featuredParam = this.route.snapshot.queryParamMap.get('featured');
+    if (featuredParam === 'true') this.featuredOnly = true;
     if (slugParam) {
       this.pendingCategorySlug = slugParam;
       this.loading = true;
@@ -548,6 +551,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     if (!isNaN(min) && min > 0) params.minPrice = min;
     if (!isNaN(max) && max > 0) params.maxPrice = max;
     if (this.inStockOnly) params.inStock = true;
+    if (this.featuredOnly) params.featured = true;
 
     this.productService.getProducts(params).subscribe({
       next: (response) => {
@@ -642,6 +646,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.minPriceInput = '';
     this.maxPriceInput = '';
     this.inStockOnly = false;
+    this.featuredOnly = false;
     this.loadProducts(0);
     this.cdr.detectChanges();
   }

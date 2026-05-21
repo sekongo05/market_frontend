@@ -1,15 +1,18 @@
 import { Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from './core/services/auth.service';
 import { ProductService } from './core/services/product.service';
 import { ReviewService } from './core/services/review.service';
+import { CategoryService } from './core/services/category.service';
 import { DashboardService, PublicStats } from './core/services/dashboard.service';
 import { WebSocketService } from './core/services/websocket.service';
 import { SeoService } from './core/services/seo.service';
 import { MediaUrlPipe } from './shared/pipes/media-url.pipe';
 import { ProductResponse } from './core/models/product.models';
 import { ReviewResponse } from './core/models/review.models';
+import { CategoryResponse } from './core/models/category.models';
 import { PageResponse } from './core/models/common.models';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -17,7 +20,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, MediaUrlPipe],
+  imports: [CommonModule, RouterLink, FormsModule, MediaUrlPipe],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,11 +28,18 @@ import { takeUntil } from 'rxjs/operators';
 export class HomeComponent implements AfterViewInit, OnDestroy {
   currentUser$;
 
+  categories: CategoryResponse[] = [];
+  featuredProducts: ProductResponse[] = [];
+  bestsellers: ProductResponse[] = [];
   newProducts: ProductResponse[] = [];
-  newProductsLoading = true;
   discountProducts: ProductResponse[] = [];
   featuredReviews: ReviewResponse[] = [];
-  reviewsLoading = true;
+
+  categoriesLoading   = true;
+  featuredLoading     = true;
+  bestsellersLoading  = true;
+  newProductsLoading  = true;
+  reviewsLoading      = true;
 
   statProducts   = 0;
   statCategories = 0;
@@ -38,20 +48,11 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   statAvgRating  = 0;
   publicStats: PublicStats | null = null;
 
+  searchQuery = '';
+
   private _observer?: IntersectionObserver;
   private _statsAnimated = false;
   private destroy$ = new Subject<void>();
-
-  readonly marqueeItems = [
-    'Rolex', 'Cartier', 'Richard Mille', 'Hublot', 'Audemars Piguet',
-    'Patek Philippe', 'Omega', 'Tag Heuer', 'Breitling', 'IWC', 'Tissot', 'Bulgari',
-    'Rolex', 'Cartier', 'Richard Mille', 'Hublot', 'Audemars Piguet',
-    'Patek Philippe', 'Omega', 'Tag Heuer', 'Breitling', 'IWC', 'Tissot', 'Bulgari',
-  ];
-
-  get hasDeals(): boolean {
-    return !this.newProductsLoading && this.discountProducts.length > 0;
-  }
 
   readonly steps = [
     {
@@ -69,7 +70,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     {
       n: '03',
       title: 'Recevez chez vous',
-      desc: '24–48h à Abidjan, 72h max partout en Côte d\'Ivoire. Paiement à la réception de votre commande.',
+      desc: '24–48h à Abidjan, 72h max partout en Côte d\'Ivoire. Paiement à la réception.',
       icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
     },
   ];
@@ -78,6 +79,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     private authService: AuthService,
     private productService: ProductService,
     private reviewService: ReviewService,
+    private categoryService: CategoryService,
     private dashboardService: DashboardService,
     private wsService: WebSocketService,
     private router: Router,
@@ -99,20 +101,15 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         logo: 'https://sdm-store.shop/icon-512.png',
         image: 'https://sdm-store.shop/icon-512.png',
         description: 'Boutique en ligne de mode, montres, bijoux et lifestyle. Livraison 24–48h en Côte d\'Ivoire.',
-        address: {
-          '@type': 'PostalAddress',
-          addressLocality: 'Abidjan',
-          addressCountry: 'CI',
-        },
-        contactPoint: {
-          '@type': 'ContactPoint',
-          contactType: 'customer service',
-          availableLanguage: 'French',
-        },
+        address: { '@type': 'PostalAddress', addressLocality: 'Abidjan', addressCountry: 'CI' },
+        contactPoint: { '@type': 'ContactPoint', contactType: 'customer service', availableLanguage: 'French' },
         sameAs: [],
       },
     });
     this._loadPublicStats();
+    this._loadCategories();
+    this._loadFeatured();
+    this._loadBestsellers();
     this._loadProducts();
     this._loadReviews();
     this._initObserver();
@@ -129,9 +126,19 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this.router.navigate(['/products'], { queryParams: { categorie: slug } });
   }
 
+  search(): void {
+    if (this.searchQuery.trim()) {
+      this.router.navigate(['/products'], { queryParams: { search: this.searchQuery.trim() } });
+    }
+  }
+
+  onSearchKey(event: KeyboardEvent): void {
+    if (event.key === 'Enter') this.search();
+  }
+
   isNew(product: ProductResponse): boolean {
     if (!product.createdAt) return false;
-    return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= 7;
+    return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= 21;
   }
 
   onHeroMouseMove(event: MouseEvent): void {
@@ -140,12 +147,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     const rect    = section.getBoundingClientRect();
     const cx = (event.clientX - rect.left) / rect.width  - 0.5;
     const cy = (event.clientY - rect.top)  / rect.height - 0.5;
-
     const parallax = section.querySelector('.hero-parallax') as HTMLElement | null;
-    if (parallax) {
-      parallax.style.transform = `translate(${(cx * -12).toFixed(2)}px, ${(cy * -8).toFixed(2)}px)`;
-    }
-
+    if (parallax) parallax.style.transform = `translate(${(cx * -12).toFixed(2)}px, ${(cy * -8).toFixed(2)}px)`;
     section.style.setProperty('--mx', ((event.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%');
     section.style.setProperty('--my', ((event.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%');
   }
@@ -156,18 +159,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     if (parallax) parallax.style.transform = '';
   }
 
-  private _subscribeStock(): void {
-    this.wsService.stockUpdate$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(update => {
-        let changed = false;
-        for (const list of [this.newProducts, this.discountProducts]) {
-          const p = list.find(p => p.id === update.productId);
-          if (p) { (p as any).stock = update.stock; changed = true; }
-        }
-        if (changed) this.cdr.detectChanges();
-      });
-  }
+  get hasDeals(): boolean { return !this.newProductsLoading && this.discountProducts.length > 0; }
+  get hasFeatured(): boolean { return !this.featuredLoading && this.featuredProducts.length > 0; }
+  get hasBestsellers(): boolean { return !this.bestsellersLoading && this.bestsellers.length > 0; }
+  get hasNewProducts(): boolean { return !this.newProductsLoading && this.newProducts.length > 0; }
 
   get editorialStats(): { v: string; l: string }[] {
     const p = this.publicStats;
@@ -185,8 +180,44 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     return parts[0];
   }
 
-  starArray(rating: number): number[] {
-    return Array.from({ length: 5 }, (_, i) => i + 1);
+  starArray(): number[] { return [1, 2, 3, 4, 5]; }
+
+  avgRatingDisplay(): string {
+    if (!this.publicStats) return '…';
+    return this.publicStats.averageRating.toFixed(1);
+  }
+
+  private _loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (r) => {
+        if (r.success) this.categories = r.data as CategoryResponse[];
+        this.categoriesLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.categoriesLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  private _loadFeatured(): void {
+    this.productService.getFeaturedProducts(6).subscribe({
+      next: (r) => {
+        if (r.success) this.featuredProducts = r.data as ProductResponse[];
+        this.featuredLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.featuredLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  private _loadBestsellers(): void {
+    this.productService.getBestsellers(8).subscribe({
+      next: (r) => {
+        if (r.success) this.bestsellers = r.data as ProductResponse[];
+        this.bestsellersLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.bestsellersLoading = false; this.cdr.detectChanges(); },
+    });
   }
 
   private _loadProducts(): void {
@@ -210,7 +241,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         if (r.success) {
           this.publicStats   = r.data as PublicStats;
           this.statAvgRating = this.publicStats.averageRating;
-          // Si la section stats est déjà visible avant le chargement, on lance les compteurs
           if (this._statsAnimated) {
             this._statsAnimated = false;
             this._count('statProducts',   this.publicStats.activeProducts,   2000);
@@ -233,6 +263,17 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: () => { this.reviewsLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  private _subscribeStock(): void {
+    this.wsService.stockUpdate$.pipe(takeUntil(this.destroy$)).subscribe(update => {
+      let changed = false;
+      for (const list of [this.newProducts, this.discountProducts, this.featuredProducts, this.bestsellers]) {
+        const p = list.find(p => p.id === update.productId);
+        if (p) { (p as any).stock = update.stock; changed = true; }
+      }
+      if (changed) this.cdr.detectChanges();
     });
   }
 

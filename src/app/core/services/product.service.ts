@@ -50,6 +50,14 @@ export class ProductService {
     return this.apiService.patch(`/products/${id}/toggle-featured`);
   }
 
+  getBestsellers(size = 8): Observable<ApiResponse<ProductResponse[]>> {
+    return this.apiService.get(`/products/bestsellers?size=${size}`);
+  }
+
+  getFeaturedProducts(size = 6): Observable<ApiResponse<ProductResponse[]>> {
+    return this.apiService.get(`/products/featured?size=${size}`);
+  }
+
   deleteProduct(id: number): Observable<ApiResponse<null>> {
     return this.apiService.delete(`/products/${id}`);
   }
