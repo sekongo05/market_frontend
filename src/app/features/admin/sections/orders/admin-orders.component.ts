@@ -49,6 +49,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   selectedOrder: OrderResponse | null = null;
   orderDetailOpen = false;
   cancelConfirmOrder: OrderResponse | null = null;
+  cancelReason = '';
 
   private readonly search$ = new Subject<string>();
 
@@ -268,15 +269,19 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
 
   cancelOrderByManager(order: OrderResponse): void {
     this.cancelConfirmOrder = order;
+    this.cancelReason = '';
     this.cdr.markForCheck();
   }
 
   confirmCancel(): void {
     const order = this.cancelConfirmOrder;
     if (!order) return;
+    if (!this.cancelReason.trim()) return;
+    const reason = this.cancelReason.trim();
     this.cancelConfirmOrder  = null;
+    this.cancelReason        = '';
     this.statusUpdatingId    = order.id;
-    this.orderService.cancelOrder(order.id).subscribe({
+    this.orderService.cancelOrder(order.id, reason).subscribe({
       next: (r) => {
         if (r.success) {
           this._patchOrder(order.id, r.data);

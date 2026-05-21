@@ -39,7 +39,8 @@ export class OrderService {
     return this.apiService.patch(`/orders/${id}/status?status=${status}`);
   }
 
-  cancelOrder(id: number): Observable<ApiResponse<OrderResponse>> {
-    return this.apiService.post(`/orders/${id}/cancel`, {});
+  cancelOrder(id: number, reason?: string): Observable<ApiResponse<OrderResponse>> {
+    const params = reason?.trim() ? `?reason=${encodeURIComponent(reason.trim())}` : '';
+    return this.apiService.post(`/orders/${id}/cancel${params}`, {});
   }
 }

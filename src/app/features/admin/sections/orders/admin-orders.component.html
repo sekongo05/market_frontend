@@ -410,14 +410,27 @@
         <p class="text-sm theme-muted text-center mb-1">
           <span class="font-mono font-bold text-gold">{{ cancelConfirmOrder.orderNumber }}</span>
         </p>
-        <p class="text-xs theme-muted text-center mb-6">Cette action est irréversible. Le stock sera restitué.</p>
+        <p class="text-xs theme-muted text-center mb-4">Le stock sera restitué et le client sera notifié par email.</p>
+
+        <div class="space-y-1.5 mb-5">
+          <label class="text-xs font-bold theme-muted uppercase tracking-wider">
+            Motif de l'annulation <span class="text-red-400">*</span>
+          </label>
+          <textarea [(ngModel)]="cancelReason" rows="3"
+            placeholder="Ex : Article en rupture de stock, erreur de prix, commande non conforme…"
+            class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm resize-none transition-all"
+            [class.border-red-500]="!cancelReason.trim()"></textarea>
+          <p class="text-[10px] theme-muted">Ce motif sera inclus dans l'email d'annulation envoyé au client.</p>
+        </div>
+
         <div class="flex gap-3">
-          <button (click)="cancelConfirmOrder = null"
+          <button (click)="cancelConfirmOrder = null; cancelReason = ''"
             class="flex-1 py-2.5 border theme-border theme-muted rounded-xl text-sm font-semibold hover:theme-text transition-colors">
             Conserver
           </button>
           <button (click)="confirmCancel()"
-            class="flex-1 py-2.5 bg-red-500/15 border border-red-500/30 text-red-400 rounded-xl text-sm font-black hover:bg-red-500/25 transition-colors">
+            [disabled]="!cancelReason.trim()"
+            class="flex-1 py-2.5 bg-red-500/15 border border-red-500/30 text-red-400 rounded-xl text-sm font-black hover:bg-red-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
             Confirmer l'annulation
           </button>
         </div>
