@@ -292,8 +292,18 @@
         <!-- Récapitulatif financier -->
         <div class="mx-6 mb-6 rounded-2xl overflow-hidden border theme-border">
           <div class="px-5 py-3 flex justify-between items-center text-sm border-b theme-border">
-            <span class="theme-muted">Sous-total</span>
-            <span class="font-semibold theme-text">{{ formatCurrency(selectedOrder.totalAmount + (selectedOrder.discountAmount ?? 0)) }} FCFA</span>
+            <span class="theme-muted">Sous-total articles</span>
+            <span class="font-semibold theme-text">
+              {{ formatCurrency(selectedOrder.totalAmount + (selectedOrder.discountAmount ?? 0) - (selectedOrder.shippingFee ?? 0)) }} FCFA
+            </span>
+          </div>
+          <div class="px-5 py-3 flex justify-between items-center text-sm border-b theme-border">
+            <span class="theme-muted">Livraison</span>
+            @if ((selectedOrder.shippingFee ?? 0) === 0) {
+              <span class="font-semibold text-green-500">Offerte ✓</span>
+            } @else {
+              <span class="font-semibold theme-text">{{ formatCurrency(selectedOrder.shippingFee ?? 0) }} FCFA</span>
+            }
           </div>
           @if (selectedOrder.promoCode) {
             <div class="px-5 py-3 flex justify-between items-center text-sm border-b theme-border">
