@@ -142,7 +142,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                           </svg>
                         </button>
-                        <p class="text-base font-bold theme-text truncate flex-1">{{ selectedNotification.subject }}</p>
+                        <p class="text-base font-bold theme-text line-clamp-2 flex-1">{{ selectedNotification.subject }}</p>
                         <button (click)="deleteNotification(selectedNotification, $event)"
                           appTooltip="Supprimer cette notification" tooltipPosition="bottom" aria-label="Supprimer cette notification"
                           class="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0">
@@ -450,7 +450,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                           </svg>
                         </button>
-                        <p class="text-base font-bold theme-text truncate flex-1">{{ selectedNotification.subject }}</p>
+                        <p class="text-base font-bold theme-text line-clamp-2 flex-1">{{ selectedNotification.subject }}</p>
                         <button (click)="deleteNotification(selectedNotification, $event)" aria-label="Supprimer cette notification"
                           class="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -901,7 +901,7 @@
             <!-- Infos -->
             <div class="flex-1 min-w-0 px-3.5 py-3 flex flex-col justify-between">
               <div>
-                <p class="font-bold text-sm leading-snug pr-6 line-clamp-2" style="color:#111111">{{ item.productName }}</p>
+                <p class="font-bold text-sm leading-snug pr-6 line-clamp-2 break-words" style="color:#111111">{{ item.productName }}</p>
                 @if (item.selectedColor) {
                   <div class="flex items-center gap-1.5 mt-1">
                     <span class="w-2.5 h-2.5 rounded-full border border-black/10 flex-shrink-0"
