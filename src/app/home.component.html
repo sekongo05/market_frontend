@@ -163,8 +163,8 @@
       @for (cat of categories; track cat.id) {
         <a (click)="goToCategory(cat.slug); $event.preventDefault()"
            [href]="'/products?categorie=' + cat.slug"
-           class="flex-shrink-0 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors hover:border-gold/40 hover:text-white cursor-pointer"
-           style="border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.45);">
+           class="flex-shrink-0 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors hover:border-gold/60 hover:text-gold cursor-pointer"
+           style="border:1px solid rgba(0,0,0,0.12);color:rgba(0,0,0,0.5);">
           {{ cat.name }}
         </a>
       }
@@ -255,8 +255,8 @@
           @for (cat of categories.slice(3); track cat.id) {
             <a [href]="'/products?categorie=' + cat.slug"
                (click)="goToCategory(cat.slug); $event.preventDefault()"
-               class="flex items-center gap-2 px-4 py-2.5 border text-sm font-bold transition-all hover:border-gold/40 hover:text-white cursor-pointer r-up"
-               style="border-color:rgba(212,175,55,0.15);color:rgba(255,255,255,0.5);"
+               class="flex items-center gap-2 px-4 py-2.5 border text-sm font-bold transition-all hover:border-gold/50 hover:text-gold cursor-pointer r-up"
+               style="border-color:rgba(0,0,0,0.12);color:rgba(0,0,0,0.5);"
                [style.transition-delay.ms]="($index) * 60 + 200">
               <span class="uppercase">{{ cat.name }}</span>
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,11 +321,11 @@
                 </div>
               }
             </div>
-            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1" style="color:rgba(212,175,55,0.68);">{{ product.category.name }}</p>
+            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1" class="text-gold">{{ product.category.name }}</p>
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                <span class="font-black text-sm text-orange-400">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
+                <span class="font-black text-sm text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
                 <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               } @else {
                 <span class="font-black text-sm theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
@@ -351,7 +351,7 @@
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-60"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
             </span>
-            <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold text-red-400/70">Les plus achetés</p>
+            <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold text-red-600">Les plus achetés</p>
           </div>
           <h2 class="r-up font-black theme-text tracking-tight leading-none"
               style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">MEILLEURES<br>VENTES</h2>
@@ -386,11 +386,11 @@
                 </div>
               }
             </div>
-            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1" style="color:rgba(212,175,55,0.68);">{{ product.category.name }}</p>
+            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1" class="text-gold">{{ product.category.name }}</p>
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                <span class="font-black text-sm text-orange-400">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
+                <span class="font-black text-sm text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
                 <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               } @else {
                 <span class="font-black text-sm theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
@@ -487,11 +487,11 @@
                    [style.display]="(product.discountPercent && product.discountPercent > 0) ? 'none' : 'flex'"
                    style="background:#d4af37;">{{ idx + 1 }}</div>
             </div>
-            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1" style="color:rgba(212,175,55,0.68);">{{ product.category.name }}</p>
+            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1" class="text-gold">{{ product.category.name }}</p>
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                <span class="font-black text-sm sm:text-base text-orange-400">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
+                <span class="font-black text-sm sm:text-base text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
                 <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               } @else {
                 <span class="font-black text-sm sm:text-base theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
@@ -538,7 +538,7 @@
           </h2>
         </div>
         <a routerLink="/products"
-           class="r-up text-[9px] sm:text-[10px] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-orange-400"
+           class="r-up text-[9px] sm:text-[10px] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-orange-600"
            style="color:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.1);transition-delay:180ms">Voir tout</a>
       </div>
 
@@ -562,7 +562,7 @@
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-1">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.salePrice) {
-                <span class="font-black text-sm text-orange-400">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
+                <span class="font-black text-sm text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
                 <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               } @else {
                 <span class="font-black text-sm theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
@@ -777,7 +777,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (review of featuredReviews; track review.id; let i = $index) {
             <div class="r-up flex flex-col gap-4 p-6 border"
-                 style="border-color:rgba(212,175,55,0.14);background:rgba(212,175,55,0.03);"
+                 style="border-color:rgba(0,0,0,0.09);background:#ffffff;"
                  [style.transition-delay.ms]="i * 80 + 200">
               <div class="flex items-center gap-0.5">
                 @for (star of starArray(); track star) {
@@ -787,7 +787,7 @@
                   </svg>
                 }
               </div>
-              <p class="text-sm leading-relaxed flex-1" style="color:rgba(255,255,255,0.65);">
+              <p class="text-sm leading-relaxed flex-1 theme-muted">
                 @if (review.comment) {
                   "{{ review.comment.length > 140 ? (review.comment.slice(0, 140) + '…') : review.comment }}"
                 } @else {
