@@ -300,6 +300,10 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
+  parseDeliveryAddress(address: string): string {
+    return address.split(' | Tél:')[0] || address;
+  }
+
   private sortByUrgency(): void {
     const rank = (o: OrderResponse) =>
       this.isUrgentOrder(o) ? 0 : o.orderStatus === 'PENDING' ? 1 : 2;
