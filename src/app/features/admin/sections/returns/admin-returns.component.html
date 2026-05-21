@@ -302,7 +302,7 @@
               <span class="font-normal normal-case ml-1">— Commande : {{ returnDecisionItem.orderTotalAmount | number:'1.0-0' }} F</span>
             </label>
             <input type="number" [(ngModel)]="returnRefundAmount" min="0"
-              [max]="returnDecisionItem.orderTotalAmount ?? undefined"
+              [max]="returnDecisionItem.orderTotalAmount ?? null"
               placeholder="Montant en FCFA"
               class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
             <p class="text-[10px] theme-muted mt-1.5">Laissez vide pour rembourser la totalité ({{ returnDecisionItem.orderTotalAmount | number:'1.0-0' }} F)</p>
