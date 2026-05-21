@@ -172,22 +172,22 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
 
   statusColor(status: string): string {
     const m: Record<string, string> = {
-      PENDING:   'bg-yellow-500/15 text-yellow-400',
-      CONFIRMED: 'bg-blue-500/15   text-blue-400',
-      SHIPPED:   'bg-orange-500/15 text-orange-400',
-      DELIVERED: 'bg-emerald-500/15 text-emerald-400',
-      CANCELLED: 'bg-red-500/15    text-red-400',
+      PENDING:   'bg-yellow-100 text-yellow-800',
+      CONFIRMED: 'bg-blue-100   text-blue-800',
+      SHIPPED:   'bg-orange-100 text-orange-800',
+      DELIVERED: 'bg-emerald-100 text-emerald-800',
+      CANCELLED: 'bg-red-100    text-red-800',
     };
-    return m[status] ?? 'bg-black/[.06] text-gray-500';
+    return m[status] ?? 'bg-gray-100 text-gray-600';
   }
 
   insightColors(type: Insight['type']): { border: string; bg: string; text: string; dot: string } {
     const map = {
-      success: { border: 'border-emerald-500/25', bg: 'bg-emerald-500/8',  text: 'text-emerald-400', dot: 'bg-emerald-400' },
-      warning: { border: 'border-amber-500/25',   bg: 'bg-amber-500/8',    text: 'text-amber-400',   dot: 'bg-amber-400'   },
-      danger:  { border: 'border-red-500/25',      bg: 'bg-red-500/8',      text: 'text-red-400',     dot: 'bg-red-400'     },
-      action:  { border: 'border-blue-500/25',     bg: 'bg-blue-500/8',     text: 'text-blue-400',    dot: 'bg-blue-400'    },
-      info:    { border: 'border-violet-500/25',   bg: 'bg-violet-500/8',   text: 'text-violet-400',  dot: 'bg-violet-400'  },
+      success: { border: 'border-emerald-200', bg: 'bg-emerald-50',  text: 'text-emerald-700', dot: 'bg-emerald-500' },
+      warning: { border: 'border-amber-200',   bg: 'bg-amber-50',    text: 'text-amber-700',   dot: 'bg-amber-500'   },
+      danger:  { border: 'border-red-200',      bg: 'bg-red-50',      text: 'text-red-700',     dot: 'bg-red-500'     },
+      action:  { border: 'border-blue-200',     bg: 'bg-blue-50',     text: 'text-blue-700',    dot: 'bg-blue-500'    },
+      info:    { border: 'border-violet-200',   bg: 'bg-violet-50',   text: 'text-violet-700',  dot: 'bg-violet-500'  },
     };
     return map[type];
   }
