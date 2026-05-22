@@ -14,6 +14,8 @@ import { ProductResponse } from './core/models/product.models';
 import { ReviewResponse } from './core/models/review.models';
 import { CategoryResponse } from './core/models/category.models';
 import { PageResponse } from './core/models/common.models';
+import { PromoService } from './core/services/promo.service';
+import { PublicPromoResponse } from './core/models/promo.models';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -49,6 +51,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   publicStats: PublicStats | null = null;
 
   searchQuery = '';
+  firstOrderPromo: PublicPromoResponse | null = null;
 
   private _observer?: IntersectionObserver;
   private _statsAnimated = false;
@@ -82,6 +85,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     private categoryService: CategoryService,
     private dashboardService: DashboardService,
     private wsService: WebSocketService,
+    private promoService: PromoService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private seo: SeoService,
@@ -130,6 +134,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this._loadBestsellers();
     this._loadProducts();
     this._loadReviews();
+    this._loadFirstOrderPromo();
     this._initObserver();
     this._subscribeStock();
   }
@@ -266,6 +271,18 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
             this._count('statClients',    this.publicStats.totalClients,     2400);
             this._count('statReviews',    this.publicStats.totalReviews,     1800);
           }
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {},
+    });
+  }
+
+  private _loadFirstOrderPromo(): void {
+    this.promoService.getActivePromos().subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.firstOrderPromo = r.data.find(p => p.firstOrderOnly) ?? null;
           this.cdr.detectChanges();
         }
       },

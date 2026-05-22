@@ -111,6 +111,24 @@
         </div>
       </div>
     </div>
+
+    <!-- Offre premier achat — affichée si un code actif existe -->
+    @if (firstOrderPromo) {
+      <div class="relative p-4 rounded-2xl flex items-center gap-4"
+           style="background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.35)">
+        <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+             style="background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3)">
+          <svg class="w-5 h-5" style="color:#d4af37" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <p class="text-xs font-bold text-white mb-0.5">Offre bienvenue — {{ firstOrderPromo.discountPercent }}% sur votre 1ère commande</p>
+          <p class="text-xs" style="color:#9ca3af">Utilisez le code <span class="font-mono font-black" style="color:#d4af37">{{ firstOrderPromo.code }}</span> lors de votre commande</p>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- ══ PANNEAU DROIT — formulaire ══ -->

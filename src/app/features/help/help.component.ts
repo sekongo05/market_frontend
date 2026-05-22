@@ -46,11 +46,11 @@ export class HelpComponent {
     // ── Codes promo
     {
       q: 'Comment utiliser un code promo ?',
-      a: 'Ouvrez votre panier et saisissez votre code dans le champ prévu, puis cliquez sur "Appliquer". La réduction est déduite automatiquement du total. Si des codes sont disponibles, ils apparaissent directement dans votre panier — cliquez dessus pour les appliquer en un instant.'
+      a: 'Ouvrez votre panier et saisissez votre code dans le champ prévu, puis cliquez sur "Appliquer". La réduction est calculée et déduite automatiquement du total avant la commande. Si vous n\'êtes pas encore inscrit, les offres de bienvenue disponibles s\'affichent directement dans le panier — cliquez dessus pour les appliquer en un clic. Les codes de campagne distribués via WhatsApp ou les réseaux sociaux doivent être saisis manuellement.'
     },
     {
       q: 'Pourquoi mon code promo n\'est-il pas accepté ?',
-      a: 'Plusieurs raisons peuvent bloquer un code : il est peut-être expiré, désactivé, ou a atteint son nombre maximum d\'utilisations. Certains codes sont réservés aux nouveaux clients (premier achat uniquement) — si vous avez déjà passé une commande confirmée, ce type de code ne vous sera plus accessible. D\'autres codes exigent un montant minimum de panier ; le message d\'erreur vous indiquera le montant requis.'
+      a: 'Plusieurs raisons peuvent bloquer un code : il est expiré, désactivé, ou a atteint son nombre maximum d\'utilisations. Les codes "premier achat" sont réservés aux nouveaux clients — si vous avez déjà une commande confirmée, expédiée ou livrée, ce type de code ne vous est plus accessible. D\'autres codes exigent un montant minimum de panier ; le message d\'erreur vous précisera le montant requis. Si votre code provient d\'une promotion externe (WhatsApp, réseaux sociaux), vérifiez qu\'il est bien actif et que sa date d\'expiration n\'est pas dépassée.'
     },
     // ── Retours
     {

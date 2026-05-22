@@ -9,6 +9,8 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { PromoService } from '../../../core/services/promo.service';
+import { PublicPromoResponse } from '../../../core/models/promo.models';
 import { SdmLogoComponent } from '../../../shared/components/logo.component';
 
 @Component({
@@ -25,15 +27,23 @@ export class RegisterComponent implements OnInit {
   error: string | null = null;
   showPwd = false;
   showConfirmPwd = false;
+  firstOrderPromo: PublicPromoResponse | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private toastService: ToastService,
+    private promoService: PromoService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.promoService.getActivePromos().subscribe({
+      next: (r) => {
+        if (r.success) this.firstOrderPromo = r.data.find(p => p.firstOrderOnly) ?? null;
+      },
+      error: () => {},
+    });
     this.registerForm = this.formBuilder.group({
       nom: ['', Validators.required],
       prenom: ['', Validators.required],
