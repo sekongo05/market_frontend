@@ -236,6 +236,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (!this.mobileSearchOpen) { this.mobileSearchQuery = ''; return; }
     this.showCart = false; this.showNotifications = false; this.mobileOpen = false;
     this._syncBodyScroll();
+    // Focus après la fin de l'animation (évite que le clavier iOS masque l'input)
+    setTimeout(() => {
+      (document.getElementById('mobile-search-input') as HTMLInputElement | null)?.focus();
+    }, 280);
   }
 
   submitMobileSearch(): void {

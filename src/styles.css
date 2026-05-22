@@ -1,6 +1,13 @@
 @import 'tailwindcss';
 @config '../tailwind.config.js';
 
+/* ─── Tokens couleurs or — rend text-gold/*, bg-gold/*, border-gold/*,
+       hover:text-gold, border-gold/50, bg-gold/8 etc. disponibles en Tailwind v4 ── */
+@theme {
+  --color-gold: #d4af37;
+  --color-gold-dark: #b8860b;
+}
+
 /* ─── Theme transition ────────────────────────────────────────────────────── */
 *, *::before, *::after {
   transition-property: background-color, border-color, color;
@@ -281,7 +288,7 @@
 
 /* ─── CSS custom properties ───────────────────────────────────────────────── */
 :root {
-  --navbar-h: 75px;
+  --navbar-h: 87px;
   --bottom-nav-h: 60px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -618,6 +625,15 @@ body   { background: #f8f5f0; color: #111111; }
   .review-banner {
     bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 12px);
   }
+}
+
+/* ─── Scroll fade indicator — signale du contenu à droite sur les carousels mobiles ── */
+.scroll-fade-right {
+  -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 48px), transparent 100%);
+  mask-image: linear-gradient(to right, black 0%, black calc(100% - 48px), transparent 100%);
+}
+@media (min-width: 640px) {
+  .scroll-fade-right { -webkit-mask-image: none; mask-image: none; }
 }
 
 /* ─── Footer ─────────────────────────────────────────────────────────────── */

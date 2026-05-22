@@ -18,6 +18,7 @@ import { SdmLogoComponent } from './logo.component';
 export class LayoutComponent implements OnInit, OnDestroy {
   navigating = false;
   isBackoffice = false;
+  readonly currentYear = new Date().getFullYear();
   private routerSub?: Subscription;
 
   constructor(

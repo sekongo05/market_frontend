@@ -96,14 +96,32 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       jsonLd: {
         '@context': 'https://schema.org',
         '@type': 'ClothingStore',
+        '@id': 'https://sdm-store.shop/#store',
         name: 'SDM STORE',
         url: 'https://sdm-store.shop',
         logo: 'https://sdm-store.shop/icon-512.png',
         image: 'https://sdm-store.shop/icon-512.png',
         description: 'Boutique en ligne de mode, montres, bijoux et lifestyle. Livraison 24–48h en Côte d\'Ivoire.',
-        address: { '@type': 'PostalAddress', addressLocality: 'Abidjan', addressCountry: 'CI' },
-        contactPoint: { '@type': 'ContactPoint', contactType: 'customer service', availableLanguage: 'French' },
-        sameAs: [],
+        priceRange: '$$',
+        currenciesAccepted: 'XOF',
+        paymentAccepted: 'Cash, Mobile Money',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Abidjan',
+          addressRegion: 'Abidjan',
+          addressCountry: 'CI',
+        },
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer service',
+          availableLanguage: 'French',
+        },
+        sameAs: [
+          'https://facebook.com/sdmstore',
+          'https://instagram.com/sdmstore',
+          'https://tiktok.com/@sdmstore',
+        ],
+        hasMap: 'https://www.google.com/maps/search/SDM+STORE+Abidjan',
       },
     });
     this._loadPublicStats();

@@ -7,7 +7,7 @@
   <!-- Barre dorée en haut -->
   <div class="h-[3px] bg-gradient-to-r from-transparent via-[#b8941e] to-transparent"></div>
 
-  <nav class="backdrop-blur-xl transition-all duration-300"
+  <nav aria-label="Navigation principale" class="backdrop-blur-xl transition-all duration-300"
        [ngClass]="scrolled
          ? 'bg-white/97 border-b border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.07)]'
          : 'bg-white/90 border-b border-neutral-100'">
@@ -22,7 +22,7 @@
         </a>
 
         <!-- ── NAV LINKS (desktop) ── -->
-        <nav class="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
+        <nav aria-label="Liens desktop" class="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
 
           <a routerLink="/" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact:true}"
              (click)="closeAll()" class="nav-item">Accueil</a>
@@ -592,7 +592,7 @@
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
               </svg>
               <input
-                autofocus
+                id="mobile-search-input"
                 type="search"
                 [(ngModel)]="mobileSearchQuery"
                 (keyup.enter)="submitMobileSearch()"
@@ -1284,7 +1284,7 @@
      BOTTOM TAB BAR — mobile uniquement (hors backoffice)
 ══════════════════════════════════════════════════════ -->
 @if (!isBackoffice) {
-<nav class="bottom-tab-bar lg:hidden" aria-label="Navigation principale">
+<nav class="bottom-tab-bar lg:hidden" aria-label="Navigation mobile">
 
   @if (!isManager) {
     <!-- ── Clients & visiteurs : 5 onglets + panier flottant ── -->

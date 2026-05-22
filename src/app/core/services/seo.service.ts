@@ -15,9 +15,10 @@ export interface SeoConfig {
   jsonLd?: object;
 }
 
-const SITE_NAME = 'SDM STORE';
-const BASE_URL = 'https://sdm-store.shop';
+const SITE_NAME    = 'SDM STORE';
+const BASE_URL     = 'https://sdm-store.shop';
 const DEFAULT_IMAGE = `${BASE_URL}/icon-512.png`;
+const TWITTER_SITE = '@sdmstore_ci';
 
 @Injectable({ providedIn: 'root' })
 export class SeoService {
@@ -45,8 +46,9 @@ export class SeoService {
     this.meta.updateTag({ property: 'og:site_name', content: SITE_NAME });
     this.meta.updateTag({ property: 'og:locale', content: 'fr_CI' });
 
-    // Twitter Card
+    // Twitter / X Card
     this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.meta.updateTag({ name: 'twitter:site', content: TWITTER_SITE });
     this.meta.updateTag({ name: 'twitter:title', content: fullTitle });
     this.meta.updateTag({ name: 'twitter:description', content: config.description });
     this.meta.updateTag({ name: 'twitter:image', content: image });

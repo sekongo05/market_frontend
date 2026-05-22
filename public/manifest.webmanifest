@@ -1,0 +1,39 @@
+{
+  "name": "SDM STORE",
+  "short_name": "SDM STORE",
+  "description": "Boutique en ligne de mode, montres, bijoux et lifestyle en Côte d'Ivoire",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f5f0",
+  "theme_color": "#d4af37",
+  "lang": "fr",
+  "dir": "ltr",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Collection",
+      "url": "/products",
+      "description": "Parcourir tous les produits"
+    },
+    {
+      "name": "Mes commandes",
+      "url": "/orders",
+      "description": "Suivre mes commandes"
+    }
+  ]
+}

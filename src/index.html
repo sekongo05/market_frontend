@@ -17,12 +17,14 @@
   <meta property="og:description" content="SDM STORE : boutique en ligne de mode, montres, bijoux, beauté et lifestyle. Livraison 24–48h partout en Côte d'Ivoire.">
   <meta property="og:image" content="https://sdm-store.shop/icon-512.png">
   <meta property="og:url" content="https://sdm-store.shop">
-  <!-- Twitter Card -->
+  <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@sdmstore_ci">
   <meta name="twitter:title" content="SDM STORE — Mode, Montres & Lifestyle en Côte d'Ivoire">
   <meta name="twitter:description" content="SDM STORE : boutique en ligne de mode, montres, bijoux, beauté et lifestyle. Livraison 24–48h partout en Côte d'Ivoire.">
   <meta name="twitter:image" content="https://sdm-store.shop/icon-512.png">
   <meta name="google-site-verification" content="xDpYHYYiCbD0sWKQqJchAJa6Myx2HPOv_WFMy-5zbIE" />
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -39,6 +41,57 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- JSON-LD statique — WebSite (SearchAction) + Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://sdm-store.shop/#website",
+        "url": "https://sdm-store.shop",
+        "name": "SDM STORE",
+        "description": "Boutique en ligne de mode, montres, bijoux et lifestyle en Côte d'Ivoire",
+        "inLanguage": "fr",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://sdm-store.shop/products?search={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://sdm-store.shop/#organization",
+        "name": "SDM STORE",
+        "url": "https://sdm-store.shop",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://sdm-store.shop/icon-512.png",
+          "width": 512,
+          "height": 512
+        },
+        "sameAs": [
+          "https://facebook.com/sdmstore",
+          "https://instagram.com/sdmstore",
+          "https://tiktok.com/@sdmstore"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "availableLanguage": "French"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Abidjan",
+          "addressCountry": "CI"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <app-root></app-root>
