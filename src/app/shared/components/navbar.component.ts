@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterModule, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { TooltipDirective } from '../directives/tooltip.directive';
+import { SmartPopupDirective } from '../directives/smart-popup.directive';
 import { AuthService, CurrentUser } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { NotificationTemplateService, NotifTemplate } from '../../core/services/notification-template.service';
@@ -26,7 +27,7 @@ import { ScrollLockService } from '../../core/services/scroll-lock.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, NotifBodyPipe, MediaUrlPipe, SdmLogoComponent],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive, TooltipDirective, SmartPopupDirective, NotifBodyPipe, MediaUrlPipe, SdmLogoComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
