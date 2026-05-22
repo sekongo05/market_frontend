@@ -119,7 +119,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         sameAs: [
           'https://facebook.com/sdmstore',
           'https://instagram.com/sdmstore',
-          'https://tiktok.com/@sdmstore',
+          'https://tiktok.com/@sdm_store1',
         ],
         hasMap: 'https://www.google.com/maps/search/SDM+STORE+Abidjan',
       },
