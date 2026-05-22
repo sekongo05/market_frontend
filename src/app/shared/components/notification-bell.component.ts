@@ -3,12 +3,15 @@ import {
   HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NotificationService } from '../../core/services/notification.service';
 import { WebSocketService } from '../../core/services/websocket.service';
 import { NotificationTemplateService } from '../../core/services/notification-template.service';
+import { AuthService } from '../../core/services/auth.service';
 import { NotificationResponse } from '../../core/models/notification.models';
+import { NotificationType, UserRole } from '../../core/models/common.models';
 
 @Component({
   selector: 'app-notification-bell',
@@ -116,6 +119,8 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private wsService: WebSocketService,
     private templateService: NotificationTemplateService,
+    private authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -157,11 +162,69 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   }
 
   markAsRead(n: NotificationResponse): void {
-    if (n.read) return;
-    n.read = true;
-    this.unreadCount = Math.max(0, this.unreadCount - 1);
+    if (!n.read) {
+      n.read = true;
+      this.unreadCount = Math.max(0, this.unreadCount - 1);
+      this.notificationService.markAsRead(n.id).subscribe();
+    }
+    const link = this.getLink(n.type);
+    if (link) {
+      this.open = false;
+      this.router.navigateByUrl(link);
+    }
     this.cdr.markForCheck();
-    this.notificationService.markAsRead(n.id).subscribe();
+  }
+
+  getLink(type: NotificationType): string | null {
+    const role      = this.authService.getCurrentUser()?.role;
+    const isAdmin   = role === UserRole.ADMIN;
+    const isManager = role === UserRole.MANAGER;
+    const isStaff   = isAdmin || isManager;
+
+    switch (type) {
+
+      // Commandes — même type envoyé au client ET au staff
+      case NotificationType.ORDER_CREATED:
+      case NotificationType.ORDER_CANCELLED:
+        if (isAdmin)   return '/admin/orders';
+        if (isManager) return '/manager/orders';
+        return '/orders';
+
+      // Commandes — client uniquement
+      case NotificationType.ORDER_CONFIRMED:
+      case NotificationType.ORDER_STATUS_CHANGED:
+      case NotificationType.CARRIER_ASSIGNED:
+      case NotificationType.DELIVERY_UPDATE:
+      case NotificationType.REVIEW_REQUEST:
+        return '/orders';
+
+      // Retours — même type envoyé au client ET au staff
+      case NotificationType.RETURN_REQUESTED:
+        return isStaff ? '/admin/returns' : '/returns';
+
+      // Retours — client uniquement
+      case NotificationType.RETURN_DECIDED:
+      case NotificationType.RETURN_COMPLETED:
+        return '/returns';
+
+      // Bienvenue — client uniquement
+      case NotificationType.WELCOME:
+        return '/products';
+
+      // Avis — admin uniquement
+      case NotificationType.REVIEW_RECEIVED:
+        return isAdmin ? '/admin/reviews' : null;
+
+      // Stock — staff uniquement
+      case NotificationType.STOCK_LOW:
+      case NotificationType.STOCK_ALERT:
+        if (isAdmin)   return '/admin/products';
+        if (isManager) return '/manager/products';
+        return null;
+
+      default:
+        return null;
+    }
   }
 
   markAllAsRead(): void {
