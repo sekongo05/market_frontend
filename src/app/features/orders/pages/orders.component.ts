@@ -170,12 +170,12 @@ export class OrdersComponent implements OnInit, OnDestroy {
     if (order.orderStatus !== 'DELIVERED') return false;
     if (this.returnsMap[order.id]) return false;
     const daysSince = (Date.now() - new Date(order.updatedAt).getTime()) / 86_400_000;
-    return daysSince >= 3;
+    return daysSince <= 3;
   }
 
-  daysUntilReturn(order: OrderResponse): number {
+  daysLeftToReturn(order: OrderResponse): number {
     const daysSince = (Date.now() - new Date(order.updatedAt).getTime()) / 86_400_000;
-    return Math.ceil(3 - daysSince);
+    return Math.max(0, Math.ceil(3 - daysSince));
   }
 
   canReview(order: OrderResponse): boolean {

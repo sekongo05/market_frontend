@@ -371,12 +371,9 @@
 
                   <!-- Retour : disponible J+7 ou message d'attente -->
                   @if (!getExistingReturn(order.id) && returnSuccessOrderId !== order.id) {
-                    @if (canReturn(order)) {
-                      <!-- Bouton retour actif -->
-                    } @else {
-                      <p class="text-xs theme-muted text-center py-1">
-                        Retour possible dans {{ daysUntilReturn(order) }} jour{{ daysUntilReturn(order) > 1 ? 's' : '' }}
-                        — délai de réception
+                    @if (!canReturn(order) && order.orderStatus === 'DELIVERED') {
+                      <p class="text-xs text-red-400/70 text-center py-1">
+                        Délai de 3 jours dépassé — retour non disponible
                       </p>
                     }
                   }
@@ -465,6 +462,11 @@
                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                             </svg>
                             <span class="text-sm font-bold theme-text">Demande de retour</span>
+                            @if (daysLeftToReturn(order) > 0) {
+                              <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/25">
+                                {{ daysLeftToReturn(order) }} jour{{ daysLeftToReturn(order) > 1 ? 's' : '' }} restant{{ daysLeftToReturn(order) > 1 ? 's' : '' }}
+                              </span>
+                            }
                           </div>
                           <button (click)="closeReturnForm()"
                             class="w-7 h-7 flex items-center justify-center rounded-lg theme-muted hover:text-gold transition-colors"

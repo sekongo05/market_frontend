@@ -139,11 +139,19 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
 
   onDecisionChange(): void {
     if (this.returnDecision === 'COMPLETED') {
-      this.returnRefundAmount = this.returnDecisionItem?.orderTotalAmount ?? null;
+      const total    = this.returnDecisionItem?.orderTotalAmount ?? 0;
+      const shipping = this.returnDecisionItem?.shippingFee ?? 0;
+      this.returnRefundAmount = total - shipping;
     } else {
       this.returnRefundAmount = null;
     }
     this.cdr.markForCheck();
+  }
+
+  get productOnlyAmount(): number {
+    const total    = this.returnDecisionItem?.orderTotalAmount ?? 0;
+    const shipping = this.returnDecisionItem?.shippingFee ?? 0;
+    return total - shipping;
   }
 
   submitReturnDecision(): void {

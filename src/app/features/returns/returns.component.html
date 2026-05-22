@@ -14,7 +14,7 @@
       <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-3">Service client</p>
       <h1 class="text-4xl font-black theme-text mb-4">Politique de retour</h1>
       <p class="theme-muted text-base max-w-xl mx-auto leading-relaxed">
-        Vous disposez de 3 jours après réception pour retourner tout article. Voici tout ce que vous devez savoir.
+        Vous disposez de <strong class="theme-text">3 jours francs</strong> à compter de la réception pour initier un retour. Passé ce délai, aucune demande ne pourra être acceptée.
       </p>
     </div>
   </div>
@@ -173,8 +173,8 @@
           </svg>
         </div>
         <div>
-          <p class="font-bold theme-text text-sm">Retour gratuit</p>
-          <p class="theme-muted text-xs mt-0.5">pour tout défaut ou erreur de notre part</p>
+          <p class="font-bold theme-text text-sm">Prix article remboursé</p>
+          <p class="theme-muted text-xs mt-0.5">frais de livraison non remboursés</p>
         </div>
       </div>
 
@@ -197,9 +197,10 @@
             <p class="font-bold theme-text text-sm">Retour accepté</p>
           </div>
           <ul class="space-y-2 text-xs theme-muted">
-            <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5">◆</span><span>Article dans son emballage d'origine, non ouvert</span></li>
-            <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5">◆</span><span>Produit reçu endommagé ou défectueux</span></li>
-            <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5">◆</span><span>Article non conforme à la description</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5">◆</span><span>Demande initiée <strong class="theme-text">dans les 3 jours</strong> suivant la réception</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5">◆</span><span>Article dans son emballage d'origine, non porté et non lavé</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5">◆</span><span>Produit reçu endommagé, défectueux ou non conforme</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5">◆</span><span>Mauvaise taille ou couleur expédiée par notre équipe</span></li>
           </ul>
         </div>
 
@@ -213,9 +214,9 @@
             <p class="font-bold theme-text text-sm">Retour refusé</p>
           </div>
           <ul class="space-y-2 text-xs theme-muted">
-            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">◆</span><span>Article utilisé, lavé ou altéré</span></li>
+            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">◆</span><span><strong class="text-red-400">Délai dépassé</strong> — demande soumise après 3 jours de réception</span></li>
+            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">◆</span><span>Article porté, lavé ou altéré</span></li>
             <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">◆</span><span>Emballage d'origine manquant ou abîmé</span></li>
-            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">◆</span><span>Retour initié après 3 jours suivant la réception</span></li>
             <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">◆</span><span>Produits personnalisés ou sur mesure</span></li>
             <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">◆</span><span>Produits d'hygiène (parfums ouverts, soins entamés)</span></li>
           </ul>
@@ -229,14 +230,25 @@
       <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-2">Procédure</p>
       <h2 class="text-2xl font-black theme-text mb-6">Comment initier un retour</h2>
 
+      <!-- Alerte délai -->
+      <div class="flex items-start gap-3 p-4 rounded-2xl mb-2"
+           style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25)">
+        <svg class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="text-xs text-amber-400/90 leading-relaxed">
+          <strong>Important :</strong> votre demande doit être soumise dans les <strong>3 jours suivant la réception</strong>. Passé ce délai, le bouton de retour n'est plus disponible dans votre espace commandes.
+        </p>
+      </div>
+
       <div class="space-y-4">
 
         <div class="luxury-card rounded-2xl p-5 flex gap-4 items-start">
           <div class="w-9 h-9 rounded-xl bg-gold flex items-center justify-center flex-shrink-0 text-black font-black text-sm">1</div>
           <div>
-            <p class="font-bold theme-text text-sm mb-1">Déclarez le retour</p>
+            <p class="font-bold theme-text text-sm mb-1">Déclarez le retour <span class="text-amber-400 text-[10px] font-normal ml-1">— dans les 3 jours</span></p>
             <p class="theme-muted text-xs leading-relaxed">
-              Depuis votre espace client, rendez-vous dans <strong class="theme-text">"Mes commandes"</strong>, sélectionnez la commande concernée et cliquez sur <strong class="theme-text">"Retourner un article"</strong>. Choisissez le motif et envoyez votre demande en quelques secondes. Si l'article est défectueux, précisez-le dans le motif — notre équipe vous recontacte sous 24h.
+              Depuis votre espace client, rendez-vous dans <strong class="theme-text">"Mes commandes"</strong>, sélectionnez la commande livrée et cliquez sur <strong class="theme-text">"Retourner un article"</strong>. Le bouton est actif uniquement pendant les 3 jours suivant la livraison. Choisissez le motif et envoyez votre demande — notre équipe vous recontacte sous 24h.
             </p>
           </div>
         </div>
@@ -275,9 +287,9 @@
       <div class="space-y-3 text-sm theme-muted">
         <p>Après réception et contrôle de l'article retourné, nous procédons au remboursement dans un délai de <strong class="theme-text">5 à 7 jours ouvrés</strong>. Le remboursement est effectué via Wave CI ou en espèces selon les modalités convenues avec notre équipe.</p>
         <ul class="space-y-2">
-          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">◆</span><span>Les frais de livraison initiaux sont remboursés uniquement en cas de défaut, d'erreur de notre part ou de produit non conforme à la description</span></li>
-          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">◆</span><span>En cas de produit non authentique, le remboursement intégral est garanti sans délai supplémentaire</span></li>
-          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">◆</span><span>Pour les retours de convenance (changement d'avis), seul le montant du produit est remboursé</span></li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">◆</span><span>Dans tous les cas, seul le <strong class="theme-text">prix de l'article</strong> est remboursé — les frais de livraison initiaux ne sont jamais remboursés</span></li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">◆</span><span><strong class="theme-text">Transport retour :</strong> à votre charge, sauf si l'erreur provient entièrement de notre part (défaut, mauvais article expédié) — dans ce cas nous organisons la récupération</span></li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">◆</span><span>Tout retour doit avoir été initié dans les <strong class="theme-text">3 jours</strong> suivant la réception — aucune exception</span></li>
         </ul>
       </div>
     </div>

@@ -344,15 +344,30 @@
         <!-- Montant remboursé (visible uniquement si décision = Traité) -->
         @if (returnDecision === 'COMPLETED') {
           <div class="mb-4 p-3 bg-blue-500/8 border border-blue-500/20 rounded-xl">
-            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">
-              Montant remboursé (FCFA)
-              <span class="font-normal normal-case ml-1">— Commande : {{ returnDecisionItem.orderTotalAmount | number:'1.0-0' }} F</span>
-            </label>
+            <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-2">Montant remboursé (FCFA)</label>
+            <!-- Détail commande -->
+            <div class="flex items-center justify-between text-xs mb-2 px-0.5">
+              <span class="theme-muted">Total commande</span>
+              <span class="theme-text font-semibold">{{ returnDecisionItem.orderTotalAmount | number:'1.0-0' }} F</span>
+            </div>
+            @if ((returnDecisionItem.shippingFee ?? 0) > 0) {
+              <div class="flex items-center justify-between text-xs mb-2 px-0.5">
+                <span class="theme-muted">Frais de livraison <span class="italic">(non remboursés)</span></span>
+                <span class="text-red-400 font-semibold">− {{ returnDecisionItem.shippingFee | number:'1.0-0' }} F</span>
+              </div>
+              <div class="flex items-center justify-between text-xs mb-3 px-0.5 pt-2 border-t theme-border">
+                <span class="font-bold theme-text">Montant articles</span>
+                <span class="font-black text-green-400">{{ productOnlyAmount | number:'1.0-0' }} F</span>
+              </div>
+            }
             <input type="number" [(ngModel)]="returnRefundAmount" min="0"
               [max]="returnDecisionItem.orderTotalAmount ?? null"
               placeholder="Montant en FCFA"
               class="theme-input w-full px-3 py-2.5 rounded-xl text-sm"/>
-            <p class="text-[10px] theme-muted mt-1.5">Laissez vide pour rembourser la totalité ({{ returnDecisionItem.orderTotalAmount | number:'1.0-0' }} F)</p>
+            <p class="text-[10px] theme-muted mt-1.5">
+              Pré-rempli avec le montant articles (hors livraison).
+              @if ((returnDecisionItem.shippingFee ?? 0) === 0) { Aucun frais de livraison sur cette commande. }
+            </p>
           </div>
         }
 

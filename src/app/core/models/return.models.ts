@@ -25,6 +25,7 @@ export interface ReturnResponse {
   deliveredAt: string | null;
   orderItems: ReturnItemDto[];
   orderTotalAmount: number | null;
+  shippingFee: number | null;
   refundAmount: number | null;
 }
 
