@@ -18,7 +18,7 @@
 
   <!-- ─── Modal création / édition ─────────────────────────────────────── -->
   @if (showCategoryForm) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeCategoryForm()"></div>
       <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl animate-scale-in max-h-[90dvh] flex flex-col">
         <div class="flex-shrink-0 flex items-center justify-between px-6 py-5 border-b theme-border">
@@ -151,7 +151,7 @@
 
   <!-- ─── Dialog confirmation désactivation ────────────────────────────── -->
   @if (confirmToggleCat && pendingToggleCat) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="cancelDeactivate()"></div>
       <div class="relative w-full max-w-sm theme-surface border theme-border rounded-3xl shadow-2xl animate-scale-in p-6 text-center">
         <div class="w-12 h-12 rounded-2xl bg-orange-500/15 flex items-center justify-center mx-auto mb-4">
