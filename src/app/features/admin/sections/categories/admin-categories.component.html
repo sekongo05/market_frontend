@@ -16,8 +16,116 @@
     </button>
   </div>
 
-  <!-- ─── Modal création / édition ─────────────────────────────────────── -->
-  @if (showCategoryForm) {
+  <!-- ─── Chargement ────────────────────────────────────────────────────── -->
+  @if (categoriesLoading) {
+    <div class="flex justify-center py-16">
+      <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+    </div>
+  }
+
+  <!-- ─── Grille des catégories ─────────────────────────────────────────── -->
+  @if (!categoriesLoading) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (cat of categories; track cat.id) {
+        <div class="luxury-card rounded-2xl overflow-hidden transition-shadow" [class.opacity-50]="!cat.active">
+
+          <!-- Image ou placeholder -->
+          @if (cat.imageUrl) {
+            <div class="h-32 overflow-hidden">
+              <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy" class="w-full h-full object-cover"/>
+            </div>
+          } @else {
+            <div class="h-32 bg-gradient-to-br from-[#b8860b]/10 to-[#d4af37]/5 flex items-center justify-center">
+              <svg class="w-10 h-10 text-gold/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </div>
+          }
+
+          <div class="p-4">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0 flex-1">
+
+                <!-- Nom + badge statut -->
+                <div class="flex items-center gap-2 mb-1">
+                  <p class="font-bold theme-text text-sm truncate">{{ cat.name }}</p>
+                  @if (!cat.active) {
+                    <span class="flex-shrink-0 text-xs font-bold px-2 py-0.5 bg-red-500/15 text-red-400 rounded-lg">Inactif</span>
+                  }
+                </div>
+
+                <!-- Description -->
+                @if (cat.description) {
+                  <p class="text-xs theme-muted leading-snug line-clamp-2 mb-1.5">{{ cat.description }}</p>
+                }
+
+                <!-- Slug -->
+                <p class="text-xs theme-muted opacity-50 font-mono">{{ cat.slug }}</p>
+
+                <!-- Meta : nb produits + ordre -->
+                <div class="flex items-center gap-3 mt-2">
+                  <span class="flex items-center gap-1 text-xs font-semibold text-gold/70">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                    </svg>
+                    {{ cat.productCount }} produit{{ cat.productCount !== 1 ? 's' : '' }}
+                  </span>
+                  <span class="text-xs theme-muted opacity-50">ordre {{ cat.displayOrder }}</span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex flex-col gap-1 flex-shrink-0">
+                <button (click)="openEditCategoryForm(cat)"
+                  appTooltip="Modifier la catégorie" tooltipPosition="left"
+                  class="w-8 h-8 flex items-center justify-center rounded-xl text-gold/60 hover:bg-gold/10 hover:text-gold transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </button>
+                <button (click)="requestToggleCategory(cat)" [disabled]="categoryToggleId === cat.id"
+                  [appTooltip]="cat.active ? 'Désactiver la catégorie' : 'Activer la catégorie'" tooltipPosition="left"
+                  class="w-8 h-8 flex items-center justify-center rounded-xl transition-colors disabled:opacity-40"
+                  [ngClass]="cat.active ? 'text-orange-400 hover:bg-orange-500/10' : 'text-green-400 hover:bg-green-500/10'">
+                  @if (categoryToggleId === cat.id) {
+                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                  } @else if (cat.active) {
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                    </svg>
+                  } @else {
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (categories.length === 0) {
+      <div class="py-20 text-center">
+        <svg class="w-12 h-12 text-gold/20 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <p class="theme-muted font-semibold">Aucune catégorie</p>
+        <p class="text-sm theme-muted opacity-60 mt-1">Créez votre première catégorie ci-dessus</p>
+      </div>
+    }
+  }
+</div>
+
+<!-- ─── Modal création / édition ─────────────────────────────────────── -->
+@if (showCategoryForm) {
     <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeCategoryForm()"></div>
       <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl animate-scale-in max-h-[90dvh] flex flex-col">
@@ -149,9 +257,9 @@
     </div>
   }
 
-  <!-- ─── Dialog confirmation désactivation ────────────────────────────── -->
-  @if (confirmToggleCat && pendingToggleCat) {
-    <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-fade-in">
+<!-- ─── Dialog confirmation désactivation ────────────────────────────── -->
+@if (confirmToggleCat && pendingToggleCat) {
+  <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="cancelDeactivate()"></div>
       <div class="relative w-full max-w-sm theme-surface border theme-border rounded-3xl shadow-2xl animate-scale-in p-6 text-center">
         <div class="w-12 h-12 rounded-2xl bg-orange-500/15 flex items-center justify-center mx-auto mb-4">
@@ -178,110 +286,3 @@
     </div>
   }
 
-  <!-- ─── Chargement ────────────────────────────────────────────────────── -->
-  @if (categoriesLoading) {
-    <div class="flex justify-center py-16">
-      <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-      </svg>
-    </div>
-  }
-
-  <!-- ─── Grille des catégories ─────────────────────────────────────────── -->
-  @if (!categoriesLoading) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      @for (cat of categories; track cat.id) {
-        <div class="luxury-card rounded-2xl overflow-hidden transition-shadow" [class.opacity-50]="!cat.active">
-
-          <!-- Image ou placeholder -->
-          @if (cat.imageUrl) {
-            <div class="h-32 overflow-hidden">
-              <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy" class="w-full h-full object-cover"/>
-            </div>
-          } @else {
-            <div class="h-32 bg-gradient-to-br from-[#b8860b]/10 to-[#d4af37]/5 flex items-center justify-center">
-              <svg class="w-10 h-10 text-gold/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
-            </div>
-          }
-
-          <div class="p-4">
-            <div class="flex items-start justify-between gap-2">
-              <div class="min-w-0 flex-1">
-
-                <!-- Nom + badge statut -->
-                <div class="flex items-center gap-2 mb-1">
-                  <p class="font-bold theme-text text-sm truncate">{{ cat.name }}</p>
-                  @if (!cat.active) {
-                    <span class="flex-shrink-0 text-xs font-bold px-2 py-0.5 bg-red-500/15 text-red-400 rounded-lg">Inactif</span>
-                  }
-                </div>
-
-                <!-- Description -->
-                @if (cat.description) {
-                  <p class="text-xs theme-muted leading-snug line-clamp-2 mb-1.5">{{ cat.description }}</p>
-                }
-
-                <!-- Slug -->
-                <p class="text-xs theme-muted opacity-50 font-mono">{{ cat.slug }}</p>
-
-                <!-- Meta : nb produits + ordre -->
-                <div class="flex items-center gap-3 mt-2">
-                  <span class="flex items-center gap-1 text-xs font-semibold text-gold/70">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
-                    </svg>
-                    {{ cat.productCount }} produit{{ cat.productCount !== 1 ? 's' : '' }}
-                  </span>
-                  <span class="text-xs theme-muted opacity-50">ordre {{ cat.displayOrder }}</span>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex flex-col gap-1 flex-shrink-0">
-                <button (click)="openEditCategoryForm(cat)"
-                  appTooltip="Modifier la catégorie" tooltipPosition="left"
-                  class="w-8 h-8 flex items-center justify-center rounded-xl text-gold/60 hover:bg-gold/10 hover:text-gold transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                  </svg>
-                </button>
-                <button (click)="requestToggleCategory(cat)" [disabled]="categoryToggleId === cat.id"
-                  [appTooltip]="cat.active ? 'Désactiver la catégorie' : 'Activer la catégorie'" tooltipPosition="left"
-                  class="w-8 h-8 flex items-center justify-center rounded-xl transition-colors disabled:opacity-40"
-                  [ngClass]="cat.active ? 'text-orange-400 hover:bg-orange-500/10' : 'text-green-400 hover:bg-green-500/10'">
-                  @if (categoryToggleId === cat.id) {
-                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                  } @else if (cat.active) {
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                    </svg>
-                  } @else {
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                  }
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
-
-    @if (categories.length === 0) {
-      <div class="py-20 text-center">
-        <svg class="w-12 h-12 text-gold/20 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-        <p class="theme-muted font-semibold">Aucune catégorie</p>
-        <p class="text-sm theme-muted opacity-60 mt-1">Créez votre première catégorie ci-dessus</p>
-      </div>
-    }
-  }
-</div>

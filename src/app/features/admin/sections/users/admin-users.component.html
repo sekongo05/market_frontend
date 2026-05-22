@@ -278,8 +278,10 @@
     }
   </div>
 
-  <!-- ── Modal fiche client ──────────────────────────────────────────────── -->
-  @if (showUserProfile) {
+</div>
+
+<!-- ── Modal fiche client ──────────────────────────────────────────────── -->
+@if (showUserProfile) {
     <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeUserProfile()"></div>
       <div class="relative w-full max-w-lg theme-surface border theme-border rounded-3xl shadow-2xl overflow-y-auto overscroll-contain max-h-[90vh] animate-scale-in">
@@ -408,8 +410,8 @@
     </div>
   }
 
-  <!-- ── Modal créer utilisateur ────────────────────────────────────────── -->
-  @if (showCreateUserModal) {
+<!-- ── Modal créer utilisateur ────────────────────────────────────────── -->
+@if (showCreateUserModal) {
     <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 animate-fade-in">
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" (click)="closeCreateUserModal()"></div>
       <div class="relative w-full max-w-md theme-surface border theme-border rounded-3xl shadow-2xl animate-scale-in max-h-[90dvh] flex flex-col overflow-hidden">
@@ -495,4 +497,3 @@
     </div>
   }
 
-</div>
