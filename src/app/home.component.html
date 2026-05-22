@@ -90,7 +90,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
-          Authenticité garantie
+          Qualité vérifiée
         </span>
         <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
               style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
@@ -595,7 +595,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
             </svg>
-            <span class="text-[9px] font-black text-white uppercase tracking-wider">Authenticité certifiée</span>
+            <span class="text-[9px] font-black text-white uppercase tracking-wider">Qualité vérifiée</span>
           </div>
         </div>
         <div class="r-right lg:flex-[48] flex flex-col justify-center" style="transition-delay:200ms;">
@@ -720,7 +720,7 @@
           { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',     title: 'Livraison rapide',        desc: '24–48h Abidjan · 72h intérieur CI.' },
           { icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', title: 'Retour 3 jours', desc: 'Remboursement garanti sans friction.' },
           { icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z', title: 'Paiement à la livraison', desc: 'Payez quand votre colis arrive chez vous.' },
-          { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Authenticité certifiée', desc: 'Chaque pièce vérifiée avant expédition.' }
+          { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Qualité vérifiée', desc: 'Chaque article inspecté avant expédition.' }
         ]; track p.title; let i = $index) {
           <div class="r-up border p-6 sm:p-8 flex flex-col gap-5 group hover:border-gold/40 transition-colors duration-300"
                style="border-color:rgba(212,175,55,0.12);" [style.transition-delay.ms]="i * 90 + 200">
@@ -859,7 +859,7 @@
         }
       </div>
       <div class="r-up flex items-center justify-center gap-6 mt-14" style="transition-delay:660ms">
-        @for (badge of ['Livraison rapide', 'Authenticité garantie', 'Paiement à la livraison']; track badge) {
+        @for (badge of ['Livraison rapide', 'Qualité vérifiée', 'Paiement à la livraison']; track badge) {
           <span class="text-[10px] uppercase tracking-[0.3em] font-bold" style="color:rgba(212,175,55,0.55);">{{ badge }}</span>
         }
       </div>

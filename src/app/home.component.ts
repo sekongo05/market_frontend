@@ -188,7 +188,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       { v: p ? p.activeProducts   + '+' : '…', l: 'Références en stock' },
       { v: p ? p.activeCategories + ''  : '…', l: 'Catégories' },
       { v: '24h',                               l: 'Livraison Abidjan' },
-      { v: '100%',                              l: 'Pièces authentifiées' },
+      { v: '100%',                              l: 'Articles vérifiés' },
     ];
   }
 

@@ -15,7 +15,7 @@ export const config: ApplicationConfig = {
         { path: '',             renderMode: RenderMode.Prerender },
         { path: 'help',         renderMode: RenderMode.Prerender },
         { path: 'privacy',      renderMode: RenderMode.Prerender },
-        { path: 'authenticity', renderMode: RenderMode.Prerender },
+        { path: 'qualite',      renderMode: RenderMode.Prerender },
         { path: 'returns',      renderMode: RenderMode.Prerender },
         // Pages dynamiques (catalogue, fiches produit) : SSR à la demande
         { path: '**',           renderMode: RenderMode.Server  },

@@ -47,7 +47,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
     'Article défectueux ou endommagé',
     'Article non conforme à la description',
     'Mauvaise taille ou couleur reçue',
-    'Article non authentique',
+    'Article de mauvaise qualité',
     'Changement d\'avis',
     'Autre',
   ];

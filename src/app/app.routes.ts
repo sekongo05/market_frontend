@@ -48,7 +48,7 @@ export const APP_ROUTES: Routes = [
       },
 { path: 'help', component: HelpComponent },
       { path: 'privacy', component: PrivacyComponent },
-      { path: 'authenticity', component: AuthenticityComponent },
+      { path: 'qualite', component: AuthenticityComponent },
       { path: 'returns', component: ReturnsComponent },
 /*       { path: '**', component: NotFoundComponent },
  */    ],
