@@ -1140,7 +1140,7 @@
 
               <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix (FCFA) *</label>
+                  <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix de vente (FCFA) *</label>
                   <div class="relative">
                     <input formControlName="price" type="number" min="1" placeholder="45 000"
                       class="theme-input w-full pl-4 pr-16 py-3 rounded-xl text-sm transition-all"
@@ -1149,6 +1149,24 @@
                   </div>
                   @if (productForm.get('price')?.touched && productForm.get('price')?.invalid) {
                     <p class="text-red-400 text-xs mt-1">Le prix doit être supérieur à 0</p>
+                  }
+                </div>
+                <div>
+                  <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix d'achat (FCFA) *</label>
+                  <div class="relative">
+                    <input formControlName="costPrice" type="number" min="1" placeholder="25 000"
+                      class="theme-input w-full pl-4 pr-16 py-3 rounded-xl text-sm transition-all"
+                      [class.border-red-500]="productForm.get('costPrice')?.touched && productForm.get('costPrice')?.invalid"/>
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold theme-muted pointer-events-none">FCFA</span>
+                  </div>
+                  @if (productForm.get('costPrice')?.touched && productForm.get('costPrice')?.invalid) {
+                    <p class="text-red-400 text-xs mt-1">Le prix d'achat est requis (min 1)</p>
+                  } @else if (productForm.get('costPrice')?.value > 0 && productForm.get('price')?.value > 0) {
+                    <p class="text-[10px] text-emerald-400 mt-1 font-semibold">
+                      Marge : {{ ((productForm.get('price')?.value - productForm.get('costPrice')?.value) / productForm.get('price')?.value * 100) | number:'1.0-0' }}%
+                    </p>
+                  } @else {
+                    <p class="text-[10px] theme-muted mt-1">Coût d'achat pour le calcul des marges.</p>
                   }
                 </div>
                 <div>

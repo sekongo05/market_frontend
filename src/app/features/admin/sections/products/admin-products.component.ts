@@ -190,7 +190,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     return !!(
       f.get('name')?.valid && f.get('description')?.valid &&
       f.get('categoryId')?.value && f.get('gender')?.value &&
-      f.get('price')?.valid && f.get('stock')?.valid
+      f.get('price')?.valid && f.get('stock')?.valid &&
+      f.get('costPrice')?.valid
     );
   }
   get creationTotalStock(): number { return this.creationItems.reduce((s, i) => s + i.stock, 0); }
