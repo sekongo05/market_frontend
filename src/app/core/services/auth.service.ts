@@ -79,6 +79,7 @@ export class AuthService {
           if (response.success && response.data) {
             this.setTokens(response.data.token, response.data.refreshToken);
             this.setCurrentUser(response.data);
+            this._connectWs(response.data);
           }
         })
       );
