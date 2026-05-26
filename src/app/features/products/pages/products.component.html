@@ -414,15 +414,15 @@
             <h3 class="text-sm sm:text-base font-bold theme-text leading-snug line-clamp-2">{{ product.name }}</h3>
             <!-- Couleurs -->
             @if ((product.variants?.length ?? 0) > 0) {
-              <div class="flex items-center gap-1">
-                @for (v of product.variants!.slice(0, 6); track v.id) {
-                  <span class="w-3 h-3 rounded-full border flex-shrink-0"
+              <div class="flex items-center gap-1.5">
+                @for (v of product.variants!.slice(0, 5); track v.id) {
+                  <span class="w-4 h-4 rounded-full flex-shrink-0 shadow-sm"
                         [style.background-color]="v.colorHex"
-                        style="border-color:rgba(0,0,0,0.12)"
+                        style="outline:1.5px solid rgba(0,0,0,0.14); outline-offset:1px;"
                         [title]="v.colorName"></span>
                 }
-                @if (product.variants!.length > 6) {
-                  <span class="text-[9px] theme-muted font-bold">+{{ product.variants!.length - 6 }}</span>
+                @if (product.variants!.length > 5) {
+                  <span class="text-[10px] theme-muted font-bold">+{{ product.variants!.length - 5 }}</span>
                 }
               </div>
             }
@@ -468,7 +468,7 @@
     </ng-template>
 
     @if (!loading && products.length > 0) {
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5 animate-fade-in">
         @for (product of products; track product.id; let i = $index) {
           <ng-container *ngTemplateOutlet="productCard; context: { product: product, i: i, wide: false }"></ng-container>
         }
@@ -570,13 +570,13 @@
     </div>
 
     <!-- Contenu produit -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-32 sm:pb-10">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16 items-start">
 
         <!-- Galerie images -->
         <div>
           <!-- Visionneuse principale -->
-          <div class="relative rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square max-h-[520px] mb-4">
+          <div class="relative overflow-hidden aspect-[4/3] sm:aspect-square max-h-[520px] mb-4">
 
             <!-- Flèche gauche -->
             @if (viewGallery.length > 1) {
@@ -634,7 +634,7 @@
             <div class="grid grid-cols-4 gap-3">
               @for (item of viewGallery; track item.url; let i = $index) {
                 <button (click)="setViewImage(i)"
-                  class="relative aspect-square rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105"
+                  class="relative aspect-square overflow-hidden border-2 transition-all duration-200 hover:opacity-80"
                   [style.border-color]="viewGalleryIndex === i ? '#d4af37' : 'transparent'">
                   @if (item.type === 'IMAGE') {
                     <img [src]="item.url | mediaUrl" [alt]="'Photo ' + (i+1)"
@@ -648,7 +648,7 @@
                     </div>
                   }
                   @if (viewGalleryIndex === i) {
-                    <div class="absolute inset-0 ring-2 ring-gold rounded-2xl pointer-events-none"></div>
+                    <div class="absolute inset-0 ring-2 ring-gold pointer-events-none"></div>
                   }
                 </button>
               }
@@ -726,7 +726,7 @@
           @if (!isManager) {
             <div class="flex items-center gap-4">
               <!-- Quantité -->
-              <div class="flex items-center border theme-border rounded-xl overflow-hidden">
+              <div class="flex items-center border theme-border overflow-hidden">
                 <button (click)="selectedProductQty = selectedProductQty > 1 ? selectedProductQty - 1 : 1"
                   appTooltip="Diminuer la quantité" tooltipPosition="top"
                   class="w-11 h-11 flex items-center justify-center theme-muted hover:text-gold hover:bg-gold/5 transition-colors">
@@ -742,7 +742,7 @@
               </div>
               <!-- Ajouter au panier -->
               <button (click)="addToCartFromView()" [disabled]="selectedProduct.stock === 0 || ((selectedProduct.variants?.length ?? 0) > 0 && !selectedViewVariant)"
-                class="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                class="flex-1 flex items-center justify-center gap-2 px-6 py-3 font-bold text-sm transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                 [class]="addedIds.has(selectedProduct.id) ? 'bg-green-500 text-white scale-95' : 'bg-gold text-black hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5'">
                 @if (addedIds.has(selectedProduct.id)) {
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
@@ -788,6 +788,48 @@
         </div>
       </div>
     </div>
+
+    <!-- ── Sticky CTA (mobile uniquement) ── -->
+    @if (!isManager) {
+      <div class="sm:hidden sticky-cart-bar fixed bottom-0 left-0 right-0 z-50 px-4 py-3"
+           style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom))">
+        <div class="flex items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-black theme-text truncate">{{ selectedProduct.name }}</p>
+            <p class="text-sm font-black" style="color:#d4af37">
+              {{ (selectedProduct.salePrice ?? selectedProduct.price) | number:'1.0-0':'fr-FR' }}&nbsp;FCFA
+            </p>
+          </div>
+          <button (click)="addToCartFromView()"
+            [disabled]="selectedProduct.stock === 0 || ((selectedProduct.variants?.length ?? 0) > 0 && !selectedViewVariant)"
+            class="flex items-center gap-2 px-5 py-3 font-black text-xs uppercase tracking-wide flex-shrink-0
+                   transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+            [class]="addedIds.has(selectedProduct.id) ? 'bg-green-500 text-white' : 'text-black'"
+            [style]="addedIds.has(selectedProduct.id) ? '' : 'background:#d4af37'">
+            @if (addedIds.has(selectedProduct.id)) {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              Ajouté !
+            } @else if ((selectedProduct.variants?.length ?? 0) > 0 && !selectedViewVariant) {
+              Choisir une couleur
+            } @else {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              Ajouter au panier
+            }
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<!-- ===== TOAST PANIER ===== -->
+@if (toastMessage) {
+  <div class="cart-toast fixed bottom-24 sm:bottom-8 right-4 z-[70] flex items-center gap-2.5
+              px-4 py-3 bg-green-500 text-white text-sm font-bold shadow-xl shadow-green-900/30">
+    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+    </svg>
+    {{ toastMessage }}
   </div>
 }
 

@@ -98,6 +98,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
   addedIds = new Set<number>();
   // Persistent set of product IDs already in cart
   cartProductIds = new Set<number>();
+  // Toast notification
+  toastMessage: string | null = null;
+  private toastTimer?: ReturnType<typeof setTimeout>;
   // Product IDs the authenticated user has already ordered
   orderedProductIds = new Set<number>();
 
@@ -258,6 +261,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       selectedColorHex: this.selectedViewVariant?.colorHex,
     });
     this.addedIds.add(this.selectedProduct.id);
+    this.showToast('Ajouté au panier');
     this.cdr.detectChanges();
     setTimeout(() => {
       if (this.selectedProduct) this.addedIds.delete(this.selectedProduct.id);
@@ -280,6 +284,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       imageUrl: product.imageUrl,
       maxStock: product.stock,
     });
+    this.showToast('Ajouté au panier');
   }
 
   ngOnInit(): void {
@@ -345,8 +350,19 @@ export class ProductsComponent implements OnInit, OnDestroy {
       });
   }
 
+  showToast(message: string): void {
+    this.toastMessage = message;
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => {
+      this.toastMessage = null;
+      this.cdr.detectChanges();
+    }, 2500);
+    this.cdr.detectChanges();
+  }
+
   ngOnDestroy(): void {
     this.scrollLock.forceUnlock();
+    clearTimeout(this.toastTimer);
     this.destroy$.next();
     this.destroy$.complete();
   }
