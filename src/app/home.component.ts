@@ -57,6 +57,24 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private _statsAnimated = false;
   private destroy$ = new Subject<void>();
 
+  private _cursorEl: HTMLElement | null = null;
+  private _isTouchDevice = false;
+
+  private _onCursorMove = (e: MouseEvent): void => {
+    if (!this._cursorEl) return;
+    this._cursorEl.style.left = e.clientX + 'px';
+    this._cursorEl.style.top  = e.clientY + 'px';
+  };
+
+  private _onCursorOver = (e: MouseEvent): void => {
+    if (!this._cursorEl) return;
+    const inside = !!(e.target as HTMLElement).closest('.cursor-hover-zone');
+    this._cursorEl.classList.toggle('sdm-visible', inside);
+  };
+
+  private _onCursorDown = (): void => this._cursorEl?.classList.add('sdm-clicking');
+  private _onCursorUp   = (): void => this._cursorEl?.classList.remove('sdm-clicking');
+
   readonly steps = [
     {
       n: '01',
@@ -94,6 +112,14 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    this._isTouchDevice = window.matchMedia('(hover: none)').matches;
+    if (!this._isTouchDevice) {
+      this._cursorEl = document.getElementById('sdm-cursor');
+      document.addEventListener('mousemove',  this._onCursorMove, { passive: true });
+      document.addEventListener('mouseover',  this._onCursorOver, { passive: true });
+      document.addEventListener('mousedown',  this._onCursorDown);
+      document.addEventListener('mouseup',    this._onCursorUp);
+    }
     this.seo.set({
       title: 'Mode, Montres & Lifestyle en Côte d\'Ivoire',
       description: 'SDM STORE : boutique en ligne de mode, montres, bijoux, beauté et lifestyle. Livraison 24–48h partout en Côte d\'Ivoire.',
@@ -143,6 +169,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this._observer?.disconnect();
     this.destroy$.next();
     this.destroy$.complete();
+    if (!this._isTouchDevice) {
+      document.removeEventListener('mousemove', this._onCursorMove);
+      document.removeEventListener('mouseover', this._onCursorOver);
+      document.removeEventListener('mousedown', this._onCursorDown);
+      document.removeEventListener('mouseup',   this._onCursorUp);
+    }
   }
 
   goToCategory(slug: string): void {

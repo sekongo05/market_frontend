@@ -1,5 +1,11 @@
 <div class="theme-bg">
 
+  <!-- ════ CURSEUR PERSONNALISÉ ════ -->
+  <div id="sdm-cursor" aria-hidden="true">
+    <div class="sdm-cursor-ring"></div>
+    <span class="sdm-cursor-label">VOIR</span>
+  </div>
+
   <!-- ════════════════════════════════════════════════════════════════
        1. HERO
   ════════════════════════════════════════════════════════════════════ -->
@@ -161,6 +167,51 @@
 
 
   <!-- ════════════════════════════════════════════════════════════════
+       MARQUEE BAND — double bande après le hero
+  ════════════════════════════════════════════════════════════════════ -->
+  <div class="marquee-band-wrap" style="background:#07060a;border-top:1px solid rgba(212,175,55,0.18);border-bottom:1px solid rgba(212,175,55,0.10);">
+    <!-- Bande 1 — défile vers la gauche -->
+    <div class="overflow-hidden py-2.5" style="border-bottom:1px solid rgba(212,175,55,0.07);">
+      <div class="marquee-track">
+        <span class="marquee-item">QUALITÉ VÉRIFIÉE</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">STYLE &amp; PRESTIGE</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">LIVRAISON 24–48H ABIDJAN</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">MADE FOR CÔTE D'IVOIRE</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">PAIEMENT À LA LIVRAISON</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">100% AUTHENTIQUE</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">MODE &amp; LIFESTYLE</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">QUALITÉ VÉRIFIÉE</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">STYLE &amp; PRESTIGE</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">LIVRAISON 24–48H ABIDJAN</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">MADE FOR CÔTE D'IVOIRE</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">PAIEMENT À LA LIVRAISON</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">100% AUTHENTIQUE</span><span class="marquee-sep">◆</span>
+        <span class="marquee-item">MODE &amp; LIFESTYLE</span><span class="marquee-sep">◆</span>
+      </div>
+    </div>
+    <!-- Bande 2 — défile vers la droite -->
+    <div class="overflow-hidden py-2.5">
+      <div class="marquee-track marquee-reverse">
+        <span class="marquee-item marquee-item--dim">SDM STORE</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">ABIDJAN, CI</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">MONTRES &amp; BIJOUX</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">BEAUTÉ &amp; PARFUMS</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">RETOUR 3 JOURS</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">MAROQUINERIE</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">PRÊT-À-PORTER</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">SDM STORE</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">ABIDJAN, CI</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">MONTRES &amp; BIJOUX</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">BEAUTÉ &amp; PARFUMS</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">RETOUR 3 JOURS</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">MAROQUINERIE</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">PRÊT-À-PORTER</span><span class="marquee-sep marquee-sep--dim">·</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════
        2. CATEGORY PILLS — navigation rapide
   ════════════════════════════════════════════════════════════════════ -->
   <div class="overflow-x-auto scrollbar-none"
@@ -197,10 +248,28 @@
 
     @if (categoriesLoading) {
       <div class="flex gap-1 px-1">
-        <div class="skeleton flex-[58]" style="height:clamp(260px,45vw,500px);"></div>
+        <!-- Card principale -->
+        <div class="skeleton flex-[58] relative" style="height:clamp(260px,45vw,500px);border-radius:0;">
+          <div class="absolute top-5 left-5 h-5 w-24 rounded-sm" style="background:rgba(0,0,0,0.08);"></div>
+          <div class="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
+            <div class="h-8 rounded-sm" style="width:55%;background:rgba(0,0,0,0.10);"></div>
+            <div class="h-[1px] w-8" style="background:rgba(0,0,0,0.14);"></div>
+          </div>
+        </div>
+        <!-- Cards secondaires -->
         <div class="flex flex-col gap-1 flex-[42]">
-          <div class="skeleton flex-1"></div>
-          <div class="skeleton flex-1"></div>
+          <div class="skeleton flex-1 relative" style="border-radius:0;">
+            <div class="absolute bottom-4 left-4 right-4 flex flex-col gap-2">
+              <div class="h-5 w-1/2 rounded-sm" style="background:rgba(0,0,0,0.09);"></div>
+              <div class="h-[1px] w-5" style="background:rgba(0,0,0,0.10);"></div>
+            </div>
+          </div>
+          <div class="skeleton flex-1 relative" style="border-radius:0;">
+            <div class="absolute bottom-4 left-4 right-4 flex flex-col gap-2">
+              <div class="h-5 w-2/3 rounded-sm" style="background:rgba(0,0,0,0.09);"></div>
+              <div class="h-[1px] w-5" style="background:rgba(0,0,0,0.10);"></div>
+            </div>
+          </div>
         </div>
       </div>
     }
@@ -210,7 +279,7 @@
         <!-- Première catégorie — hero large -->
         <a [href]="'/products?categorie=' + categories[0].slug"
            (click)="goToCategory(categories[0].slug); $event.preventDefault()"
-           class="glint-card bracket-card group relative overflow-hidden cursor-pointer block r-scale"
+           class="glint-card bracket-card cursor-hover-zone group relative overflow-hidden cursor-pointer block r-scale"
            [class]="categories.length > 1 ? 'lg:flex-[58]' : 'w-full'"
            style="height:clamp(260px,58vw,680px);transition-delay:200ms;">
           @if (categories[0].imageUrl) {
@@ -241,7 +310,7 @@
             @for (cat of categories.slice(1, 3); track cat.id) {
               <a [href]="'/products?categorie=' + cat.slug"
                  (click)="goToCategory(cat.slug); $event.preventDefault()"
-                 class="glint-card bracket-card group relative overflow-hidden cursor-pointer block flex-1 h-[42vw] lg:h-0 lg:flex-1">
+                 class="glint-card bracket-card cursor-hover-zone group relative overflow-hidden cursor-pointer block flex-1 h-[42vw] lg:h-0 lg:flex-1">
                 @if (cat.imageUrl) {
                   <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy"
                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-1000 ease-out"/>
@@ -285,6 +354,7 @@
        4. SÉLECTION DE LA SEMAINE — produits featured
   ════════════════════════════════════════════════════════════════════ -->
   @if (hasFeatured) {
+    <div aria-hidden="true" class="sdm-sep sdm-sep--to-dark"></div>
     <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;background:linear-gradient(135deg,#07050f 0%,#0a0a0a 50%,#07050f 100%);">
       <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
         <div>
@@ -308,7 +378,7 @@
           <a [routerLink]="['/products', product.slug]"
              class="card-appear group flex-shrink-0 w-[52vw] sm:w-auto cursor-pointer block"
              [style.animation-delay.ms]="idx * 75">
-            <div class="product-card-wrap relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
+            <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
               <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
                    class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
                    (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
@@ -347,6 +417,7 @@
         }
       </div>
     </section>
+    <div aria-hidden="true" class="sdm-sep sdm-sep--from-dark"></div>
   }
 
 
@@ -378,7 +449,7 @@
           <a [routerLink]="['/products', product.slug]"
              class="card-appear group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block"
              [style.animation-delay.ms]="idx * 80">
-            <div class="product-card-wrap relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
+            <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
               <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
                    class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
                    (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
@@ -459,12 +530,22 @@
     </div>
 
     @if (newProductsLoading) {
-      <div class="flex gap-3 overflow-x-auto px-5 sm:px-8 scrollbar-none sm:grid sm:grid-cols-4">
+      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
+                  sm:grid sm:grid-cols-3 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
         @for (i of [1,2,3,4]; track i) {
           <div class="flex-shrink-0 w-[60vw] sm:w-auto">
-            <div class="skeleton aspect-[3/4] mb-3 rounded"></div>
-            <div class="skeleton h-3 w-3/4 mb-2 rounded"></div>
-            <div class="skeleton h-3 w-1/2 rounded"></div>
+            <!-- Zone image avec badge et numéro -->
+            <div class="skeleton relative mb-3" style="aspect-ratio:3/4;border-radius:0;">
+              <div class="absolute top-2.5 left-2.5 h-5 w-14 rounded-sm" style="background:rgba(0,0,0,0.08);"></div>
+              <div class="absolute top-2.5 right-2.5 w-6 h-6 rounded-sm" style="background:rgba(0,0,0,0.07);"></div>
+            </div>
+            <!-- Label catégorie -->
+            <div class="skeleton h-2 w-14 mb-2" style="border-radius:2px;"></div>
+            <!-- Nom produit (2 lignes) -->
+            <div class="skeleton h-3.5 w-full mb-1.5" style="border-radius:2px;"></div>
+            <div class="skeleton h-3.5 w-3/4 mb-2.5" style="border-radius:2px;"></div>
+            <!-- Prix -->
+            <div class="skeleton h-4 w-20" style="border-radius:2px;"></div>
           </div>
         }
       </div>
@@ -477,7 +558,7 @@
           <a [routerLink]="['/products', product.slug]"
              class="card-appear group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block"
              [style.animation-delay.ms]="idx * 75">
-            <div class="product-card-wrap relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
+            <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
               <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
                    class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
                    (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
@@ -533,6 +614,7 @@
        7. VENTES FLASH
   ════════════════════════════════════════════════════════════════════ -->
   @if (hasDeals) {
+    <div aria-hidden="true" class="sdm-sep sdm-sep--to-dark-warm"></div>
     <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;background:linear-gradient(135deg,#0e0500 0%,#0a0a0a 50%,#0e0500 100%);">
       <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
         <div>
@@ -559,7 +641,7 @@
           <a [routerLink]="['/products', product.slug]"
              class="card-appear group flex-shrink-0 w-[70vw] sm:w-auto cursor-pointer block"
              [style.animation-delay.ms]="idx * 80">
-            <div class="product-card-wrap relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
+            <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
               <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
                    class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700"
                    (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/f97316?text=SDM'"/>
@@ -642,6 +724,7 @@
   </section>
 
 
+  <div aria-hidden="true" class="sdm-sep sdm-sep--from-editorial"></div>
   <!-- ════════════════════════════════════════════════════════════════
        9. COMMENT ÇA MARCHE
   ════════════════════════════════════════════════════════════════════ -->
