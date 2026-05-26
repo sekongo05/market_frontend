@@ -1,21 +1,21 @@
 <div class="min-h-screen theme-bg">
 
   <!-- Page header -->
-  <div class="theme-surface border-b theme-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
+  <div class="prod-header">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-fade-in-down">
         <div>
-          <a routerLink="/" class="inline-flex items-center gap-1.5 text-xs font-semibold theme-muted hover:text-gold transition-colors group mb-3">
-            <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <a routerLink="/" class="inline-flex items-center gap-1.5 text-[9px] font-bold theme-muted hover:text-gold transition-colors group mb-3 uppercase tracking-widest">
+            <svg class="w-3 h-3 group-hover:-translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
             Accueil
           </a>
-          <p class="text-gold font-semibold text-xs uppercase tracking-widest mb-1">
-            {{ selectedCategoryId ? 'Catégorie' : 'Catalogue' }}
+          <p class="text-[9px] font-bold uppercase tracking-[0.4em] mb-1.5" style="color:rgba(212,175,55,0.8);">
+            {{ selectedCategoryId ? 'Collection' : 'Catalogue' }}
           </p>
-          <h1 class="text-3xl font-black theme-text">
-            {{ selectedCategoryName ?? 'Collection' }}
+          <h1 class="text-2xl sm:text-3xl font-black theme-text tracking-tight uppercase">
+            {{ selectedCategoryName ?? 'Catalogue' }}
           </h1>
           @if (!loading && totalItems > 0) {
             <p class="text-xs theme-muted mt-1">{{ totalItems }} article{{ totalItems > 1 ? 's' : '' }}</p>
@@ -36,7 +36,7 @@
               (keyup.enter)="search()"
               type="text"
               placeholder="Rechercher un article…"
-              class="theme-input w-full pl-10 pr-10 py-3 rounded-xl text-sm transition-all duration-200 focus:ring-2 focus:ring-gold/40"
+              class="theme-input w-full pl-10 pr-10 py-3 text-sm transition-all duration-200 focus:ring-2 focus:ring-gold/40"
             />
             <!-- Spinner chargement -->
             @if (loading && searchQuery) {
@@ -65,7 +65,7 @@
               <!-- Sort -->
               <div class="relative flex-1 md:flex-none">
                 <select [ngModel]="sortOption" (ngModelChange)="onSortChange($event)"
-                  class="theme-input appearance-none w-full pl-3 pr-8 py-3 rounded-xl text-sm cursor-pointer">
+                  class="theme-input appearance-none w-full pl-3 pr-8 py-3 text-sm cursor-pointer">
                   <option value="newest">Nouveautés</option>
                   <option value="price_asc">Prix ↑</option>
                   <option value="price_desc">Prix ↓</option>
@@ -79,7 +79,7 @@
 
               <!-- Filter toggle -->
               <button (click)="showFilters = !showFilters"
-                class="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold border transition-all duration-200 flex-shrink-0"
+                class="flex items-center gap-2 px-4 py-3 text-sm font-bold border transition-all duration-200 flex-shrink-0"
                 [class]="hasActiveFilters
                   ? 'border-[#b8941e] bg-[#b8941e]/10 text-[#b8941e]'
                   : 'theme-border theme-muted hover:text-gold hover:border-gold/40'">
@@ -113,7 +113,7 @@
 
   <!-- ── Panneau filtres prix ──────────────────────────────────────── -->
   @if (showFilters && !isManager) {
-    <div class="theme-surface border-b theme-border animate-fade-in-down">
+    <div class="filter-panel animate-fade-in-down">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         <div class="flex flex-wrap items-center gap-5">
 
@@ -172,7 +172,7 @@
           <!-- Toggle En stock + Réinitialiser -->
           <div class="flex flex-wrap items-center gap-3">
             <button (click)="inStockOnly = !inStockOnly; loadProducts(0)"
-              class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200"
+              class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border transition-all duration-200"
               [class]="inStockOnly
                 ? 'border-green-500/60 bg-green-500/10 text-green-400'
                 : 'theme-border theme-muted hover:text-green-400 hover:border-green-500/40'">
@@ -183,7 +183,7 @@
 
             @if (hasActiveFilters) {
               <button (click)="clearFilters()"
-                class="px-4 py-2.5 text-sm font-semibold theme-muted luxury-card rounded-xl hover:text-gold transition-colors">
+                class="px-4 py-2.5 text-sm font-semibold theme-muted border hover:text-gold hover:border-gold/30 transition-colors" style="border-color:rgba(212,175,55,0.2);">
                 Réinitialiser
               </button>
             }
@@ -193,27 +193,35 @@
     </div>
   }
 
+  <!-- ── Category hero banner ─────────────────────────────────────── -->
+  @if (selectedCategory?.imageUrl) {
+    <div class="cat-hero">
+      <img [src]="selectedCategory!.imageUrl! | mediaUrl" [alt]="selectedCategory!.name"
+           class="cat-hero__img" loading="lazy"/>
+      <div class="cat-hero__overlay"></div>
+      <div class="cat-hero__content px-4 sm:px-6 lg:px-8">
+        <p class="cat-hero__eyebrow">Collection · SDM Store</p>
+        <h2 class="cat-hero__title">{{ selectedCategory!.name }}</h2>
+        @if (!loading && totalItems > 0) {
+          <p class="cat-hero__count">{{ totalItems }} article{{ totalItems > 1 ? 's' : '' }}</p>
+        }
+      </div>
+    </div>
+  }
+
   <!-- ── Category tabs ─────────────────────────────────────────────── -->
-  <div class="border-b theme-border theme-surface">
+  <div class="cat-tabs-wrap">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center gap-1 overflow-x-auto py-1 scrollbar-none" style="-webkit-overflow-scrolling:touch">
-        <!-- Tout -->
+      <div class="flex items-center overflow-x-auto scrollbar-none" style="-webkit-overflow-scrolling:touch">
         <button (click)="selectCategory(null)"
-          class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
-          [class]="selectedCategoryId === null
-            ? 'bg-gold text-black shadow-lg shadow-yellow-600/20'
-            : 'theme-muted hover:text-gold hover:bg-gold/5'">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-          </svg>
+          class="cat-tab"
+          [class.cat-tab--active]="selectedCategoryId === null">
           Tout
         </button>
         @for (cat of categories; track cat.id) {
           <button (click)="selectCategory(cat.id)"
-            class="flex-shrink-0 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
-            [class]="selectedCategoryId === cat.id
-              ? 'bg-gold text-black shadow-lg shadow-yellow-600/20'
-              : 'theme-muted hover:text-gold hover:bg-gold/5'">
+            class="cat-tab"
+            [class.cat-tab--active]="selectedCategoryId === cat.id">
             {{ cat.name }}
           </button>
         }
@@ -237,7 +245,15 @@
     @if (loading) {
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         @for (item of [1,2,3,4,5,6,7,8]; track item) {
-          <div class="skeleton rounded-2xl aspect-[3/4]"></div>
+          <div class="skel-card">
+            <div class="skeleton skel-card__img"></div>
+            <div class="skel-card__body">
+              <div class="skeleton skel-card__cat"></div>
+              <div class="skeleton skel-card__name1"></div>
+              <div class="skeleton skel-card__name2"></div>
+              <div class="skeleton skel-card__price"></div>
+            </div>
+          </div>
         }
       </div>
     }
@@ -247,8 +263,8 @@
          Context : product, i, wide (optionnel — carte hero panoramique)
     ══════════════════════════════════════════════════════════════ -->
     <ng-template #productCard let-product="product" let-i="i" let-wide="wide">
-      <div class="group relative overflow-hidden rounded-2xl cursor-pointer select-none animate-fade-in-up
-                  shadow-[0_2px_16px_rgba(0,0,0,0.28)] hover:shadow-[0_8px_36px_rgba(0,0,0,0.50)]
+      <div class="group relative overflow-hidden cursor-pointer select-none animate-fade-in-up
+                  shadow-[0_2px_10px_rgba(0,0,0,0.12)] hover:shadow-[0_8px_28px_rgba(0,0,0,0.24)]
                   transition-shadow duration-500"
            [class]="!wide ? 'flex flex-col' : ''"
            [style.animation-delay]="(i % 8 * 0.06) + 's'"
@@ -452,46 +468,60 @@
     @if (!loading && products.length > 0) {
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         @for (product of products; track product.id; let i = $index) {
-          <ng-container *ngTemplateOutlet="productCard; context: { product: product, i: i, wide: false }"></ng-container>
+          @if (i === 0 && products.length > 1) {
+            <div class="col-span-2 sm:col-span-3 lg:col-span-2">
+              <ng-container *ngTemplateOutlet="productCard; context: { product: product, i: i, wide: true }"></ng-container>
+            </div>
+          } @else {
+            <ng-container *ngTemplateOutlet="productCard; context: { product: product, i: i, wide: false }"></ng-container>
+          }
         }
       </div>
     }
 
     <!-- Empty state -->
     @if (!loading && products.length === 0) {
-      <div class="flex flex-col items-center justify-center py-24 text-center animate-fade-in">
-        <div class="w-24 h-24 luxury-card rounded-3xl flex items-center justify-center mb-6">
-          <svg class="w-12 h-12 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="empty-state animate-fade-in">
+        <div class="empty-state__icon">
+          <svg class="w-8 h-8 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
         </div>
-        <h3 class="text-xl font-bold theme-text mb-2">Aucun produit trouvé</h3>
-        <p class="theme-muted mb-6">Essayez avec d'autres mots-clés</p>
-        <button (click)="searchQuery = ''; loadProducts(0)" class="px-6 py-3 bg-gold text-black rounded-xl font-bold hover:shadow-lg hover:shadow-yellow-600/20 transition-all">
-          Voir tous les produits
+        <p class="empty-state__label">SDM Store</p>
+        <h3 class="empty-state__title">Aucun article trouvé</h3>
+        <p class="empty-state__desc">
+          @if (searchQuery) {
+            Aucun résultat pour "{{ searchQuery }}" — essayez avec d'autres mots-clés.
+          } @else {
+            Cette collection est vide pour l'instant.
+          }
+        </p>
+        <button (click)="searchQuery = ''; selectedCategoryId = null; loadProducts(0)" class="empty-state__btn">
+          Voir tout le catalogue
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
         </button>
       </div>
     }
 
     <!-- Pagination -->
     @if (totalPages > 1) {
-      <div class="flex justify-center items-center gap-1 sm:gap-2 mt-8 sm:mt-12 animate-fade-in overflow-x-auto pb-2 scrollbar-none">
+      <div class="flex justify-center items-center mt-10 sm:mt-14 animate-fade-in overflow-x-auto pb-2 scrollbar-none">
         <button
           (click)="previousPage()"
           [disabled]="currentPage === 0"
-          class="flex items-center gap-1.5 px-3 sm:px-4 py-2.5 border theme-border rounded-xl text-xs sm:text-sm font-medium theme-muted hover:border-yellow-600/40 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 flex-shrink-0">
+          class="pag-btn">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-          <span class="hidden sm:inline">Précédent</span>
+          <span class="hidden sm:inline">Préc.</span>
         </button>
 
         @for (page of pages; track page) {
           @if (page === currentPage || page === 0 || page === totalPages - 1 || (page >= currentPage - 1 && page <= currentPage + 1)) {
             <button
               (click)="loadProducts(page)"
-              class="min-h-[44px] min-w-[44px] w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex-shrink-0"
-              [class]="page === currentPage
-                ? 'bg-gold text-black shadow-lg shadow-yellow-600/20'
-                : 'luxury-card theme-muted hover:border-yellow-600/40 hover:text-gold'">
+              class="pag-btn"
+              [class.pag-btn--active]="page === currentPage">
               {{ page + 1 }}
             </button>
           }
@@ -500,8 +530,8 @@
         <button
           (click)="nextPage()"
           [disabled]="currentPage >= totalPages - 1"
-          class="flex items-center gap-1.5 px-3 sm:px-4 py-2.5 border theme-border rounded-xl text-xs sm:text-sm font-medium theme-muted hover:border-yellow-600/40 hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 flex-shrink-0">
-          <span class="hidden sm:inline">Suivant</span>
+          class="pag-btn">
+          <span class="hidden sm:inline">Suiv.</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </button>
       </div>

@@ -1,1 +1,235 @@
-/* Products styles */
+/* ═══════════════════════════════════════════════════════════════════
+   PAGE HEADER — fond crème + bordure or discrète
+═══════════════════════════════════════════════════════════════════ */
+.prod-header {
+  background: #f8f5f0;
+  border-bottom: 1px solid rgba(212,175,55,0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CATEGORY HERO BANNER — mini-hero éditorial quand catégorie choisie
+═══════════════════════════════════════════════════════════════════ */
+.cat-hero {
+  position: relative;
+  height: clamp(160px, 26vw, 300px);
+  overflow: hidden;
+}
+.cat-hero__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  transition: transform 8s ease;
+  will-change: transform;
+}
+.cat-hero:hover .cat-hero__img { transform: scale(1.0); }
+.cat-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(4,4,4,0.92) 0%,
+    rgba(4,4,4,0.60) 42%,
+    rgba(4,4,4,0.18) 72%,
+    transparent 90%
+  );
+}
+.cat-hero__content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(1.25rem, 3.5vw, 2.5rem) clamp(1rem, 3vw, 2rem);
+  max-width: 80rem;
+  margin: 0 auto;
+}
+.cat-hero__eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: rgba(212,175,55,0.78);
+  margin-bottom: 0.4rem;
+}
+.cat-hero__title {
+  font-size: clamp(2rem, 7vw, 5rem);
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+.cat-hero__count {
+  font-size: 11px;
+  color: rgba(255,255,255,0.42);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CATEGORY TABS — style éditorial, indicateur doré souligné
+═══════════════════════════════════════════════════════════════════ */
+.cat-tabs-wrap {
+  background: #f8f5f0;
+  border-bottom: 1px solid rgba(212,175,55,0.15);
+}
+.cat-tab {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0.9rem 1.1rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.40);
+  white-space: nowrap;
+  transition: color 0.2s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.cat-tab:hover { color: rgba(0,0,0,0.72); }
+.cat-tab.cat-tab--active { color: #a07010; }
+.cat-tab::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0.75rem;
+  right: 0.75rem;
+  height: 2px;
+  background: #d4af37;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cat-tab.cat-tab--active::after { transform: scaleX(1); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SKELETON CARDS — structure fidèle aux vraies cards
+═══════════════════════════════════════════════════════════════════ */
+.skel-card__img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 0;
+  display: block;
+}
+.skel-card__body {
+  background: #ffffff;
+  padding: 0.625rem 0.75rem 0.75rem;
+  border-top: 1px solid rgba(212,175,55,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.skel-card__cat   { width: 52px;  height: 8px;  border-radius: 2px; }
+.skel-card__name1 { width: 100%;  height: 13px; border-radius: 2px; }
+.skel-card__name2 { width: 68%;   height: 13px; border-radius: 2px; }
+.skel-card__price { width: 68px;  height: 15px; border-radius: 2px; margin-top: 3px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   EMPTY STATE — style éditorial luxe
+═══════════════════════════════════════════════════════════════════ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1.5rem;
+  text-align: center;
+}
+.empty-state__icon {
+  width: 68px;
+  height: 68px;
+  border: 1px solid rgba(212,175,55,0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.empty-state__label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: rgba(212,175,55,0.72);
+  margin-bottom: 0.5rem;
+}
+.empty-state__title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #111111;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.empty-state__desc {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  max-width: 22rem;
+}
+.empty-state__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.75rem;
+  background: #d4af37;
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.empty-state__btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   PAGINATION — rectangulaire, cohérente avec le style global
+═══════════════════════════════════════════════════════════════════ */
+.pag-btn {
+  min-width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.75rem;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba(212,175,55,0.18);
+  border-right-width: 0;
+  color: rgba(0,0,0,0.42);
+  transition: all 0.2s;
+  cursor: pointer;
+  background: transparent;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  letter-spacing: 0.08em;
+}
+.pag-btn:last-child { border-right-width: 1px; }
+.pag-btn:hover:not(:disabled) {
+  background: rgba(212,175,55,0.06);
+  color: #a07010;
+  border-color: rgba(212,175,55,0.4);
+  z-index: 1;
+}
+.pag-btn.pag-btn--active {
+  background: #d4af37;
+  border-color: #d4af37;
+  color: #000;
+  z-index: 1;
+}
+.pag-btn:disabled { opacity: 0.28; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FILTER PANEL — raffiné
+═══════════════════════════════════════════════════════════════════ */
+.filter-panel {
+  background: #f8f5f0;
+  border-bottom: 1px solid rgba(212,175,55,0.12);
+}

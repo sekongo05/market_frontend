@@ -735,4 +735,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
     if (this.selectedCategoryId === null) return null;
     return this.categories.find(c => c.id === this.selectedCategoryId)?.name ?? null;
   }
+
+  get selectedCategory(): CategoryResponse | null {
+    if (this.selectedCategoryId === null) return null;
+    return this.categories.find(c => c.id === this.selectedCategoryId) ?? null;
+  }
 }
