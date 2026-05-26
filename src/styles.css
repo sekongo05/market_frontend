@@ -383,7 +383,7 @@ body   { background: #f8f5f0; color: #111111; }
   font-size: 0.875rem;
   font-weight: 600;
   border-radius: 0.5rem;
-  color: #4b5563;
+  color: rgba(255,255,255,0.68);
   transition: color .2s;
   text-decoration: none;
   letter-spacing: 0.01em;
@@ -396,14 +396,14 @@ body   { background: #f8f5f0; color: #111111; }
   transform: translateX(-50%) scaleX(0);
   width: 60%;
   height: 2px;
-  background: #b8860b;
+  background: #d4af37;
   border-radius: 2px;
   transition: transform .25s ease;
 }
-.nav-item:hover { color: #92700c; }
+.nav-item:hover { color: #d4af37; }
 .nav-item:hover::after { transform: translateX(-50%) scaleX(1); }
 
-.nav-active { color: #92700c !important; }
+.nav-active { color: #d4af37 !important; }
 .nav-active::after { transform: translateX(-50%) scaleX(1) !important; }
 
 /* ─── Navbar icon buttons ────────────────────────────────────────────────── */
@@ -414,13 +414,13 @@ body   { background: #f8f5f0; color: #111111; }
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 0.625rem;
-  color: #6b7280;
+  color: rgba(255,255,255,0.60);
   transition: color .2s, background-color .2s;
   flex-shrink: 0;
 }
-.nav-icon-btn:hover { color: #92700c; background: rgba(146,112,12,.09); }
+.nav-icon-btn:hover { color: #d4af37; background: rgba(212,175,55,.10); }
 
-.active-icon { color: #92700c; background: rgba(146,112,12,.10); }
+.active-icon { color: #d4af37; background: rgba(212,175,55,.12); }
 
 /* ─── Nav link (legacy) ──────────────────────────────────────────────────── */
 .nav-link {
@@ -635,6 +635,46 @@ body   { background: #f8f5f0; color: #111111; }
 @media (min-width: 640px) {
   .scroll-fade-right { -webkit-mask-image: none; mask-image: none; }
 }
+
+/* ─── Price range slider ─────────────────────────────────────────────────── */
+.price-range-input {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: transparent;
+  pointer-events: none;
+  outline: none;
+  cursor: pointer;
+}
+.price-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d4af37;
+  cursor: pointer;
+  pointer-events: all;
+  border: 2.5px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.price-range-input::-webkit-slider-thumb:hover,
+.price-range-input::-webkit-slider-thumb:active {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 5px rgba(212,175,55,0.20), 0 3px 10px rgba(0,0,0,0.25);
+}
+.price-range-input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d4af37;
+  cursor: pointer;
+  pointer-events: all;
+  border: 2.5px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+}
+.price-range-input::-moz-range-track { background: transparent; }
 
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 footer {

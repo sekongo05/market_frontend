@@ -9,8 +9,8 @@
 
   <nav aria-label="Navigation principale" class="backdrop-blur-xl transition-all duration-300"
        [ngClass]="scrolled
-         ? 'bg-white/97 border-b border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.07)]'
-         : 'bg-white/90 border-b border-neutral-100'">
+         ? 'bg-[#0a0a0a]/98 border-b border-[#b8941e]/25 shadow-[0_4px_32px_rgba(0,0,0,0.55)]'
+         : 'bg-[#0a0a0a]/92 border-b border-[#b8941e]/12'"  >
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-[84px] gap-0 sm:gap-6">
@@ -87,13 +87,13 @@
           }
 
           <!-- Divider -->
-          <div class="w-px h-5 mx-1" style="background:rgba(0,0,0,0.12)"></div>
+          <div class="w-px h-5 mx-1" style="background:rgba(255,255,255,0.12)"></div>
 
           <!-- Guest -->
           @if (!currentUser) {
             <a routerLink="/auth/login"
-               class="px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200
-                      theme-muted hover:theme-text">
+               class="px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200"
+               style="color:rgba(255,255,255,0.60)">
               Connexion
             </a>
             <a routerLink="/auth/register"
@@ -285,9 +285,9 @@
             <div class="relative" data-user-menu>
               <button (click)="toggleUserMenu()" appTooltip="Mon compte" tooltipPosition="bottom" aria-label="Mon compte"
                 class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl border transition-all duration-200
-                       border-transparent hover:border-black/[.08] hover:bg-black/[.04]"
-                [class.border-black/10]="showUserMenu"
-                [class.bg-black/5]="showUserMenu">
+                       border-transparent hover:border-white/10 hover:bg-white/5"
+                [style.border-color]="showUserMenu ? 'rgba(255,255,255,0.10)' : ''"
+                [style.background-color]="showUserMenu ? 'rgba(255,255,255,0.05)' : ''">
                 <!-- Avatar ring -->
                 <div class="relative">
                   <div class="w-8 h-8 bg-gold rounded-xl flex items-center justify-center
@@ -298,12 +298,12 @@
                                border-2 border-black"></span>
                 </div>
                 <div class="hidden xl:block text-left">
-                  <p class="text-xs font-bold leading-none mb-0.5" style="color:#111111">{{ fullName }}</p>
+                  <p class="text-xs font-bold leading-none mb-0.5" style="color:rgba(255,255,255,0.88)">{{ fullName }}</p>
                   @if (currentUser.role !== 'CUSTOMER') {
                     <p class="text-xs leading-none" style="color:#d4af37">{{ currentUser.role }}</p>
                   }
                 </div>
-                <svg class="w-3.5 h-3.5 transition-transform duration-200 text-gray-600"
+                <svg class="w-3.5 h-3.5 transition-transform duration-200" style="color:rgba(255,255,255,0.35)"
                      [class.rotate-180]="showUserMenu"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -406,7 +406,8 @@
           <button (click)="toggleMobileSearch()"
             [attr.aria-label]="mobileSearchOpen ? 'Fermer la recherche' : 'Ouvrir la recherche'"
             class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0"
-            [class]="mobileSearchOpen ? 'text-[#92700c] bg-[rgba(146,112,12,.10)]' : 'text-gray-500 hover:text-[#92700c] hover:bg-[rgba(146,112,12,.09)]'">
+            [class]="mobileSearchOpen ? 'text-[#d4af37] bg-[rgba(212,175,55,.12)]' : 'hover:text-[#d4af37] hover:bg-[rgba(212,175,55,.09)]'"
+            style="color:rgba(255,255,255,0.60)">
             @if (mobileSearchOpen) {
               <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
@@ -421,7 +422,7 @@
           <!-- Notifications (mobile, logged-in only) -->
           @if (currentUser) {
             <div class="relative" data-notif-panel>
-              <button (click)="toggleNotifications()" aria-label="Notifications" class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 relative text-gray-500 hover:text-[#92700c] hover:bg-[rgba(146,112,12,.09)]">
+              <button (click)="toggleNotifications()" aria-label="Notifications" class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 relative hover:text-[#d4af37] hover:bg-[rgba(212,175,55,.09)]" style="color:rgba(255,255,255,0.60)">
                 <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -563,16 +564,16 @@
             [attr.aria-label]="mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
             [attr.aria-expanded]="mobileOpen"
             class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
-                   text-gray-500 hover:text-gray-700 hover:bg-black/5 flex-shrink-0">
+                   hover:bg-white/8 flex-shrink-0"
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
-                  style="background:#6b7280"
+                  style="background:rgba(255,255,255,0.72)"
                   [style.transform]="mobileOpen ? 'translateY(6.5px) rotate(45deg)' : 'none'"></span>
             <span class="block h-[1.5px] rounded-full transition-all duration-300"
-                  style="background:#6b7280"
+                  style="background:rgba(255,255,255,0.72)"
                   [style.width]="mobileOpen ? '0' : '14px'"
                   [style.opacity]="mobileOpen ? '0' : '1'"></span>
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
-                  style="background:#6b7280"
+                  style="background:rgba(255,255,255,0.72)"
                   [style.transform]="mobileOpen ? 'translateY(-6.5px) rotate(-45deg)' : 'none'"></span>
           </button>
         </div>
@@ -582,7 +583,7 @@
 
     <!-- ── Barre de recherche mobile (expandable) ── -->
     @if (mobileSearchOpen) {
-      <div class="lg:hidden border-t theme-border animate-fade-in-down">
+      <div class="lg:hidden border-t border-white/10 animate-fade-in-down">
         <div class="max-w-7xl mx-auto px-4 py-2.5">
           <div class="relative flex items-center gap-2">
             <div class="relative flex-1">
@@ -969,288 +970,77 @@
            style="padding-bottom: max(1.25rem, env(safe-area-inset-bottom));background:#f0ece0;border-top:1px solid rgba(0,0,0,0.08)">
 
         <!-- Totaux -->
-        @if (!showCheckout) {
-          <div class="space-y-2">
-            <div class="flex items-center justify-between text-sm">
-              <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
-              <span class="font-semibold" style="color:#374151">
-                {{ cartTotal  | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA
-              </span>
-            </div>
-            <div class="flex items-center justify-between text-sm">
-              <span style="color:#6b7280">Livraison</span>
-              @if (shippingFee === 0) {
-                <span class="font-semibold" style="color:#9ca3af">À définir</span>
-              } @else {
-                <span class="font-semibold text-orange-400">{{ shippingFee | number:'1.0-0':'fr-FR' }}&thinsp; FCFA</span>
-              }
-            </div>
-            <div class="h-px my-1" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.35),transparent)"></div>
-            @if (discountAmount > 0) {
-              <div class="flex items-center justify-between text-sm">
-                <span style="color:#6b7280">Réduction ({{ promoCheckResult!.discountPercent }}%)</span>
-                <span class="font-semibold text-green-400">−{{ discountAmount | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
-              </div>
-            }
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-sm" style="color:#111111">Total</span>
-              <div class="flex items-baseline gap-1">
-                @if (discountAmount > 0) {
-                  <span class="text-sm line-through" style="color:#9ca3af">{{ cartTotal | number:'1.0-0': 'fr-FR' }}</span>
-                }
-                <span class="text-2xl font-black gold-text">{{ finalTotal | number:'1.0-0': 'fr-FR' }}</span>
-                <span class="text-xs" style="color:#6b7280">FCFA</span>
-              </div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-sm">
+            <span style="color:#6b7280">Sous-total ({{ cartCount }} art.)</span>
+            <span class="font-semibold" style="color:#374151">
+              {{ cartTotal | number:'1.0-0':'fr-FR' }}&thinsp; FCFA
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span style="color:#6b7280">Livraison</span>
+            <span style="color:#9ca3af">Calculée au checkout</span>
+          </div>
+          <div class="h-px my-1" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.35),transparent)"></div>
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-sm" style="color:#111111">Total</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-2xl font-black gold-text">{{ cartTotal | number:'1.0-0':'fr-FR' }}</span>
+              <span class="text-xs" style="color:#6b7280">FCFA</span>
             </div>
           </div>
+        </div>
 
-          <!-- Promotions disponibles — premier achat uniquement, visiteurs et nouveaux clients -->
-          @if (cartPromos.length > 0 && !currentUser) {
-            <div class="border border-[#b8941e]/25 rounded-xl overflow-hidden">
-              <div class="flex items-center gap-2 px-3 py-2 bg-[#b8941e]/8 border-b border-[#b8941e]/20">
-                <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                </svg>
-                <span class="text-xs font-bold text-gold">Offre 1er achat</span>
-              </div>
-              <div class="divide-y divide-[#b8941e]/10">
-                @for (promo of cartPromos; track promo.code) {
-                  <button (click)="applyPromoFromBadge(promo.code)"
-                    class="w-full flex items-center justify-between px-3 py-2.5 hover:bg-[#b8941e]/5 transition-colors text-left">
-                    <div class="min-w-0 flex-1">
-                      <div class="flex items-center gap-2 flex-wrap">
-                        <span class="font-mono font-black text-gold text-sm">{{ promo.code }}</span>
-                        <span class="text-xs font-bold px-1.5 py-0.5 bg-gold/15 text-gold rounded-md">-{{ promo.discountPercent }}%</span>
-                        @if (promo.firstOrderOnly) {
-                          <span class="text-[10px] font-bold px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded-md">1er achat</span>
-                        }
-                      </div>
-                      @if (promo.description) {
-                        <p class="text-xs mt-0.5 truncate" style="color:#9ca3af">{{ promo.description }}</p>
-                      }
-                      <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-                        @if (promo.minCartAmount) {
-                          <p class="text-xs" style="color:#6b7280">Panier min. {{ promo.minCartAmount | number:'1.0-0':'fr-FR' }} FCFA</p>
-                        }
-                        @if (promo.expiresAt) {
-                          <p class="text-xs" style="color:#6b7280">· Expire le {{ promo.expiresAt | date:'dd/MM/yyyy' }}</p>
-                        }
-                      </div>
-                    </div>
-                    <span class="text-xs text-gold/60 flex-shrink-0 ml-2">Appliquer →</span>
-                  </button>
-                }
-              </div>
+        <!-- Promotions disponibles — premier achat uniquement, visiteurs et nouveaux clients -->
+        @if (cartPromos.length > 0 && !currentUser) {
+          <div class="border border-[#b8941e]/25 rounded-xl overflow-hidden">
+            <div class="flex items-center gap-2 px-3 py-2 bg-[#b8941e]/8 border-b border-[#b8941e]/20">
+              <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+              </svg>
+              <span class="text-xs font-bold text-gold">Offre 1er achat</span>
             </div>
-          }
-
-          <!-- Bouton commander -->
-          <button (click)="openCheckout()"
-                  class="w-full py-4 bg-gold text-black font-black rounded-2xl text-base
-                         flex items-center justify-center gap-2.5
-                         hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5 active:scale-98 transition-all duration-200">
-            <svg class="w-4.5 h-4.5 flex-shrink-0" style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-            </svg>
-            Commander maintenant
-          </button>
+            <div class="divide-y divide-[#b8941e]/10">
+              @for (promo of cartPromos; track promo.code) {
+                <button (click)="applyPromoFromBadge(promo.code)"
+                  class="w-full flex items-center justify-between px-3 py-2.5 hover:bg-[#b8941e]/5 transition-colors text-left">
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-mono font-black text-gold text-sm">{{ promo.code }}</span>
+                      <span class="text-xs font-bold px-1.5 py-0.5 bg-gold/15 text-gold rounded-md">-{{ promo.discountPercent }}%</span>
+                      @if (promo.firstOrderOnly) {
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded-md">1er achat</span>
+                      }
+                    </div>
+                    @if (promo.description) {
+                      <p class="text-xs mt-0.5 truncate" style="color:#9ca3af">{{ promo.description }}</p>
+                    }
+                    <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                      @if (promo.minCartAmount) {
+                        <p class="text-xs" style="color:#6b7280">Panier min. {{ promo.minCartAmount | number:'1.0-0':'fr-FR' }} FCFA</p>
+                      }
+                      @if (promo.expiresAt) {
+                        <p class="text-xs" style="color:#6b7280">· Expire le {{ promo.expiresAt | date:'dd/MM/yyyy' }}</p>
+                      }
+                    </div>
+                  </div>
+                  <span class="text-xs text-gold/60 flex-shrink-0 ml-2">Appliquer →</span>
+                </button>
+              }
+            </div>
+          </div>
         }
 
-        <!-- Formulaire checkout -->
-        @if (showCheckout) {
-          @if (checkoutSuccess) {
-            <div class="flex flex-col items-center gap-3 py-4 text-center">
-              <div class="w-12 h-12 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center">
-                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                </svg>
-              </div>
-              <p class="text-sm font-bold text-green-400">Commande passée avec succès !</p>
-              <p class="text-xs" style="color:#6b7280">Redirection vers vos commandes…</p>
-            </div>
-          } @else {
-            <div class="space-y-3">
-              <!-- Mini récap -->
-              <div class="rounded-xl overflow-hidden"
-                   style="background:#fafafa;border:1px solid rgba(0,0,0,0.07)">
-                @for (item of cartItems; track (item.productId + '-' + (item.variantId ?? 0))) {
-                  <div class="flex items-center justify-between px-3 py-2 text-xs"
-                       style="border-bottom:1px solid rgba(0,0,0,0.05)">
-                    <div class="flex items-center gap-1.5 min-w-0">
-                      @if (item.selectedColorHex) {
-                        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 border border-white/40"
-                              [style.background-color]="item.selectedColorHex"></span>
-                      }
-                      <span class="truncate max-w-[160px]" style="color:#374151">{{ item.productName }}</span>
-                    </div>
-                    <span class="font-bold ml-2 flex-shrink-0" style="color:#d4af37">×{{ item.quantity }}</span>
-                  </div>
-                }
-                <div class="flex items-center justify-between px-3 py-2 text-xs" style="border-top:1px solid rgba(0,0,0,0.05)">
-                  <span style="color:#6b7280">Livraison</span>
-                  @if (shippingFee === 0) {
-                    <span class="font-bold" style="color:#9ca3af">À définir</span>
-                  } @else {
-                    <span class="font-bold text-orange-400">{{ shippingFee | number:'1.0-0':'fr-FR' }}&thinsp; FCFA</span>
-                  }
-                </div>
-                <div class="flex items-center justify-between px-3 py-2 text-xs font-black">
-                  <span style="color:#111111">Total</span>
-                  <div class="flex items-baseline gap-1.5">
-                    @if (discountAmount > 0) {
-                      <span class="line-through" style="color:#9ca3af">{{ cartTotal | number:'1.0-0': 'fr-FR' }}</span>
-                    }
-                    <span style="color:#d4af37">{{ finalTotal | number:'1.0-0': 'fr-FR' }}&thinsp; FCFA</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Téléphone -->
-              <div>
-                <p class="text-xs font-semibold mb-1.5" style="color:#6b7280">
-                  Téléphone <span class="text-red-400">*</span>
-                </p>
-                <input type="tel" [(ngModel)]="deliveryPhone"
-                  placeholder="+225 07 00 00 00 00"
-                  class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
-              </div>
-
-              <!-- Zone de livraison -->
-              <div>
-                <p class="text-xs font-semibold mb-2" style="color:#6b7280">
-                  Zone de livraison <span class="text-red-400">*</span>
-                </p>
-                <div class="grid grid-cols-2 gap-2">
-                  <button (click)="deliveryZone = 'abidjan'; deliveryCity = ''"
-                    class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold border transition-all"
-                    [ngClass]="deliveryZone === 'abidjan'
-                      ? 'border-[#b8941e] bg-[#b8941e]/10 text-[#b8941e]'
-                      : 'theme-border theme-muted hover:border-[#b8941e]/50'">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                    </svg>
-                    Abidjan
-                  </button>
-                  <button (click)="deliveryZone = 'interieur'; deliveryAddress = ''"
-                    class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold border transition-all"
-                    [ngClass]="deliveryZone === 'interieur'
-                      ? 'border-[#b8941e] bg-[#b8941e]/10 text-[#b8941e]'
-                      : 'theme-border theme-muted hover:border-[#b8941e]/50'">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    Intérieur du pays
-                  </button>
-                </div>
-
-                <!-- Coût de livraison affiché dynamiquement -->
-                @if (deliveryZone === 'abidjan') {
-                  <div class="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-xs text-orange-400 font-semibold">
-                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                    </svg>
-                    Frais de livraison Abidjan : 1 500 FCFA
-                  </div>
-                }
-                @if (deliveryZone === 'interieur') {
-                  <div class="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-xs text-orange-400 font-semibold">
-                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    Frais de livraison intérieur : 2 000 FCFA
-                  </div>
-                }
-              </div>
-
-              <!-- Abidjan : saisie libre -->
-              @if (deliveryZone === 'abidjan') {
-                <div>
-                  <p class="text-xs font-semibold mb-1.5" style="color:#6b7280">
-                    Lieu de livraison <span class="text-red-400">*</span>
-                  </p>
-                  <input type="text" [(ngModel)]="deliveryAddress"
-                    placeholder="Ex: Cocody, Angré, Yopougon…"
-                    class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all"/>
-                </div>
-              }
-
-              <!-- Intérieur : liste des villes -->
-              @if (deliveryZone === 'interieur') {
-                <div>
-                  <p class="text-xs font-semibold mb-1.5" style="color:#6b7280">
-                    Ville de destination <span class="text-red-400">*</span>
-                  </p>
-                  <select [(ngModel)]="deliveryCity"
-                    class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm transition-all">
-                    <option value="" disabled>Choisir une ville…</option>
-                    @for (ville of villesInterieur; track ville) {
-                      <option [value]="ville">{{ ville }}</option>
-                    }
-                  </select>
-                </div>
-              }
-
-              <!-- Code promo -->
-              <div>
-                <p class="text-xs font-semibold mb-1.5" style="color:#6b7280">Code promo</p>
-                @if (promoCheckResult?.valid) {
-                  <div class="flex items-center justify-between p-2.5 bg-green-500/10 border border-green-500/25 rounded-xl text-green-400 text-xs">
-                    <span>✓ <strong>{{ promoCheckResult!.code }}</strong> — {{ promoCheckResult!.discountPercent }}% de réduction</span>
-                    <button (click)="removePromo()" class="text-xs text-red-400/70 hover:text-red-400 transition-colors ml-2">Retirer</button>
-                  </div>
-                } @else {
-                  <div class="flex gap-2">
-                    <input type="text" [(ngModel)]="promoCodeInput" placeholder="PROMO10…" (keyup.enter)="checkPromo()"
-                      class="theme-input flex-1 px-3 py-2 rounded-xl text-xs uppercase transition-all"/>
-                    <button (click)="checkPromo()" [disabled]="promoChecking || !promoCodeInput.trim()"
-                      class="px-3 py-2 rounded-xl text-xs font-bold bg-gold/10 text-gold border border-gold/20 hover:bg-gold/15 transition-colors disabled:opacity-50">
-                      @if (promoChecking) { … } @else { Appliquer }
-                    </button>
-                  </div>
-                  @if (promoError) {
-                    <p class="text-xs text-red-400 mt-1">{{ promoError }}</p>
-                  }
-                }
-              </div>
-
-              @if (checkoutError) {
-                <p class="text-xs text-red-400 flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  {{ checkoutError }}
-                </p>
-              }
-
-              <div class="flex gap-2">
-                <button (click)="cancelCheckout()"
-                        class="flex-1 py-2.5 rounded-xl text-sm font-semibold theme-muted luxury-card transition-all hover:text-gold">
-                  Annuler
-                </button>
-                <button (click)="placeOrder()"
-                        [disabled]="checkoutLoading || !deliveryPhone.trim() || !deliveryZone ||
-                          (deliveryZone === 'abidjan' && !deliveryAddress.trim()) ||
-                          (deliveryZone === 'interieur' && !deliveryCity)"
-                        class="flex-1 py-2.5 bg-gold text-black rounded-xl text-sm font-black
-                               flex items-center justify-center gap-1.5
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               hover:shadow-lg hover:shadow-yellow-600/25 transition-all">
-                  @if (checkoutLoading) {
-                    <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                    Envoi…
-                  } @else {
-                    Confirmer
-                  }
-                </button>
-              </div>
-            </div>
-          }
-        }
+        <!-- Bouton commander -->
+        <button (click)="goToCheckout()"
+                class="w-full py-4 bg-gold text-black font-black rounded-2xl text-base
+                       flex items-center justify-center gap-2.5
+                       hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5 active:scale-98 transition-all duration-200">
+          <svg class="w-4.5 h-4.5 flex-shrink-0" style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+          Commander maintenant
+        </button>
 
         <!-- Garanties -->
         <div class="flex items-center justify-between pt-2" style="border-top:1px solid rgba(0,0,0,0.07)">

@@ -14,13 +14,12 @@ import { NotificationType } from '../../core/models/common.models';
 import { AuthPromptService } from '../../core/services/auth-prompt.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { CartService, CartItem } from '../../core/services/cart.service';
-import { OrderService } from '../../core/services/order.service';
 import { PromoService } from '../../core/services/promo.service';
 import { ToastService } from '../../core/services/toast.service';
 import { WebSocketService } from '../../core/services/websocket.service';
-import { PromoCheckResponse, PublicPromoResponse } from '../../core/models/promo.models';
+import { PublicPromoResponse } from '../../core/models/promo.models';
 import { Subject } from 'rxjs';
-import { takeUntil, timeout } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { SdmLogoComponent } from './logo.component';
 import { ScrollLockService } from '../../core/services/scroll-lock.service';
 
@@ -48,30 +47,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   notificationsLoading = false;
   selectedNotification: NotificationResponse | null = null;
 
-  // Checkout flow
-  showCheckout    = false;
-  deliveryAddress = '';
-  deliveryPhone   = '';
-  deliveryZone: 'abidjan' | 'interieur' | '' = '';
-  deliveryCity    = '';
-  checkoutLoading = false;
-  checkoutError: string | null = null;
-  promoCodeInput = '';
-  promoCheckResult: PromoCheckResponse | null = null;
-  promoChecking = false;
-  promoError: string | null = null;
   activePromos: PublicPromoResponse[] = [];
   promosLoaded = false;
-
-  readonly villesInterieur = [
-    'Abengourou', 'Aboisso', 'Adzopé', 'Agboville', 'Bondoukou','Bouaflé', 'Bouaké', 'Boundiali',  'Daloa',
-    'Danané', 'Dimbokro', 'Divo','Duékoué','Ferkessédougou', 'Gagnoa','Grand-Bassam', 'Grand-Lahou',
-    'Issia', 'Jacqueville', 'Katiola', 'Korhogo', 'Lakota',
-    'Man', 'Odienné', 'San-Pédro', 'Sassandra', 'Séguéla', 'Sinfra',
-    'Soubré', 'Tabou', 'Tiassalé', 'Tingrela', 
-    'Toumodi', 'Yamoussoukro',
-  ];
-  checkoutSuccess = false;
 
   reviewRequestBanner: { subject: string; products: { slug: string; name: string }[] } | null = null;
   private reviewDismissTimer?: ReturnType<typeof setTimeout>;
@@ -91,7 +68,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     readonly notifTemplate: NotificationTemplateService,
     private authPromptService: AuthPromptService,
-    private orderService: OrderService,
     private promoService: PromoService,
     private toastService: ToastService,
     private router: Router,
@@ -229,7 +205,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showNotifications = false; this.mobileOpen = false;
     this.mobileSearchOpen = false; this.mobileSearchQuery = '';
     this.scrollLock.forceUnlock();
-    this._resetCheckout();
   }
 
   toggleMobileSearch(): void {
@@ -403,105 +378,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   // ── Checkout ────────────────────────────────────────────────────────────────
 
-  openCheckout(): void {
+  goToCheckout(promoCode?: string): void {
     if (!this.authService.isAuthenticated()) {
       this.showCart = false;
       this.authPromptService.show();
       return;
     }
-    const user = this.authService.getCurrentUser();
-    this.showCheckout = true;
-    this.deliveryAddress = '';
-    this.deliveryPhone   = user?.phone || '';
-    this.deliveryZone    = '';
-    this.deliveryCity    = '';
-    this.checkoutError = null;
-    this.checkoutSuccess = false;
+    this.showCart = false;
+    this.scrollLock.forceUnlock();
     this.cdr.detectChanges();
-  }
-
-  cancelCheckout(): void {
-    this.showCheckout = false;
-    this.checkoutError = null;
-    this.deliveryZone = '';
-    this.cdr.detectChanges();
-  }
-
-  placeOrder(): void {
-    if (!this.deliveryPhone.trim()) {
-      this.checkoutError = 'Veuillez saisir votre numéro de téléphone';
-      this.cdr.detectChanges();
-      return;
-    }
-    const phoneDigits = this.deliveryPhone.trim().replace(/^\+225/, '');
-    if (!/^[0-9]{10}$/.test(phoneDigits)) {
-      this.checkoutError = 'Numéro invalide — 10 chiffres requis après +225 (ex: 0700000000)';
-      this.cdr.detectChanges();
-      return;
-    }
-    if (!this.deliveryZone) {
-      this.checkoutError = 'Veuillez sélectionner une zone de livraison';
-      this.cdr.detectChanges();
-      return;
-    }
-    if (this.deliveryZone === 'abidjan' && !this.deliveryAddress.trim()) {
-      this.checkoutError = 'Veuillez indiquer le lieu de livraison à Abidjan';
-      this.cdr.detectChanges();
-      return;
-    }
-    if (this.deliveryZone === 'interieur' && !this.deliveryCity) {
-      this.checkoutError = 'Veuillez sélectionner une ville';
-      this.cdr.detectChanges();
-      return;
-    }
-    this.checkoutLoading = true;
-    this.checkoutError = null;
-
-    const adresse = this.deliveryZone === 'abidjan'
-      ? `Abidjan — ${this.deliveryAddress.trim()}`
-      : `Intérieur du pays — ${this.deliveryCity}`;
-    const fullAddress = `${adresse} | Tél: ${this.deliveryPhone.trim()}`;
-    const payload: any = {
-      items: this.cartItems.map(i => ({
-        productId: i.productId,
-        quantity: i.quantity,
-        ...(i.variantId != null ? { variantId: i.variantId } : {}),
-      })),
-      deliveryAddress: fullAddress,
-      deliveryZone: this.deliveryZone === 'interieur' ? 'INTERIOR' : 'ABIDJAN',
-    };
-    if (this.promoCheckResult?.valid && this.promoCheckResult.code) {
-      payload.promoCode = this.promoCheckResult.code;
-    }
-
-    this.orderService.createOrder(payload).pipe(
-      timeout(30000)
-    ).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.checkoutSuccess = true;
-          this.cartService.clearCart();
-          this.cdr.detectChanges();
-          setTimeout(() => {
-            this.closeAll();
-            this.router.navigate(['/orders']);
-          }, 1200);
-        } else {
-          this.checkoutError = 'Erreur lors de la commande, veuillez réessayer';
-        }
-        this.checkoutLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        if (err?.name === 'TimeoutError') {
-          this.checkoutError = 'Le serveur met trop de temps à répondre. Veuillez réessayer dans quelques instants.';
-        } else {
-          this.checkoutError = err?.error?.message || 'Erreur lors de la commande, veuillez réessayer';
-        }
-        this.checkoutLoading = false;
-        this.cdr.detectChanges();
-      },
-    });
+    this.router.navigate(['/checkout'], promoCode ? { state: { promoCode } } : {});
   }
 
   private _loadActivePromos(): void {
@@ -517,47 +403,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   applyPromoFromBadge(code: string): void {
-    this.promoCodeInput = code;
-    this.checkPromo();
-  }
-
-  checkPromo(): void {
-    if (!this.promoCodeInput.trim()) return;
-    this.promoChecking = true;
-    this.promoError = null;
-    this.promoCheckResult = null;
-    this.promoService.checkPromo(this.promoCodeInput.trim(), this.cartTotal).subscribe({
-      next: (r) => {
-        if (r.success) {
-          this.promoCheckResult = r.data;
-          if (!r.data.valid) this.promoError = r.data.message;
-        }
-        this.promoChecking = false;
-        this.cdr.detectChanges();
-      },
-      error: () => { this.promoError = 'Erreur de vérification'; this.promoChecking = false; this.cdr.detectChanges(); },
-    });
-  }
-
-  removePromo(): void {
-    this.promoCodeInput = '';
-    this.promoCheckResult = null;
-    this.promoError = null;
-    this.cdr.detectChanges();
-  }
-
-  private _resetCheckout(): void {
-    this.showCheckout = false;
-    this.deliveryAddress = '';
-    this.deliveryPhone   = '';
-    this.deliveryZone    = '';
-    this.deliveryCity    = '';
-    this.checkoutLoading = false;
-    this.checkoutError = null;
-    this.checkoutSuccess = false;
-    this.promoCodeInput = '';
-    this.promoCheckResult = null;
-    this.promoError = null;
+    this.goToCheckout(code);
   }
 
   // ── Cart toast ──────────────────────────────────────────────────────────────
@@ -602,7 +448,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (delta > 90) {
       this.showCart = false;
       this.scrollLock.forceUnlock();
-      this._resetCheckout();
       this.cdr.detectChanges();
     }
   }
@@ -614,19 +459,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
   get cartCount(): number { return this.cartItems.reduce((s, i) => s + i.quantity, 0); }
   get cartTotal(): number { return this.cartService.getTotalPrice(); }
-  get discountAmount(): number {
-    if (!this.promoCheckResult?.valid) return 0;
-    return this.promoCheckResult.discountAmount ?? 0;
-  }
   get cartPromos(): PublicPromoResponse[] {
     return this.activePromos.filter(p => p.firstOrderOnly);
-  }
-  get shippingFee(): number {
-    return this.deliveryZone === 'interieur' ? 2000 : (this.deliveryZone === 'abidjan' ? 1500 : 0);
-  }
-  get finalTotal(): number {
-    const base = !this.promoCheckResult?.valid ? this.cartTotal : (this.promoCheckResult.finalAmount ?? this.cartTotal);
-    return base + this.shippingFee;
   }
 
   get fullName(): string {

@@ -149,15 +149,47 @@
       </div>
 
       <!-- En-tête -->
-      <div class="mb-8">
+      <div class="mb-7">
         <p class="text-xs font-bold uppercase tracking-[0.2em] mb-2" style="color:#d4af37">Inscription</p>
-        <h1 class="text-3xl font-black theme-text mb-2">Créer mon compte</h1>
+        <h1 class="text-3xl font-black theme-text mb-1">Créer mon compte</h1>
         <p class="text-sm theme-muted">Accédez à toute notre sélection et suivez vos commandes en temps réel</p>
+      </div>
+
+      <!-- ── Stepper ── -->
+      <div class="flex items-center mb-8">
+        @for (n of [1, 2, 3]; track n) {
+          <!-- Cercle -->
+          <div class="flex flex-col items-center gap-1.5 flex-shrink-0">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all duration-300"
+                 [style.background]="isStepDone(n) ? '#d4af37' : (step === n ? '#d4af37' : 'transparent')"
+                 [style.border-color]="isStepDone(n) || step === n ? '#d4af37' : 'rgba(0,0,0,0.15)'"
+                 [style.color]="isStepDone(n) || step === n ? '#000' : '#9ca3af'">
+              @if (isStepDone(n)) {
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+              } @else {
+                {{ n }}
+              }
+            </div>
+            <span class="text-[10px] font-bold whitespace-nowrap"
+                  [style.color]="isStepDone(n) ? '#b8941e' : (step === n ? '#b8941e' : '#9ca3af')">
+              @if (n === 1) { Identité }
+              @if (n === 2) { Contact }
+              @if (n === 3) { Sécurité }
+            </span>
+          </div>
+          <!-- Ligne de connexion (sauf après le dernier) -->
+          @if (n < 3) {
+            <div class="flex-1 h-0.5 mx-2 mb-5 rounded-full transition-all duration-500"
+                 [style.background]="isStepDone(n) ? '#d4af37' : 'rgba(0,0,0,0.10)'"></div>
+          }
+        }
       </div>
 
       <!-- Message d'erreur -->
       @if (error) {
-        <div class="flex items-center gap-3 p-4 rounded-2xl mb-6 animate-fade-in"
+        <div class="flex items-center gap-3 p-4 rounded-2xl mb-5 animate-fade-in"
              style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2)">
           <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -166,167 +198,191 @@
         </div>
       }
 
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
-        <!-- Nom + Prénom -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Nom</label>
-            <input type="text" formControlName="nom" placeholder="Diallo"
-              class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="(submitted || f['nom'].touched) && f['nom'].errors"/>
-            @if ((submitted || f['nom'].touched) && f['nom'].errors?.['required']) {
-              <p class="mt-1 text-xs text-red-400">Requis</p>
-            }
+        <!-- ── Étape 1 : Identité ── -->
+        @if (step === 1) {
+          <div class="space-y-4 animate-fade-in">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Nom</label>
+                <input type="text" formControlName="nom" placeholder="Diallo" autofocus
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
+                  [class.!border-red-500]="f['nom'].touched && f['nom'].errors"/>
+                @if (f['nom'].touched && f['nom'].errors?.['required']) {
+                  <p class="mt-1 text-xs text-red-400">Requis</p>
+                }
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Prénom</label>
+                <input type="text" formControlName="prenom" placeholder="Mamadou"
+                  class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
+                  [class.!border-red-500]="f['prenom'].touched && f['prenom'].errors"/>
+                @if (f['prenom'].touched && f['prenom'].errors?.['required']) {
+                  <p class="mt-1 text-xs text-red-400">Requis</p>
+                }
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Prénom</label>
-            <input type="text" formControlName="prenom" placeholder="Mamadou"
-              class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="(submitted || f['prenom'].touched) && f['prenom'].errors"/>
-            @if ((submitted || f['prenom'].touched) && f['prenom'].errors?.['required']) {
-              <p class="mt-1 text-xs text-red-400">Requis</p>
-            }
-          </div>
-        </div>
+        }
 
-        <!-- Email -->
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Adresse email</label>
-          <div class="relative">
-            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:#6b7280"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
-            <input type="email" formControlName="email" autocomplete="email" placeholder="vous@exemple.com"
-              class="theme-input w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="(submitted || f['email'].touched) && f['email'].errors"/>
-          </div>
-          @if ((submitted || f['email'].touched) && f['email'].errors) {
-            <p class="mt-1 text-xs text-red-400">
-              @if (f['email'].errors['required']) { Email requis }
-              @if (f['email'].errors['email']) { Email invalide }
-            </p>
-          }
-        </div>
-
-        <!-- Téléphone -->
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Téléphone</label>
-          <div class="relative">
-            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:#6b7280"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-            </svg>
-            <input type="tel" formControlName="phone" placeholder="+225 07 00 00 00 00"
-              class="theme-input w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="(submitted || f['phone'].touched) && f['phone'].errors"/>
-          </div>
-          @if ((submitted || f['phone'].touched) && f['phone'].errors) {
-            <p class="mt-1 text-xs text-red-400">
-              @if (f['phone'].errors['required']) { Téléphone requis }
-              @else { 10 chiffres requis après +225 (ex: 0700000000) }
-            </p>
-          }
-        </div>
-
-        <!-- Mot de passe -->
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Mot de passe</label>
-          <div class="relative">
-            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:#6b7280"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
-            <input [type]="showPwd ? 'text' : 'password'" formControlName="password"
-              autocomplete="new-password" placeholder="••••••••"
-              class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="(submitted || f['password'].touched) && f['password'].errors"/>
-            <button type="button" (click)="showPwd = !showPwd"
-              class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:text-gold"
-              style="color:#6b7280">
-              @if (showPwd) {
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- ── Étape 2 : Contact ── -->
+        @if (step === 2) {
+          <div class="space-y-4 animate-fade-in">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Adresse email</label>
+              <div class="relative">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:#6b7280"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
+                <input type="email" formControlName="email" autocomplete="email" placeholder="vous@exemple.com"
+                  class="theme-input w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all"
+                  [class.!border-red-500]="f['email'].touched && f['email'].errors"/>
+              </div>
+              @if (f['email'].touched && f['email'].errors) {
+                <p class="mt-1 text-xs text-red-400">
+                  @if (f['email'].errors['required']) { Email requis }
+                  @if (f['email'].errors['email']) { Email invalide }
+                </p>
+              }
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Téléphone</label>
+              <div class="relative">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:#6b7280"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                </svg>
+                <input type="tel" formControlName="phone" placeholder="+225 07 00 00 00 00"
+                  class="theme-input w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all"
+                  [class.!border-red-500]="f['phone'].touched && f['phone'].errors"/>
+              </div>
+              @if (f['phone'].touched && f['phone'].errors) {
+                <p class="mt-1 text-xs text-red-400">
+                  @if (f['phone'].errors['required']) { Téléphone requis }
+                  @else { 10 chiffres requis après +225 (ex: 0700000000) }
+                </p>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ── Étape 3 : Sécurité ── -->
+        @if (step === 3) {
+          <div class="space-y-4 animate-fade-in">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Mot de passe</label>
+              <div class="relative">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:#6b7280"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <input [type]="showPwd ? 'text' : 'password'" formControlName="password"
+                  autocomplete="new-password" placeholder="••••••••"
+                  class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
+                  [class.!border-red-500]="(submitted || f['password'].touched) && f['password'].errors"/>
+                <button type="button" (click)="showPwd = !showPwd"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:text-gold"
+                  style="color:#6b7280">
+                  @if (showPwd) {
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                    </svg>
+                  } @else {
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+              @if ((submitted || f['password'].touched) && f['password'].errors) {
+                <p class="mt-1 text-xs text-red-400">
+                  @if (f['password'].errors['required']) { Mot de passe requis }
+                  @else if (f['password'].errors['minlength']) { Minimum 6 caractères }
+                </p>
+              }
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Confirmer le mot de passe</label>
+              <div class="relative">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:#6b7280"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                <input [type]="showConfirmPwd ? 'text' : 'password'" formControlName="confirmPassword"
+                  autocomplete="new-password" placeholder="••••••••"
+                  class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
+                  [class.!border-red-500]="(submitted || f['confirmPassword'].touched) && f['confirmPassword'].errors"/>
+                <button type="button" (click)="showConfirmPwd = !showConfirmPwd"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:text-gold"
+                  style="color:#6b7280">
+                  @if (showConfirmPwd) {
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                    </svg>
+                  } @else {
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+              @if ((submitted || f['confirmPassword'].touched) && f['confirmPassword'].errors?.['required']) {
+                <p class="mt-1 text-xs text-red-400">Confirmation requise</p>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ── Navigation ── -->
+        <div class="flex gap-3 mt-7">
+          @if (step > 1) {
+            <button type="button" (click)="prevStep()"
+              class="flex-1 py-3.5 rounded-xl text-sm font-bold theme-muted
+                     border theme-border hover:border-gold/40 hover:text-gold transition-all duration-200">
+              ← Retour
+            </button>
+          }
+          @if (step < totalSteps) {
+            <button type="button" (click)="nextStep()"
+              class="flex-1 py-3.5 bg-gold text-black font-black text-sm rounded-xl
+                     flex items-center justify-center gap-2
+                     hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5
+                     transition-all duration-300">
+              Suivant
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </button>
+          }
+          @if (step === totalSteps) {
+            <button type="submit" [disabled]="loading"
+              class="flex-1 flex items-center justify-center gap-2 py-3.5 font-black text-sm rounded-xl
+                     bg-gold text-black
+                     hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5
+                     transition-all duration-300
+                     disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0">
+              @if (loading) {
+                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                Création en cours…
               } @else {
+                Créer mon compte
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                 </svg>
               }
             </button>
-          </div>
-          @if ((submitted || f['password'].touched) && f['password'].errors) {
-            <p class="mt-1 text-xs text-red-400">
-              @if (f['password'].errors['required']) { Mot de passe requis }
-              @else if (f['password'].errors['minlength']) { Minimum 6 caractères }
-            </p>
           }
         </div>
-
-        <!-- Confirmer le mot de passe -->
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">Confirmer le mot de passe</label>
-          <div class="relative">
-            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:#6b7280"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-            <input [type]="showConfirmPwd ? 'text' : 'password'" formControlName="confirmPassword"
-              autocomplete="new-password" placeholder="••••••••"
-              class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
-              [class.!border-red-500]="(submitted || f['confirmPassword'].touched) && f['confirmPassword'].errors"/>
-            <button type="button" (click)="showConfirmPwd = !showConfirmPwd"
-              class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:text-gold"
-              style="color:#6b7280">
-              @if (showConfirmPwd) {
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
-                </svg>
-              } @else {
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-              }
-            </button>
-          </div>
-          @if ((submitted || f['confirmPassword'].touched) && f['confirmPassword'].errors?.['required']) {
-            <p class="mt-1 text-xs text-red-400">Confirmation requise</p>
-          }
-        </div>
-
-        <!-- Bouton soumettre -->
-        <button type="submit" [disabled]="loading"
-          class="w-full flex items-center justify-center gap-2 py-3.5 font-black text-sm rounded-xl
-                 bg-gold text-black
-                 hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5
-                 transition-all duration-300
-                 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 mt-2">
-          @if (loading) {
-            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-            </svg>
-            Création en cours…
-          } @else {
-            Créer mon compte
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
-          }
-        </button>
 
       </form>
 
@@ -337,9 +393,8 @@
            style="color:#d4af37">Se connecter</a>
       </p>
 
-      <!-- Séparateur et note légale -->
-      <div class="mt-6 pt-6"
-           style="border-top:1px solid rgba(212,175,55,0.1)">
+      <!-- Note légale -->
+      <div class="mt-6 pt-6" style="border-top:1px solid rgba(212,175,55,0.1)">
         <p class="text-center text-xs theme-muted leading-relaxed">
           En créant un compte vous acceptez nos
           <a routerLink="/privacy" class="hover:text-gold transition-colors underline underline-offset-2">conditions d'utilisation</a>

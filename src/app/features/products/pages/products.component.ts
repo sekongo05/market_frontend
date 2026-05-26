@@ -18,6 +18,7 @@ import { PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 import { ScrollLockService } from '../../../core/services/scroll-lock.service';
+import { OrderService } from '../../../core/services/order.service';
 
 @Component({
   selector: 'app-products',
@@ -60,10 +61,45 @@ export class ProductsComponent implements OnInit, OnDestroy {
   inStockOnly = false;
   showFilters = false;
 
+  // Price range slider
+  readonly PRICE_MAX = 200000;
+  readonly PRICE_STEP = 500;
+  minPriceSlider = 0;
+  maxPriceSlider = 200000;
+  private priceDebounceTimer?: ReturnType<typeof setTimeout>;
+
+  get sliderTrackStyle(): string {
+    const minPct = (this.minPriceSlider / this.PRICE_MAX) * 100;
+    const maxPct = (this.maxPriceSlider / this.PRICE_MAX) * 100;
+    return `linear-gradient(to right,rgba(0,0,0,.12) 0%,rgba(0,0,0,.12) ${minPct}%,#d4af37 ${minPct}%,#d4af37 ${maxPct}%,rgba(0,0,0,.12) ${maxPct}%,rgba(0,0,0,.12) 100%)`;
+  }
+
+  get minThumbZ(): number { return this.minPriceSlider >= this.PRICE_MAX - this.PRICE_STEP ? 5 : 3; }
+  get maxThumbZ(): number { return this.minThumbZ === 5 ? 3 : 5; }
+
+  onMinSliderChange(): void {
+    if (this.minPriceSlider > this.maxPriceSlider) this.minPriceSlider = this.maxPriceSlider;
+    this.minPriceInput = this.minPriceSlider > 0 ? String(this.minPriceSlider) : '';
+    this._debouncedApply();
+  }
+
+  onMaxSliderChange(): void {
+    if (this.maxPriceSlider < this.minPriceSlider) this.maxPriceSlider = this.minPriceSlider;
+    this.maxPriceInput = this.maxPriceSlider < this.PRICE_MAX ? String(this.maxPriceSlider) : '';
+    this._debouncedApply();
+  }
+
+  private _debouncedApply(): void {
+    clearTimeout(this.priceDebounceTimer);
+    this.priceDebounceTimer = setTimeout(() => this.loadProducts(0), 400);
+  }
+
   // Temporary feedback after "add" action (quick-view panel)
   addedIds = new Set<number>();
   // Persistent set of product IDs already in cart
   cartProductIds = new Set<number>();
+  // Product IDs the authenticated user has already ordered
+  orderedProductIds = new Set<number>();
 
   // Product quick-view panel
   selectedProduct: ProductResponse | null = null;
@@ -135,6 +171,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private variantService: ProductVariantService,
     private categoryService: CategoryService,
     private authService: AuthService,
+    private orderService: OrderService,
     private cartService: CartService,
     private authPromptService: AuthPromptService,
     private wsService: WebSocketService,
@@ -277,6 +314,15 @@ export class ProductsComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
+      if (user) {
+        this._loadOrderedProductIds();
+      } else {
+        this.orderedProductIds = new Set();
+        this.cdr.detectChanges();
+      }
+    });
+
     this.wsService.stockUpdate$
       .pipe(takeUntil(this.destroy$))
       .subscribe(update => {
@@ -303,6 +349,22 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.scrollLock.forceUnlock();
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private _loadOrderedProductIds(): void {
+    this.orderService.getMyOrders(0, 50).pipe(takeUntil(this.destroy$)).subscribe({
+      next: r => {
+        if (r.success) {
+          const ids = new Set<number>();
+          for (const order of r.data.content) {
+            for (const item of order.items) ids.add(item.productId);
+          }
+          this.orderedProductIds = ids;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {},
+    });
   }
 
   get isManager(): boolean {
@@ -645,6 +707,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.sortOption = 'newest';
     this.minPriceInput = '';
     this.maxPriceInput = '';
+    this.minPriceSlider = 0;
+    this.maxPriceSlider = this.PRICE_MAX;
     this.inStockOnly = false;
     this.featuredOnly = false;
     this.loadProducts(0);
@@ -652,7 +716,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   get hasActiveFilters(): boolean {
-    return this.sortOption !== 'newest' || !!this.minPriceInput || !!this.maxPriceInput || this.inStockOnly;
+    return this.sortOption !== 'newest' || this.minPriceSlider > 0 || this.maxPriceSlider < this.PRICE_MAX || this.inStockOnly;
   }
 
   previousPage(): void {

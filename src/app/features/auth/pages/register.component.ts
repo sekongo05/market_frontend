@@ -29,6 +29,30 @@ export class RegisterComponent implements OnInit {
   showConfirmPwd = false;
   firstOrderPromo: PublicPromoResponse | null = null;
 
+  step = 1;
+  readonly totalSteps = 3;
+
+  private readonly stepFields = [
+    ['nom', 'prenom'],
+    ['email', 'phone'],
+    ['password', 'confirmPassword'],
+  ];
+
+  isStepDone(n: number): boolean {
+    return n < this.step;
+  }
+
+  nextStep(): void {
+    const fields = this.stepFields[this.step - 1];
+    fields.forEach(f => this.registerForm.get(f)?.markAsTouched());
+    const valid = fields.every(f => this.registerForm.get(f)?.valid);
+    if (valid && this.step < this.totalSteps) this.step++;
+  }
+
+  prevStep(): void {
+    if (this.step > 1) this.step--;
+  }
+
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,

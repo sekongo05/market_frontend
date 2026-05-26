@@ -3,7 +3,7 @@ import { LayoutComponent } from './shared/components/layout.component';
 import { HomeComponent } from './home.component';
 import { LoginComponent, RegisterComponent } from './features/auth/pages';
 import { ProductsComponent, ProductDetailComponent } from './features/products/pages';
-import { OrdersComponent } from './features/orders/pages';
+import { OrdersComponent, CheckoutComponent } from './features/orders/pages';
 import { ProfileComponent } from './features/profile/pages';
 import { ADMIN_ROUTES } from './features/admin/admin.routes';
 import { MANAGER_ROUTES } from './features/manager/manager.routes';
@@ -27,6 +27,11 @@ export const APP_ROUTES: Routes = [
       {
         path: 'orders',
         component: OrdersComponent,
+        canActivate: [authGuard],
+      },
+      {
+        path: 'checkout',
+        component: CheckoutComponent,
         canActivate: [authGuard],
       },
       {
