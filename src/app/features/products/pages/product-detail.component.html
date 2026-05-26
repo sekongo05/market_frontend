@@ -121,7 +121,7 @@
                 <span class="px-3 py-1 bg-red-900/80 text-red-300 text-xs font-bold rounded-full">Épuisé</span>
               } @else if (effectiveStock <= 3 && effectiveStock > 0 && (!hasVariants || selectedVariant)) {
                 <span class="px-3 py-1 bg-orange-900/80 text-orange-300 text-xs font-bold rounded-full animate-pulse">
-                  {{ effectiveStock }} restant{{ effectiveStock > 1 ? 's' : '' }}
+                  Dernières pièces
                 </span>
               } @else if (!hasVariants || selectedVariant) {
                 <span class="px-3 py-1 bg-gold text-black text-xs font-bold rounded-full">En stock</span>
@@ -287,7 +287,7 @@
             </div>
             <div class="p-3.5 rounded-xl luxury-card">
               <p class="text-xs theme-muted uppercase tracking-widest mb-1">Stock</p>
-              <p class="text-sm font-bold" [style.color]="stockColor">{{ product.stock }} unités</p>
+              <p class="text-sm font-bold" [style.color]="stockColor">{{ stockLabel }}</p>
             </div>
            <!--  <div class="p-3.5 rounded-xl luxury-card">
               <p class="text-[10px] theme-muted uppercase tracking-widest mb-1">Garantie</p>
@@ -364,10 +364,10 @@
                       } @else if (variant.stock <= 3) {
                         <p class="text-xs text-orange-400 font-semibold flex items-center gap-1">
                           <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse inline-block"></span>
-                          Plus que {{ variant.stock }} disponible{{ variant.stock > 1 ? 's' : '' }}
+                          Presque épuisé
                         </p>
                       } @else {
-                        <p class="text-xs theme-muted">{{ variant.stock }} en stock</p>
+                        <p class="text-xs theme-muted">En stock</p>
                       }
                     </div>
 

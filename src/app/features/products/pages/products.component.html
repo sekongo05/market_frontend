@@ -249,7 +249,7 @@
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-500 text-white
                              text-xs font-black uppercase rounded shadow-lg shadow-red-900/50">
                   <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                  Plus que {{ product.stock }} !
+                  Dernières pièces !
                 </span>
               }
             </div>
@@ -591,7 +591,7 @@
           <div class="flex items-center gap-2">
             @if (selectedProduct.stock > 0) {
               <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-              <span class="text-sm text-green-400 font-medium">{{ selectedProduct.stock }} unité{{ selectedProduct.stock > 1 ? 's' : '' }} disponible{{ selectedProduct.stock > 1 ? 's' : '' }}</span>
+              <span class="text-sm text-green-400 font-medium">En stock</span>
             } @else {
               <div class="w-2 h-2 rounded-full bg-red-400"></div>
               <span class="text-sm text-red-400 font-medium">Rupture de stock</span>

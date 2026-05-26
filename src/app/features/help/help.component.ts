@@ -32,7 +32,7 @@ export class HelpComponent {
     },
     {
       q: 'Y a-t-il des frais de livraison ?',
-      a: 'La livraison est offerte pour toutes les commandes dans Abidjan. Pour l\'intérieur de la Côte d\'Ivoire, des frais de 2 000 FCFA s\'appliquent. Ce montant est indiqué clairement avant la confirmation de votre commande et n\'est pas remboursable.'
+      a: 'Des frais de livraison s\'appliquent à toutes les commandes : 1 500 FCFA pour une livraison à Abidjan et 2 000 FCFA pour l\'intérieur de la Côte d\'Ivoire. Ces montants sont indiqués clairement avant la confirmation de votre commande et ne sont pas remboursables.'
     },
     {
       q: 'Que se passe-t-il si je suis absent lors de la livraison ?',

@@ -980,7 +980,7 @@
             <div class="flex items-center justify-between text-sm">
               <span style="color:#6b7280">Livraison</span>
               @if (shippingFee === 0) {
-                <span class="font-semibold text-green-500">Offerte ✓</span>
+                <span class="font-semibold" style="color:#9ca3af">À définir</span>
               } @else {
                 <span class="font-semibold text-orange-400">{{ shippingFee | number:'1.0-0':'fr-FR' }}&thinsp; FCFA</span>
               }
@@ -1089,7 +1089,7 @@
                 <div class="flex items-center justify-between px-3 py-2 text-xs" style="border-top:1px solid rgba(0,0,0,0.05)">
                   <span style="color:#6b7280">Livraison</span>
                   @if (shippingFee === 0) {
-                    <span class="font-bold text-green-500">Offerte ✓</span>
+                    <span class="font-bold" style="color:#9ca3af">À définir</span>
                   } @else {
                     <span class="font-bold text-orange-400">{{ shippingFee | number:'1.0-0':'fr-FR' }}&thinsp; FCFA</span>
                   }
@@ -1146,11 +1146,11 @@
 
                 <!-- Coût de livraison affiché dynamiquement -->
                 @if (deliveryZone === 'abidjan') {
-                  <div class="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-xs text-green-500 font-semibold">
+                  <div class="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-xs text-orange-400 font-semibold">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
-                    Livraison offerte à Abidjan
+                    Frais de livraison Abidjan : 1 500 FCFA
                   </div>
                 }
                 @if (deliveryZone === 'interieur') {
