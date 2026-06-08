@@ -69,7 +69,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products',
     },
     {
-      imageUrl: '/ci.jpeg',
+      imageUrl: '/mt.png',
       label: 'Maillots toutes nations',
       eyebrow: 'Coupe du Monde 2026',
       title: [
@@ -82,7 +82,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products?categorie=sport',
     },
     {
-      imageUrl: 'https://images.pexels.com/photos/5788986/pexels-photo-5788986.jpeg?auto=compress&cs=tinysrgb&w=1920',
+      imageUrl: '/campus.png',
       label: 'Baskets & Sneakers',
       eyebrow: 'Nouveautés',
       title: [
@@ -107,7 +107,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products?categorie=audio',
     },
     {
-      imageUrl: 'https://images.pexels.com/photos/18311094/pexels-photo-18311094.jpeg?auto=compress&cs=tinysrgb&w=1920',
+      imageUrl: '/lalé.png',
       label: 'Smartphones & Tech',
       eyebrow: 'High-Tech',
       title: [
@@ -131,7 +131,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products?categorie=accessoires',
     },
     {
-      imageUrl: 'https://images.pexels.com/photos/1181271/pexels-photo-1181271.jpeg?auto=compress&cs=tinysrgb&w=1920',
+      imageUrl: '/mac.png',
       label: 'Ordinateurs & PC',
       eyebrow: 'High-Tech',
       title: [
