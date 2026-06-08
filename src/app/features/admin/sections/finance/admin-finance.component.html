@@ -151,7 +151,7 @@
             </div>
 
             <!-- Répartition charges par catégorie -->
-            @if (dashboard()!.expensesByCategory?.length) {
+            @if (dashboard()!.expensesByCategory.length) {
               <div class="theme-surface border theme-border rounded-2xl p-5 mb-6">
                 <h3 class="text-sm font-bold theme-text mb-4">Charges par catégorie</h3>
                 <div class="space-y-2">
@@ -188,7 +188,7 @@
             }
 
             <!-- Graphique évolution mensuelle -->
-            @if (dashboard()!.monthly?.length) {
+            @if (dashboard()!.monthly.length) {
               <div class="theme-surface border theme-border rounded-2xl p-5 mb-6">
                 <h3 class="text-sm font-bold theme-text mb-5">Évolution mensuelle</h3>
                 <div class="flex items-end gap-2 h-32 overflow-x-auto pb-2">
@@ -222,7 +222,7 @@
             }
 
             <!-- Répartition par catégorie -->
-            @if (dashboard()!.byCategory?.length) {
+            @if (dashboard()!.byCategory.length) {
               <div class="theme-surface border theme-border rounded-2xl p-5">
                 <h3 class="text-sm font-bold theme-text mb-4">Répartition par catégorie</h3>
                 <div class="overflow-x-auto">
@@ -445,7 +445,7 @@
             }
 
             <!-- Répartition par catégorie -->
-            @if (stockValue()!.byCategory?.length) {
+            @if (stockValue()!.byCategory.length) {
               <div class="theme-surface border theme-border rounded-2xl p-5 mb-6">
                 <h3 class="text-sm font-bold theme-text mb-4">Valeur par catégorie</h3>
                 <div class="overflow-x-auto">
@@ -486,7 +486,7 @@
                     </span>
                   }
                 </h3>
-                @if (!stockValue()!.outOfStock?.length) {
+                @if (!stockValue()!.outOfStock.length) {
                   <p class="text-sm theme-muted text-center py-4">Aucune rupture</p>
                 } @else {
                   <div class="space-y-3">
@@ -524,7 +524,7 @@
                     </span>
                   }
                 </h3>
-                @if (!stockValue()!.lowStock?.length) {
+                @if (!stockValue()!.lowStock.length) {
                   <p class="text-sm theme-muted text-center py-4">Aucun stock bas</p>
                 } @else {
                   <div class="space-y-3">
@@ -604,7 +604,7 @@
             </div>
 
             <!-- Graphique mensuel cash flow -->
-            @if (cashFlow()!.monthly?.length) {
+            @if (cashFlow()!.monthly.length) {
               <div class="theme-surface border theme-border rounded-2xl p-5">
                 <h3 class="text-sm font-bold theme-text mb-5">Évolution mensuelle</h3>
                 <div class="flex items-end gap-2 h-32 overflow-x-auto pb-2">

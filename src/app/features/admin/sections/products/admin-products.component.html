@@ -850,7 +850,7 @@
               <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Stock *</label>
               @if (productVariants.length > 0) {
                 <div class="px-4 py-3 rounded-xl bg-black/[.04] border theme-border">
-                  <p class="text-sm font-black text-gold">{{ editingProduct?.stock ?? 0 }}</p>
+                  <p class="text-sm font-black text-gold">{{ editingProduct.stock }}</p>
                   <p class="text-[10px] theme-muted mt-0.5">Calculé depuis {{ productVariants.length }} couleur{{ productVariants.length > 1 ? 's' : '' }}</p>
                 </div>
               } @else {

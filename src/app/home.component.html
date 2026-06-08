@@ -11,26 +11,97 @@
   ════════════════════════════════════════════════════════════════════ -->
   <section class="relative min-h-screen overflow-hidden hero-spotlight"
            (mousemove)="onHeroMouseMove($event)"
-           (mouseleave)="onHeroMouseLeave($event)">
+           (mouseleave)="onHeroMouseLeave($event)"
+           (touchstart)="onTouchStart($event)"
+           (touchend)="onTouchEnd($event)">
 
-    <div class="hero-parallax absolute inset-0">
-      <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1200&q=80&fm=webp"
-           srcset="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=800&q=80&fm=webp 800w,
-                   https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1200&q=80&fm=webp 1200w,
-                   https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=80&fm=webp 1920w"
-           sizes="100vw"
-           alt="Montre de prestige SDM Store"
-           class="hero-img absolute inset-0 w-full h-full object-cover"
-           fetchpriority="high"/>
+    <!-- ════ SKELETON LOADER ════ -->
+    @if (!slidesLoaded) {
+      <div class="absolute inset-0 z-30 flex items-center justify-center" style="background:#07060a;">
+        <div class="flex flex-col items-center gap-4">
+          <div class="w-16 h-16 rounded-full skeleton-loader"></div>
+          <div class="h-3 w-40 rounded skeleton-loader"></div>
+          <div class="h-2 w-56 rounded skeleton-loader"></div>
+        </div>
+      </div>
+    }
+
+    <!-- ════ SLIDES ════ -->
+    <div class="hero-parallax absolute inset-0"
+         [class.swiping]="_isTransitioning">
+
+      @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
+        <img [src]="slide.imageUrl"
+             [alt]="slide.label"
+             class="hero-slide absolute inset-0 w-full h-full object-cover"
+             [class.active]="i === currentSlide"
+             [class.prev]="i === currentSlide - 1 || (currentSlide === 0 && i === heroSlides.length - 1)"
+             [class.next]="i === currentSlide + 1 || (currentSlide === heroSlides.length - 1 && i === 0)"
+             [attr.fetchpriority]="i === 0 ? 'high' : 'low'"
+             (load)="i === 0 ? onHeroImgLoad() : null"
+             (error)="onSlideError($event)"/>
+      }
+
+      <!-- Overlay progress bar -->
+      <div class="absolute bottom-0 left-0 right-0 z-20 h-[3px] bg-white/10">
+        @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
+          <div class="hero-progress-bar absolute inset-y-0 left-0"
+               [class.active]="i === currentSlide"
+               [style.width.%]="i === currentSlide ? progressValue : 0">
+          </div>
+        }
+      </div>
+
+      <!-- Flèche précédente -->
+      <button (click)="prevSlide()"
+              aria-label="Slide précédent"
+              class="hero-arrow hero-arrow--left z-20">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <!-- Flèche suivante -->
+      <button (click)="nextSlide()"
+              aria-label="Slide suivant"
+              class="hero-arrow hero-arrow--right z-20">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+      <!-- Navigation dots -->
+      @if (slidesLoaded) {
+        <div class="hero-dots z-20">
+          @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
+            <button (click)="goToSlide(i)"
+                    [class.active]="i === currentSlide"
+                    class="hero-dot"
+                    [attr.aria-label]="'Aller à ' + slide.label">
+              <span class="hero-dot-inner"></span>
+              <span class="hero-dot-label">{{ slide.label }}</span>
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Category label -->
+      @if (slidesLoaded) {
+        <div class="absolute top-5 right-5 sm:top-8 sm:right-8 z-20">
+          <span class="hero-slide-label">{{ heroSlides[currentSlide].label }}</span>
+        </div>
+      }
     </div>
 
+    <!-- Gradients overlay -->
     <div class="absolute inset-0" style="z-index:1;
-         background:linear-gradient(105deg,rgba(4,4,4,0.97) 0%,rgba(4,4,4,0.7) 36%,rgba(4,4,4,0.12) 58%,transparent 76%)"></div>
+         background:linear-gradient(105deg,rgba(4,4,4,0.98) 0%,rgba(4,4,4,0.75) 38%,rgba(4,4,4,0.2) 60%,transparent 78%)"></div>
     <div class="absolute inset-0 lg:hidden" style="z-index:1;
-         background:linear-gradient(to top,rgba(4,4,4,0.97) 0%,rgba(4,4,4,0.25) 45%,transparent 66%)"></div>
-    <div class="absolute inset-0 pointer-events-none" style="z-index:2;box-shadow:inset 0 0 200px rgba(0,0,0,0.4)"></div>
+         background:linear-gradient(to top,rgba(4,4,4,0.98) 0%,rgba(4,4,4,0.3) 48%,transparent 68%)"></div>
+    <div class="absolute inset-0 pointer-events-none" style="z-index:2;box-shadow:inset 0 0 120px rgba(0,0,0,0.3)"></div>
+    <div class="absolute inset-0 pointer-events-none opacity-20" style="z-index:2;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%224%22 height=%224%22><path d=%22M0 0h1v1H0zm2 2h1v1H2z%22 fill=%22%23fff%22 opacity=%22.08%22/></svg>');background-size:4px 4px;"></div>
     <div class="hero-line-v absolute top-0 left-0 w-[1px] hidden lg:block"
-         style="height:clamp(220px,42vh,460px);z-index:5;background:linear-gradient(to bottom,rgba(212,175,55,0.75),transparent)"></div>
+         style="height:clamp(220px,42vh,460px);z-index:5;background:linear-gradient(to bottom,rgba(212,175,55,0.6),transparent)"></div>
 
     <span class="particle" style="z-index:5;width:2px;height:2px;left:21%;bottom:29%;animation-duration:5.5s;animation-delay:0s;"></span>
     <span class="particle" style="z-index:5;width:1px;height:1px;left:36%;bottom:21%;animation-duration:7.2s;animation-delay:1.3s;"></span>
@@ -38,104 +109,125 @@
     <span class="particle" style="z-index:5;width:2px;height:2px;left:64%;bottom:17%;animation-duration:8.4s;animation-delay:0.8s;"></span>
     <span class="particle" style="z-index:5;width:1px;height:1px;left:74%;bottom:31%;animation-duration:5.2s;animation-delay:3.4s;"></span>
 
+    <!-- ════ CONTENU ANIMÉ PAR SLIDE ════ -->
     <div class="relative flex flex-col justify-end lg:justify-center min-h-screen
                 px-7 sm:px-12 lg:px-16 xl:px-24
                 pb-20 pt-28 sm:pt-36 lg:pb-0 lg:pt-0 lg:max-w-[56%]"
          style="z-index:10">
 
-      <div class="hidden lg:block w-8 h-[1px] mb-14"
-           style="background:#d4af37;opacity:0;animation:slide-up-fade 0.6s ease 0.15s both;"></div>
+      @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
+        <div class="hero-content"
+             [class.visible]="i === currentSlide"
+             [class.exiting]="false">
 
-      <div class="hero-eyebrow flex items-center gap-2.5 mb-7 sm:mb-9">
-        <div class="relative flex h-2 w-2 flex-shrink-0">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style="background:#d4af37;"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2" style="background:#d4af37;"></span>
+          @if (i === currentSlide) {
+            <div class="hidden lg:block w-8 h-[1px] mb-14 hero-content-line"
+                 style="background:#d4af37;"></div>
+
+            <div class="flex items-center gap-2.5 mb-7 sm:mb-9 hero-content-eyebrow">
+              <div class="relative flex h-2 w-2 flex-shrink-0">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style="background:#d4af37;"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2" style="background:#d4af37;"></span>
+              </div>
+              <p class="text-[11px] uppercase tracking-[0.45em] font-bold" style="color:rgba(212,175,55,0.72);">
+                {{ slide.eyebrow }}
+              </p>
+            </div>
+
+            <h1 class="font-black leading-[0.85] tracking-tight text-white mb-9 sm:mb-11">
+              @for (word of slide.title; track $index; let wi = $index) {
+                <span class="hero-wrap">
+                  <span class="hero-word"
+                        [class.gold-shimmer]="word.gold"
+                        style="font-size:clamp(2rem,5.5vw,4rem);"
+                        [style.animation-delay.ms]="300 + wi * 200">
+                    {{ word.text }}
+                  </span>
+                </span>
+              }
+            </h1>
+
+            <p class="max-w-xs leading-relaxed mb-8 hero-content-desc"
+               style="color:rgba(255,255,255,0.65);font-size:0.875rem;">
+              {{ slide.description }}
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-3 mb-8 hero-content-ctas">
+              <a [routerLink]="slide.ctaLink"
+                 class="inline-flex items-center gap-3 px-7 py-4 text-xs uppercase tracking-[0.2em] font-black text-black
+                        hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
+                 style="background:#d4af37;box-shadow:0 8px 28px rgba(212,175,55,0.3)">
+                {{ slide.cta }}
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </a>
+              @if (!(currentUser$ | async)) {
+                <a routerLink="/auth/register"
+                   class="inline-flex items-center justify-center px-7 py-4 text-xs uppercase tracking-[0.2em] font-bold
+                          border hover:border-white/30 hover:text-white/80 transition-all duration-300"
+                   style="color:rgba(255,255,255,0.48);border-color:rgba(255,255,255,0.14);">
+                  Créer un compte
+                </a>
+              }
+            </div>
+          }
         </div>
-        <p class="text-[11px] uppercase tracking-[0.45em] font-bold" style="color:rgba(212,175,55,0.72);">
-          SDM Store · Abidjan, Côte d'Ivoire
-        </p>
-      </div>
+      }
 
-      <h1 class="font-black leading-[0.85] tracking-tight text-white mb-9 sm:mb-11">
-        <span class="hero-wrap"><span class="hero-word" style="font-size:clamp(2.9rem,11vw,7rem);animation-delay:0.38s">L'HEURE</span></span>
-        <span class="hero-wrap"><span class="hero-word gold-shimmer" style="font-size:clamp(2.9rem,11vw,7rem);animation-delay:0.62s">DU</span></span>
-        <span class="hero-wrap"><span class="hero-word" style="font-size:clamp(2.9rem,11vw,7rem);animation-delay:0.88s">PRESTIGE.</span></span>
-      </h1>
-
-      <p class="hero-desc max-w-xs leading-relaxed mb-8" style="color:rgba(255,255,255,0.65);font-size:0.875rem;">
-        Montres, bijoux, mode &amp; lifestyle — sélectionnés pour vous, livrés partout en Côte d'Ivoire.
-      </p>
-
-      <!-- Barre de recherche -->
-      <div class="hero-chips mb-8 flex gap-2 max-w-md">
-        <div class="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl"
-             style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);">
-          <svg class="w-4 h-4 flex-shrink-0" style="color:rgba(212,175,55,0.6);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-          <input [(ngModel)]="searchQuery"
-                 (keydown)="onSearchKey($event)"
-                 type="text"
-                 placeholder="Rechercher un article…"
-                 class="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none min-w-0"/>
-        </div>
-        <button (click)="search()" aria-label="Lancer la recherche"
-                class="px-4 py-3 text-black transition-all hover:-translate-y-0.5 flex items-center justify-center flex-shrink-0"
-                style="background:#d4af37;">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Trust chips -->
-      <div class="hero-chips flex flex-wrap gap-2 mb-10">
-        <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
-              style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.88);">
-          <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-          </svg>
-          Qualité vérifiée
-        </span>
-        <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
-              style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
-          Livraison 24–48h
-        </span>
-        <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
-              style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
-          Paiement à la livraison
-        </span>
-        @if (!(currentUser$ | async) && firstOrderPromo) {
-          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold"
-                style="background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.5);color:#d4af37;">
-            <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+      <!-- Search + Trust chips (toujours visibles) -->
+      <div class="hero-permanent">
+        <!-- Barre de recherche -->
+        <div class="mb-4 sm:mb-6 flex gap-2 max-w-md">
+          <div class="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl"
+               style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);">
+            <svg class="w-4 h-4 flex-shrink-0" style="color:rgba(212,175,55,0.6);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            1er achat : <span class="font-mono ml-1">{{ firstOrderPromo.code }}</span>&nbsp;(-{{ firstOrderPromo.discountPercent }}%)
-          </span>
-        }
-      </div>
+            <input [(ngModel)]="searchQuery"
+                   (keydown)="onSearchKey($event)"
+                   type="text"
+                   placeholder="Rechercher un article…"
+                   class="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none min-w-0"/>
+          </div>
+          <button (click)="search()" aria-label="Lancer la recherche"
+                  class="px-4 py-3 text-black transition-all hover:-translate-y-0.5 flex items-center justify-center flex-shrink-0"
+                  style="background:#d4af37;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </button>
+        </div>
 
-      <div class="hero-ctas flex flex-col sm:flex-row gap-3">
-        <a routerLink="/products"
-           class="inline-flex items-center gap-3 px-7 py-4 text-xs uppercase tracking-[0.2em] font-black text-black
-                  hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
-           style="background:#d4af37;box-shadow:0 8px 28px rgba(212,175,55,0.3)">
-          Découvrir la collection
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
-        </a>
-        @if (!(currentUser$ | async)) {
-          <a routerLink="/auth/register"
-             class="inline-flex items-center justify-center px-7 py-4 text-xs uppercase tracking-[0.2em] font-bold
-                    border hover:border-white/30 hover:text-white/80 transition-all duration-300"
-             style="color:rgba(255,255,255,0.48);border-color:rgba(255,255,255,0.14);">
-            Créer un compte
-          </a>
-        }
+        <!-- Trust chips -->
+        <div class="flex flex-wrap gap-2 mb-10">
+          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+                style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.88);">
+            <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            Qualité vérifiée
+          </span>
+          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
+                style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
+            Livraison 24–48h
+          </span>
+          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
+                style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
+            Paiement à la livraison
+          </span>
+          @if (!(currentUser$ | async) && firstOrderPromo) {
+            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold"
+                  style="background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.5);color:#d4af37;">
+              <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+              </svg>
+              1er achat : <span class="font-mono ml-1">{{ firstOrderPromo.code }}</span>&nbsp;(-{{ firstOrderPromo.discountPercent }}%)
+            </span>
+          }
+        </div>
       </div>
 
       <div class="hero-sig hidden lg:flex items-center gap-5 mt-auto pt-20"

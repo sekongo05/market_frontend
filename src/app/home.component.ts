@@ -1,5 +1,5 @@
-import { Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './core/services/auth.service';
@@ -53,6 +53,98 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   searchQuery = '';
   firstOrderPromo: PublicPromoResponse | null = null;
 
+  // ── Hero slideshow ──────────────────────────────────────────────
+  readonly heroSlides = [
+    {
+      imageUrl: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=80&fm=webp',
+      label: 'Montres de prestige',
+      eyebrow: 'SDM Store · Abidjan',
+      title: [
+        { text: "L'HEURE", gold: false },
+        { text: 'DU', gold: true },
+        { text: 'PRESTIGE.', gold: false },
+      ],
+      description: "Montres, bijoux et accessoires de prestige — la classe sans quitter Abidjan.",
+      cta: 'Découvrir la collection',
+      ctaLink: '/products',
+    },
+    {
+      imageUrl: '/ci.jpeg',
+      label: 'Maillots toutes nations',
+      eyebrow: 'Coupe du Monde 2026',
+      title: [
+        { text: 'TOUTES', gold: true },
+        { text: 'LES', gold: false },
+        { text: 'NATIONS.', gold: false },
+      ],
+      description: 'Côte d\'Ivoire, France, Brésil, Argentine, Maroc… tous les maillots internationaux disponibles — portez vos couleurs.',
+      cta: 'Découvrir tous les maillots',
+      ctaLink: '/products?categorie=sport',
+    },
+    {
+      imageUrl: '/air%20force%20one.jpeg',
+      label: 'Baskets & Sneakers',
+      eyebrow: 'Nouveautés',
+      title: [
+        { text: 'VOTRE', gold: false },
+        { text: 'ALLURE.', gold: true },
+      ],
+      description: 'Sneakers originales et baskets tendance — reçues en 48h chez vous à Abidjan.',
+      cta: 'Explorer les sneakers',
+      ctaLink: '/products?categorie=chaussures',
+    },
+    {
+      imageUrl: '/airpods.jpeg',
+      label: 'Écouteurs sans fil',
+      eyebrow: 'Audio Premium',
+      title: [
+        { text: 'SON', gold: false },
+        { text: 'SANS', gold: true },
+        { text: 'FIL.', gold: false },
+      ],
+      description: 'AirPods, écouteurs et casques audio — authentiques, pas de contrefaçons.',
+      cta: 'Découvrir l\'audio',
+      ctaLink: '/products?categorie=audio',
+    },
+    {
+      imageUrl: '/iPhone.jpeg',
+      label: 'Smartphones & Tech',
+      eyebrow: 'High-Tech',
+      title: [
+        { text: 'AUTHENTIQUE.', gold: true },
+      ],
+      description: 'iPhone et smartphones originaux — payez à la livraison, zéro stress.',
+      cta: 'Voir les smartphones',
+      ctaLink: '/products?categorie=telephones',
+    },
+    {
+      imageUrl: '/casquette2.jpeg',
+      label: 'Casquettes & Accessoires',
+      eyebrow: 'Streetwear',
+      title: [
+        { text: 'LE', gold: false },
+        { text: 'LOOK', gold: true },
+        { text: 'QUI PARLE.', gold: false },
+      ],
+      description: 'Casquettes, bonnets et accessoires — le streetwear qui impose le respect.',
+      cta: 'Voir les casquettes',
+      ctaLink: '/products?categorie=accessoires',
+    },
+  ];
+
+  currentSlide = 0;
+  slidesLoaded = false;
+  progressValue = 0;
+  slideDirection: 'next' | 'prev' = 'next';
+
+  private _slideTimer: ReturnType<typeof setInterval> | null = null;
+  private _progressTimer: ReturnType<typeof setInterval> | null = null;
+  readonly _slideInterval = 4000;
+  _isPaused = false;
+  private _swipeStartX = 0;
+  _isTransitioning = false;
+  private _preloaded = new Set<string>();
+
   private _observer?: IntersectionObserver;
   private _statsAnimated = false;
   private destroy$ = new Subject<void>();
@@ -96,7 +188,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     },
   ];
 
+  private _platformBrowser: boolean;
+
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private authService: AuthService,
     private productService: ProductService,
     private reviewService: ReviewService,
@@ -108,18 +203,24 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private seo: SeoService,
   ) {
+    this._platformBrowser = isPlatformBrowser(this.platformId);
     this.currentUser$ = this.authService.currentUser$;
   }
 
   ngAfterViewInit(): void {
-    this._isTouchDevice = window.matchMedia('(hover: none)').matches;
-    if (!this._isTouchDevice) {
-      this._cursorEl = document.getElementById('sdm-cursor');
-      document.addEventListener('mousemove',  this._onCursorMove, { passive: true });
-      document.addEventListener('mouseover',  this._onCursorOver, { passive: true });
-      document.addEventListener('mousedown',  this._onCursorDown);
-      document.addEventListener('mouseup',    this._onCursorUp);
+    if (this._platformBrowser) {
+      this._isTouchDevice = window.matchMedia('(hover: none)').matches;
+      if (!this._isTouchDevice) {
+        this._cursorEl = document.getElementById('sdm-cursor');
+        document.addEventListener('mousemove',  this._onCursorMove, { passive: true });
+        document.addEventListener('mouseover',  this._onCursorOver, { passive: true });
+        document.addEventListener('mousedown',  this._onCursorDown);
+        document.addEventListener('mouseup',    this._onCursorUp);
+      }
     }
+    this._preloadAdjacent();
+    this._startAutoPlay();
+    this._startProgress();
     this.seo.set({
       title: 'Mode, Montres & Lifestyle en Côte d\'Ivoire',
       description: 'SDM STORE : boutique en ligne de mode, montres, bijoux, beauté et lifestyle. Livraison 24–48h partout en Côte d\'Ivoire.',
@@ -166,10 +267,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this._stopAutoPlay();
+    this._stopProgress();
     this._observer?.disconnect();
     this.destroy$.next();
     this.destroy$.complete();
-    if (!this._isTouchDevice) {
+    if (this._platformBrowser && !this._isTouchDevice) {
       document.removeEventListener('mousemove', this._onCursorMove);
       document.removeEventListener('mouseover', this._onCursorOver);
       document.removeEventListener('mousedown', this._onCursorDown);
@@ -197,7 +300,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   onHeroMouseMove(event: MouseEvent): void {
-    if (window.matchMedia('(hover: none)').matches) return;
+    if (!this._platformBrowser || window.matchMedia('(hover: none)').matches) return;
     const section = event.currentTarget as HTMLElement;
     const rect    = section.getBoundingClientRect();
     const cx = (event.clientX - rect.left) / rect.width  - 0.5;
@@ -209,9 +312,112 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   onHeroMouseLeave(event: MouseEvent): void {
-    if (window.matchMedia('(hover: none)').matches) return;
+    if (!this._platformBrowser || window.matchMedia('(hover: none)').matches) return;
     const parallax = (event.currentTarget as HTMLElement).querySelector('.hero-parallax') as HTMLElement | null;
     if (parallax) parallax.style.transform = '';
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (!event.touches.length) return;
+    this._swipeStartX = event.touches[0].clientX;
+  }
+
+  onTouchEnd(event: TouchEvent): void {
+    if (!event.changedTouches.length) return;
+    const delta = event.changedTouches[0].clientX - this._swipeStartX;
+    if (Math.abs(delta) > 50) {
+      delta > 0 ? this.prevSlide() : this.nextSlide();
+    }
+  }
+
+  prevSlide(): void {
+    if (this._isTransitioning) return;
+    this.slideDirection = 'prev';
+    const prev = (this.currentSlide - 1 + this.heroSlides.length) % this.heroSlides.length;
+    this._goTo(prev);
+  }
+
+  nextSlide(): void {
+    if (this._isTransitioning) return;
+    this.slideDirection = 'next';
+    const next = (this.currentSlide + 1) % this.heroSlides.length;
+    this._goTo(next);
+  }
+
+  goToSlide(index: number): void {
+    if (this._isTransitioning || index === this.currentSlide) return;
+    this.slideDirection = index > this.currentSlide ? 'next' : 'prev';
+    this._goTo(index);
+  }
+
+  private _goTo(index: number): void {
+    this._isTransitioning = true;
+    this.currentSlide = index;
+    this.progressValue = 0;
+    this._preloadAdjacent();
+    this._stopAutoPlay();
+    this._stopProgress();
+    this._startAutoPlay();
+    this._startProgress();
+    this.cdr.detectChanges();
+    setTimeout(() => { this._isTransitioning = false; }, 600);
+  }
+
+  onSlideError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1200&q=80&fm=webp';
+  }
+
+  onHeroImgLoad(): void {
+    this.slidesLoaded = true;
+    this.cdr.detectChanges();
+  }
+
+  private _preloadAdjacent(): void {
+    if (!this._platformBrowser) return;
+    const next = (this.currentSlide + 1) % this.heroSlides.length;
+    const prev = (this.currentSlide - 1 + this.heroSlides.length) % this.heroSlides.length;
+    [next, prev].forEach(i => {
+      const url = this.heroSlides[i].imageUrl;
+      if (!this._preloaded.has(url)) {
+        const img = new Image();
+        img.src = url;
+        this._preloaded.add(url);
+      }
+    });
+  }
+
+  private _startAutoPlay(): void {
+    this._slideTimer = setInterval(() => {
+      if (!this._isPaused) {
+        this.nextSlide();
+      }
+    }, this._slideInterval);
+  }
+
+  private _stopAutoPlay(): void {
+    if (this._slideTimer) {
+      clearInterval(this._slideTimer);
+      this._slideTimer = null;
+    }
+  }
+
+  private _startProgress(): void {
+    this.progressValue = 0;
+    const step = 100 / (this._slideInterval / 30);
+    this._progressTimer = setInterval(() => {
+      if (!this._isPaused) {
+        this.progressValue = Math.min(this.progressValue + step, 100);
+        this.cdr.detectChanges();
+      }
+    }, 30);
+  }
+
+  private _stopProgress(): void {
+    if (this._progressTimer) {
+      clearInterval(this._progressTimer);
+      this._progressTimer = null;
+    }
   }
 
   get hasDeals(): boolean { return !this.newProductsLoading && this.discountProducts.length > 0; }
@@ -345,6 +551,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _initObserver(): void {
+    if (!this._platformBrowser) return;
     this._observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
@@ -360,9 +567,11 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.scroll-reveal').forEach(el => this._observer!.observe(el));
-    const stats = document.getElementById('stats-row');
-    if (stats) this._observer.observe(stats);
+    if (this._platformBrowser) {
+      document.querySelectorAll('.scroll-reveal').forEach(el => this._observer!.observe(el));
+      const stats = document.getElementById('stats-row');
+      if (stats) this._observer.observe(stats);
+    }
   }
 
   private _count(prop: 'statProducts'|'statCategories'|'statClients'|'statReviews', target: number, ms: number): void {
