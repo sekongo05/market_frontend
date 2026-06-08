@@ -37,6 +37,7 @@
              [class.active]="i === currentSlide"
              [class.prev]="i === currentSlide - 1 || (currentSlide === 0 && i === heroSlides.length - 1)"
              [class.next]="i === currentSlide + 1 || (currentSlide === heroSlides.length - 1 && i === 0)"
+             [class.no-ken]="i === 1"
              [attr.fetchpriority]="i === 0 ? 'high' : 'low'"
              (load)="i === 0 ? onHeroImgLoad() : null"
              (error)="onSlideError($event)"/>

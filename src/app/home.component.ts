@@ -82,7 +82,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products?categorie=sport',
     },
     {
-      imageUrl: '/air%20force%20one.jpeg',
+      imageUrl: 'https://images.pexels.com/photos/5788986/pexels-photo-5788986.jpeg?auto=compress&cs=tinysrgb&w=1920',
       label: 'Baskets & Sneakers',
       eyebrow: 'Nouveautés',
       title: [
@@ -94,7 +94,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products?categorie=chaussures',
     },
     {
-      imageUrl: '/airpods.jpeg',
+      imageUrl: 'https://images.pexels.com/photos/18254084/pexels-photo-18254084.jpeg?auto=compress&cs=tinysrgb&w=1920',
       label: 'Écouteurs sans fil',
       eyebrow: 'Audio Premium',
       title: [
@@ -107,7 +107,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products?categorie=audio',
     },
     {
-      imageUrl: '/iPhone.jpeg',
+      imageUrl: 'https://images.pexels.com/photos/18311094/pexels-photo-18311094.jpeg?auto=compress&cs=tinysrgb&w=1920',
       label: 'Smartphones & Tech',
       eyebrow: 'High-Tech',
       title: [
@@ -118,7 +118,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products?categorie=telephones',
     },
     {
-      imageUrl: '/casquette2.jpeg',
+      imageUrl: 'https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg?auto=compress&cs=tinysrgb&w=1920',
       label: 'Casquettes & Accessoires',
       eyebrow: 'Streetwear',
       title: [
@@ -129,6 +129,19 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       description: 'Casquettes, bonnets et accessoires — le streetwear qui impose le respect.',
       cta: 'Voir les casquettes',
       ctaLink: '/products?categorie=accessoires',
+    },
+    {
+      imageUrl: 'https://images.pexels.com/photos/1181271/pexels-photo-1181271.jpeg?auto=compress&cs=tinysrgb&w=1920',
+      label: 'Ordinateurs & PC',
+      eyebrow: 'High-Tech',
+      title: [
+        { text: 'LA', gold: false },
+        { text: 'PUISSANCE', gold: true },
+        { text: 'CHEZ VOUS.', gold: false },
+      ],
+      description: 'PC portables, gaming et accessoires — performances pro, payez à la livraison.',
+      cta: 'Voir les ordinateurs',
+      ctaLink: '/products?categorie=informatique',
     },
   ];
 
