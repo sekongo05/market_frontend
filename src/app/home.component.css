@@ -699,3 +699,16 @@
   animation: shimmer 2.2s ease-in-out infinite;
   will-change: transform;
 }
+
+/* ─── Parallax ─── */
+.parallax-wrap {
+  background:#07060a;
+}
+.parallax-bg {
+  will-change: transform;
+}
+@media (max-width: 1023px) {
+  .parallax-bg {
+    background-attachment: scroll !important;
+  }
+}

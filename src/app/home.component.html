@@ -928,7 +928,42 @@
 
 
   <!-- ════════════════════════════════════════════════════════════════
-       12. AVIS CLIENTS
+        12. PARALLAX — Bannière lifestyle
+  ════════════════════════════════════════════════════════════════════ -->
+  <section class="parallax-wrap relative overflow-hidden"
+           style="min-height:clamp(400px,60vh,600px);">
+    <div class="parallax-bg absolute inset-0 bg-cover bg-center"
+         style="background-image:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80&fm=webp');
+                background-attachment:fixed;background-size:cover;background-position:center;"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(4,4,4,0.93) 0%,rgba(4,4,4,0.3) 50%,rgba(4,4,4,0.7) 100%);z-index:1;"></div>
+    <div class="absolute inset-0" style="z-index:2;background:rgba(0,0,0,0.15);"></div>
+    <div class="relative z-10 flex flex-col items-center justify-center min-h-[clamp(400px,60vh,600px)] px-5 text-center">
+      <div class="r-line w-8 h-[1px] mb-10" style="background:#d4af37;"></div>
+      <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-6"
+         style="color:rgba(212,175,55,0.65);transition-delay:100ms;">L'Art de vivre</p>
+      <h2 class="font-black text-white leading-[0.88] tracking-tight mb-6"
+          style="font-size:clamp(2.8rem,8vw,5.5rem);">
+        <span class="r-up block" style="transition-delay:200ms">L'ÉLÉGANCE</span>
+        <span class="r-up block gold-shimmer" style="transition-delay:340ms">N'ATTEND PAS.</span>
+      </h2>
+      <p class="r-up text-sm max-w-md mb-10" style="color:rgba(255,255,255,0.48);transition-delay:460ms;">
+        Découvrez une sélection exclusive pensée pour ceux qui refusent de passer inaperçus.
+      </p>
+      <div class="r-up" style="transition-delay:560ms">
+        <a routerLink="/products"
+           class="inline-flex items-center gap-3 px-8 py-4 font-black text-xs uppercase tracking-[0.2em] text-black transition-all hover:-translate-y-0.5"
+           style="background:#d4af37;box-shadow:0 8px 32px rgba(212,175,55,0.22);">
+          Explorer la boutique
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════
+        13. AVIS CLIENTS
   ════════════════════════════════════════════════════════════════════ -->
   @if (!reviewsLoading && featuredReviews.length > 0) {
     <section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
@@ -1004,7 +1039,7 @@
 
 
   <!-- ════════════════════════════════════════════════════════════════
-       13. CTA FINAL
+        14. CTA FINAL
   ════════════════════════════════════════════════════════════════════ -->
   <section class="relative border-t overflow-hidden scroll-reveal"
            style="border-color:rgba(212,175,55,0.1);padding:clamp(80px,12vw,160px) 1.5rem;">
