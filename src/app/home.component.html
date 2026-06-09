@@ -51,24 +51,6 @@
         }
       </div>
 
-      <!-- Flèche précédente -->
-      <button (click)="prevSlide()"
-              aria-label="Slide précédent"
-              class="hero-arrow hero-arrow--left z-20">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-      </button>
-
-      <!-- Flèche suivante -->
-      <button (click)="nextSlide()"
-              aria-label="Slide suivant"
-              class="hero-arrow hero-arrow--right z-20">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-        </svg>
-      </button>
-
       <!-- Navigation dots -->
       @if (slidesLoaded) {
         <div class="hero-dots z-20">
@@ -994,7 +976,7 @@
         13. CTA FINAL
   ════════════════════════════════════════════════════════════════════ -->
   <section class="relative border-t overflow-hidden scroll-reveal"
-           style="border-color:rgba(212,175,55,0.1);padding:clamp(80px,12vw,160px) 1.5rem;">
+           style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,10vw,120px) 1.5rem;">
     <div class="cta-halo absolute inset-0 pointer-events-none"
          style="background:radial-gradient(ellipse at center,rgba(212,175,55,0.07) 0%,transparent 60%);"></div>
     <div class="absolute top-0 left-0 w-16 h-16 pointer-events-none hidden lg:block r-scale"
@@ -1002,12 +984,20 @@
     <div class="absolute bottom-0 right-0 w-16 h-16 pointer-events-none hidden lg:block r-scale"
          style="border-bottom:1px solid rgba(212,175,55,0.22);border-right:1px solid rgba(212,175,55,0.22);transition-delay:400ms"></div>
 
+    <!-- Décorations flottantes -->
+    <div class="cta-ring hidden lg:block" style="top:15%;right:8%;"></div>
+    <div class="cta-ring--sm hidden lg:block" style="bottom:20%;left:5%;"></div>
+    <div class="cta-line hidden lg:block" style="top:30%;left:12%;width:120px;transform:rotate(-35deg);"></div>
+    <div class="cta-line hidden lg:block" style="bottom:35%;right:10%;width:160px;transform:rotate(25deg);"></div>
+    <div class="cta-dot" style="top:10%;left:50%;width:4px;height:4px;"></div>
+    <div class="cta-dot--2" style="bottom:15%;right:20%;width:3px;height:3px;"></div>
+
     <div class="relative max-w-2xl mx-auto text-center">
-      <div class="r-line w-8 h-[1px] mx-auto mb-10" style="background:#d4af37;"></div>
-      <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-8"
+      <div class="r-line w-8 h-[1px] mx-auto mb-8" style="background:#d4af37;"></div>
+      <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-6"
          style="color:rgba(212,175,55,0.58);transition-delay:100ms">
         Rejoignez {{ publicStats ? (publicStats.totalClients + '+ clients') : 'notre communauté' }}</p>
-      <h2 class="font-black theme-text leading-[0.88] tracking-tight mb-12"
+      <h2 class="font-black theme-text leading-[0.88] tracking-tight mb-10"
           style="font-size:clamp(3rem,9vw,6.5rem);">
         <span class="r-up block" style="transition-delay:160ms">VOTRE</span>
         <span class="r-up block" style="transition-delay:260ms">PROCHAINE</span>
@@ -1031,7 +1021,7 @@
           </a>
         }
       </div>
-      <div class="r-up flex items-center justify-center gap-6 mt-14" style="transition-delay:660ms">
+      <div class="r-up flex items-center justify-center gap-6 mt-10" style="transition-delay:660ms">
         @for (badge of ['Livraison rapide', 'Qualité vérifiée', 'Paiement à la livraison']; track badge) {
           <span class="text-[10px] uppercase tracking-[0.3em] font-bold" style="color:rgba(212,175,55,0.55);">{{ badge }}</span>
         }
