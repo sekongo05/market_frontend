@@ -94,7 +94,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products?categorie=chaussures',
     },
     {
-      imageUrl: 'https://images.pexels.com/photos/18254084/pexels-photo-18254084.jpeg?auto=compress&cs=tinysrgb&w=1920',
+      imageUrl: '/sans_fil.png',
       label: 'Écouteurs sans fil',
       eyebrow: 'Audio Premium',
       title: [
