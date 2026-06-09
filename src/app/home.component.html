@@ -121,7 +121,7 @@
 
         <p class="max-w-xs leading-relaxed mb-8 hero-content-desc"
            style="color:rgba(255,255,255,0.65);font-size:0.875rem;">
-          Mode, tech & accessoires authentiques — livrés chez vous à Abidjan et à l'intérieur du pays.
+          L'authentique, livré chez vous.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-3 mb-8 hero-content-ctas">
@@ -273,27 +273,6 @@
   </div>
 
 
-  <!-- ════════════════════════════════════════════════════════════════
-       2. CATEGORY PILLS — navigation rapide
-  ════════════════════════════════════════════════════════════════════ -->
-  <div class="overflow-x-auto scrollbar-none"
-       style="border-top:1px solid rgba(212,175,55,0.1);border-bottom:1px solid rgba(212,175,55,0.08);">
-    <div class="flex items-center gap-2 px-5 sm:px-8 py-3 min-w-max sm:flex-wrap sm:min-w-0 sm:justify-center">
-      <a routerLink="/products"
-         class="flex-shrink-0 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors"
-         style="background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.35);color:#d4af37;">
-        Tout voir
-      </a>
-      @for (cat of categories; track cat.id) {
-        <a (click)="goToCategory(cat.slug); $event.preventDefault()"
-           [href]="'/products?categorie=' + cat.slug"
-           class="flex-shrink-0 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors hover:border-gold/60 hover:text-gold cursor-pointer"
-           style="border:1px solid rgba(0,0,0,0.12);color:rgba(0,0,0,0.5);">
-          {{ cat.name }}
-        </a>
-      }
-    </div>
-  </div>
 
 
   <!-- ════════════════════════════════════════════════════════════════
@@ -686,6 +665,14 @@
               <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
             </span>
             <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold text-orange-500/70">Offres limitées</p>
+            <span class="r-up inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-wider"
+                  style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.25);color:#f97316;transition-delay:160ms">
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-orange-500"></span>
+              </span>
+              Temps limité
+            </span>
           </div>
           <h2 class="r-up font-black theme-text tracking-tight leading-none"
               style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">
@@ -739,18 +726,10 @@
     <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
       <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-stretch">
         <div class="r-left relative lg:flex-[52] overflow-hidden" style="min-height:clamp(320px,55vw,640px);transition-delay:100ms;">
-          <img src="/cassio.png"
+          <img src="/seko.png"
                alt="Éditorial SDM Store" loading="lazy"
                class="absolute inset-0 w-full h-full object-cover object-center hover:scale-[1.04] transition-transform duration-1000 ease-out"/>
           <div class="absolute inset-0" style="background:linear-gradient(to bottom,transparent 55%,rgba(6,6,6,0.55) 100%)"></div>
-          <div class="absolute bottom-6 left-6 flex items-center gap-2.5 px-4 py-2.5"
-               style="background:rgba(7,6,2,0.9);border:1px solid rgba(212,175,55,0.22);backdrop-filter:blur(14px);">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-            <span class="text-[9px] font-black text-white uppercase tracking-wider">Qualité vérifiée</span>
-          </div>
         </div>
         <div class="r-right lg:flex-[48] flex flex-col justify-center" style="transition-delay:200ms;">
           <div class="gold-line-pulse w-6 h-[1px] mb-10" style="background:#d4af37;"></div>
@@ -763,19 +742,10 @@
           <p class="leading-relaxed mb-10 text-sm" style="color:rgba(255,255,255,0.38);max-width:28rem;">
             Chaque pièce est choisie pour son caractère, sa rareté et son savoir-faire. Rien de banal, tout de l'exception.
           </p>
-          <div class="grid grid-cols-2 gap-x-8 gap-y-5 mb-12">
-            @for (s of editorialStats; track s.l; let i = $index) {
-              <div class="r-up border-l-2 pl-4" style="border-color:rgba(212,175,55,0.38);"
-                   [style.transition-delay.ms]="i * 80 + 300">
-                <p class="font-black text-white text-xl leading-none mb-1">{{ s.v }}</p>
-                <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:rgba(255,255,255,0.28);">{{ s.l }}</p>
-              </div>
-            }
-          </div>
           <a routerLink="/products"
-             class="self-start inline-flex items-center gap-3 px-6 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-black transition-all duration-300 hover:-translate-y-0.5"
-             style="background:#d4af37;box-shadow:0 8px 28px rgba(212,175,55,0.25);">
-            Explorer la collection
+             class="self-start inline-flex items-center gap-3 px-8 py-4 text-xs font-black uppercase tracking-[0.2em] text-black transition-all duration-300 hover:-translate-y-0.5"
+             style="background:#d4af37;box-shadow:0 8px 32px rgba(212,175,55,0.3);">
+            Découvrir la collection
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
             </svg>
@@ -787,8 +757,25 @@
 
 
   <div aria-hidden="true" class="sdm-sep sdm-sep--from-editorial"></div>
+
   <!-- ════════════════════════════════════════════════════════════════
-       9. COMMENT ÇA MARCHE
+        STATS — preuve sociale
+  ════════════════════════════════════════════════════════════════════ -->
+  <section class="scroll-reveal border-b" style="border-color:rgba(212,175,55,0.08);padding:clamp(40px,6vw,80px) 0;">
+    <div class="max-w-5xl mx-auto px-5 sm:px-8 lg:px-12">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-8">
+        @for (s of editorialStats; track s.l; let i = $index) {
+          <div class="text-center">
+            <p class="font-black theme-text text-2xl sm:text-3xl leading-none mb-1.5">{{ s.v }}</p>
+            <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:rgba(0,0,0,0.35);">{{ s.l }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════
+        9. COMMENT ÇA MARCHE
   ════════════════════════════════════════════════════════════════════ -->
   <section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
     <div class="max-w-5xl mx-auto px-5 sm:px-8 lg:px-12">
@@ -1002,29 +989,24 @@
         <span class="r-up gold-shimmer block" style="transition-delay:360ms">PIÈCE</span>
         <span class="r-up block" style="transition-delay:460ms">EST LÀ.</span>
       </h2>
-      <div class="r-up flex flex-col sm:flex-row justify-center gap-3" style="transition-delay:560ms">
+      <div class="r-up flex flex-col sm:flex-row justify-center gap-4" style="transition-delay:560ms">
         <a routerLink="/products"
-           class="inline-flex items-center justify-center gap-3 px-8 py-4 font-black text-xs uppercase tracking-[0.2em] text-black transition-all hover:-translate-y-0.5"
-           style="background:#d4af37;box-shadow:0 8px 32px rgba(212,175,55,0.22);">
-          Explorer la boutique
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           class="inline-flex items-center justify-center gap-3 px-10 py-5 font-black text-sm uppercase tracking-[0.2em] text-black transition-all hover:-translate-y-0.5 active:scale-[0.97]"
+           style="background:#d4af37;box-shadow:0 12px 40px rgba(212,175,55,0.25);">
+          Trouver ma pièce
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
           </svg>
         </a>
         @if (!(currentUser$ | async)) {
           <a routerLink="/auth/register"
-             class="inline-flex items-center justify-center px-8 py-4 font-bold text-xs uppercase tracking-[0.2em] border transition-all duration-300 hover:text-gold"
-             style="color:rgba(0,0,0,0.42);border-color:rgba(0,0,0,0.14);">
+             class="inline-flex items-center justify-center px-10 py-5 font-bold text-xs uppercase tracking-[0.2em] border-2 transition-all duration-300 hover:border-gold/60 hover:text-gold"
+             style="color:rgba(0,0,0,0.5);border-color:rgba(0,0,0,0.12);">
             Créer mon compte
           </a>
         }
       </div>
-      <div class="r-up flex items-center justify-center gap-6 mt-10" style="transition-delay:660ms">
-        @for (badge of ['Livraison rapide', 'Qualité vérifiée', 'Paiement à la livraison']; track badge) {
-          <span class="text-[10px] uppercase tracking-[0.3em] font-bold" style="color:rgba(212,175,55,0.55);">{{ badge }}</span>
-        }
-      </div>
-      <div class="r-line w-8 h-[1px] mx-auto mt-10" style="background:#d4af37;opacity:0.4;transition-delay:700ms;"></div>
+      <div class="r-line w-8 h-[1px] mx-auto mt-12" style="background:#d4af37;opacity:0.4;transition-delay:700ms;"></div>
     </div>
   </section>
 
