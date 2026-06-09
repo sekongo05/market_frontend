@@ -95,7 +95,7 @@
 /* ─── Slides ─── */
 .hero-slide {
   opacity: 0;
-  object-position: center;
+  object-position: center 20%;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   will-change: opacity;

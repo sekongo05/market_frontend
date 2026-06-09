@@ -152,7 +152,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   private _slideTimer: ReturnType<typeof setInterval> | null = null;
   private _progressTimer: ReturnType<typeof setInterval> | null = null;
-  readonly _slideInterval = 6000;
+  readonly _slideInterval = 4000;
   _isPaused = false;
   private _swipeStartX = 0;
   _isTransitioning = false;
