@@ -118,7 +118,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       ctaLink: '/products?categorie=telephones',
     },
     {
-      imageUrl: 'https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg?auto=compress&cs=tinysrgb&w=1920',
+      imageUrl: '/cas.png',
       label: 'Casquettes & Accessoires',
       eyebrow: 'Streetwear',
       title: [
@@ -154,7 +154,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private _progressTimer: ReturnType<typeof setInterval> | null = null;
   readonly _slideInterval = 4000;
   _isPaused = false;
-  private _swipeStartX = 0;
   _isTransitioning = false;
   private _preloaded = new Set<string>();
 
@@ -328,19 +327,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     if (!this._platformBrowser || window.matchMedia('(hover: none)').matches) return;
     const parallax = (event.currentTarget as HTMLElement).querySelector('.hero-parallax') as HTMLElement | null;
     if (parallax) parallax.style.transform = '';
-  }
-
-  onTouchStart(event: TouchEvent): void {
-    if (!event.touches.length) return;
-    this._swipeStartX = event.touches[0].clientX;
-  }
-
-  onTouchEnd(event: TouchEvent): void {
-    if (!event.changedTouches.length) return;
-    const delta = event.changedTouches[0].clientX - this._swipeStartX;
-    if (Math.abs(delta) > 50) {
-      delta > 0 ? this.prevSlide() : this.nextSlide();
-    }
   }
 
   prevSlide(): void {

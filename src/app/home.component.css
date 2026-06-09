@@ -95,7 +95,7 @@
 /* ─── Slides ─── */
 .hero-slide {
   opacity: 0;
-  object-position: center 20%;
+  object-position: center;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   will-change: opacity;
@@ -322,7 +322,6 @@
 .hero-line-v   { animation: line-draw-y 1.6s ease-out 0.2s both,
                             drift-line 6s ease-in-out 2.5s infinite; transform-origin: top; }
 .hero-wrap     { display: block; overflow: hidden; }
-.hero-wrap + .hero-wrap { margin-top: 3px; }
 .hero-word     { display: inline-block; white-space: nowrap; animation: word-rise 1.4s ease-out both; }
 .hero-title    { min-height: clamp(5rem, 14vw, 9rem); }
 
@@ -368,7 +367,7 @@
 .gold-shimmer {
   position: relative;
   display: inline-block;
-  background: linear-gradient(90deg, #9a7415 0%, #d4af37 40%, #9a7415 100%);
+  background: linear-gradient(90deg, #b8860b 0%, #d4af37 30%, #b8860b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -379,10 +378,10 @@
   content: '';
   position: absolute;
   top: 0; left: 0;
-  width: 60%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(254, 249, 195, 0.4), transparent);
+  width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   transform: translateX(-100%);
-  animation: gold-shine-sweep 5s linear 2s infinite;
+  animation: gold-shine-sweep 5s ease-in-out 3s infinite;
   will-change: transform;
 }
 
