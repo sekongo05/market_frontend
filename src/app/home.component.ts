@@ -55,94 +55,13 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   // ── Hero slideshow ──────────────────────────────────────────────
   readonly heroSlides = [
-    {
-      imageUrl: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=80&fm=webp',
-      label: 'Montres de prestige',
-      eyebrow: 'SDM Store · Abidjan',
-      title: [
-        { text: "L'HEURE", gold: false },
-        { text: 'DU', gold: true },
-        { text: 'PRESTIGE.', gold: false },
-      ],
-      description: "Montres, bijoux et accessoires de prestige — la classe sans quitter Abidjan.",
-      cta: 'Découvrir la collection',
-      ctaLink: '/products',
-    },
-    {
-      imageUrl: '/mt.png',
-      label: 'Maillots toutes nations',
-      eyebrow: 'Coupe du Monde 2026',
-      title: [
-        { text: 'TOUTES', gold: true },
-        { text: 'LES', gold: false },
-        { text: 'NATIONS.', gold: false },
-      ],
-      description: 'Côte d\'Ivoire, France, Brésil, Argentine, Maroc… tous les maillots internationaux disponibles — portez vos couleurs.',
-      cta: 'Découvrir tous les maillots',
-      ctaLink: '/products?categorie=sport',
-    },
-    {
-      imageUrl: '/campus.png',
-      label: 'Baskets & Sneakers',
-      eyebrow: 'Nouveautés',
-      title: [
-        { text: 'VOTRE', gold: false },
-        { text: 'ALLURE.', gold: true },
-      ],
-      description: 'Sneakers originales et baskets tendance — reçues en 48h chez vous à Abidjan.',
-      cta: 'Explorer les sneakers',
-      ctaLink: '/products?categorie=chaussures',
-    },
-    {
-      imageUrl: '/sans_fil.png',
-      label: 'Écouteurs sans fil',
-      eyebrow: 'Audio Premium',
-      title: [
-        { text: 'SON', gold: false },
-        { text: 'SANS', gold: true },
-        { text: 'FIL.', gold: false },
-      ],
-      description: 'AirPods, écouteurs et casques audio — authentiques, pas de contrefaçons.',
-      cta: 'Découvrir l\'audio',
-      ctaLink: '/products?categorie=audio',
-    },
-    {
-      imageUrl: '/lalé.png',
-      label: 'Smartphones & Tech',
-      eyebrow: 'High-Tech',
-      title: [
-        { text: 'AUTHENTIQUE.', gold: true },
-      ],
-      description: 'iPhone et smartphones originaux — payez à la livraison, zéro stress.',
-      cta: 'Voir les smartphones',
-      ctaLink: '/products?categorie=telephones',
-    },
-    {
-      imageUrl: '/cas.png',
-      label: 'Casquettes & Accessoires',
-      eyebrow: 'Streetwear',
-      title: [
-        { text: 'LE', gold: false },
-        { text: 'LOOK', gold: true },
-        { text: 'QUI PARLE.', gold: false },
-      ],
-      description: 'Casquettes, bonnets et accessoires — le streetwear qui impose le respect.',
-      cta: 'Voir les casquettes',
-      ctaLink: '/products?categorie=accessoires',
-    },
-    {
-      imageUrl: '/macccc.png',
-      label: 'Ordinateurs & PC',
-      eyebrow: 'High-Tech',
-      title: [
-        { text: 'LA', gold: false },
-        { text: 'PUISSANCE', gold: true },
-        { text: 'CHEZ VOUS.', gold: false },
-      ],
-      description: 'PC portables, gaming et accessoires — performances pro, payez à la livraison.',
-      cta: 'Voir les ordinateurs',
-      ctaLink: '/products?categorie=informatique',
-    },
+    { imageUrl: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=80&fm=webp', label: 'Montres de prestige' },
+    { imageUrl: '/mt.png', label: 'Maillots toutes nations' },
+    { imageUrl: '/campus.png', label: 'Baskets & Sneakers' },
+    { imageUrl: '/sans_fil.png', label: 'Écouteurs sans fil' },
+    { imageUrl: '/lalé.png', label: 'Smartphones & Tech' },
+    { imageUrl: '/cas.png', label: 'Casquettes & Accessoires' },
+    { imageUrl: '/macccc.png', label: 'Ordinateurs & PC' },
   ];
 
   currentSlide = 0;
@@ -156,6 +75,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   _isPaused = false;
   _isTransitioning = false;
   private _preloaded = new Set<string>();
+  private _frameIds: number[] = [];
+  private _transitionTimeout: ReturnType<typeof setTimeout> | null = null;
 
   private _observer?: IntersectionObserver;
   private _statsAnimated = false;
@@ -284,6 +205,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this._observer?.disconnect();
     this.destroy$.next();
     this.destroy$.complete();
+    this._frameIds.forEach(id => cancelAnimationFrame(id));
+    this._frameIds = [];
+    if (this._transitionTimeout) clearTimeout(this._transitionTimeout);
     if (this._platformBrowser && !this._isTouchDevice) {
       document.removeEventListener('mousemove', this._onCursorMove);
       document.removeEventListener('mouseover', this._onCursorOver);
@@ -359,7 +283,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this._startAutoPlay();
     this._startProgress();
     this.cdr.detectChanges();
-    setTimeout(() => { this._isTransitioning = false; }, 600);
+    if (this._transitionTimeout) clearTimeout(this._transitionTimeout);
+    this._transitionTimeout = setTimeout(() => { this._isTransitioning = false; }, 600);
   }
 
   onSlideError(event: Event): void {
@@ -511,7 +436,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
           this.cdr.detectChanges();
         }
       },
-      error: () => {},
+      error: (err) => { console.error('Stats load failed', err); },
     });
   }
 
@@ -523,7 +448,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
           this.cdr.detectChanges();
         }
       },
-      error: () => {},
+      error: (err) => { console.error('Promo load failed', err); },
     });
   }
 
@@ -577,10 +502,20 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     const t0 = performance.now();
     const tick = (now: number) => {
       const p = Math.min((now - t0) / ms, 1);
-      (this as any)[prop] = Math.round((1 - Math.pow(1 - p, 4)) * target);
+      const val = Math.round((1 - Math.pow(1 - p, 4)) * target);
+      switch (prop) {
+        case 'statProducts':   this.statProducts = val; break;
+        case 'statCategories': this.statCategories = val; break;
+        case 'statClients':    this.statClients = val; break;
+        case 'statReviews':    this.statReviews = val; break;
+      }
       this.cdr.detectChanges();
-      if (p < 1) requestAnimationFrame(tick);
+      if (p < 1) {
+        const id = requestAnimationFrame(tick);
+        this._frameIds.push(id);
+      }
     };
-    requestAnimationFrame(tick);
+    const id = requestAnimationFrame(tick);
+    this._frameIds.push(id);
   }
 }
