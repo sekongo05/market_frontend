@@ -99,7 +99,7 @@
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   will-change: opacity;
-  transition: opacity 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 2.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .hero-slide.active {
@@ -115,7 +115,7 @@
 .hero-slide.prev,
 .hero-slide.next {
   opacity: 0;
-  transition: opacity 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 2.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ─── Progress Bar ─── */
@@ -262,6 +262,15 @@
   justify-content: flex-end;
   padding: 0;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero-content.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.hero-content:not(.visible) {
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (min-width: 1024px) {
@@ -283,17 +292,15 @@
 }
 
 .hero-content.visible .hero-content-eyebrow {
-  animation: fade-blur-in 0.7s ease-out 0.15s both,
-             float-subtle 4s ease-in-out 1.5s infinite;
+  animation: fade-blur-in 6s ease-out 0.3s both;
 }
 
 .hero-content.visible .hero-content-desc {
-  animation: text-reveal 0.7s ease-out 0.4s both,
-             float-subtle 5s ease-in-out 2s infinite;
+  animation: text-reveal 6s ease-out 0.8s both;
 }
 
 .hero-content.visible .hero-content-ctas {
-  animation: slide-up-fade 0.6s ease-out 0.6s both;
+  animation: slide-up-fade 6s ease-out 1.2s both;
 }
 
 .hero-content.visible .hero-content-ctas a:first-child {
@@ -312,18 +319,20 @@
 }
 
 /* ─── Animations existantes conservées ─── */
-.hero-line-v   { animation: line-draw-y 1.2s ease-out 0.1s both,
+.hero-line-v   { animation: line-draw-y 1.6s ease-out 0.2s both,
                             drift-line 6s ease-in-out 2.5s infinite; transform-origin: top; }
 .hero-wrap     { display: block; overflow: hidden; }
-.hero-word     { display: inline-block; white-space: nowrap; animation: word-rise 1s ease-out both; }
+.hero-wrap + .hero-wrap { margin-top: 3px; }
+.hero-word     { display: inline-block; white-space: nowrap; animation: word-rise 1.4s ease-out both; }
+.hero-title    { min-height: clamp(5rem, 14vw, 9rem); }
 
 /* Réduction du délai sur mobile */
 @media (max-width: 1023px) {
-  .hero-word { animation-duration: 0.7s; }
-  .hero-content.visible .hero-content-eyebrow { animation-duration: 0.5s; }
-  .hero-content.visible .hero-content-desc    { animation-duration: 0.5s; }
-  .hero-content.visible .hero-content-ctas    { animation-duration: 0.4s; }
-  .hero-permanent > *                         { animation-duration: 0.4s; }
+  .hero-word { animation-duration: 1s; }
+  .hero-content.visible .hero-content-eyebrow { animation-duration: 0.9s; }
+  .hero-content.visible .hero-content-desc    { animation-duration: 0.9s; }
+  .hero-content.visible .hero-content-ctas    { animation-duration: 0.8s; }
+  .hero-permanent > *                         { animation-duration: 0.6s; }
 }
 
 .hero-sig     { animation: slide-up-fade 0.7s ease 1.2s both; }
