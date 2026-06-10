@@ -575,10 +575,8 @@
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 px-5 sm:px-8 lg:px-12">
         @for (i of [1,2,3,4]; track i) {
           <div>
-            <div class="skeleton relative mb-2 sm:mb-3" style="aspect-ratio:3/4;border-radius:0;"></div>
-            <div class="skeleton h-2 w-14 mb-2" style="border-radius:2px;"></div>
-            <div class="skeleton h-3.5 w-full mb-1.5" style="border-radius:2px;"></div>
-            <div class="skeleton h-3.5 w-3/4 mb-2.5" style="border-radius:2px;"></div>
+            <div class="skeleton relative mb-1.5 rounded-xl" style="aspect-ratio:3/4;"></div>
+            <div class="skeleton h-3.5 w-full mb-1" style="border-radius:2px;"></div>
             <div class="skeleton h-4 w-20" style="border-radius:2px;"></div>
           </div>
         }
@@ -593,7 +591,8 @@
             <!-- Lien principal vers la fiche produit -->
             <a [routerLink]="['/products', product.slug]"
                class="block cursor-pointer">
-              <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-2 sm:mb-3" style="aspect-ratio:3/4;">
+              <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-1.5 border transition-colors duration-300 rounded-xl"
+                    style="aspect-ratio:3/4;border-color:rgba(212,175,55,0.12);">
                 <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
                      class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
                      (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
@@ -617,7 +616,7 @@
             <!-- Bouton Ajouter (entre image et infos) -->
             @if (product.stock > 0) {
               <button (click)="quickAdd(product, $event)"
-                      class="w-full py-2 mb-2 sm:mb-2.5 text-[10px] font-bold uppercase tracking-wider rounded-lg
+                      class="w-full py-2 mb-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg
                              border transition-all duration-200
                              opacity-100 lg:opacity-0 lg:group-hover:opacity-100
                              hover:bg-gold/10"
@@ -630,18 +629,17 @@
             }
 
             <!-- Infos sous l'image -->
-            <p class="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-bold mb-0.5 truncate text-gold">{{ product.category.name }}</p>
             <a [routerLink]="['/products', product.slug]" class="block">
-              <p class="font-bold theme-text text-xs sm:text-sm leading-snug mb-1.5 line-clamp-2 hover:text-gold transition-colors">{{ product.name }}</p>
+              <p class="font-semibold theme-text text-sm leading-snug mb-0.5 line-clamp-2 hover:text-gold transition-colors">{{ product.name }}</p>
             </a>
             <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                <span class="font-black text-sm text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
+                <span class="font-bold text-[13px] text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
                 <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               } @else {
-                <span class="font-black text-sm theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+                <span class="font-bold text-[13px] theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               }
-              <span class="text-[9px] theme-muted">FCFA</span>
+              <span class="text-[13px] theme-muted" style="opacity:0.6;">FCFA</span>
             </div>
           </div>
         }
