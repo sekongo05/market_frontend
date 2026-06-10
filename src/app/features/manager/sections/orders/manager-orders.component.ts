@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '../../../../core/services/order.service';
 import { WebSocketService } from '../../../../core/services/websocket.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
@@ -55,12 +56,16 @@ export class ManagerOrdersComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
+  private _pendingOrderNumber: string | null = null;
+
   constructor(
     private orderService: OrderService,
     private wsService: WebSocketService,
     private scrollLock: ScrollLockService,
     private cdr: ChangeDetectorRef,
     private toast: ManagerToastService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   @HostListener('document:keydown.escape')
@@ -72,6 +77,12 @@ export class ManagerOrdersComponent implements OnInit, OnDestroy {
       this.loadAllOrders(0);
       this.cdr.markForCheck();
     });
+
+    const orderParam = this.route.snapshot.queryParamMap.get('order');
+    if (orderParam) {
+      this._pendingOrderNumber = orderParam;
+      this.router.navigate([], { queryParams: { order: null }, queryParamsHandling: 'merge', replaceUrl: true });
+    }
   }
 
   ngOnDestroy(): void {
@@ -84,6 +95,7 @@ export class ManagerOrdersComponent implements OnInit, OnDestroy {
     this.ordersLoading = true;
     const params: any = { page, size: 15 };
     if (this.statusFilter) params.status = this.statusFilter;
+    if (this._pendingOrderNumber) params.search = this._pendingOrderNumber;
     this.orderService.getAllOrders(params).subscribe({
       next: (r) => {
         if (r.success) {
@@ -91,6 +103,14 @@ export class ManagerOrdersComponent implements OnInit, OnDestroy {
           this.allOrders = pg.content;
           this.ordersTotalPages = pg.totalPages;
           this.ordersPage = page;
+
+          if (this._pendingOrderNumber) {
+            const match = this.allOrders.find(o => o.orderNumber === this._pendingOrderNumber);
+            if (match) {
+              this._pendingOrderNumber = null;
+              this.openOrderDetail(match);
+            }
+          }
         }
         this.ordersLoading = false;
         this.cdr.markForCheck();

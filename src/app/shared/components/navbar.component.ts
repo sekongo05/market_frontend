@@ -282,7 +282,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  getNotificationLink(type: NotificationType): string | null {
+  private _extractOrderNumber(notif: NotificationResponse): string | null {
+    const match = notif.subject.match(/[A-Z0-9][A-Z0-9-]{3,}/i);
+    return match ? match[0] : null;
+  }
+
+  getNotificationLink(notif: NotificationResponse): string | null {
     const orderTypes: NotificationType[] = [
       NotificationType.ORDER_CREATED,
       NotificationType.ORDER_CONFIRMED,
@@ -293,18 +298,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
       NotificationType.RETURN_REQUESTED,
       NotificationType.RETURN_DECIDED,
     ];
-    if (!orderTypes.includes(type)) return null;
+    if (!orderTypes.includes(notif.type)) return null;
     const role = this.currentUser?.role;
-    if (role === 'ADMIN') return '/admin';
-    if (role === 'MANAGER') return '/manager';
-    return '/orders';
+    const base = role === 'ADMIN' ? '/admin/orders' : role === 'MANAGER' ? '/manager/orders' : '/orders';
+    const order = this._extractOrderNumber(notif);
+    return order ? `${base}?order=${order}` : base;
   }
 
   navigateFromNotif(notif: NotificationResponse): void {
-    const link = this.getNotificationLink(notif.type);
+    const link = this.getNotificationLink(notif);
     if (!link) return;
     this.closeAll();
-    this.router.navigate([link]);
+    this.router.navigateByUrl(link);
   }
 
   markAsRead(notif: NotificationResponse): void {

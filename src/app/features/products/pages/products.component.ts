@@ -47,6 +47,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   modalLoading = false;
   modalError: string | null = null;
   modalSuccess: string | null = null;
+  confirmDeleteProduct: ProductResponse | null = null;
   productForm!: FormGroup;
   selectedViewVariant: ProductVariant | null = null;
   // Category filter
@@ -609,10 +610,16 @@ export class ProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteProduct(product: ProductResponse): void {
-    if (!confirm(`Supprimer "${product.name}" ?`)) return;
+  startDelete(product: ProductResponse): void {
+    this.confirmDeleteProduct = product;
+  }
 
-    this.productService.deleteProduct(product.id).subscribe({
+  confirmDelete(): void {
+    if (!this.confirmDeleteProduct) return;
+    const id = this.confirmDeleteProduct.id;
+    this.confirmDeleteProduct = null;
+
+    this.productService.deleteProduct(id).subscribe({
       next: (response) => {
         if (response.success) {
           this.loadProducts(this.currentPage);
@@ -621,6 +628,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
       },
       error: () => this.cdr.detectChanges(),
     });
+  }
+
+  cancelDelete(): void {
+    this.confirmDeleteProduct = null;
   }
 
   // ─── Catalogue ──────────────────────────────────────────────────────────────

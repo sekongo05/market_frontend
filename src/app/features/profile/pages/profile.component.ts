@@ -34,6 +34,7 @@ export class ProfileComponent implements OnInit {
   savingAddress = false;
   showAddressForm = false;
   editingAddress: Address | null = null;
+  confirmDeleteAddressId: number | null = null;
   addressForm!: FormGroup;
   readonly ADDRESS_LABELS = ['Domicile', 'Bureau', 'Autre'];
   readonly MAX_ADDRESSES = 5;
@@ -235,12 +236,22 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  deleteAddress(id: number): void {
-    if (!confirm('Supprimer cette adresse ?')) return;
+  startDeleteAddress(id: number): void {
+    this.confirmDeleteAddressId = id;
+  }
+
+  confirmDeleteAddress(): void {
+    if (!this.confirmDeleteAddressId) return;
+    const id = this.confirmDeleteAddressId;
+    this.confirmDeleteAddressId = null;
     this.userService.deleteAddress(id).subscribe({
       next: () => { this.loadAddresses(); this._showSuccess('Adresse supprimée'); this.cdr.detectChanges(); },
       error: () => { this._showError('Erreur lors de la suppression'); this.cdr.detectChanges(); },
     });
+  }
+
+  cancelDeleteAddress(): void {
+    this.confirmDeleteAddressId = null;
   }
 
   setDefaultAddress(id: number): void {

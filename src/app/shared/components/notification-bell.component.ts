@@ -161,13 +161,18 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  private _extractOrderNumber(n: NotificationResponse): string | null {
+    const match = n.subject.match(/[A-Z0-9][A-Z0-9-]{3,}/i);
+    return match ? match[0] : null;
+  }
+
   markAsRead(n: NotificationResponse): void {
     if (!n.read) {
       n.read = true;
       this.unreadCount = Math.max(0, this.unreadCount - 1);
       this.notificationService.markAsRead(n.id).subscribe();
     }
-    const link = this.getLink(n.type);
+    const link = this.getLink(n);
     if (link) {
       this.open = false;
       this.router.navigateByUrl(link);
@@ -175,56 +180,42 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  getLink(type: NotificationType): string | null {
+  getLink(n: NotificationResponse): string | null {
     const role      = this.authService.getCurrentUser()?.role;
     const isAdmin   = role === UserRole.ADMIN;
     const isManager = role === UserRole.MANAGER;
     const isStaff   = isAdmin || isManager;
 
-    switch (type) {
-
-      // Commandes — même type envoyé au client ET au staff
-      case NotificationType.ORDER_CREATED:
-      case NotificationType.ORDER_CANCELLED:
-        if (isAdmin)   return '/admin/orders';
-        if (isManager) return '/manager/orders';
-        return '/orders';
-
-      // Commandes — client uniquement
-      case NotificationType.ORDER_CONFIRMED:
-      case NotificationType.ORDER_STATUS_CHANGED:
-      case NotificationType.CARRIER_ASSIGNED:
-      case NotificationType.DELIVERY_UPDATE:
-      case NotificationType.REVIEW_REQUEST:
-        return '/orders';
-
-      // Retours — même type envoyé au client ET au staff
-      case NotificationType.RETURN_REQUESTED:
-        return isStaff ? '/admin/returns' : '/returns';
-
-      // Retours — client uniquement
-      case NotificationType.RETURN_DECIDED:
-      case NotificationType.RETURN_COMPLETED:
-        return '/returns';
-
-      // Bienvenue — client uniquement
-      case NotificationType.WELCOME:
-        return '/products';
-
-      // Avis — admin uniquement
-      case NotificationType.REVIEW_RECEIVED:
-        return isAdmin ? '/admin/reviews' : null;
-
-      // Stock — staff uniquement
-      case NotificationType.STOCK_LOW:
-      case NotificationType.STOCK_ALERT:
-        if (isAdmin)   return '/admin/products';
-        if (isManager) return '/manager/products';
-        return null;
-
-      default:
-        return null;
-    }
+    const base = (() => {
+      switch (n.type) {
+        case NotificationType.ORDER_CREATED:
+        case NotificationType.ORDER_CANCELLED:
+          return isAdmin ? '/admin/orders' : isManager ? '/manager/orders' : '/orders';
+        case NotificationType.ORDER_CONFIRMED:
+        case NotificationType.ORDER_STATUS_CHANGED:
+        case NotificationType.CARRIER_ASSIGNED:
+        case NotificationType.DELIVERY_UPDATE:
+        case NotificationType.REVIEW_REQUEST:
+          return '/orders';
+        case NotificationType.RETURN_REQUESTED:
+          return isStaff ? '/admin/returns' : '/returns';
+        case NotificationType.RETURN_DECIDED:
+        case NotificationType.RETURN_COMPLETED:
+          return '/returns';
+        case NotificationType.WELCOME:
+          return '/products';
+        case NotificationType.REVIEW_RECEIVED:
+          return isAdmin ? '/admin/reviews' : null;
+        case NotificationType.STOCK_LOW:
+        case NotificationType.STOCK_ALERT:
+          return isAdmin ? '/admin/products' : isManager ? '/manager/products' : null;
+        default:
+          return null;
+      }
+    })();
+    if (!base) return null;
+    const order = this._extractOrderNumber(n);
+    return order && (base.includes('/orders') || base.includes('/returns')) ? `${base}?order=${order}` : base;
   }
 
   markAllAsRead(): void {

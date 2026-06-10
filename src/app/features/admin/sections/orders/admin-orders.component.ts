@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '../../../../core/services/order.service';
 import { OrderResponse, GetOrdersParams } from '../../../../core/models/order.models';
 import { OrderStatus, PageResponse } from '../../../../core/models/common.models';
@@ -76,11 +77,21 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     private toast: AdminToastService,
     private scrollLock: ScrollLockService,
     private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.loadAllOrders(0);
     this.loadStatusCounts();
+
+    const orderParam = this.route.snapshot.queryParamMap.get('order');
+    if (orderParam) {
+      this.searchQuery = orderParam;
+      this._pendingOrderNumber = orderParam;
+      this.router.navigate([], { queryParams: { order: null }, queryParamsHandling: 'merge', replaceUrl: true });
+      this.loadAllOrders(0);
+    }
 
     this.search$.pipe(
       debounceTime(350),
@@ -107,7 +118,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     return !!this.searchQuery || !!this.statusFilter || !!this.dateRange;
   }
 
-  onSearchInput(): void { this.search$.next(this.searchQuery); }
+  onSearchInput(): void { this._pendingOrderNumber = null; this.search$.next(this.searchQuery); }
 
   applyFilter(): void { this.loadAllOrders(0); }
 
@@ -173,6 +184,8 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   }
 
   /* ── Chargement ── */
+  private _pendingOrderNumber: string | null = null;
+
   loadAllOrders(page = 0): void {
     this.ordersLoading = true;
     const params: GetOrdersParams = { page, size: 15 };
@@ -188,6 +201,16 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
           this.ordersTotalPages     = pg.totalPages;
           this.ordersTotalElements  = pg.totalElements;
           this.ordersPage           = page;
+
+          if (this._pendingOrderNumber) {
+            const match = this.allOrders.find(o => o.orderNumber === this._pendingOrderNumber);
+            if (match) {
+              this._pendingOrderNumber = null;
+              this.openOrderDetail(match);
+            } else if (this.ordersTotalPages > 0 && page === 0) {
+              this.loadAllOrders(this.ordersTotalPages - 1);
+            }
+          }
         }
         this.ordersLoading = false;
         this.cdr.markForCheck();

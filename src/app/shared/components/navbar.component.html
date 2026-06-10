@@ -131,7 +131,7 @@
                   <!-- ── Vue détail d'une notification ── -->
                   @if (selectedNotification) {
                     @let tpl = getTemplate(selectedNotification.type);
-                    @let notifLink = getNotificationLink(selectedNotification.type);
+                    @let notifLink = getNotificationLink(selectedNotification);
                     <div class="flex flex-col">
                       <!-- Header détail -->
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
@@ -442,7 +442,7 @@
                   <!-- réutilise le même contenu que desktop -->
                   @if (selectedNotification) {
                     @let tplM = getTemplate(selectedNotification.type);
-                    @let notifLinkM = getNotificationLink(selectedNotification.type);
+                    @let notifLinkM = getNotificationLink(selectedNotification);
                     <div class="flex flex-col">
                       <div class="flex items-center gap-3 px-5 py-4 border-b theme-border">
                         <button (click)="closeNotificationDetail()" aria-label="Retour à la liste"
