@@ -338,7 +338,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
 
   saveProduct(): void {
-    if (this.productForm.invalid) return;
+    if (this.productForm.invalid || this.drawerLoading) return;
     this.drawerLoading = true;
     this.drawerError = null;
     const v = this.productForm.value;

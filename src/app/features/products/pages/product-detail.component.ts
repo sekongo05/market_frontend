@@ -26,47 +26,7 @@ export interface GalleryItem {
   type: 'IMAGE' | 'VIDEO';
 }
 
-// Category → curated Unsplash gallery images  (slugs match real DB: electronique, mode-vetements, maison-cuisine, beaute-sante, sports-loisirs)
-const CATEGORY_GALLERIES: Record<string, string[]> = {
-  electronique: [
-    'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=85',
-    'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&q=85',
-    'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&q=85',
-    'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&q=85',
-    'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&q=85',
-  ],
-  mode: [
-    'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=85',
-    'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&q=85',
-    'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=85',
-    'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=85',
-  ],
-  maison: [
-    'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&q=85',
-    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=85',
-    'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=85',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=85',
-  ],
-  beaute: [
-    'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800&q=85',
-    'https://images.unsplash.com/photo-1541643600914-78b084683702?w=800&q=85',
-    'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&q=85',
-    'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=800&q=85',
-  ],
-  sport: [
-    'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&q=85',
-    'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=85',
-    'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=85',
-    'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=85',
-  ],
-};
 
-const DEFAULT_GALLERY = [
-  'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=85',
-  'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=85',
-  'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800&q=85',
-  'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&q=85',
-];
 
 @Component({
   selector: 'app-product-detail',
@@ -230,13 +190,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         }
       }
     } else {
-      // ── Priorité 2 : image principale + galerie Unsplash par catégorie ──────
-      const slug = this.product.category?.slug?.toLowerCase() ?? '';
-      const catKey = Object.keys(CATEGORY_GALLERIES).find(k => slug.includes(k)) ?? '';
-      const pool = catKey ? CATEGORY_GALLERIES[catKey] : DEFAULT_GALLERY;
-      const main = this.product.imageUrl;
-      const others = pool.filter(url => url !== main).slice(0, 3);
-      this.galleryItems = [main, ...others].map(url => ({ url, type: 'IMAGE' as const }));
+      // ── Priorité 2 : seulement l'image principale ──────────────────────────
+      this.galleryItems = this.product.imageUrl
+        ? [{ url: this.product.imageUrl, type: 'IMAGE' as const }]
+        : [];
     }
 
     // ── Ajouter les images des variantes (si pas déjà présentes) ────────────

@@ -275,31 +275,13 @@
             <p class="theme-text leading-relaxed text-[15px]">{{ product.description }}</p>
           </div>
 
-          <!-- Specs grid -->
-          <div class="grid grid-cols-2 gap-3">
-            <div class="p-3.5 rounded-xl luxury-card">
-              <p class="text-xs theme-muted uppercase tracking-widest mb-1">Référence</p>
-              <p class="text-sm font-bold theme-text"># {{ product.id.toString().padStart(4, '0') }}</p>
-            </div>
-            <div class="p-3.5 rounded-xl luxury-card">
-              <p class="text-xs theme-muted uppercase tracking-widest mb-1">Catégorie</p>
-              <p class="text-sm font-bold theme-text">{{ product.category.name }}</p>
-            </div>
-            <div class="p-3.5 rounded-xl luxury-card">
-              <p class="text-xs theme-muted uppercase tracking-widest mb-1">Stock</p>
-              <p class="text-sm font-bold" [style.color]="stockColor">{{ stockLabel }}</p>
-            </div>
-           <!--  <div class="p-3.5 rounded-xl luxury-card">
-              <p class="text-[10px] theme-muted uppercase tracking-widest mb-1">Garantie</p>
-              <p class="text-sm font-bold" style="color:#60a5fa">2 mois</p>
-            </div> -->
-          </div>
+
 
           <!-- Color + Quantity selector (multi-variant Alibaba style) -->
           @if (hasVariants) {
             <div class="rounded-2xl luxury-card overflow-hidden">
               <div class="flex items-center justify-between px-5 pt-5 pb-3">
-                <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">Couleur & Quantité</h3>
+                <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">Couleurs</h3>
                 @if (totalSelectedQty > 0) {
                   <span class="text-xs font-bold text-gold">
                     {{ totalSelectedQty }} article{{ totalSelectedQty > 1 ? 's' : '' }} sélectionné{{ totalSelectedQty > 1 ? 's' : '' }}
@@ -442,10 +424,10 @@
                 ← Retour à la collection
               </button>
             } @else {
-              <div class="flex flex-col gap-3">
+              <div class="hidden lg:flex flex-col gap-3">
 
-                <!-- Qty selector (sans variante) -->
-                @if (!hasVariants) {
+                <!-- Qty selector (connecté seulement) -->
+                @if (isLoggedIn && !hasVariants) {
                   <div class="flex items-center gap-4">
                     <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
                     <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
@@ -503,10 +485,16 @@
                         d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
                     @if (selectedVariant?.stock === 0) {
-                      Ce coloris est épuisé — choisissez une autre couleur
+                      Ce coloris est épuisé
                     } @else {
-                      Choisissez une quantité
+                      Choisissez une couleur
                     }
+                  } @else if (!isLoggedIn) {
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Connectez-vous pour acheter
                   } @else {
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -888,7 +876,13 @@
                 </svg>
                 Ajouté !
               } @else if (hasVariants && totalSelectedQty === 0) {
-                Choisissez une quantité
+                Choisissez une couleur
+              } @else if (!isLoggedIn) {
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                Connectez-vous
               } @else {
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
