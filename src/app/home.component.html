@@ -572,21 +572,13 @@
     </div>
 
     @if (newProductsLoading) {
-      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
-                  sm:grid sm:grid-cols-3 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 px-5 sm:px-8 lg:px-12">
         @for (i of [1,2,3,4]; track i) {
-          <div class="flex-shrink-0 w-[60vw] sm:w-auto">
-            <!-- Zone image avec badge et numéro -->
-            <div class="skeleton relative mb-3" style="aspect-ratio:3/4;border-radius:0;">
-              <div class="absolute top-2.5 left-2.5 h-5 w-14 rounded-sm" style="background:rgba(0,0,0,0.08);"></div>
-              <div class="absolute top-2.5 right-2.5 w-6 h-6 rounded-sm" style="background:rgba(0,0,0,0.07);"></div>
-            </div>
-            <!-- Label catégorie -->
+          <div>
+            <div class="skeleton relative mb-2 sm:mb-3" style="aspect-ratio:3/4;border-radius:0;"></div>
             <div class="skeleton h-2 w-14 mb-2" style="border-radius:2px;"></div>
-            <!-- Nom produit (2 lignes) -->
             <div class="skeleton h-3.5 w-full mb-1.5" style="border-radius:2px;"></div>
             <div class="skeleton h-3.5 w-3/4 mb-2.5" style="border-radius:2px;"></div>
-            <!-- Prix -->
             <div class="skeleton h-4 w-20" style="border-radius:2px;"></div>
           </div>
         }
@@ -594,42 +586,64 @@
     }
 
     @if (!newProductsLoading && hasNewProducts) {
-      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right
-                  sm:grid sm:grid-cols-3 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 px-5 sm:px-8 lg:px-12">
         @for (product of newProducts; track product.id; let idx = $index) {
-          <a [routerLink]="['/products', product.slug]"
-             class="card-appear group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block"
-             [style.animation-delay.ms]="idx * 75">
-            <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-              <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
-                   class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
-                   (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-              <span class="absolute top-2.5 left-2.5 text-[8px] font-black px-2 py-1 uppercase tracking-wider"
-                    style="background:#d4af37;color:black;">Nouveau</span>
-              @if (product.discountPercent && product.discountPercent > 0) {
-                <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[9px] font-black px-2 py-0.5 uppercase">
-                  −{{ product.discountPercent }}%
-                </span>
-              }
-              @if (product.stock === 0) {
-                <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <span class="text-white/70 text-[10px] font-black uppercase tracking-widest">Épuisé</span>
+          <div class="card-appear group relative"
+               [style.animation-delay.ms]="idx * 75">
+            <!-- Lien principal vers la fiche produit -->
+            <a [routerLink]="['/products', product.slug]"
+               class="block cursor-pointer">
+              <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-2 sm:mb-3" style="aspect-ratio:3/4;">
+                <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+                     class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+                     (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
+
+                <!-- Badge Nouveau (doré) -->
+                <span class="absolute top-2 left-2 text-[9px] font-black px-2 py-1 uppercase tracking-wider z-10"
+                      style="background:#d4af37;color:black;">Nouveau</span>
+
+                <!-- Badge promo (orange) -->
+                @if (product.discountPercent && product.discountPercent > 0) {
+                  <span class="absolute top-2 right-2 bg-orange-500 text-white text-[9px] font-black px-2 py-0.5 uppercase z-10">
+                    −{{ product.discountPercent }}%
+                  </span>
+                }
+
+                <!-- Stock épuisé -->
+                @if (product.stock === 0) {
+                  <div class="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+                    <span class="text-white/70 text-[10px] font-black uppercase tracking-widest">Épuisé</span>
+                  </div>
+                }
+
+                <!-- Bouton quick-add (toujours visible mobile / hover desktop) -->
+                <div class="absolute bottom-0 left-0 right-0 z-10 p-2
+                            transition-opacity duration-300
+                            opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
+                  <button (click)="quickAdd(product, $event)"
+                          class="w-full py-2 text-[10px] font-black uppercase tracking-wider text-black transition-all duration-200 hover:brightness-110"
+                          style="background:#d4af37;">
+                    Ajouter
+                  </button>
                 </div>
-              }
-            </div>
-            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1 text-gold">{{ product.category.name }}</p>
-            <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
+              </div>
+            </a>
+
+            <!-- Infos sous l'image -->
+            <p class="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-bold mb-0.5 truncate text-gold">{{ product.category.name }}</p>
+            <a [routerLink]="['/products', product.slug]" class="block">
+              <p class="font-bold theme-text text-xs sm:text-sm leading-snug mb-1.5 line-clamp-2 hover:text-gold transition-colors">{{ product.name }}</p>
+            </a>
             <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                <span class="font-black text-sm sm:text-base text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
+                <span class="font-black text-sm text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
                 <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               } @else {
-                <span class="font-black text-sm sm:text-base theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+                <span class="font-black text-sm theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               }
               <span class="text-[9px] theme-muted">FCFA</span>
             </div>
-          </a>
+          </div>
         }
       </div>
     }

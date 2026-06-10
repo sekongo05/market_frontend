@@ -6,6 +6,8 @@ import { AuthService } from './core/services/auth.service';
 import { ProductService } from './core/services/product.service';
 import { ReviewService } from './core/services/review.service';
 import { CategoryService } from './core/services/category.service';
+import { CartService } from './core/services/cart.service';
+import { ToastService } from './core/services/toast.service';
 import { DashboardService, PublicStats } from './core/services/dashboard.service';
 import { WebSocketService } from './core/services/websocket.service';
 import { SeoService } from './core/services/seo.service';
@@ -135,6 +137,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private seo: SeoService,
+    private cartService: CartService,
+    private toastService: ToastService,
   ) {
     this._platformBrowser = isPlatformBrowser(this.platformId);
     this.currentUser$ = this.authService.currentUser$;
@@ -233,6 +237,20 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   isNew(product: ProductResponse): boolean {
     if (!product.createdAt) return false;
     return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= 21;
+  }
+
+  quickAdd(product: ProductResponse, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.cartService.addToCart({
+      productId: product.id,
+      productName: product.name,
+      price: product.salePrice ?? product.price,
+      quantity: 1,
+      imageUrl: product.imageUrl,
+      maxStock: product.stock,
+    });
+    this.toastService.success(`${product.name} ajouté au panier`);
   }
 
   onHeroMouseMove(event: MouseEvent): void {
