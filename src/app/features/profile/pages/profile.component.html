@@ -259,6 +259,39 @@
       </div>
     }
 
+    <!-- ── Commandes récentes ─────────────────────────────────────── -->
+    @if (fullProfile?.recentOrders && fullProfile.recentOrders.length > 0) {
+      <div class="mb-6 luxury-card rounded-3xl overflow-hidden">
+        <div class="px-6 sm:px-8 pt-5 pb-4 border-b theme-border flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <p class="text-sm font-black theme-text">Dernières commandes</p>
+          </div>
+          <a routerLink="/orders" class="text-[11px] font-bold text-gold hover:underline">Voir tout</a>
+        </div>
+        <div class="divide-y theme-border">
+          @for (order of fullProfile.recentOrders; track order.id) {
+            <a [routerLink]="['/orders']" [queryParams]="{order: order.orderNumber}"
+               class="flex items-center gap-3 px-6 sm:px-8 py-3.5 hover:bg-black/[.02] transition-colors group">
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold theme-text font-mono">{{ order.orderNumber }}</p>
+                <p class="text-[11px] theme-muted">{{ order.createdAt | date:'dd/MM/yy' }}</p>
+              </div>
+              <span class="text-xs font-black theme-text">{{ order.amount | number:'1.0-0':'fr-FR' }}<span class="text-[9px] theme-muted font-normal"> F</span></span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md" [class]="orderStatusClass(order.orderStatus)">
+                {{ orderStatusLabel(order.orderStatus) }}
+              </span>
+              <svg class="w-3.5 h-3.5 theme-muted group-hover:text-gold group-hover:translate-x-0.5 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+          }
+        </div>
+      </div>
+    }
+
     <!-- ── Onglet Profil ──────────────────────────────────────────── -->
     @if (!loading || user) {
       @if (activeTab === 'profile') {
@@ -383,7 +416,7 @@
                 }
               </div>
 
-              <button type="submit" [disabled]="profileForm.invalid || saving"
+              <button type="submit" [disabled]="profileForm.invalid || !profileForm.dirty || saving"
                 class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black text-black transition-all duration-200
                        disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0"
                 style="background: linear-gradient(135deg, #f5d442, #b8941e)"

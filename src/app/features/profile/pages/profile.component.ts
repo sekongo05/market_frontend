@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserResponse, UserFullProfileResponse, Address, AddressRequest } from '../../../core/models/user.models';
+import { orderStatusLabel, orderStatusClass } from '../../admin/shared/admin-status.helpers';
 
 @Component({
   selector: 'app-profile',
@@ -14,6 +15,8 @@ import { UserResponse, UserFullProfileResponse, Address, AddressRequest } from '
   styleUrls: ['./profile.component.css'],
 })
 export class ProfileComponent implements OnInit {
+  readonly orderStatusLabel = orderStatusLabel;
+  readonly orderStatusClass = orderStatusClass;
   profileForm!: FormGroup;
   passwordForm!: FormGroup;
   user: UserResponse | null = null;
@@ -129,6 +132,7 @@ export class ProfileComponent implements OnInit {
         if (r.success && r.data) {
           this.user = r.data;
           this.profileForm.patchValue({ nom: r.data.nom, prenom: r.data.prenom, phone: r.data.phone });
+          this.profileForm.markAsPristine();
           this.loadFullProfile(r.data.id);
         }
         this.loading = false;
@@ -158,6 +162,7 @@ export class ProfileComponent implements OnInit {
       next: (r) => {
         if (r.success) {
           this.user = r.data;
+          this.profileForm.markAsPristine();
           this._showSuccess('Profil mis à jour avec succès');
         } else {
           this._showError('Une erreur est survenue');
