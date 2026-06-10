@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Client } from '@stomp/stompjs';
+import { Client, StompSubscription } from '@stomp/stompjs';
 import { Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { WsNotification, WsStockUpdate, WsOrderEvent, WsOrderStatusUpdate, WsStaffEvent } from '../models/notification.models';
@@ -11,6 +11,7 @@ export class WebSocketService implements OnDestroy {
 
   private notificationSubject      = new Subject<WsNotification>();
   private stockSubject             = new Subject<WsStockUpdate>();
+  private subs: StompSubscription[] = [];
   private orderEventSubject        = new Subject<WsOrderEvent>();
   private orderStatusUpdateSubject = new Subject<WsOrderStatusUpdate>();
   private staffEventSubject        = new Subject<WsStaffEvent>();
@@ -43,9 +44,57 @@ export class WebSocketService implements OnDestroy {
       heartbeatIncoming: 10000,
       heartbeatOutgoing: 10000,
       onConnect: () => {
-        // Les abonnements sont créés dans connect() avant activate().
-        // STOMP.js les conserve dans _subscriptions et les renouvelle
-        // automatiquement à chaque reconnexion, sans duplication.
+        // Nettoyer les anciens abonnements pour éviter les doublons
+        // après une reconnexion automatique
+        this.subs.forEach(s => s.unsubscribe());
+        this.subs = [];
+
+        // ── Public : stock ──────────────────────────────────────────────
+        this.subs.push(
+          this.client!.subscribe('/topic/stock', (msg) => {
+            try { this.stockSubject.next(JSON.parse(msg.body)); }
+            catch (e) { console.error('WebSocket: stock parse error', e); }
+          })
+        );
+
+        if (token) {
+          this.subs.push(
+            this.client!.subscribe('/user/queue/notifications', (msg) => {
+              try { this.notificationSubject.next(JSON.parse(msg.body)); }
+              catch (e) { console.error('WebSocket: notification parse error', e); }
+            })
+          );
+
+          this.subs.push(
+            this.client!.subscribe('/user/queue/order-status', (msg) => {
+              try { this.orderStatusUpdateSubject.next(JSON.parse(msg.body)); }
+              catch (e) { console.error('WebSocket: order-status parse error', e); }
+            })
+          );
+        }
+
+        if (isStaff) {
+          this.subs.push(
+            this.client!.subscribe('/topic/staff/notifications', (msg) => {
+              try { this.notificationSubject.next(JSON.parse(msg.body)); }
+              catch (e) { console.error('WebSocket: staff-notification parse error', e); }
+            })
+          );
+
+          this.subs.push(
+            this.client!.subscribe('/topic/staff/orders', (msg) => {
+              try { this.orderEventSubject.next(JSON.parse(msg.body)); }
+              catch (e) { console.error('WebSocket: order parse error', e); }
+            })
+          );
+
+          this.subs.push(
+            this.client!.subscribe('/topic/staff/events', (msg) => {
+              try { this.staffEventSubject.next(JSON.parse(msg.body)); }
+              catch (e) { console.error('WebSocket: staff-event parse error', e); }
+            })
+          );
+        }
       },
       beforeConnect: () => {
         // Token frais à chaque tentative (utile si le token a expiré entre-temps)
@@ -67,46 +116,6 @@ export class WebSocketService implements OnDestroy {
         console.error('STOMP error', frame.headers['message']);
       },
     });
-
-    // ── Public : stock ──────────────────────────────────────────────────
-    this.client.subscribe('/topic/stock', (msg) => {
-      try { this.stockSubject.next(JSON.parse(msg.body)); }
-      catch (e) { console.error('WebSocket: stock parse error', e); }
-    });
-
-    if (token) {
-      // ── Authentifié : notifications personnelles ──────────────────────
-      this.client.subscribe('/user/queue/notifications', (msg) => {
-        try { this.notificationSubject.next(JSON.parse(msg.body)); }
-        catch (e) { console.error('WebSocket: notification parse error', e); }
-      });
-
-      // ── Authentifié : statut commande en direct ───────────────────────
-      this.client.subscribe('/user/queue/order-status', (msg) => {
-        try { this.orderStatusUpdateSubject.next(JSON.parse(msg.body)); }
-        catch (e) { console.error('WebSocket: order-status parse error', e); }
-      });
-    }
-
-    if (isStaff) {
-      // ── Staff : notifications de gestion ──────────────────────────────
-      this.client.subscribe('/topic/staff/notifications', (msg) => {
-        try { this.notificationSubject.next(JSON.parse(msg.body)); }
-        catch (e) { console.error('WebSocket: staff-notification parse error', e); }
-      });
-
-      // ── Staff : nouvelles commandes + compteur PENDING ────────────────
-      this.client.subscribe('/topic/staff/orders', (msg) => {
-        try { this.orderEventSubject.next(JSON.parse(msg.body)); }
-        catch (e) { console.error('WebSocket: order parse error', e); }
-      });
-
-      // ── Staff : événements métier (produits, catégories, promos…) ─────
-      this.client.subscribe('/topic/staff/events', (msg) => {
-        try { this.staffEventSubject.next(JSON.parse(msg.body)); }
-        catch (e) { console.error('WebSocket: staff-event parse error', e); }
-      });
-    }
 
     this.client.activate();
   }
