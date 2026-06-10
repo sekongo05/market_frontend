@@ -71,15 +71,14 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   CATEGORY TABS — style éditorial, indicateur doré souligné
+   CATEGORY CHIPS — premium rounded-full, actif = fond doré
 ═══════════════════════════════════════════════════════════════════ */
-.cat-tabs-wrap {
+.cat-chips-wrap {
   background: #f8f5f0;
   border-bottom: 1px solid rgba(212,175,55,0.15);
   position: relative;
 }
-/* Dégradé droit — indique que les tabs continuent */
-.cat-tabs-wrap::after {
+.cat-chips-wrap::after {
   content: '';
   position: absolute;
   top: 0;
@@ -90,58 +89,101 @@
   pointer-events: none;
   z-index: 2;
 }
-.cat-tab {
-  position: relative;
+.cat-chip {
   flex-shrink: 0;
-  padding: 0.9rem 1.1rem;
+  padding: 0.5rem 1.1rem;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(0,0,0,0.40);
   white-space: nowrap;
-  transition: color 0.2s ease;
   border: none;
-  background: transparent;
   cursor: pointer;
+  border-radius: 9999px;
+  background: transparent;
+  color: rgba(0,0,0,0.40);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid transparent;
 }
-.cat-tab:hover { color: rgba(0,0,0,0.72); }
-.cat-tab.cat-tab--active { color: #a07010; }
-.cat-tab::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0.75rem;
-  right: 0.75rem;
-  height: 2px;
+.cat-chip:hover {
+  color: rgba(0,0,0,0.72);
+  border-color: rgba(212,175,55,0.3);
+}
+.cat-chip--active {
   background: #d4af37;
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #000;
+  border-color: #d4af37;
 }
-.cat-tab.cat-tab--active::after { transform: scaleX(1); }
 
 /* ═══════════════════════════════════════════════════════════════════
-   SKELETON CARDS — structure fidèle aux vraies cards
+   GLASSMORPHISM OVERLAY — texte produit par-dessus l'image
+═══════════════════════════════════════════════════════════════════ */
+.glass-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.92) 0%,
+    rgba(0,0,0,0.5) 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Carte produit glass ── */
+.product-card-glass {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(212,175,55,0.1);
+  overflow: hidden;
+  transition: box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.product-card-glass:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  transform: translateY(-2px);
+}
+
+/* ── Bouton Ajouter sous la carte ── */
+.add-btn-glass {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  margin-top: 0.35rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(212,175,55,0.35);
+  color: #d4af37;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.add-btn-glass:hover {
+  background: rgba(212,175,55,0.12);
+  border-color: #d4af37;
+}
+.add-btn-glass:active {
+  transform: scale(0.97);
+}
+.add-btn-glass:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SKELETON CARDS — reflet de la nouvelle carte glassmorphism
 ═══════════════════════════════════════════════════════════════════ */
 .skel-card__img {
   width: 100%;
   aspect-ratio: 3/4;
-  border-radius: 0;
+  border-radius: 0.75rem;
   display: block;
 }
-.skel-card__body {
-  background: #ffffff;
-  padding: 0.625rem 0.75rem 0.75rem;
-  border-top: 1px solid rgba(212,175,55,0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+.skel-card:not(.skel-card--list) .skel-card__body {
+  display: none;
 }
-.skel-card__cat   { width: 52px;  height: 8px;  border-radius: 2px; }
-.skel-card__name1 { width: 100%;  height: 13px; border-radius: 2px; }
-.skel-card__name2 { width: 68%;   height: 13px; border-radius: 2px; }
-.skel-card__price { width: 68px;  height: 15px; border-radius: 2px; margin-top: 3px; }
 
 /* ═══════════════════════════════════════════════════════════════════
    EMPTY STATE — style éditorial luxe

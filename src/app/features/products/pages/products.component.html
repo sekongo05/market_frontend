@@ -209,19 +209,19 @@
     </div>
   }
 
-  <!-- ── Category tabs ─────────────────────────────────────────────── -->
-  <div class="cat-tabs-wrap">
+  <!-- ── Category chips ─────────────────────────────────────────────── -->
+  <div class="cat-chips-wrap">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center overflow-x-auto scrollbar-none" style="-webkit-overflow-scrolling:touch">
+      <div class="flex items-center gap-2 overflow-x-auto scrollbar-none py-3 sm:py-4" style="-webkit-overflow-scrolling:touch">
         <button (click)="selectCategory(null)"
-          class="cat-tab"
-          [class.cat-tab--active]="selectedCategoryId === null">
-          Tout
+          class="cat-chip"
+          [class.cat-chip--active]="selectedCategoryId === null">
+          Tous
         </button>
         @for (cat of categories; track cat.id) {
           <button (click)="selectCategory(cat.id)"
-            class="cat-tab"
-            [class.cat-tab--active]="selectedCategoryId === cat.id">
+            class="cat-chip"
+            [class.cat-chip--active]="selectedCategoryId === cat.id">
             {{ cat.name }}
           </button>
         }
@@ -263,15 +263,12 @@
          Context : product, i, wide (optionnel — carte hero panoramique)
     ══════════════════════════════════════════════════════════════ -->
     <ng-template #productCard let-product="product" let-i="i" let-wide="wide">
-      <div class="group relative overflow-hidden cursor-pointer select-none animate-fade-in-up
-                  shadow-[0_2px_10px_rgba(0,0,0,0.12)] hover:shadow-[0_8px_28px_rgba(0,0,0,0.24)]
-                  transition-shadow duration-500"
-           [class]="!wide ? 'flex flex-col' : ''"
+      <div class="group cursor-pointer select-none animate-fade-in-up flex flex-col"
            [style.animation-delay]="(i % 8 * 0.06) + 's'"
            (click)="openProductView(product)">
 
-        <!-- ── Image ── -->
-        <div class="relative overflow-hidden flex-shrink-0"
+        <!-- ── Carte image + glass overlay ── -->
+        <div class="relative overflow-hidden product-card-glass"
              [class]="wide ? 'aspect-[21/9]' : 'aspect-[3/4]'">
 
           <img [src]="product.imageUrl | mediaUrl" [alt]="product.name"
@@ -279,17 +276,12 @@
                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                (error)="$any($event.target).src='https://placehold.co/400x533/1a1a1a/d4af37?text=SDM'"/>
 
-          <!-- Vignette top (badges lisibilité) -->
+          <!-- Vignette top (lisibilité badges) -->
           <div class="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-transparent pointer-events-none"></div>
 
-          <!-- Bottom gradient — wide only (text overlay needs it) -->
-          @if (wide) {
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none"></div>
-          }
-
           <!-- ── Badges haut ── -->
-          <div class="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between pointer-events-none">
-            <!-- Gauche : urgence stock + déjà acheté -->
+          <div class="absolute top-2 left-2 right-2 flex items-start justify-between pointer-events-none z-10">
+            <!-- Gauche : urgence stock -->
             <div class="flex flex-col items-start gap-1">
               @if (product.stock === 0) {
                 <span class="inline-flex px-2 py-0.5 backdrop-blur-sm bg-black/70 text-red-400
@@ -303,16 +295,6 @@
                   Dernières pièces !
                 </span>
               }
-              @if (!isManager && orderedProductIds.has(product.id)) {
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded
-                             text-[10px] font-black backdrop-blur-sm
-                             bg-emerald-500/85 text-white shadow-sm">
-                  <svg class="w-2 h-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  Déjà acheté
-                </span>
-              }
             </div>
             <!-- Droite : promo / nouveau -->
             @if (product.discountPercent && product.discountPercent > 0) {
@@ -320,8 +302,8 @@
                 −{{ product.discountPercent }}%
               </span>
             } @else if (isNew(product)) {
-              <span class="flex items-center gap-1 px-2 py-0.5 bg-violet-600 text-white text-[10px] font-black rounded shadow-md shadow-violet-900/40">
-                <span class="w-1 h-1 rounded-full bg-white animate-pulse"></span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black"
+                    style="background:rgba(212,175,55,0.85); color:#000;">
                 NOUVEAU
               </span>
             }
@@ -329,7 +311,7 @@
 
           <!-- ── Actions manager ── -->
           @if (isManager) {
-            <div class="absolute top-2.5 right-2.5 flex gap-1.5 transition-opacity duration-200 opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+            <div class="absolute top-2 right-2 flex gap-1.5 z-20"
                  (click)="$event.stopPropagation()">
               <button (click)="openEditModal(product)"
                 appTooltip="Modifier ce produit" tooltipPosition="bottom"
@@ -344,124 +326,63 @@
             </div>
           }
 
-          <!-- ── Wide-only: text overlay ── -->
-          @if (wide) {
-            <div class="absolute bottom-0 left-0 right-0 p-5 sm:p-7">
-              <p class="text-[10px] sm:text-xs uppercase tracking-[0.25em] font-bold mb-1"
-                 style="color:rgba(212,175,55,0.9)">{{ product.category.name }}</p>
-              <h3 class="text-lg sm:text-2xl font-bold text-white drop-shadow-md mb-2">{{ product.name }}</h3>
-              @if ((product.variants?.length ?? 0) > 0) {
-                <div class="flex items-center gap-1.5 mb-3">
-                  @for (v of product.variants!.slice(0, 5); track v.id) {
-                    <span class="w-4 h-4 rounded-full border-2 flex-shrink-0 shadow-sm"
-                          [style.background-color]="v.colorHex"
-                          style="border-color:rgba(255,255,255,0.5)"
-                          [title]="v.colorName"></span>
-                  }
-                  @if (product.variants!.length > 5) {
-                    <span class="text-[9px] text-white/60 font-bold bg-white/10 rounded-full px-1.5 py-0.5">+{{ product.variants!.length - 5 }}</span>
-                  }
-                </div>
-              }
-              <div class="flex items-center justify-between gap-3">
-                <div>
-                  @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                    <div class="flex items-baseline gap-1.5">
-                      <span class="text-xl sm:text-2xl font-black text-orange-400 leading-none">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
-                      <span class="text-sm text-white/45 line-through leading-none">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-                      <span class="text-[9px] text-white/40 font-bold">FCFA</span>
-                    </div>
-                  } @else {
-                    <div class="flex items-baseline gap-1">
-                      <span class="text-xl sm:text-2xl font-black leading-none" style="color:#d4af37">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-                      <span class="text-[9px] text-white/40 font-bold">FCFA</span>
-                    </div>
-                  }
-                </div>
-                @if (!isManager) {
-                  <button (click)="$event.stopPropagation(); addToCart(product)"
-                    [disabled]="product.stock === 0"
-                    class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs flex-shrink-0
-                           transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                    [class]="cartProductIds.has(product.id) ? 'bg-green-500 text-white' : 'text-black hover:brightness-110 hover:-translate-y-0.5 active:scale-95'"
-                    [style]="cartProductIds.has(product.id) ? '' : 'background:#d4af37;box-shadow:0 4px 16px rgba(212,175,55,0.35)'">
-                    @if (cartProductIds.has(product.id)) {
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                      Dans le panier
-                    } @else {
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                      Ajouter au panier
-                    }
-                  </button>
-                }
-              </div>
-            </div>
-          }
-        </div>
-
-        <!-- ── Regular card: text panel ── -->
-        @if (!wide) {
-          <div class="px-3 pt-3 pb-3.5 flex flex-col gap-1.5 theme-surface border-t theme-border">
-            <!-- Catégorie + promo ligne du haut -->
-            <div class="flex items-start justify-between gap-1">
-              <p class="text-[10px] font-bold uppercase tracking-[0.18em] truncate"
-                 style="color:#b8941e">{{ product.category.name }}</p>
-              @if (product.discountPercent && product.discountPercent > 0) {
-                <span class="text-[10px] font-black text-orange-500 flex-shrink-0">−{{ product.discountPercent }}%</span>
-              }
-            </div>
-            <!-- Nom produit -->
-            <h3 class="text-sm sm:text-base font-bold theme-text leading-snug line-clamp-2">{{ product.name }}</h3>
-            <!-- Couleurs -->
+          <!-- ── Glassmorphism overlay ── -->
+          <div class="absolute bottom-0 left-0 right-0 pt-6 pb-2.5 px-2.5 glass-overlay z-10">
+            <!-- Catégorie -->
+            <p class="text-[9px] font-bold uppercase tracking-[0.18em] mb-0.5" style="color:rgba(212,175,55,0.85)">{{ product.category.name }}</p>
+            <!-- Nom -->
+            <h3 class="text-sm font-bold text-white leading-snug line-clamp-2 mb-1">{{ product.name }}</h3>
+            <!-- Variantes (compact) -->
             @if ((product.variants?.length ?? 0) > 0) {
-              <div class="flex items-center gap-1.5">
-                @for (v of product.variants!.slice(0, 5); track v.id) {
-                  <span class="w-4 h-4 rounded-full flex-shrink-0 shadow-sm"
+              <div class="flex items-center gap-1 mb-1">
+                @for (v of product.variants!.slice(0, 4); track v.id) {
+                  <span class="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
                         [style.background-color]="v.colorHex"
-                        style="outline:1.5px solid rgba(0,0,0,0.14); outline-offset:1px;"
+                        style="outline:1px solid rgba(255,255,255,0.3); outline-offset:1px;"
                         [title]="v.colorName"></span>
                 }
-                @if (product.variants!.length > 5) {
-                  <span class="text-[10px] theme-muted font-bold">+{{ product.variants!.length - 5 }}</span>
+                @if (product.variants!.length > 4) {
+                  <span class="text-[8px] text-white/50 font-bold ml-0.5">+{{ product.variants!.length - 4 }}</span>
                 }
               </div>
             }
-            <!-- Prix + bouton panier -->
-            <div class="flex items-center justify-between gap-2 mt-0.5">
-              <div>
-                @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                  <div class="flex items-baseline gap-1 flex-wrap">
-                    <span class="text-base sm:text-lg font-black text-orange-500 leading-none">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
-                    <span class="text-[10px] theme-muted line-through leading-none">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-                    <span class="text-[9px] theme-muted font-bold">FCFA</span>
-                  </div>
-                } @else {
-                  <div class="flex items-baseline gap-1">
-                    <span class="text-base sm:text-lg font-black leading-none" style="color:#b8941e">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-                    <span class="text-[9px] theme-muted font-bold">FCFA</span>
-                  </div>
-                }
-              </div>
-              @if (!isManager) {
-                <button (click)="$event.stopPropagation(); addToCart(product)"
-                  [disabled]="product.stock === 0"
-                  class="flex items-center gap-1 px-2.5 py-2 flex-shrink-0 text-[10px] font-black uppercase tracking-wide
-                         transition-all duration-200 disabled:opacity-35 disabled:cursor-not-allowed"
-                  [class]="cartProductIds.has(product.id)
-                    ? 'bg-green-500 text-white'
-                    : 'text-black active:scale-95'"
-                  [style]="cartProductIds.has(product.id) ? '' : 'background:#d4af37;'">
-                  @if (cartProductIds.has(product.id)) {
-                    <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                    <span class="hidden sm:inline">Ajouté</span>
-                  } @else {
-                    <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                    <span class="hidden sm:inline">Panier</span>
-                  }
-                </button>
+            <!-- Prix -->
+            <div class="flex items-baseline gap-1">
+              @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
+                <span class="text-sm font-black text-orange-400 leading-none">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
+                <span class="text-[9px] text-white/45 line-through leading-none">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+              } @else {
+                <span class="text-sm font-black leading-none" style="color:#d4af37">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               }
+              <span class="text-[9px] text-white/45 font-bold">FCFA</span>
             </div>
+            <!-- Déjà acheté (subtil, sans badge) -->
+            @if (!isManager && orderedProductIds.has(product.id)) {
+              <div class="flex items-center gap-1 mt-1">
+                <svg class="w-2.5 h-2.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-[8px] font-bold text-emerald-400/80">Déjà acheté</span>
+              </div>
+            }
           </div>
+
+        </div>
+
+        <!-- ── Bouton Ajouter sous l'image ── -->
+        @if (!isManager && !wide) {
+          <button (click)="$event.stopPropagation(); addToCart(product)"
+            [disabled]="product.stock === 0"
+            class="add-btn-glass"
+            [class]="cartProductIds.has(product.id) ? '!bg-green-500 !text-white !border-green-500' : ''">
+            @if (cartProductIds.has(product.id)) {
+              <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              Ajouté
+            } @else {
+              <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              Ajouter
+            }
+          </button>
         }
 
       </div>
