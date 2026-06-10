@@ -162,8 +162,9 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   }
 
   private _extractOrderNumber(n: NotificationResponse): string | null {
-    const match = n.subject.match(/[A-Z0-9][A-Z0-9-]{3,}/i);
-    return match ? match[0] : null;
+    const m = n.subject.match(/\b(?:CMD|ORD)[-\s][A-Z0-9-]+\b/i);
+    if (m) return m[0].replace(/\s+/, '-');
+    return n.subject.match(/(\b[A-Z0-9][A-Z0-9-]{3,}\b)$/i)?.[1] ?? null;
   }
 
   markAsRead(n: NotificationResponse): void {

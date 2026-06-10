@@ -283,8 +283,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private _extractOrderNumber(notif: NotificationResponse): string | null {
-    const match = notif.subject.match(/[A-Z0-9][A-Z0-9-]{3,}/i);
-    return match ? match[0] : null;
+    const m = notif.subject.match(/\b(?:CMD|ORD)[-\s][A-Z0-9-]+\b/i);
+    if (m) return m[0].replace(/\s+/, '-');
+    return notif.subject.match(/(\b[A-Z0-9][A-Z0-9-]{3,}\b)$/i)?.[1] ?? null;
   }
 
   getNotificationLink(notif: NotificationResponse): string | null {
