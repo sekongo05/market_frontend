@@ -337,8 +337,8 @@
                           </svg>
                         </div>
                       }
-                      <!-- Badge stock faible -->
-                      @if (variant.stock > 0 && variant.stock <= 3) {
+                      <!-- Badge stock faible (manager uniquement) -->
+                      @if (isManager && variant.stock > 0 && variant.stock <= 3) {
                         <div class="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-orange-500 border border-black/30
                                     flex items-center justify-center animate-pulse">
                           <span class="text-[9px] font-black text-white leading-none">{{ variant.stock }}</span>

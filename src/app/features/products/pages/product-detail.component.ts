@@ -505,7 +505,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     const s = this.product.stock;
     if (s === 0) return 'Épuisé';
-    if (s <= 3) return `Plus que ${s} en stock`;
     return 'En stock';
   }
 
