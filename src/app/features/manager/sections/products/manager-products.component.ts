@@ -602,7 +602,10 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   loadMedia(productId: number): void {
     this.mediaLoading = true;
     this.productMediaService.getAll(productId).subscribe({
-      next: (r) => { if (r.success) this.productMedia = r.data; this.mediaLoading = false; this.cdr.markForCheck(); },
+      next: (r) => {
+        if (this.editingProduct?.id !== productId) return;
+        if (r.success) this.productMedia = r.data; this.mediaLoading = false; this.cdr.markForCheck();
+      },
       error: () => { this.mediaLoading = false; this.cdr.markForCheck(); },
     });
   }
@@ -630,12 +633,13 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
     const file = this.pendingMediaFile;
     const color = { ...this.pendingMediaColor };
+    const targetProductId = this.editingProduct.id;
     this.pendingMediaFile = null; this.pendingMediaPreview = null;
-    this.productMediaService.upload(this.editingProduct.id, file).subscribe({
+    this.productMediaService.upload(targetProductId, file).subscribe({
       next: (r) => {
         if (r.success) {
           this.productMedia = [...this.productMedia, r.data];
-          this.productVariantService.addVariant(this.editingProduct!.id, {
+          this.productVariantService.addVariant(targetProductId, {
             colorName: color.colorName.trim(), colorHex: color.colorHex, imageUrl: r.data.url, stock: color.stock || 0,
           }).subscribe({
             next: (vr: any) => { if (vr.success) this.productVariants = [...this.productVariants, vr.data]; this.cdr.markForCheck(); },
@@ -676,7 +680,10 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   loadVariants(productId: number): void {
     this.variantsLoading = true;
     this.productVariantService.getVariants(productId).subscribe({
-      next: (r) => { if (r.success) this.productVariants = r.data; this.variantsLoading = false; this.cdr.markForCheck(); },
+      next: (r) => {
+        if (this.editingProduct?.id !== productId) return;
+        if (r.success) this.productVariants = r.data; this.variantsLoading = false; this.cdr.markForCheck();
+      },
       error: () => { this.variantsLoading = false; this.cdr.markForCheck(); },
     });
   }
@@ -700,12 +707,12 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     if (!/^#[0-9A-Fa-f]{6}$/.test(this.newVariant.colorHex)) { this.variantError = 'Couleur hex invalide (ex: #FF5733)'; return; }
     this.variantSaving = true;
     this.variantError = null;
-
+    const targetProductId = this.editingProduct.id;
     const doSave = (imageUrl: string) => {
       const payload = { ...this.newVariant, imageUrl };
       const req$ = this.editingVariant
-        ? this.productVariantService.updateVariant(this.editingProduct!.id, this.editingVariant.id, payload)
-        : this.productVariantService.addVariant(this.editingProduct!.id, payload);
+        ? this.productVariantService.updateVariant(targetProductId, this.editingVariant.id, payload)
+        : this.productVariantService.addVariant(targetProductId, payload);
       req$.subscribe({
         next: (r) => {
           if (r.success) {
@@ -724,7 +731,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     };
 
     if (this.newVariantFile) {
-      this.productMediaService.upload(this.editingProduct.id, this.newVariantFile).subscribe({
+      this.productMediaService.upload(targetProductId, this.newVariantFile).subscribe({
         next: (r) => doSave(r.success ? r.data.url : (this.newVariant.imageUrl ?? '')),
         error: () => doSave(this.newVariant.imageUrl ?? ''),
       });

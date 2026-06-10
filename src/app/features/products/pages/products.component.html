@@ -281,21 +281,23 @@
 
           <!-- ── Badges haut ── -->
           <div class="absolute top-2 left-2 right-2 flex items-start justify-between pointer-events-none z-10">
-            <!-- Gauche : urgence stock -->
-            <div class="flex flex-col items-start gap-1">
-              @if (product.stock === 0) {
-                <span class="inline-flex px-2 py-0.5 backdrop-blur-sm bg-black/70 text-red-400
-                             text-[10px] font-black uppercase tracking-wide rounded border border-red-500/30">
-                  Épuisé
-                </span>
-              } @else if (product.stock <= 5) {
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-500 text-white
-                             text-[10px] font-black uppercase rounded shadow-md shadow-red-900/50">
-                  <span class="w-1 h-1 rounded-full bg-white animate-pulse flex-shrink-0"></span>
-                  Dernières pièces !
-                </span>
-              }
-            </div>
+            <!-- Gauche : urgence stock (manager uniquement) -->
+            @if (isManager) {
+              <div class="flex flex-col items-start gap-1">
+                @if (product.stock === 0) {
+                  <span class="inline-flex px-2 py-0.5 backdrop-blur-sm bg-black/70 text-red-400
+                               text-[10px] font-black uppercase tracking-wide rounded border border-red-500/30">
+                    Épuisé
+                  </span>
+                } @else if (product.stock <= 5) {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-500 text-white
+                               text-[10px] font-black uppercase rounded shadow-md shadow-red-900/50">
+                    <span class="w-1 h-1 rounded-full bg-white animate-pulse flex-shrink-0"></span>
+                    Dernières pièces !
+                  </span>
+                }
+              </div>
+            }
             <!-- Droite : promo / nouveau -->
             @if (product.discountPercent && product.discountPercent > 0) {
               <span class="px-2 py-0.5 bg-orange-500 text-white text-[10px] font-black rounded shadow-md shadow-orange-900/40">
@@ -604,10 +606,10 @@
             <span class="text-xl theme-muted line-through"> {{ selectedProduct.price | number:'1.0-0': 'fr-FR' }}</span>
 
             <span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-sm font-black">-{{ selectedProduct.discountPercent }}%</span>
-              <span class="text-base theme-muted">FCFA · TTC</span>
+              <span class="text-base theme-muted">FCFA</span>
             } @else {
               <span class="text-4xl font-black text-gold">{{ selectedProduct.price | number:'1.0-0': 'fr-FR' }}</span>
-              <span class="text-base theme-muted">FCFA · TTC</span>
+              <span class="text-base theme-muted">FCFA</span>
             }
           </div>
 
