@@ -8,6 +8,8 @@ import { WsNotification, WsStockUpdate, WsOrderEvent, WsOrderStatusUpdate, WsSta
 export class WebSocketService implements OnDestroy {
 
   private client: Client | null = null;
+  private reconnectCount = 0;
+  private readonly maxReconnect = 15;
 
   private notificationSubject      = new Subject<WsNotification>();
   private stockSubject             = new Subject<WsStockUpdate>();
@@ -37,6 +39,8 @@ export class WebSocketService implements OnDestroy {
     const headers: Record<string, string> = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
+    this.reconnectCount = 0;
+
     this.client = new Client({
       brokerURL: environment.wsUrl,
       connectHeaders: headers,
@@ -44,6 +48,7 @@ export class WebSocketService implements OnDestroy {
       heartbeatIncoming: 10000,
       heartbeatOutgoing: 10000,
       onConnect: () => {
+        this.reconnectCount = 0;
         // Nettoyer les anciens abonnements pour éviter les doublons
         // après une reconnexion automatique
         this.subs.forEach(s => s.unsubscribe());
@@ -97,6 +102,12 @@ export class WebSocketService implements OnDestroy {
         }
       },
       beforeConnect: () => {
+        this.reconnectCount++;
+        if (this.reconnectCount > this.maxReconnect) {
+          console.warn(`WebSocket: ${this.maxReconnect} tentatives échouées, arrêt`);
+          this.client?.deactivate();
+          return;
+        }
         // Token frais à chaque tentative (utile si le token a expiré entre-temps)
         if (typeof localStorage !== 'undefined' && this.client) {
           const freshToken = localStorage.getItem('auth_token');
@@ -106,11 +117,14 @@ export class WebSocketService implements OnDestroy {
         }
       },
       onWebSocketClose: (event) => {
-        console.warn('WebSocket closed', {
-          code: event.code,
-          reason: event.reason,
-          wasClean: event.wasClean,
-        });
+        if (this.reconnectCount <= 3) {
+          console.warn('WebSocket closed', {
+            code: event.code,
+            reason: event.reason,
+            wasClean: event.wasClean,
+            attempt: this.reconnectCount,
+          });
+        }
       },
       onStompError: (frame) => {
         console.error('STOMP error', frame.headers['message']);
