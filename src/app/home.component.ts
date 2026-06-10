@@ -18,7 +18,7 @@ import { CategoryResponse } from './core/models/category.models';
 import { PageResponse } from './core/models/common.models';
 import { PromoService } from './core/services/promo.service';
 import { PublicPromoResponse } from './core/models/promo.models';
-import { Subject } from 'rxjs';
+import { Subject, interval, fromEvent, merge } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -201,6 +201,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this._loadFirstOrderPromo();
     this._initObserver();
     this._subscribeStock();
+    if (this._platformBrowser) this._startPolling();
   }
 
   ngOnDestroy(): void {
@@ -483,6 +484,17 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: () => { this.reviewsLoading = false; this.cdr.detectChanges(); },
+    });
+  }
+
+  private _startPolling(): void {
+    merge(
+      interval(30000),
+      fromEvent(window, 'focus'),
+    ).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this._loadProducts();
+      this._loadFeatured();
+      this._loadBestsellers();
     });
   }
 

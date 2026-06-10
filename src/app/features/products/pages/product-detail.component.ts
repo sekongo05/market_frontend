@@ -5,7 +5,7 @@ import {
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
-import { Subject } from 'rxjs';
+import { Subject, interval, fromEvent, merge } from 'rxjs';
 import { takeUntil, switchMap } from 'rxjs/operators';
 
 import { FormsModule } from '@angular/forms';
@@ -70,6 +70,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   selectedVariant: ProductVariant | null = null;
   variantQty = new Map<number, number>();
 
+  private _currentProductId: number | null = null;
   private destroy$ = new Subject<void>();
   private observer?: IntersectionObserver;
 
@@ -141,6 +142,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       next: (response) => {
         if (response.success && response.data) {
           this.product = response.data;
+          this._currentProductId = response.data.id;
           this.wa.context.set({ name: response.data.name, price: response.data.price, id: response.data.id });
           this._autoSelectVariant();
           this._buildGallery();
@@ -154,7 +156,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         }
         this.loading = false;
         this.cdr.detectChanges();
-        // DOM updated — now attach scroll-reveal observer to newly rendered elements
         setTimeout(() => this._initScrollReveal(), 0);
       },
       error: () => {
@@ -164,6 +165,26 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         setTimeout(() => this._initScrollReveal(), 0);
       },
     });
+
+    if (typeof window !== 'undefined') {
+      merge(
+        interval(30000),
+        fromEvent(window, 'focus'),
+      ).pipe(takeUntil(this.destroy$)).subscribe(() => {
+        if (this._currentProductId) {
+          this.productService.getProductById(this._currentProductId).subscribe(response => {
+            if (response.success && response.data) {
+              this.product = response.data;
+              this._buildGallery();
+              this._loadRelated();
+              this._loadReviews();
+              this._loadRating();
+              this.cdr.detectChanges();
+            }
+          });
+        }
+      });
+    }
   }
 
   ngAfterViewInit(): void { /* observer started after product loads */ }
