@@ -143,7 +143,7 @@
               <div class="flex items-center justify-between text-sm">
                 <span style="color:#6b7280">Livraison</span>
                 @if (shippingFee === 0) {
-                  <span style="color:#9ca3af">À définir</span>
+                  <span style="color:#9ca3af;text-align:right;line-height:1.4">Abidjan 1 500 FCFA<br>Intérieur 2 000 FCFA</span>
                 } @else {
                   <span class="font-semibold text-orange-500">{{ shippingFee | number:'1.0-0':'fr-FR' }}&thinsp;FCFA</span>
                 }

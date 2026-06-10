@@ -22,6 +22,7 @@ export class CartService {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private cartSubject = new BehaviorSubject<CartItem[]>(this.loadCart());
   public cart$ = this.cartSubject.asObservable();
+  get cartValue(): CartItem[] { return this.cartSubject.value; }
 
   private _lastAdded = new Subject<CartItem>();
   readonly lastAdded$ = this._lastAdded.asObservable();

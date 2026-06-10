@@ -242,6 +242,11 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   quickAdd(product: ProductResponse, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+    const exists = this.cartService.cartValue.some(i => i.productId === product.id);
+    if (exists) {
+      this.toastService.info(`${product.name} déjà dans le panier`);
+      return;
+    }
     this.cartService.addToCart({
       productId: product.id,
       productName: product.name,

@@ -787,57 +787,6 @@
 
       </div>
 
-      <!-- ════════════════════════════════════════════
-           SECTION: Related products
-      ════════════════════════════════════════════ -->
-      @if (relatedProducts.length > 0) {
-        <div class="mt-20 scroll-reveal">
-          <div class="flex items-end justify-between mb-8">
-            <div>
-              <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-2">Vous aimerez aussi</p>
-              <h2 class="text-2xl font-black theme-text">Produits similaires</h2>
-            </div>
-            <a routerLink="/products"
-               class="hidden sm:flex items-center gap-1.5 text-sm text-gold hover:text-yellow-400 font-semibold transition-colors">
-              Voir tout
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-              </svg>
-            </a>
-          </div>
-
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-            @for (related of relatedProducts; track related.id; let i = $index) {
-              <a [routerLink]="['/products', related.id]"
-                 class="group luxury-card rounded-3xl overflow-hidden cursor-pointer stagger-{{i+1}} scroll-reveal">
-                <div class="relative overflow-hidden h-44">
-                  <img [src]="related.imageUrl | mediaUrl" [alt]="related.name"
-                       loading="lazy"
-                       class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                       (error)="$any($event.target).src='https://placehold.co/400x300/1a1a1a/d4af37?text=Luxe'"/>
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <div class="w-8 h-8 bg-gold text-black rounded-full flex items-center justify-center">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div class="p-4">
-                  <p class="text-[10px] text-gold font-semibold uppercase tracking-wider mb-0.5">{{ related.category.name }}</p>
-                  <p class="font-bold theme-text text-sm leading-tight truncate mb-2">{{ related.name }}</p>
-                  <div class="flex items-center justify-between">
-                    <span class="font-black text-gold text-base">{{ related.price | number:'1.0-0': 'fr-FR' }}</span>
-                    <span class="text-[10px] theme-muted">FCFA</span>
-                  </div>
-                </div>
-              </a>
-            }
-          </div>
-        </div>
-      }
 
     </div>
 
