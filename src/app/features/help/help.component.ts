@@ -55,7 +55,7 @@ export class HelpComponent {
     // ── Retours
     {
       q: 'Puis-je retourner un article ?',
-      a: 'Oui, sous conditions. Vous disposez de 3 jours francs à compter de la réception pour initier votre retour. Passé ce délai, le bouton de retour est automatiquement désactivé dans votre espace commandes et aucune demande ne peut être acceptée. L\'article doit être non porté, non lavé et dans son emballage d\'origine. Connectez-vous, allez dans "Mes commandes", sélectionnez la commande livrée et cliquez sur "Retourner un article".'
+      a: 'Oui, sous conditions. Vous disposez de 3 jours  à compter de la réception pour initier votre retour. Passé ce délai, le bouton de retour est automatiquement désactivé dans votre espace commandes et aucune demande ne peut être acceptée. L\'article doit être non porté, non lavé et dans son emballage d\'origine. Connectez-vous, allez dans "Mes commandes", sélectionnez la commande livrée et cliquez sur "Retourner un article".'
     },
     {
       q: 'Quel montant est remboursé en cas de retour ?',
