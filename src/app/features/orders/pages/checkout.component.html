@@ -201,9 +201,9 @@
                 <!-- Phone -->
                 <div class="px-5 py-4">
                   <label class="block text-xs font-bold mb-2" style="color:#6b7280">
-                    Téléphone de contact <span class="text-red-500">*</span>
+                    Téléphone <span class="text-red-500">*</span>
                   </label>
-                  <input type="tel" [(ngModel)]="deliveryPhone"
+                  <input type="tel" [ngModel]="deliveryPhone" (input)="onPhoneInput()"
                     placeholder="+225 07 00 00 00 00"
                     class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
                 </div>

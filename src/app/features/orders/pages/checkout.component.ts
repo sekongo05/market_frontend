@@ -63,6 +63,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     const user = this.authService.getCurrentUser();
     this.deliveryPhone = user?.phone || '';
+    if (this.deliveryPhone) this.onPhoneInput();
 
     const nav = this.router.getCurrentNavigation();
     const promoFromState = nav?.extras?.state?.['promoCode'];
@@ -120,7 +121,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     if (!this.deliveryPhone.trim()) {
       this.checkoutError = 'Veuillez saisir votre numéro de téléphone'; return;
     }
-    const phoneDigits = this.deliveryPhone.trim().replace(/^\+225/, '');
+    const phoneDigits = this.deliveryPhone.trim().replace(/^\+225\s*/, '').replace(/\s/g, '');
     if (!/^[0-9]{10}$/.test(phoneDigits)) {
       this.checkoutError = 'Numéro invalide — 10 chiffres requis (ex: 0700000000)'; return;
     }
@@ -184,5 +185,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   formatPrice(n: number): string {
     return n.toLocaleString('fr-FR');
+  }
+
+  onPhoneInput(): void {
+    let digits = this.deliveryPhone.replace(/[^\d+]/g, '');
+    if (!digits.startsWith('+225')) digits = '+225' + digits.replace(/^\+?225?/, '');
+    const prefix = '+225 ';
+    const rest = digits.replace(/^\+225/, '').replace(/\D/g, '').slice(0, 10);
+    const pairs = rest.match(/.{1,2}/g)?.join(' ') || '';
+    this.deliveryPhone = prefix + pairs;
   }
 }
