@@ -408,23 +408,13 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _loadFeatured(): void {
-    console.log('[Featured] loading…');
     this.productService.getFeaturedProducts(6).subscribe({
       next: (r) => {
-        console.log('[Featured] response', r);
-        if (r.success) {
-          this.featuredProducts = r.data as ProductResponse[];
-          console.log('[Featured] products', this.featuredProducts);
-        }
-        this.featuredLoading = false;
-        this.cdr.detectChanges();
-        console.log('[Featured] loading=false, hasFeatured=', !this.featuredLoading && this.featuredProducts.length > 0);
-      },
-      error: (err) => {
-        console.error('[Featured] error', err);
+        if (r.success) this.featuredProducts = r.data as ProductResponse[];
         this.featuredLoading = false;
         this.cdr.detectChanges();
       },
+      error: () => { this.featuredLoading = false; this.cdr.detectChanges(); },
     });
   }
 
