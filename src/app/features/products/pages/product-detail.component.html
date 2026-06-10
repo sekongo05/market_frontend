@@ -465,6 +465,7 @@
                 }
 
                 <!-- CTA -->
+                @if (isLoggedIn) {
                 <button (click)="addToCart()"
                   [disabled]="hasVariants && totalSelectedQty === 0"
                   class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
@@ -489,12 +490,6 @@
                     } @else {
                       Choisissez une couleur
                     }
-                  } @else if (!isLoggedIn) {
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                    Connectez-vous pour acheter
                   } @else {
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -508,6 +503,7 @@
                     }
                   }
                 </button>
+                }
 
                 <button (click)="goBack()"
                   class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
@@ -846,7 +842,7 @@
     </div>
 
     <!-- ── Sticky CTA mobile (hidden on desktop) ── -->
-    @if (!isManager) {
+    @if (isLoggedIn && !isManager) {
       <div class="lg:hidden fixed left-0 right-0 z-[46] theme-surface border-t theme-border"
            style="bottom: calc(var(--bottom-nav-h, 60px) + env(safe-area-inset-bottom, 0px))">
         <div class="flex items-center gap-3 px-4 py-3">
@@ -877,12 +873,6 @@
                 Ajouté !
               } @else if (hasVariants && totalSelectedQty === 0) {
                 Choisissez une couleur
-              } @else if (!isLoggedIn) {
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-                Connectez-vous
               } @else {
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
