@@ -388,7 +388,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   loadUnreadCount(): void {
     this.notificationService.getUnreadCount()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(r => { if (r.success) this.unreadNotifications = r.data.count; });
+      .subscribe({
+        next: r => { if (r.success) this.unreadNotifications = r.data.count; },
+        error: (err) => { console.error('Failed to load unread count', err); },
+      });
   }
 
   // ── Checkout ────────────────────────────────────────────────────────────────
@@ -427,6 +430,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
             this.cdr.detectChanges();
           }
         },
+        error: (err) => { console.error('Failed to load pending orders count', err); },
       });
   }
 
