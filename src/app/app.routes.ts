@@ -53,7 +53,6 @@ export const APP_ROUTES: Routes = [
       { path: 'privacy', component: PrivacyComponent },
       { path: 'qualite', component: AuthenticityComponent },
       { path: 'returns', component: ReturnsComponent },
-      { path: '**', redirectTo: '' },
     ],
   },
   {
@@ -64,4 +63,5 @@ export const APP_ROUTES: Routes = [
       { path: 'forgot-password', component: ForgotPasswordComponent },
     ],
   },
+  { path: '**', redirectTo: '' },
 ];

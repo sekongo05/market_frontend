@@ -399,55 +399,64 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private _loadCategories(): void {
     this.categoryService.getCategories().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
-        if (r.success) this.categories = r.data as CategoryResponse[];
+        if (r.success) {
+          const raw = r.data;
+          this.categories = Array.isArray(raw) ? raw : [];
+        }
         this.categoriesLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => { this.categoriesLoading = false; this.cdr.detectChanges(); },
+      error: (err) => { console.error('Failed to load categories', err); this.categoriesLoading = false; this.cdr.detectChanges(); },
     });
   }
 
   private _loadFeatured(): void {
     this.productService.getFeaturedProducts(6).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
-        if (r.success) this.featuredProducts = r.data as ProductResponse[];
+        if (r.success) {
+          const raw = r.data;
+          this.featuredProducts = Array.isArray(raw) ? raw : [];
+        }
         this.featuredLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => { this.featuredLoading = false; this.cdr.detectChanges(); },
+      error: (err) => { console.error('Failed to load featured', err); this.featuredLoading = false; this.cdr.detectChanges(); },
     });
   }
 
   private _loadBestsellers(): void {
     this.productService.getBestsellers(8).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
-        if (r.success) this.bestsellers = r.data as ProductResponse[];
+        if (r.success) {
+          const raw = r.data;
+          this.bestsellers = Array.isArray(raw) ? raw : [];
+        }
         this.bestsellersLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => { this.bestsellersLoading = false; this.cdr.detectChanges(); },
+      error: (err) => { console.error('Failed to load bestsellers', err); this.bestsellersLoading = false; this.cdr.detectChanges(); },
     });
   }
 
   private _loadProducts(): void {
     this.productService.getProducts({ page: 0, size: 24, sort: 'newest' }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
-        if (r.success) {
+        if (r.success && r.data) {
           const pg = r.data as PageResponse<ProductResponse>;
-          this.newProducts      = pg.content.filter(p => this.isNew(p)).slice(0, 8);
-          this.discountProducts = pg.content.filter(p => p.discountPercent && p.discountPercent > 0).slice(0, 4);
+          this.newProducts      = (pg.content ?? []).filter(p => this.isNew(p)).slice(0, 8);
+          this.discountProducts = (pg.content ?? []).filter(p => p.discountPercent && p.discountPercent > 0).slice(0, 4);
         }
         this.newProductsLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => { this.newProductsLoading = false; this.cdr.detectChanges(); },
+      error: (err) => { console.error('Failed to load products', err); this.newProductsLoading = false; this.cdr.detectChanges(); },
     });
   }
 
   private _loadPublicStats(): void {
     this.dashboardService.getPublicStats().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
-        if (r.success) {
+        if (r.success && r.data) {
           this.publicStats   = r.data as PublicStats;
           this.statAvgRating = this.publicStats.averageRating;
           if (this._statsAnimated) {
@@ -467,7 +476,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private _loadFirstOrderPromo(): void {
     this.promoService.getActivePromos().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
-        if (r.success) {
+        if (r.success && Array.isArray(r.data)) {
           this.firstOrderPromo = r.data.find(p => p.firstOrderOnly) ?? null;
           this.cdr.detectChanges();
         }
@@ -479,11 +488,14 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private _loadReviews(): void {
     this.reviewService.getFeaturedReviews().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
-        if (r.success) this.featuredReviews = (r.data as ReviewResponse[]).slice(0, 6);
+        if (r.success) {
+          const raw = r.data;
+          this.featuredReviews = Array.isArray(raw) ? raw.slice(0, 6) : [];
+        }
         this.reviewsLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => { this.reviewsLoading = false; this.cdr.detectChanges(); },
+      error: (err) => { console.error('Failed to load reviews', err); this.reviewsLoading = false; this.cdr.detectChanges(); },
     });
   }
 
