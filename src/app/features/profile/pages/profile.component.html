@@ -260,7 +260,7 @@
     }
 
     <!-- ── Commandes récentes ─────────────────────────────────────── -->
-    @if (fullProfile?.recentOrders && fullProfile.recentOrders.length > 0) {
+    @if (recentOrders.length > 0) {
       <div class="mb-6 luxury-card rounded-3xl overflow-hidden">
         <div class="px-6 sm:px-8 pt-5 pb-4 border-b theme-border flex items-center justify-between">
           <div class="flex items-center gap-2">
@@ -272,7 +272,7 @@
           <a routerLink="/orders" class="text-[11px] font-bold text-gold hover:underline">Voir tout</a>
         </div>
         <div class="divide-y theme-border">
-          @for (order of fullProfile.recentOrders; track order.id) {
+          @for (order of recentOrders; track order.id) {
             <a [routerLink]="['/orders']" [queryParams]="{order: order.orderNumber}"
                class="flex items-center gap-3 px-6 sm:px-8 py-3.5 hover:bg-black/[.02] transition-colors group">
               <div class="flex-1 min-w-0">

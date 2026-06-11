@@ -74,6 +74,10 @@ export class ProfileComponent implements OnInit {
     this.loadUserProfile();
   }
 
+  get recentOrders() {
+    return this.fullProfile?.recentOrders ?? [];
+  }
+
   get isManager(): boolean {
     const role = this.authService.getCurrentUser()?.role;
     return role === 'MANAGER' || role === 'ADMIN';
