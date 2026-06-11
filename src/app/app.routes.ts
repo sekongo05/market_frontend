@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './shared/components/layout.component';
 import { HomeComponent } from './home.component';
-import { LoginComponent, RegisterComponent, ForgotPasswordComponent } from './features/auth/pages';
+import { LoginComponent, RegisterComponent, ForgotPasswordComponent, ResetPasswordComponent } from './features/auth/pages';
 import { ProductsComponent, ProductDetailComponent } from './features/products/pages';
 import { OrdersComponent, CheckoutComponent } from './features/orders/pages';
 import { ProfileComponent } from './features/profile/pages';
@@ -61,6 +61,7 @@ export const APP_ROUTES: Routes = [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'forgot-password', component: ForgotPasswordComponent },
+      { path: 'reset-password', component: ResetPasswordComponent },
     ],
   },
   { path: '**', redirectTo: '' },
