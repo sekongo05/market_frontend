@@ -32,6 +32,7 @@ export interface OrderResponse {
   totalAmount: number;
   orderStatus: OrderStatus;
   deliveryStatus: DeliveryStatus;
+  deliveryZone: DeliveryZone | null;
   deliveryAddress: string;
   trackingNumber: string | null;
   customerName: string | null;
