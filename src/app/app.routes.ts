@@ -14,8 +14,6 @@ import { ReturnsComponent } from './features/returns/returns.component';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { UserRole } from './core/models/common.models';
-import { NotFoundComponent } from './features/not-found/not-found.component';
-
 export const APP_ROUTES: Routes = [
   {
     path: '',
@@ -55,8 +53,8 @@ export const APP_ROUTES: Routes = [
       { path: 'privacy', component: PrivacyComponent },
       { path: 'qualite', component: AuthenticityComponent },
       { path: 'returns', component: ReturnsComponent },
-/*       { path: '**', component: NotFoundComponent },
- */    ],
+      { path: '**', redirectTo: '' },
+    ],
   },
   {
     path: 'auth',

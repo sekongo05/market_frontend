@@ -3,6 +3,8 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } fro
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { filter, takeUntil, take } from 'rxjs/operators';
+import { OrderService } from '../../../core/services/order.service';
+import { PageResponse } from '../../../core/models/common.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { AdminToastService } from '../shared/admin-toast.service';
@@ -67,6 +69,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private wsService: WebSocketService,
+    private orderService: OrderService,
     public toastService: AdminToastService,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -74,6 +77,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this._loadPendingOrdersCount();
+
     this.authService.currentUser$.pipe(
       filter(user => user === null),
       takeUntil(this.destroy$)
@@ -104,6 +109,19 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       this.moreSheetOpen = false;
       this.cdr.markForCheck();
     });
+  }
+
+  private _loadPendingOrdersCount(): void {
+    this.orderService.getAllOrders({ page: 0, size: 1, status: 'PENDING' as any })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (r) => {
+          if (r.success) {
+            this.pendingOrdersCount = (r.data as PageResponse<any>).totalElements;
+            this.cdr.markForCheck();
+          }
+        },
+      });
   }
 
   ngOnDestroy(): void {

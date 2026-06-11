@@ -1,7 +1,10 @@
-import { Component, OnInit, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { SupplierService } from '../../../../core/services/supplier.service';
+import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import { SupplierResponse, SupplierRequest } from '../../../../core/models/supplier.models';
 
@@ -12,7 +15,8 @@ import { SupplierResponse, SupplierRequest } from '../../../../core/models/suppl
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-suppliers.component.html',
 })
-export class AdminSuppliersComponent implements OnInit {
+export class AdminSuppliersComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
   suppliers = signal<SupplierResponse[]>([]);
   loading = signal(true);
   drawerOpen = false;
@@ -25,12 +29,18 @@ export class AdminSuppliersComponent implements OnInit {
 
   constructor(
     private supplierService: SupplierService,
+    private wsService: WebSocketService,
     private toast: AdminToastService,
     private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     this.load();
+    this.wsService.staffEvent$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        if (event.module === 'suppliers') this.load();
+      });
   }
 
   openCreate(): void {
@@ -127,6 +137,11 @@ export class AdminSuppliersComponent implements OnInit {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private emptyForm(): SupplierRequest {

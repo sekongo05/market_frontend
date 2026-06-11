@@ -10,6 +10,7 @@ import { ManagerToastService } from '../../shared/manager-toast.service';
 import { OrderResponse } from '../../../../core/models/order.models';
 import { DeliveryResponse, AddDeliveryEventRequest, UpdateDeliveryRequest } from '../../../../core/models/delivery.models';
 import { PageResponse, DeliveryStatus } from '../../../../core/models/common.models';
+import { orderStatusLabel, orderStatusClass, deliveryStatusLabel, deliveryStatusClass } from '../../../admin/shared/admin-status.helpers';
 
 @Component({
   selector: 'app-manager-delivery',
@@ -147,36 +148,10 @@ export class ManagerDeliveryComponent implements OnInit, OnDestroy {
     });
   }
 
-  deliveryStatusLabel(s: string): string {
-    const m: Record<string, string> = { PREPARING: 'En préparation', OUT_FOR_DELIVERY: 'En livraison', DELIVERED: 'Livré', FAILED: 'Échec' };
-    return m[s] ?? s;
-  }
-
-  deliveryStatusClass(s: string): string {
-    const m: Record<string, string> = {
-      PREPARING:        'bg-blue-500/15   text-blue-400   border border-blue-500/25',
-      OUT_FOR_DELIVERY: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-      DELIVERED:        'bg-green-500/15  text-green-400  border border-green-500/25',
-      FAILED:           'bg-red-500/15    text-red-400    border border-red-500/25',
-    };
-    return m[s] ?? 'bg-black/[.06] theme-muted border border-black/[.10]';
-  }
-
-  orderStatusLabel(s: string): string {
-    const m: Record<string, string> = { PENDING: 'En attente', CONFIRMED: 'Confirmée', SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée' };
-    return m[s] ?? s;
-  }
-
-  orderStatusClass(s: string): string {
-    const m: Record<string, string> = {
-      PENDING:   'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-      CONFIRMED: 'bg-blue-500/15   text-blue-400   border border-blue-500/25',
-      SHIPPED:   'bg-orange-500/15 text-orange-400 border border-orange-500/25',
-      DELIVERED: 'bg-green-500/15  text-green-400  border border-green-500/25',
-      CANCELLED: 'bg-red-500/15    text-red-400    border border-red-500/25',
-    };
-    return m[s] ?? 'bg-black/[.06] theme-muted border border-black/[.10]';
-  }
+  readonly deliveryStatusLabel = deliveryStatusLabel;
+  readonly deliveryStatusClass = deliveryStatusClass;
+  readonly orderStatusLabel = orderStatusLabel;
+  readonly orderStatusClass = orderStatusClass;
 
   formatCurrency(amount: number): string {
     if (amount >= 1_000_000) return (amount / 1_000_000).toFixed(1) + 'M';

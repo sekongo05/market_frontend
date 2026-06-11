@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OrderService } from '../../../../core/services/order.service';
 import { DeliveryService } from '../../../../core/services/delivery.service';
@@ -42,8 +41,6 @@ export class AdminDeliveryComponent implements OnInit, OnDestroy {
   searchQuery = '';
   filterOrderStatus: '' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' = '';
 
-  private readonly search$ = new Subject<string>();
-
   readonly deliveryStatuses = Object.values(DeliveryStatus);
   readonly orderStatusLabel    = orderStatusLabel;
   readonly orderStatusClass    = orderStatusClass;
@@ -63,8 +60,6 @@ export class AdminDeliveryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadDeliveryOrders();
-    this.search$.pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => this.cdr.markForCheck());
     this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe(e => {
       if (e.module === 'deliveries') this.loadDeliveryOrders();
     });
@@ -90,7 +85,7 @@ export class AdminDeliveryComponent implements OnInit, OnDestroy {
     return !!this.searchQuery || !!this.filterOrderStatus;
   }
 
-  onSearchChange(): void { this.search$.next(this.searchQuery); }
+  onSearchChange(): void { this.cdr.markForCheck(); }
 
   applyFilter(): void { this.cdr.markForCheck(); }
 

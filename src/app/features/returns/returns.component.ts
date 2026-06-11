@@ -1,8 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ReturnService } from '../../core/services/return.service';
 import { AuthService } from '../../core/services/auth.service';
+import { WebSocketService } from '../../core/services/websocket.service';
 import { ReturnResponse, ReturnStatus } from '../../core/models/return.models';
 import { PageResponse } from '../../core/models/common.models';
 
@@ -13,16 +16,19 @@ import { PageResponse } from '../../core/models/common.models';
   imports: [CommonModule, RouterLink],
   templateUrl: './returns.component.html',
 })
-export class ReturnsComponent implements OnInit {
+export class ReturnsComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   myReturns: ReturnResponse[] = [];
   returnsLoading = false;
   returnsPage = 0;
   returnsTotalPages = 0;
 
+  private readonly destroy$ = new Subject<void>();
+
   constructor(
     private returnService: ReturnService,
     private authService: AuthService,
+    private wsService: WebSocketService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -30,7 +36,15 @@ export class ReturnsComponent implements OnInit {
     this.isAuthenticated = this.authService.isAuthenticated();
     if (this.isAuthenticated) {
       this.loadMyReturns(0);
+      this.wsService.notification$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => this.loadMyReturns(0));
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadMyReturns(page: number): void {

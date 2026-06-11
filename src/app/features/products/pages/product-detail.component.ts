@@ -602,7 +602,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           this.cdr.detectChanges();
         }
       },
-      error: () => {}
+      error: (err) => { console.error('Failed to load rating', err); }
     });
   }
 
@@ -637,7 +637,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     if (!this.myReview) return;
     this.reviewService.deleteReview(this.myReview.id).subscribe({
       next: () => { this.myReview = null; this.editingReview = false; this._loadReviews(); this._loadRating(); },
-      error: () => {}
+      error: (err) => { console.error('Failed to delete review', err); }
     });
   }
 

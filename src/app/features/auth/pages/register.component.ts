@@ -66,7 +66,7 @@ export class RegisterComponent implements OnInit {
       next: (r) => {
         if (r.success) this.firstOrderPromo = r.data.find(p => p.firstOrderOnly) ?? null;
       },
-      error: () => {},
+      error: (err) => { console.error('Failed to load promos', err); },
     });
     this.registerForm = this.formBuilder.group({
       nom: ['', Validators.required],

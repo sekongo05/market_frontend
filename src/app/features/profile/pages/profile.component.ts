@@ -154,7 +154,7 @@ export class ProfileComponent implements OnInit {
           this.cdr.detectChanges();
         }
       },
-      error: () => {},
+      error: (err) => { console.error('Failed to load profile', err); },
     });
   }
 

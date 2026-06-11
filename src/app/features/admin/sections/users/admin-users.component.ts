@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil, tap } from 'rxjs';
+import { SEARCH_DEBOUNCE } from '../../../../core/constants';
 import { UserService } from '../../../../core/services/user.service';
 import { UserResponse, AdminCreateUserRequest, UserFullProfileResponse } from '../../../../core/models/user.models';
 import { PageResponse, UserRole } from '../../../../core/models/common.models';
@@ -69,8 +70,9 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     this.loadUsers(0);
 
     this.search$.pipe(
-      debounceTime(350),
+      debounceTime(SEARCH_DEBOUNCE),
       distinctUntilChanged(),
+      tap(query => this.searchQuery = query),
       takeUntil(this.destroy$),
     ).subscribe(() => this.loadUsers(0));
 

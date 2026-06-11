@@ -83,15 +83,15 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
     });
     this.dashboardService.getMonthlyRevenue(this.selectedYear).subscribe({
       next: (r) => { if (r.success) this.monthlyRevenue = r.data; this.cdr.markForCheck(); },
-      error: () => {},
+      error: (err) => { console.error('Failed to load monthly revenue', err); },
     });
     this.dashboardService.getTopProducts(6).subscribe({
       next: (r) => { if (r.success) this.topProducts = r.data; this.cdr.markForCheck(); },
-      error: () => {},
+      error: (err) => { console.error('Failed to load monthly revenue', err); },
     });
     this.dashboardService.getWeeklyActivity().subscribe({
       next: (r) => { if (r.success) this.weeklyActivity = r.data; this.cdr.markForCheck(); },
-      error: () => {},
+      error: (err) => { console.error('Failed to load monthly revenue', err); },
     });
   }
 
@@ -99,7 +99,7 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
     this.selectedYear += delta;
     this.dashboardService.getMonthlyRevenue(this.selectedYear).subscribe({
       next: (r) => { if (r.success) this.monthlyRevenue = r.data; this.cdr.markForCheck(); },
-      error: () => {},
+      error: (err) => { console.error('Failed to load monthly revenue', err); },
     });
   }
 

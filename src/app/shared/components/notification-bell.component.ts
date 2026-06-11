@@ -171,7 +171,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     if (!n.read) {
       n.read = true;
       this.unreadCount = Math.max(0, this.unreadCount - 1);
-      this.notificationService.markAsRead(n.id).subscribe();
+      this.notificationService.markAsRead(n.id).subscribe({ error: (err) => console.error('markAsRead failed', err) });
     }
     const link = this.getLink(n);
     if (link) {
@@ -223,7 +223,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     this.notifications.forEach(n => (n.read = true));
     this.unreadCount = 0;
     this.cdr.markForCheck();
-    this.notificationService.markAllAsRead().subscribe();
+    this.notificationService.markAllAsRead().subscribe({ error: (err) => console.error('markAllAsRead failed', err) });
   }
 
   tpl(n: NotificationResponse) {

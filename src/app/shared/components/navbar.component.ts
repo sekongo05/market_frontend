@@ -17,7 +17,9 @@ import { CartService, CartItem } from '../../core/services/cart.service';
 import { PromoService } from '../../core/services/promo.service';
 import { ToastService } from '../../core/services/toast.service';
 import { WebSocketService } from '../../core/services/websocket.service';
+import { OrderService } from '../../core/services/order.service';
 import { PublicPromoResponse } from '../../core/models/promo.models';
+import { PageResponse } from '../../core/models/common.models';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SdmLogoComponent } from './logo.component';
@@ -48,7 +50,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   selectedNotification: NotificationResponse | null = null;
 
   activePromos: PublicPromoResponse[] = [];
-  promosLoaded = false;
 
   reviewRequestBanner: { subject: string; products: { slug: string; name: string }[] } | null = null;
   private reviewDismissTimer?: ReturnType<typeof setTimeout>;
@@ -75,7 +76,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     readonly cartService: CartService,
     private cdr: ChangeDetectorRef,
     private scrollLock: ScrollLockService,
-    private webSocketService: WebSocketService
+    private webSocketService: WebSocketService,
+    private orderService: OrderService,
   ) {}
 
   getTemplate(type: NotificationType): NotifTemplate {
@@ -130,7 +132,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(user => { this.currentUser = user; this.cdr.detectChanges(); });
+      .subscribe(user => {
+        this.currentUser = user;
+        if (user) {
+          this.loadUnreadCount();
+          if (user.role === 'ADMIN' || user.role === 'MANAGER') {
+            this._loadPendingOrdersCount();
+          }
+        }
+        this.cdr.detectChanges();
+      });
 
     this.cartService.cart$
       .pipe(takeUntil(this.destroy$))
@@ -139,8 +150,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.cartService.lastAdded$
       .pipe(takeUntil(this.destroy$))
       .subscribe(item => this._showCartToast(item));
-
-    if (this.currentUser) this.loadUnreadCount();
 
     this.webSocketService.notification$
       .pipe(takeUntil(this.destroy$))
@@ -191,7 +200,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showNotifications = false;
     this.mobileOpen = false;
     if (this.showCart) { this.scrollLock.lock(); } else { this.scrollLock.forceUnlock(); }
-    if (this.showCart && !this.promosLoaded) this._loadActivePromos();
+    if (this.showCart) this._loadActivePromos();
     if (this.showCart) setTimeout(() => document.getElementById('cart-drawer-body')?.scrollTo(0, 0), 0);
   }
   toggleUserMenu():void { this.showUserMenu = !this.showUserMenu; this.showCart = false; this.showNotifications = false; }
@@ -401,10 +410,23 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (r) => {
-          if (r.success) { this.activePromos = r.data; this.promosLoaded = true; }
+          if (r.success) { this.activePromos = r.data; }
           this.cdr.detectChanges();
         },
-        error: () => {},
+        error: (err) => { console.error('Failed to load promos', err); },
+      });
+  }
+
+  private _loadPendingOrdersCount(): void {
+    this.orderService.getAllOrders({ page: 0, size: 1, status: 'PENDING' as any })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (r) => {
+          if (r.success) {
+            this.pendingOrdersCount = (r.data as PageResponse<any>).totalElements;
+            this.cdr.detectChanges();
+          }
+        },
       });
   }
 

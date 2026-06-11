@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, tap } from 'rxjs/operators';
+import { SEARCH_DEBOUNCE } from '../../../../core/constants';
 import { ReturnService } from '../../../../core/services/return.service';
 import { ReturnResponse, ReturnDecisionRequest, ReturnStatus } from '../../../../core/models/return.models';
 import { PageResponse } from '../../../../core/models/common.models';
@@ -55,8 +56,12 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadReturns(0);
     this.loadPendingCount();
-    this.search$.pipe(debounceTime(350), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => this.loadReturns(0));
+    this.search$.pipe(
+      debounceTime(SEARCH_DEBOUNCE),
+      distinctUntilChanged(),
+      tap(query => this.searchQuery = query),
+      takeUntil(this.destroy$),
+    ).subscribe(() => this.loadReturns(0));
     this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe(e => {
       if (e.module === 'returns') { this.loadReturns(0); this.loadPendingCount(); }
     });
@@ -116,7 +121,7 @@ export class AdminReturnsComponent implements OnInit, OnDestroy {
         if (r.success) this.pendingCount = (r.data as PageResponse<ReturnResponse>).totalElements;
         this.cdr.markForCheck();
       },
-      error: () => {},
+      error: (err) => { console.error('Failed to load pending return count', err); },
     });
   }
 

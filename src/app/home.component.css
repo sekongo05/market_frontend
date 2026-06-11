@@ -70,11 +70,6 @@
   50%      { opacity: 0.5; }
 }
 
-@keyframes arrow-hint {
-  0%, 100% { transform: translateX(0); opacity: 0.4; }
-  50%      { transform: translateX(4px); opacity: 0.8; }
-}
-
 @keyframes dot-label-in {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0);   }
@@ -542,22 +537,6 @@
    QUOTE — effet 3D flip en entrée
 ═══════════════════════════════════════════════════════════════════ */
 
-@keyframes quote-flip {
-  from { opacity: 0; transform: rotateX(-25deg) translateY(20px); }
-  to   { opacity: 1; transform: rotateX(0deg)   translateY(0); }
-}
-
-.scroll-reveal:not(.in-view) .r-flip {
-  opacity: 0 !important;
-  transform: rotateX(-25deg) translateY(20px) !important;
-  transform-style: preserve-3d;
-}
-
-.scroll-reveal.in-view .r-flip {
-  opacity: 1; transform: none;
-  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
 /* ═══════════════════════════════════════════════════════════════════
    STATS — glow pulsant sur les chiffres
 ═══════════════════════════════════════════════════════════════════ */
@@ -632,16 +611,6 @@
   flex-shrink: 0;
 }
 
-/* Fond clair (#f8f5f0) → fond sombre bleu-noir (#07050f) */
-.sdm-sep--to-dark {
-  background: linear-gradient(to bottom, #f8f5f0, #07050f);
-}
-
-/* Fond sombre bleu-noir (#07050f) → fond clair (#f8f5f0) */
-.sdm-sep--from-dark {
-  background: linear-gradient(to bottom, #07050f, #f8f5f0);
-}
-
 /* Fond clair → ventes flash brun-noir (#0e0500) */
 .sdm-sep--to-dark-warm {
   background: linear-gradient(to bottom, #f8f5f0, #0e0500);
@@ -650,30 +619,6 @@
 /* Section éditoriale (#060606) → fond clair */
 .sdm-sep--from-editorial {
   background: linear-gradient(to bottom, #060606 0%, rgba(6,6,6,0.85) 30%, rgba(212,175,55,0.04) 55%, #f8f5f0 100%);
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   SKELETON SOMBRE — variante pour sections à fond noir
-═══════════════════════════════════════════════════════════════════ */
-.skeleton-dark {
-  position: relative;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.07);
-  border-radius: 0;
-}
-.skeleton-dark::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(212, 175, 55, 0.10) 50%,
-    transparent 100%
-  );
-  transform: translateX(-100%);
-  animation: shimmer 2.2s ease-in-out infinite;
-  will-change: transform;
 }
 
 /* ─── Décorations CTA ─── */

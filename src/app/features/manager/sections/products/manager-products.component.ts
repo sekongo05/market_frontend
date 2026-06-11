@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
+import { SEARCH_DEBOUNCE } from '../../../../core/constants';
 import { MediaUrlPipe } from '../../../../shared/pipes/media-url.pipe';
 import { ProductService } from '../../../../core/services/product.service';
 import { CategoryService } from '../../../../core/services/category.service';
@@ -133,8 +134,9 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.loadProducts();
     this.loadCategories();
     this.searchSubject.pipe(
-      debounceTime(400),
+      debounceTime(SEARCH_DEBOUNCE),
       distinctUntilChanged(),
+      tap(query => this.searchQuery = query),
       takeUntil(this.destroy$)
     ).subscribe(() => this.loadProducts(0));
 
@@ -209,8 +211,8 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSearchChange(value: string): void { this.searchQuery = value; this.searchSubject.next(value); }
-  clearSearch(): void { this.searchQuery = ''; this.searchSubject.next(''); }
+  onSearchChange(value: string): void { this.searchSubject.next(value); }
+  clearSearch(): void { this.searchSubject.next(''); }
   search(): void { this.loadProducts(0); }
   previousPage(): void { if (this.currentPage > 0) this.loadProducts(this.currentPage - 1); }
   nextPage(): void { if (this.currentPage < this.totalPages - 1) this.loadProducts(this.currentPage + 1); }
@@ -643,7 +645,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
             colorName: color.colorName.trim(), colorHex: color.colorHex, imageUrl: r.data.url, stock: color.stock || 0,
           }).subscribe({
             next: (vr: any) => { if (vr.success) this.productVariants = [...this.productVariants, vr.data]; this.cdr.markForCheck(); },
-            error: () => {},
+            error: (err) => { console.error('Failed to add variant', err); },
           });
           this.toast.show('Photo & couleur ajoutées ✓');
         }

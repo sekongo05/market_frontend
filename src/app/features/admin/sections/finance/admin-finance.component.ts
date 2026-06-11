@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { interval, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FinanceService, FinanceDashboardResponse, StockValueResponse } from '../../../../core/services/finance.service';
 import { ProductService } from '../../../../core/services/product.service';
 import { ProductResponse } from '../../../../core/models/product.models';
@@ -16,6 +18,7 @@ import { PinSetupComponent } from './pin-setup.component';
   templateUrl: './admin-finance.component.html',
 })
 export class AdminFinanceComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
   view = signal<'loading' | 'setup' | 'pin' | 'dashboard'>('loading');
   activeTab = signal<'report' | 'margins' | 'stock' | 'cashflow'>('report');
 
@@ -50,7 +53,8 @@ export class AdminFinanceComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnDestroy(): void {
-    // Verrouille automatiquement dès qu'on quitte la page
+    this.destroy$.next();
+    this.destroy$.complete();
     this.financeService.clearFinanceSession();
   }
 
@@ -60,6 +64,7 @@ export class AdminFinanceComponent implements OnInit, OnDestroy {
       this.loadDashboard();
       this.loadProducts();
       this.loadStockValue();
+      this._startPolling();
     } else {
       this.financeService.getPinStatus().subscribe({
         next: (res) => {
@@ -77,7 +82,16 @@ export class AdminFinanceComponent implements OnInit, OnDestroy {
     this.loadProducts();
     this.loadStockValue();
     this.loadCashFlow();
+    this._startPolling();
     this.cdr.markForCheck();
+  }
+
+  private _startPolling(): void {
+    interval(60000).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.loadDashboard();
+      this.loadStockValue();
+      this.loadCashFlow();
+    });
   }
 
   onSetupDone(): void {

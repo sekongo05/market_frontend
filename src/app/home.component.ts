@@ -397,7 +397,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _loadCategories(): void {
-    this.categoryService.getCategories().subscribe({
+    this.categoryService.getCategories().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) this.categories = r.data as CategoryResponse[];
         this.categoriesLoading = false;
@@ -408,7 +408,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _loadFeatured(): void {
-    this.productService.getFeaturedProducts(6).subscribe({
+    this.productService.getFeaturedProducts(6).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) this.featuredProducts = r.data as ProductResponse[];
         this.featuredLoading = false;
@@ -419,7 +419,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _loadBestsellers(): void {
-    this.productService.getBestsellers(8).subscribe({
+    this.productService.getBestsellers(8).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) this.bestsellers = r.data as ProductResponse[];
         this.bestsellersLoading = false;
@@ -430,7 +430,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _loadProducts(): void {
-    this.productService.getProducts({ page: 0, size: 24, sort: 'newest' }).subscribe({
+    this.productService.getProducts({ page: 0, size: 24, sort: 'newest' }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) {
           const pg = r.data as PageResponse<ProductResponse>;
@@ -445,7 +445,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _loadPublicStats(): void {
-    this.dashboardService.getPublicStats().subscribe({
+    this.dashboardService.getPublicStats().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) {
           this.publicStats   = r.data as PublicStats;
@@ -465,7 +465,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _loadFirstOrderPromo(): void {
-    this.promoService.getActivePromos().subscribe({
+    this.promoService.getActivePromos().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) {
           this.firstOrderPromo = r.data.find(p => p.firstOrderOnly) ?? null;
@@ -477,7 +477,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _loadReviews(): void {
-    this.reviewService.getFeaturedReviews().subscribe({
+    this.reviewService.getFeaturedReviews().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) this.featuredReviews = (r.data as ReviewResponse[]).slice(0, 6);
         this.reviewsLoading = false;
@@ -495,6 +495,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       this._loadProducts();
       this._loadFeatured();
       this._loadBestsellers();
+      this._loadCategories();
+      this._loadPublicStats();
+      this._loadReviews();
+      this._loadFirstOrderPromo();
     });
   }
 

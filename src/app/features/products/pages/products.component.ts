@@ -3,7 +3,8 @@ import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subject, interval, fromEvent, merge } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
+import { SEARCH_DEBOUNCE, PRICE_DEBOUNCE } from '../../../core/constants';
 import { ProductService } from '../../../core/services/product.service';
 import { ProductVariantService } from '../../../core/services/product-variant.service';
 import { CategoryService } from '../../../core/services/category.service';
@@ -92,7 +93,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   private _debouncedApply(): void {
     clearTimeout(this.priceDebounceTimer);
-    this.priceDebounceTimer = setTimeout(() => this.loadProducts(0), 400);
+    this.priceDebounceTimer = setTimeout(() => this.loadProducts(0), PRICE_DEBOUNCE);
   }
 
   // Temporary feedback after "add" action (quick-view panel)
@@ -207,7 +208,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
               this.cdr.detectChanges();
             }
           },
-          error: () => {},
+          error: (err) => { console.error('Failed to load variants', err); },
         });
     }
   }
@@ -310,8 +311,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }
     this.loadCategories();
     this.searchSubject.pipe(
-      debounceTime(400),
+      debounceTime(SEARCH_DEBOUNCE),
       distinctUntilChanged(),
+      tap(query => this.searchQuery = query),
       takeUntil(this.destroy$)
     ).subscribe(() => this.loadProducts(0));
 
@@ -356,6 +358,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         fromEvent(window, 'focus'),
       ).pipe(takeUntil(this.destroy$)).subscribe(() => {
         this.loadProducts(this.currentPage);
+        this.loadCategories();
       });
     }
   }
@@ -373,6 +376,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.scrollLock.forceUnlock();
     clearTimeout(this.toastTimer);
+    clearTimeout(this.priceDebounceTimer);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -389,7 +393,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
       },
-      error: () => {},
+      error: (err) => { console.error('Failed to load my orders for product IDs', err); },
     });
   }
 
@@ -588,7 +592,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       request$ = this.productService.createProduct(fd);
     }
 
-    request$.subscribe({
+    request$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         if (response.success) {
           this.modalSuccess = this.editingProduct
@@ -619,7 +623,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const id = this.confirmDeleteProduct.id;
     this.confirmDeleteProduct = null;
 
-    this.productService.deleteProduct(id).subscribe({
+    this.productService.deleteProduct(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         if (response.success) {
           this.loadProducts(this.currentPage);
@@ -651,7 +655,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
     if (this.inStockOnly) params.inStock = true;
     if (this.featuredOnly) params.featured = true;
 
-    this.productService.getProducts(params).subscribe({
+    this.productService.getProducts(params).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (response) => {
         if (response.success) {
           const pageResponse = response.data as PageResponse<ProductResponse>;
@@ -675,7 +681,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   private loadCategories(): void {
-    this.categoryService.getCategories().subscribe({
+    this.categoryService.getCategories().pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         if (response.success && Array.isArray(response.data)) {
           this.categories = response.data;
@@ -687,7 +693,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
             this.loadProducts(0);
           }
         } else if (this.pendingCategorySlug) {
-          // catégories indisponibles — charger sans filtre quand même
           this.pendingCategorySlug = null;
           this.loadProducts(0);
         }
@@ -704,12 +709,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   onSearchChange(value: string): void {
-    this.searchQuery = value;
     this.searchSubject.next(value);
   }
 
   clearSearch(): void {
-    this.searchQuery = '';
     this.searchSubject.next('');
   }
 

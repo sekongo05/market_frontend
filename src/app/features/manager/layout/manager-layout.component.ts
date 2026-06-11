@@ -3,6 +3,8 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/rou
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
+import { OrderService } from '../../../core/services/order.service';
+import { PageResponse } from '../../../core/models/common.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { ManagerToastService } from '../shared/manager-toast.service';
@@ -29,6 +31,7 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private wsService: WebSocketService,
+    private orderService: OrderService,
     public toastService: ManagerToastService,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -37,6 +40,8 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
   get currentUser() { return this.authService.getCurrentUser(); }
 
   ngOnInit(): void {
+    this._loadPendingOrdersCount();
+
     this.authService.currentUser$.pipe(
       filter(user => user === null),
       takeUntil(this.destroy$)
@@ -47,6 +52,19 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
       .subscribe(event => {
         this.pendingOrdersCount = event.pendingCount;
         this.cdr.markForCheck();
+      });
+  }
+
+  private _loadPendingOrdersCount(): void {
+    this.orderService.getAllOrders({ page: 0, size: 1, status: 'PENDING' as any })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (r) => {
+          if (r.success) {
+            this.pendingOrdersCount = (r.data as PageResponse<any>).totalElements;
+            this.cdr.markForCheck();
+          }
+        },
       });
   }
 

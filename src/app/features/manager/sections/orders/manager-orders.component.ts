@@ -10,6 +10,7 @@ import { ScrollLockService } from '../../../../core/services/scroll-lock.service
 import { ManagerToastService } from '../../shared/manager-toast.service';
 import { OrderResponse } from '../../../../core/models/order.models';
 import { PageResponse, OrderStatus } from '../../../../core/models/common.models';
+import { orderStatusLabel, orderStatusClass } from '../../../admin/shared/admin-status.helpers';
 
 interface OrderVariantLine {
   color: string | null | undefined;
@@ -187,21 +188,8 @@ export class ManagerOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
-  orderStatusLabel(s: string): string {
-    const m: Record<string, string> = { PENDING: 'En attente', CONFIRMED: 'Confirmée', SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée' };
-    return m[s] ?? s;
-  }
-
-  orderStatusClass(s: string): string {
-    const m: Record<string, string> = {
-      PENDING:   'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-      CONFIRMED: 'bg-blue-500/15   text-blue-400   border border-blue-500/25',
-      SHIPPED:   'bg-orange-500/15 text-orange-400 border border-orange-500/25',
-      DELIVERED: 'bg-green-500/15  text-green-400  border border-green-500/25',
-      CANCELLED: 'bg-red-500/15    text-red-400    border border-red-500/25',
-    };
-    return m[s] ?? 'bg-black/[.06] theme-muted border border-black/[.10]';
-  }
+  readonly orderStatusLabel = orderStatusLabel;
+  readonly orderStatusClass = orderStatusClass;
 
   nextStatusLabel(s: string): string {
     const next = this.nextStatusMap[s];

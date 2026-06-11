@@ -55,7 +55,7 @@ export class AdminReviewsComponent implements OnInit, OnDestroy {
     this.reviewService.getAllReviews(page, 20, this.ratingFilter, this.visibilityFilter).subscribe({
       next: (r) => {
         if (r.success) {
-          const pg = r.data as any as PageResponse<ReviewResponse>;
+          const pg = r.data;
           this.reviews = pg.content;
           this.reviewsTotalPages = pg.totalPages;
           this.reviewsTotalElements = pg.totalElements;

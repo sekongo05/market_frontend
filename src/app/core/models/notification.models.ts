@@ -45,6 +45,6 @@ export interface WsOrderStatusUpdate {
 }
 
 export interface WsStaffEvent {
-  module: 'products' | 'categories' | 'users' | 'deliveries' | 'returns' | 'promos' | 'reviews';
+  module: 'products' | 'categories' | 'users' | 'deliveries' | 'returns' | 'promos' | 'reviews' | 'suppliers' | 'expenses' | 'purchase-orders' | 'finance';
   action: 'created' | 'updated' | 'deleted';
 }

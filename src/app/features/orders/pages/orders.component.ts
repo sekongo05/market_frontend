@@ -11,6 +11,7 @@ import { OrderResponse } from '../../../core/models/order.models';
 import { ReturnResponse } from '../../../core/models/return.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
+import { orderStatusLabel, orderStatusClass } from '../../admin/shared/admin-status.helpers';
 
 @Component({
   selector: 'app-orders',
@@ -80,6 +81,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
       });
+    this.wsService.notification$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadMyReturns());
   }
 
   ngOnDestroy(): void {
@@ -119,7 +123,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
       },
-      error: () => {},
+      error: (err) => { console.error('Failed to load my returns', err); },
     });
   }
 
@@ -270,27 +274,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   // ── Labels & styles ───────────────────────────────────────────────────────
 
-  orderStatusLabel(s: string): string {
-    const m: Record<string, string> = {
-      PENDING:   'En attente',
-      CONFIRMED: 'Confirmée',
-      SHIPPED:   'Expédiée',
-      DELIVERED: 'Livrée',
-      CANCELLED: 'Annulée',
-    };
-    return m[s] ?? s;
-  }
-
-  orderStatusClass(s: string): string {
-    const m: Record<string, string> = {
-      PENDING:   'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-      CONFIRMED: 'bg-blue-500/15   text-blue-400   border border-blue-500/25',
-      SHIPPED:   'bg-orange-500/15 text-orange-400 border border-orange-500/25',
-      DELIVERED: 'bg-green-500/15  text-green-400  border border-green-500/25',
-      CANCELLED: 'bg-red-500/15    text-red-400    border border-red-500/25',
-    };
-    return m[s] ?? 'bg-black/[.06] theme-muted border border-black/[.10]';
-  }
+  readonly orderStatusLabel = orderStatusLabel;
+  readonly orderStatusClass = orderStatusClass;
 
   deliveryLabel(s: string): string {
     const m: Record<string, string> = {

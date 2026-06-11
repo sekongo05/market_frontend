@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, tap } from 'rxjs/operators';
+import { SEARCH_DEBOUNCE } from '../../../../core/constants';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '../../../../core/services/order.service';
 import { OrderResponse, GetOrdersParams } from '../../../../core/models/order.models';
@@ -94,8 +95,9 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     }
 
     this.search$.pipe(
-      debounceTime(350),
+      debounceTime(SEARCH_DEBOUNCE),
       distinctUntilChanged(),
+      tap(query => this.searchQuery = query),
       takeUntil(this.destroy$),
     ).subscribe(() => this.loadAllOrders(0));
 
@@ -225,7 +227,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
         if (r.success) this.pendingCount = (r.data as PageResponse<OrderResponse>).totalElements;
         this.cdr.markForCheck();
       },
-      error: () => {},
+      error: (err) => { console.error('Failed to load pending count', err); },
     });
   }
 
@@ -241,7 +243,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
           if (status === OrderStatus.DELIVERED) this.deliveredCount = count;
           this.cdr.markForCheck();
         },
-        error: () => {},
+        error: (err) => { console.error('Failed to load status counts', err); },
       });
     });
   }

@@ -1,9 +1,12 @@
 import {
-  Component, OnInit, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef,
+  Component, OnInit, OnDestroy, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ExpenseService } from '../../../../core/services/expense.service';
+import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import {
   ExpenseResponse, ExpenseRequest, ExpenseCategory, PaymentMethod, ExpenseCategoryStat,
@@ -16,7 +19,8 @@ import {
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-expenses.component.html',
 })
-export class AdminExpensesComponent implements OnInit {
+export class AdminExpensesComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
 
   expenses = signal<ExpenseResponse[]>([]);
   loading  = signal(true);
@@ -73,11 +77,19 @@ export class AdminExpensesComponent implements OnInit {
 
   constructor(
     private expenseService: ExpenseService,
+    private wsService: WebSocketService,
     private toast: AdminToastService,
     private cdr: ChangeDetectorRef,
   ) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+    this.wsService.staffEvent$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        if (event.module === 'expenses') this.load();
+      });
+  }
 
   load(): void {
     this.loading.set(true);
@@ -195,6 +207,11 @@ export class AdminExpensesComponent implements OnInit {
 
   formatAmount(v: number): string {
     return v.toLocaleString('fr-FR') + ' F';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private emptyForm(): ExpenseRequest {

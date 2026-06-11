@@ -1,11 +1,14 @@
 import {
-  Component, OnInit, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef,
+  Component, OnInit, OnDestroy, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { PurchaseOrderService } from '../../../../core/services/purchase-order.service';
 import { SupplierService } from '../../../../core/services/supplier.service';
 import { ProductService } from '../../../../core/services/product.service';
+import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import {
   PurchaseOrderResponse,
@@ -38,7 +41,8 @@ interface ReceiveLine {
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-purchase-orders.component.html',
 })
-export class AdminPurchaseOrdersComponent implements OnInit {
+export class AdminPurchaseOrdersComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
 
   // ── Liste ─────────────────────────────────────────────────────────
   orders = signal<PurchaseOrderResponse[]>([]);
@@ -93,6 +97,7 @@ export class AdminPurchaseOrdersComponent implements OnInit {
     private poService: PurchaseOrderService,
     private supplierService: SupplierService,
     private productService: ProductService,
+    private wsService: WebSocketService,
     private toast: AdminToastService,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -107,6 +112,16 @@ export class AdminPurchaseOrdersComponent implements OnInit {
       this.products.set(res.data?.content ?? []);
       this.cdr.markForCheck();
     });
+    this.wsService.staffEvent$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        if (event.module === 'purchase-orders') this.load();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // ── Chargement ────────────────────────────────────────────────────

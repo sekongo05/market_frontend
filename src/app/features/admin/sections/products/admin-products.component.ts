@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
+import { SEARCH_DEBOUNCE } from '../../../../core/constants';
 import { ProductService } from '../../../../core/services/product.service';
 import { ProductMediaService } from '../../../../core/services/product-media.service';
 import { ProductVariantService, ProductVariantRequest } from '../../../../core/services/product-variant.service';
@@ -145,10 +146,15 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.loadProducts(0);
     this.initProductForm();
     this.loadProductCategories();
-    this.searchSubject.pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => this.loadProducts(0));
+    this.searchSubject.pipe(
+      debounceTime(SEARCH_DEBOUNCE),
+      distinctUntilChanged(),
+      tap(query => this.productSearchQuery = query),
+      takeUntil(this.destroy$),
+    ).subscribe(() => this.loadProducts(0));
     this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe(e => {
       if (e.module === 'products') this.loadProducts(this.productsPage);
+      if (e.module === 'suppliers') { this.allSuppliers = []; this._lastSuppliersFetch = 0; }
     });
   }
 
@@ -245,7 +251,6 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
 
   onProductSearchChange(value: string): void {
-    this.productSearchQuery = value;
     this.searchSubject.next(value);
   }
 
@@ -333,7 +338,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   loadProductCategories(): void {
     this.categoryService.getCategories().subscribe({
       next: (r) => { if (r.success) this.productCategories = r.data; this.cdr.markForCheck(); },
-      error: () => {},
+      error: (err) => { console.error('Failed to load categories', err); },
     });
   }
 
@@ -638,7 +643,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
               colorName: color.colorName.trim(), colorHex: color.colorHex, imageUrl: r.data.url, stock: color.stock || 0,
             }).subscribe({
               next: (vr: any) => { if (vr.success) this.productVariants = [...this.productVariants, vr.data]; this.cdr.markForCheck(); },
-              error: () => {},
+              error: (err) => { console.error('Failed to add variant', err); },
             });
             this.toast.show('Photo & couleur ajoutées ✓');
           } else {
@@ -884,15 +889,18 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   loadProductSuppliers(productId: number): void {
     this.supplierService.getSuppliersForProduct(productId).subscribe({
       next: (r) => { if (r.success) { this.productSuppliers = r.data ?? []; this.cdr.markForCheck(); } },
-      error: () => {},
+      error: (err) => { console.error('Failed to load product suppliers', err); },
     });
   }
 
+  private _lastSuppliersFetch = 0;
   loadAllSuppliers(): void {
-    if (this.allSuppliers.length) return;
+    const now = Date.now();
+    if (this.allSuppliers.length && now - this._lastSuppliersFetch < 300_000) return;
+    this._lastSuppliersFetch = now;
     this.supplierService.getAll().subscribe({
       next: (r) => { if (r.success) { this.allSuppliers = r.data ?? []; this.cdr.markForCheck(); } },
-      error: () => {},
+      error: (err) => { console.error('Failed to load all suppliers', err); },
     });
   }
 
