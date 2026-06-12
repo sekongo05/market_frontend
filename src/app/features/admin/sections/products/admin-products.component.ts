@@ -92,7 +92,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     return out;
   }
 
-  private generateVariantName(): string {
+  generateVariantName(): string {
     const vals = Object.values(this.variantFormAttributes).filter(Boolean);
     return vals.join(' / ') || '';
   }
@@ -731,7 +731,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       if (!autoName) { this.variantError = 'Remplissez au moins un attribut'; return; }
     } else {
       if (!this.newVariant.variantName.trim()) { this.variantError = 'Le nom de la variante est requis'; return; }
-      if (!/^#[0-9A-Fa-f]{6}$/.test(this.newVariant.colorHex)) { this.variantError = 'Couleur hex invalide (ex: #FF5733)'; return; }
+      if (!/^#[0-9A-Fa-f]{6}$/.test(this.newVariant.colorHex ?? '')) { this.variantError = 'Couleur hex invalide (ex: #FF5733)'; return; }
     }
     this.variantSaving = true;
     this.variantError = null;

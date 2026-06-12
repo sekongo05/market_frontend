@@ -116,8 +116,9 @@ export class AuthService {
     const token = this.getToken();
     if (!token) return true;
     const payload = this._getTokenPayload(token);
-    if (!payload?.exp) return false;
-    return Date.now() >= payload.exp * 1000;
+    const exp = payload?.['exp'];
+    if (!exp) return false;
+    return Date.now() >= (exp as number) * 1000;
   }
 
   getCurrentUser(): CurrentUser | null {

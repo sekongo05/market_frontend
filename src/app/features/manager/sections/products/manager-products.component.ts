@@ -106,7 +106,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     return out;
   }
 
-  private generateVariantName(): string {
+  generateVariantName(): string {
     const vals = Object.values(this.variantFormAttributes).filter(Boolean);
     return vals.join(' / ') || '';
   }
@@ -396,7 +396,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.pendingCreationFile = null;
     this.pendingCreationPreview = null;
     this.pendingCreationColorError = null;
-    this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
+    this.pendingCreationColor = { variantName: '', colorHex: '#000000', stock: 0 };
     this.selectedVideo = null; this.videoPreview = null;
     this.imagePreview = null; this.selectedImageFile = null;
     this.uploadError = null;
@@ -419,7 +419,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.productMedia = product.media ?? [];
     this.productVariants = product.variants ?? [];
     this.variantError = null; this.editingVariant = null;
-    this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+    this.newVariant = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
     this.initForm(product);
     this.drawerOpen = true;
     this.scrollLock.lock();
@@ -441,12 +441,12 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.wizardStep = 1; this.hasVariantsToggle = false;
     this.creationItems = []; this.pendingCreationFile = null; this.pendingCreationPreview = null;
     this.pendingCreationColorError = null;
-    this.pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
+    this.pendingCreationColor = { variantName: '', colorHex: '#000000', stock: 0 };
     this.selectedVideo = null; this.videoPreview = null;
     this.imagePreview = null; this.selectedImageFile = null; this.uploadError = null;
     this.drawerTab = 'info'; this.productMedia = []; this.productVariants = [];
     this.variantError = null; this.editingVariant = null;
-    this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+    this.newVariant = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
     this.newVariantFile = null; this.newVariantPreview = null;
     this.pendingMediaFile = null; this.pendingMediaPreview = null; this.mediaColorError = null;
     this.cdr.markForCheck();
@@ -744,7 +744,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
       if (!autoName) { this.variantError = 'Remplissez au moins un attribut'; return; }
     } else {
       if (!this.newVariant.variantName.trim()) { this.variantError = 'Le nom de la variante est requis'; return; }
-      if (!/^#[0-9A-Fa-f]{6}$/.test(this.newVariant.colorHex)) { this.variantError = 'Couleur hex invalide (ex: #FF5733)'; return; }
+      if (!/^#[0-9A-Fa-f]{6}$/.test(this.newVariant.colorHex ?? '')) { this.variantError = 'Couleur hex invalide (ex: #FF5733)'; return; }
     }
     this.variantSaving = true;
     this.variantError = null;
