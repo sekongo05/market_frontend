@@ -16,3 +16,22 @@
 
 /* ── Quantity stepper ───────────────────────────────────────────────── */
 .qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Mobile: description après les options/CTA ───────────────────────── */
+.product-info-col { display: flex; flex-direction: column; gap: 1.5rem; }
+.sec-badge { order: 0; }
+.sec-title { order: 1; }
+.sec-price { order: 2; }
+.sec-variants { order: 3; }
+.sec-cta     { order: 4; }
+.sec-wa      { order: 5; }
+.sec-desc    { order: 6; }
+@media (min-width: 640px) {
+  .sec-badge { order: 0; }
+  .sec-title { order: 1; }
+  .sec-price { order: 2; }
+  .sec-desc  { order: 3; }
+  .sec-variants { order: 4; }
+  .sec-cta     { order: 5; }
+  .sec-wa      { order: 6; }
+}
