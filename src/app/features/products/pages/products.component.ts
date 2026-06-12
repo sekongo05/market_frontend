@@ -720,22 +720,22 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   private _syncUrl(): void {
     const queryParams: Record<string, string | null> = {};
-    queryParams.search = this.searchQuery || null;
+    queryParams['search'] = this.searchQuery || null;
     if (this.selectedCategoryId) {
       const cat = this.categories.find(c => c.id === this.selectedCategoryId);
-      queryParams.categorie = cat?.slug || null;
+      queryParams['categorie'] = cat?.slug || null;
     } else {
-      queryParams.categorie = null;
+      queryParams['categorie'] = null;
     }
-    queryParams.sort = this.sortOption !== 'newest' ? this.sortOption : null;
-    queryParams.minPrice = this.minPriceSlider > 0 ? String(this.minPriceSlider) : null;
-    queryParams.maxPrice = this.maxPriceSlider < this.PRICE_MAX ? String(this.maxPriceSlider) : null;
-    queryParams.inStock = this.inStockOnly ? 'true' : null;
-    queryParams.page = this.currentPage > 0 ? String(this.currentPage) : null;
+    queryParams['sort'] = this.sortOption !== 'newest' ? this.sortOption : null;
+    queryParams['minPrice'] = this.minPriceSlider > 0 ? String(this.minPriceSlider) : null;
+    queryParams['maxPrice'] = this.maxPriceSlider < this.PRICE_MAX ? String(this.maxPriceSlider) : null;
+    queryParams['inStock'] = this.inStockOnly ? 'true' : null;
+    queryParams['page'] = this.currentPage > 0 ? String(this.currentPage) : null;
     if (this.featuredOnly) {
-      queryParams.featured = 'true';
+      queryParams['featured'] = 'true';
     } else {
-      queryParams.featured = null;
+      queryParams['featured'] = null;
     }
     this.router.navigate([], {
       relativeTo: this.route,

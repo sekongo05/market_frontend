@@ -111,6 +111,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   get whatsappUrl(): string {
+    if (!this.product?.slug) return '';
     return this.wa.buildUrl(this.product.slug);
   }
 
