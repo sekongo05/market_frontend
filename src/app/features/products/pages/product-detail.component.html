@@ -222,20 +222,6 @@
         <!-- ════ RIGHT: Product Info ════ -->
         <div class="product-info-col scroll-reveal from-right">
 
-          <!-- Category badge -->
-          <div class="sec-badge flex items-center gap-3">
-            <span class="px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-full
-                         bg-gold/15 text-gold border border-gold/25">
-              {{ product.category.name }}
-            </span>
-            @if (product.active) {
-              <span class="flex items-center gap-1.5 text-xs theme-muted">
-                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                Disponible
-              </span>
-            }
-          </div>
-
           <!-- Title -->
           <div class="sec-title">
             <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black theme-text leading-tight mb-3">{{ product.name }}</h1>
@@ -259,13 +245,7 @@
                 }
                 <p class="text-sm theme-muted mt-1">FCFA</p>
               </div>
-              <div class="flex-1 min-w-[120px]">
-                <p class="text-xs theme-muted uppercase tracking-wider mb-1">Disponibilité</p>
-                <p class="text-sm font-bold flex items-center gap-1.5" [style.color]="stockColor">
-                  <span class="w-2 h-2 rounded-full inline-block" [style.background]="stockColor"></span>
-                  {{ stockLabel }}
-                </p>
-              </div>
+
             </div>
           </div>
 
@@ -642,7 +622,7 @@
           </a>
 
           <!-- Trust badges -->
-          <div class="grid grid-cols-3 gap-3 pt-2">
+          <div class="sec-trust grid grid-cols-3 gap-3 pt-2">
             <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl luxury-card text-center">
               <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
