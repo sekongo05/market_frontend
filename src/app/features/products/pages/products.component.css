@@ -115,62 +115,7 @@
   border-color: #d4af37;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   GLASSMORPHISM OVERLAY — texte produit par-dessus l'image
-═══════════════════════════════════════════════════════════════════ */
-.glass-overlay {
-  background: linear-gradient(
-    to top,
-    rgba(0,0,0,0.92) 0%,
-    rgba(0,0,0,0.5) 40%,
-    transparent 100%
-  );
-  pointer-events: none;
-}
 
-/* ── Carte produit glass ── */
-.product-card-glass {
-  border-radius: 0.75rem;
-  border: 1px solid rgba(212,175,55,0.1);
-  overflow: hidden;
-  transition: box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.product-card-glass:hover {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  transform: translateY(-2px);
-}
-
-/* ── Bouton Ajouter sous la carte ── */
-.add-btn-glass {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  margin-top: 0.35rem;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(212,175,55,0.35);
-  color: #d4af37;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.add-btn-glass:hover {
-  background: rgba(212,175,55,0.12);
-  border-color: #d4af37;
-}
-.add-btn-glass:active {
-  transform: scale(0.97);
-}
-.add-btn-glass:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
 
 /* ═══════════════════════════════════════════════════════════════════
    SKELETON CARDS — reflet de la nouvelle carte glassmorphism
