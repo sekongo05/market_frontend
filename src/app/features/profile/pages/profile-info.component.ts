@@ -47,7 +47,7 @@ import { UserResponse } from '../../../core/models/user.models';
         <div class="space-y-2">
           <label class="text-xs font-bold uppercase tracking-wider theme-muted">Adresse e-mail</label>
           <div class="relative">
-            <input type="email" [value]="user?.email || ''" disabled
+            <input type="email" [value]="user.email || ''" disabled
               class="theme-input w-full px-4 py-3 pl-11 rounded-xl text-sm opacity-40 cursor-not-allowed"/>
             <div class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-md bg-gold/10 flex items-center justify-center">
               <svg class="w-3 h-3 text-gold/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">

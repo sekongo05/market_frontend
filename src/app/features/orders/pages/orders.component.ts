@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OrderService } from '../../../core/services/order.service';
@@ -59,7 +59,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
     private orderService: OrderService,
     private returnService: ReturnService,
     private wsService: WebSocketService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
   ) {}
 
   @HostListener('document:keydown.escape')
@@ -86,9 +87,15 @@ export class OrdersComponent implements OnInit, OnDestroy {
       .subscribe(() => this.loadMyReturns());
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  private _focusOrder(orderNumber: string): void {
+    const idx = this.orders.findIndex(o => o.orderNumber === orderNumber);
+    if (idx === -1) return;
+    this.expandedId = this.orders[idx].id;
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      const el = document.getElementById('order-' + this.orders[idx].id);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
   }
 
   loadOrders(page = 0): void {
@@ -101,6 +108,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
           this.orders = pg.content;
           this.currentPage = page;
           this.totalPages = pg.totalPages;
+          const targetOrder = this.route.snapshot.queryParamMap.get('order');
+          if (targetOrder) this._focusOrder(targetOrder);
+        }
         }
         this.loading = false;
         this.cdr.detectChanges();
@@ -173,12 +183,14 @@ export class OrdersComponent implements OnInit, OnDestroy {
   canReturn(order: OrderResponse): boolean {
     if (order.orderStatus !== 'DELIVERED') return false;
     if (this.returnsMap[order.id]) return false;
-    const daysSince = (Date.now() - new Date(order.updatedAt).getTime()) / 86_400_000;
+    const refDate = order.deliveredAt || order.updatedAt;
+    const daysSince = (Date.now() - new Date(refDate).getTime()) / 86_400_000;
     return daysSince <= 3;
   }
 
   daysLeftToReturn(order: OrderResponse): number {
-    const daysSince = (Date.now() - new Date(order.updatedAt).getTime()) / 86_400_000;
+    const refDate = order.deliveredAt || order.updatedAt;
+    const daysSince = (Date.now() - new Date(refDate).getTime()) / 86_400_000;
     return Math.max(0, Math.ceil(3 - daysSince));
   }
 

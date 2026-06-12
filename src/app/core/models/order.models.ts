@@ -42,6 +42,7 @@ export interface OrderResponse {
   shippingFee: number | null;
   createdAt: string;
   updatedAt: string;
+  deliveredAt: string | null;
 }
 
 export interface GetOrdersParams {

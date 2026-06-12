@@ -71,6 +71,7 @@
       @for (order of orders; track order.id; let i = $index) {
 
         <div class="luxury-card rounded-2xl overflow-hidden transition-all duration-300"
+             id="order-{{ order.id }}"
              [style.box-shadow]="expandedId === order.id ? '0 0 0 1px rgba(212,175,55,0.35)' : 'none'">
 
           <!-- ── En-tête ────────────────────────────────────────────────── -->
