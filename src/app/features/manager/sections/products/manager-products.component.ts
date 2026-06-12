@@ -82,10 +82,25 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   newVariantPreview: string | null = null;
   variantFormAttributes: Record<string, string> = {};
 
-  get categoryVariantAttributes(): { name: string; type: string }[] {
+  get categoryVariantAttributes(): { name: string; type: string; options?: string[] }[] {
     const cfg = this.editingProduct?.category?.variantConfig;
     if (!cfg) return [];
     try { return JSON.parse(cfg); } catch { return []; }
+  }
+
+  get selectedCategoryHasVariants(): boolean {
+    const catId = this.productForm?.get('categoryId')?.value;
+    if (!catId) return false;
+    const cat = this.categories.find(c => c.id === +catId);
+    return !!cat?.variantConfig;
+  }
+
+  get selectedCategoryVariantAttributes(): { name: string; type: string; options?: string[] }[] {
+    const catId = this.productForm?.get('categoryId')?.value;
+    if (!catId) return [];
+    const cat = this.categories.find(c => c.id === +catId);
+    if (!cat?.variantConfig) return [];
+    try { return JSON.parse(cat.variantConfig); } catch { return []; }
   }
 
   get attributesAvailableValues(): Record<string, { value: string; count: number }[]> {
@@ -352,7 +367,10 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   get isStep1Valid(): boolean {
     const f = this.productForm;
-    return !!(f.get('name')?.valid && f.get('description')?.valid && f.get('categoryId')?.value && f.get('gender')?.value);
+    if (this.selectedCategoryHasVariants) {
+      return !!(f.get('name')?.valid && f.get('description')?.valid && f.get('categoryId')?.value && f.get('gender')?.value);
+    }
+    return !!(f.get('name')?.valid && f.get('description')?.valid && f.get('categoryId')?.value && f.get('gender')?.value && f.get('stock')?.valid);
   }
 
   get creationTotalStock(): number { return this.creationItems.reduce((s, i) => s + i.stock, 0); }
@@ -375,6 +393,17 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
       document.getElementById('manager-drawer-body')?.scrollTo(0, 0);
       this.cdr.markForCheck();
     }
+  }
+
+  onCategoryChange(): void {
+    if (this.editingProduct) return;
+    this.wizardStep = 1;
+    this.hasVariantsToggle = false;
+    this.creationItems = [];
+    this.pendingCreationFile = null;
+    this.pendingCreationPreview = null;
+    this.pendingCreationColorError = null;
+    this.cdr.markForCheck();
   }
 
   toggleVariants(): void {
@@ -462,7 +491,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     fd.append('name', v.name);
     if (v.description) fd.append('description', v.description);
     fd.append('price', v.price.toString());
-    fd.append('stock', v.stock.toString());
+    fd.append('stock', (v.stock ?? 0).toString());
     if (v.gender) fd.append('gender', v.gender);
     if (v.categoryId) fd.append('categoryId', v.categoryId.toString());
 

@@ -31,7 +31,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   imagePreview: string | null = null;
   imageDragOver = false;
 
-  variantAttributes: { name: string; type: string }[] = [];
+  variantAttributes: { name: string; type: string; options?: string[] }[] = [];
 
   // Confirmation dialog before deactivating
   pendingToggleCat: CategoryResponse | null = null;
@@ -124,11 +124,17 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       this.categoryForm.variantConfig = '';
       return;
     }
-    this.categoryForm.variantConfig = JSON.stringify(this.variantAttributes);
+    const clean = this.variantAttributes.map(a => ({
+      ...a,
+      options: a.type === 'select'
+        ? (a.options ?? []).filter(o => o.trim())
+        : undefined,
+    }));
+    this.categoryForm.variantConfig = JSON.stringify(clean);
   }
 
   addVariantAttribute(): void {
-    this.variantAttributes = [...this.variantAttributes, { name: '', type: 'select' }];
+    this.variantAttributes = [...this.variantAttributes, { name: '', type: 'select', options: [] }];
     this.syncVariantConfigJson();
     this.cdr.markForCheck();
   }
@@ -140,6 +146,26 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   }
 
   onVariantAttributeChange(): void {
+    this.syncVariantConfigJson();
+  }
+
+  onVariantAttributeTypeChange(attr: { name: string; type: string; options?: string[] }): void {
+    if (attr.type === 'select') {
+      if (!attr.options) attr.options = [''];
+    } else {
+      delete attr.options;
+    }
+    this.syncVariantConfigJson();
+  }
+
+  addOption(attr: { options?: string[] }): void {
+    if (!attr.options) attr.options = [];
+    attr.options.push('');
+    this.onVariantAttributeChange();
+  }
+
+  removeOption(attr: { options?: string[] }, index: number): void {
+    if (attr.options) attr.options = attr.options.filter((_, i) => i !== index);
     this.syncVariantConfigJson();
   }
 
