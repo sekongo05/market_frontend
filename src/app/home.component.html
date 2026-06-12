@@ -395,7 +395,7 @@
   <!-- ════════════════════════════════════════════════════════════════
        4. SÉLECTION DE LA SEMAINE — produits featured
   ════════════════════════════════════════════════════════════════════ -->
-  @if (hasFeatured) {
+  @if (!featuredLoading && featuredProducts.length > 0) {
     <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;background:#fcf8f0;border-top:1px solid rgba(212,175,55,0.15);border-bottom:1px solid rgba(212,175,55,0.15);">
       <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
         <div>
@@ -455,6 +455,32 @@
               <span class="text-[9px] theme-muted">FCFA</span>
             </div>
           </a>
+        }
+      </div>
+    </section>
+  } @else if (featuredLoading) {
+    <section style="padding:clamp(60px,8vw,110px) 0;background:#fcf8f0;border-top:1px solid rgba(212,175,55,0.15);border-bottom:1px solid rgba(212,175,55,0.15);">
+      <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-3.5 h-3.5" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold" style="color:rgba(212,175,55,0.65);">Nos coups de cœur</p>
+          </div>
+          <h2 class="r-up font-black theme-text tracking-tight leading-none"
+              style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">SÉLECTION</h2>
+        </div>
+      </div>
+      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
+                  sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
+        @for (_ of skeletonArray; track $index) {
+          <div class="flex-shrink-0 w-[52vw] sm:w-auto">
+            <div style="aspect-ratio:3/4;" class="rounded-lg bg-white/30 animate-pulse mb-3"></div>
+            <div class="h-2 w-16 rounded bg-white/30 animate-pulse mb-1.5"></div>
+            <div class="h-3 w-28 rounded bg-white/30 animate-pulse mb-2"></div>
+            <div class="h-3 w-20 rounded bg-white/30 animate-pulse"></div>
+          </div>
         }
       </div>
     </section>

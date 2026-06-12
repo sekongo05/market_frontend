@@ -19,7 +19,7 @@ import { PageResponse } from './core/models/common.models';
 import { PromoService } from './core/services/promo.service';
 import { PublicPromoResponse } from './core/models/promo.models';
 import { Subject, interval, fromEvent, merge } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, retry } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -54,6 +54,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   searchQuery = '';
   firstOrderPromo: PublicPromoResponse | null = null;
+  readonly skeletonArray = new Array(6);
 
   // ── Hero slideshow ──────────────────────────────────────────────
   readonly heroSlides = [
@@ -411,7 +412,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   private _loadFeatured(): void {
-    this.productService.getFeaturedProducts(6).pipe(takeUntil(this.destroy$)).subscribe({
+    this.productService.getFeaturedProducts(6).pipe(
+      retry({ count: 2, delay: 1000 }),
+      takeUntil(this.destroy$),
+    ).subscribe({
       next: (r) => {
         if (r.success) {
           const raw = r.data;
