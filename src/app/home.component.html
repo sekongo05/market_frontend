@@ -982,13 +982,15 @@
                   <p class="text-xs font-black theme-text">{{ reviewInitials(review.customerName) }}</p>
                   <p class="text-[10px] font-medium" style="color:rgba(212,175,55,0.55);">{{ review.productName }}</p>
                 </div>
-                <div class="flex items-center gap-1 px-2 py-1 rounded-full"
-                     style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);">
-                  <svg class="w-2.5 h-2.5" style="color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  <span class="text-[8px] font-bold uppercase tracking-wider" style="color:#10b981;">Achat vérifié</span>
-                </div>
+                @if (review.purchased) {
+                  <div class="flex items-center gap-1 px-2 py-1 rounded-full"
+                       style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);">
+                    <svg class="w-2.5 h-2.5" style="color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span class="text-[8px] font-bold uppercase tracking-wider" style="color:#10b981;">Achat vérifié</span>
+                  </div>
+                }
               </div>
             </div>
           }

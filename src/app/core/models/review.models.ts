@@ -7,6 +7,7 @@ export interface ReviewResponse {
   rating: number;
   comment: string | null;
   visible: boolean;
+  purchased: boolean;
   createdAt: string;
 }
 

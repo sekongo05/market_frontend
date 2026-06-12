@@ -760,7 +760,17 @@
         @if (myReview && !editingReview) {
           <div class="luxury-card rounded-2xl p-4 mb-6 border border-gold/20">
             <div class="flex items-center justify-between mb-2">
-              <p class="text-xs font-bold text-gold uppercase tracking-wide">Mon avis</p>
+              <p class="text-xs font-bold text-gold uppercase tracking-wide">Mon avis
+                @if (myReview.purchased) {
+                  <span class="inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 rounded text-[8px] font-bold align-middle"
+                        style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.2);">
+                    <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Vérifié
+                  </span>
+                }
+              </p>
               <div class="flex gap-2">
                 <button (click)="startEditReview()" class="text-xs theme-muted hover:text-gold transition-colors font-semibold">Modifier</button>
                 <button (click)="deleteMyReview()" class="text-xs text-red-400/60 hover:text-red-400 transition-colors font-semibold">Supprimer</button>
@@ -829,7 +839,18 @@
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-2 mb-1">
-                      <p class="text-sm font-bold theme-text truncate">{{ review.customerName }}</p>
+                      <p class="text-sm font-bold theme-text truncate">{{ review.customerName }}
+                        @if (review.purchased) {
+                          <span class="inline-flex items-center gap-0.5 ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold align-middle"
+                                style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.2);"
+                                title="Achat vérifié">
+                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Vérifié
+                          </span>
+                        }
+                      </p>
                       <p class="text-xs theme-muted flex-shrink-0">{{ review.createdAt | date:'dd/MM/yyyy' }}</p>
                     </div>
                     <!-- Étoiles -->
