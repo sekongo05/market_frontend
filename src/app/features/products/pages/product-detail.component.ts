@@ -253,7 +253,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
-  get cascadeAvailableValues(attrName: string): string[] {
+  cascadeAvailableValues(attrName: string): string[] {
     const values = new Set<string>();
     for (const v of this.cascadeFilteredVariants) {
       const val = v.attributes?.[attrName];
