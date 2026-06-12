@@ -50,10 +50,10 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   // ── Wizard création ───────────────────────────────────────────────────────
   wizardStep: 1 | 2 | 3 = 1;
   hasVariantsToggle = false;
-  creationItems: { file: File; preview: string; colorName: string; colorHex: string; stock: number }[] = [];
+  creationItems: { file: File; preview: string; variantName: string; colorHex: string; stock: number }[] = [];
   pendingCreationFile: File | null = null;
   pendingCreationPreview: string | null = null;
-  pendingCreationColor = { colorName: '', colorHex: '#000000', stock: 0 };
+  pendingCreationColor = { variantName: '', colorHex: '#000000', stock: 0 };
   pendingCreationColorError: string | null = null;
 
   // ── Image & vidéo ─────────────────────────────────────────────────────────
@@ -70,16 +70,46 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   mediaUploading = false;
   pendingMediaFile: File | null = null;
   pendingMediaPreview: string | null = null;
-  pendingMediaColor = { colorName: '', colorHex: '#000000', stock: 0 };
+  pendingMediaColor = { variantName: '', colorHex: '#000000', stock: 0 };
   mediaColorError: string | null = null;
   productVariants: ProductVariant[] = [];
   variantsLoading = false;
   variantSaving = false;
   variantError: string | null = null;
-  newVariant: ProductVariantRequest = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+  newVariant: ProductVariantRequest = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
   editingVariant: ProductVariant | null = null;
   newVariantFile: File | null = null;
   newVariantPreview: string | null = null;
+  variantFormAttributes: Record<string, string> = {};
+
+  get categoryVariantAttributes(): { name: string; type: string }[] {
+    const cfg = this.editingProduct?.category?.variantConfig;
+    if (!cfg) return [];
+    try { return JSON.parse(cfg); } catch { return []; }
+  }
+
+  get attributesAvailableValues(): Record<string, { value: string; count: number }[]> {
+    const result: Record<string, Set<string>> = {};
+    for (const attr of this.categoryVariantAttributes) {
+      result[attr.name] = new Set();
+    }
+    for (const v of this.productVariants) {
+      if (v.id === this.editingVariant?.id) continue;
+      for (const [key, val] of Object.entries(v.attributes ?? {})) {
+        if (result[key]) result[key].add(val);
+      }
+    }
+    const out: Record<string, { value: string; count: number }[]> = {};
+    for (const [key, set] of Object.entries(result)) {
+      out[key] = [...set].map(value => ({ value, count: this.productVariants.filter(v => v.attributes?.[key] === value).length }));
+    }
+    return out;
+  }
+
+  private generateVariantName(): string {
+    const vals = Object.values(this.variantFormAttributes).filter(Boolean);
+    return vals.join(' / ') || '';
+  }
 
   // ── Inline edits ──────────────────────────────────────────────────────────
   editingStockId: number | null = null;
@@ -481,7 +511,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
               const item = itemsSnapshot[index];
               const createVariant = (imageUrl: string) => {
                 this.productVariantService.addVariant(product.id, {
-                  colorName: item.colorName, colorHex: item.colorHex, imageUrl, stock: item.stock,
+                  variantName: item.variantName, colorHex: item.colorHex, imageUrl, stock: item.stock,
                 }).subscribe({ next: () => processItem(index + 1), error: () => processItem(index + 1) });
               };
               if (index === 0 && product.imageUrl) {
@@ -556,12 +586,12 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   confirmCreationItem(): void {
     if (!this.pendingCreationFile) return;
-    if (!this.pendingCreationColor.colorName.trim()) { this.pendingCreationColorError = 'Le nom de la couleur est requis'; return; }
+    if (!this.pendingCreationColor.variantName.trim()) { this.pendingCreationColorError = 'Le nom de la variante est requis'; return; }
     if (!/^#[0-9A-Fa-f]{6}$/.test(this.pendingCreationColor.colorHex)) { this.pendingCreationColorError = 'Code couleur invalide (ex: #FF5733)'; return; }
     this.creationItems = [...this.creationItems, {
       file: this.pendingCreationFile,
       preview: this.pendingCreationPreview!,
-      colorName: this.pendingCreationColor.colorName.trim(),
+      variantName: this.pendingCreationColor.variantName.trim(),
       colorHex: this.pendingCreationColor.colorHex,
       stock: this.pendingCreationColor.stock || 0,
     }];
@@ -628,7 +658,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   confirmMediaUpload(): void {
     if (!this.pendingMediaFile || !this.editingProduct) return;
-    if (!this.pendingMediaColor.colorName.trim()) { this.mediaColorError = 'Le nom de la couleur est requis'; return; }
+    if (!this.pendingMediaColor.variantName.trim()) { this.mediaColorError = 'Le nom de la variante est requis'; return; }
     if (!/^#[0-9A-Fa-f]{6}$/.test(this.pendingMediaColor.colorHex)) { this.mediaColorError = 'Code couleur invalide (ex: #FF5733)'; return; }
     this.mediaColorError = null;
     this.mediaUploading = true;
@@ -642,7 +672,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
         if (r.success) {
           this.productMedia = [...this.productMedia, r.data];
           this.productVariantService.addVariant(targetProductId, {
-            colorName: color.colorName.trim(), colorHex: color.colorHex, imageUrl: r.data.url, stock: color.stock || 0,
+            variantName: color.variantName.trim(), colorHex: color.colorHex, imageUrl: r.data.url, stock: color.stock || 0,
           }).subscribe({
             next: (vr: any) => { if (vr.success) this.productVariants = [...this.productVariants, vr.data]; this.cdr.markForCheck(); },
             error: (err) => { console.error('Failed to add variant', err); },
@@ -705,8 +735,17 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   saveVariant(): void {
     if (!this.editingProduct) return;
-    if (!this.newVariant.colorName.trim()) { this.variantError = 'Le nom de la couleur est requis'; return; }
-    if (!/^#[0-9A-Fa-f]{6}$/.test(this.newVariant.colorHex)) { this.variantError = 'Couleur hex invalide (ex: #FF5733)'; return; }
+    if (this.categoryVariantAttributes.length > 0) {
+      this.newVariant.attributes = { ...this.variantFormAttributes };
+      const autoName = this.generateVariantName();
+      if (!this.newVariant.variantName.trim()) {
+        this.newVariant.variantName = autoName;
+      }
+      if (!autoName) { this.variantError = 'Remplissez au moins un attribut'; return; }
+    } else {
+      if (!this.newVariant.variantName.trim()) { this.variantError = 'Le nom de la variante est requis'; return; }
+      if (!/^#[0-9A-Fa-f]{6}$/.test(this.newVariant.colorHex)) { this.variantError = 'Couleur hex invalide (ex: #FF5733)'; return; }
+    }
     this.variantSaving = true;
     this.variantError = null;
     const targetProductId = this.editingProduct.id;
@@ -722,7 +761,8 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
               ? this.productVariants.map(v => v.id === r.data.id ? r.data : v)
               : [...this.productVariants, r.data];
             this.editingVariant = null;
-            this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+            this.newVariant = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+            this.variantFormAttributes = {};
             this.newVariantFile = null; this.newVariantPreview = null;
           }
           this.variantSaving = false;
@@ -744,14 +784,17 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   startEditVariant(variant: ProductVariant): void {
     this.editingVariant = variant;
-    this.newVariant = { colorName: variant.colorName, colorHex: variant.colorHex, imageUrl: variant.imageUrl || '', stock: variant.stock };
+    this.newVariant = { variantName: variant.variantName, colorHex: variant.colorHex || '#000000', imageUrl: variant.imageUrl || '', stock: variant.stock, attributes: variant.attributes };
+    this.variantFormAttributes = variant.attributes ? { ...variant.attributes } : {};
     this.newVariantFile = null; this.newVariantPreview = variant.imageUrl || null;
+    this.variantError = null;
     this.cdr.markForCheck();
   }
 
   cancelEditVariant(): void {
     this.editingVariant = null;
-    this.newVariant = { colorName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+    this.newVariant = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+    this.variantFormAttributes = {};
     this.newVariantFile = null; this.newVariantPreview = null; this.variantError = null;
     this.cdr.markForCheck();
   }

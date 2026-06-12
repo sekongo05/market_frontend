@@ -7,10 +7,11 @@ import { ProductVariant } from '../models/product.models';
 export interface ApiResponse<T> { success: boolean; data: T; message?: string; }
 
 export interface ProductVariantRequest {
-  colorName: string;
-  colorHex: string;
+  variantName: string;
+  colorHex?: string;
   imageUrl?: string;
   stock: number;
+  attributes?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })

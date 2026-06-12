@@ -24,12 +24,14 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   categoryToggleId: number | null = null;
   showCategoryForm = false;
   editingCategory: CategoryResponse | null = null;
-  categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0 };
+  categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0, variantConfig: '' };
   categoryFormLoading = false;
   categoryFormError: string | null = null;
   imageUploading = false;
   imagePreview: string | null = null;
   imageDragOver = false;
+
+  variantAttributes: { name: string; type: string }[] = [];
 
   // Confirmation dialog before deactivating
   pendingToggleCat: CategoryResponse | null = null;
@@ -72,7 +74,8 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
   openCategoryForm(): void {
     this.editingCategory = null;
-    this.categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0 };
+    this.categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0, variantConfig: '' };
+    this.variantAttributes = [];
     this.categoryFormError = null;
     this.imagePreview = null;
     this.showCategoryForm = true;
@@ -87,7 +90,9 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       description: cat.description ?? '',
       imageUrl: cat.imageUrl ?? '',
       displayOrder: cat.displayOrder ?? 0,
+      variantConfig: cat.variantConfig ?? '',
     };
+    this.syncVariantAttributes();
     this.categoryFormError = null;
     this.imagePreview = cat.imageUrl || null;
     this.showCategoryForm = true;
@@ -102,6 +107,40 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     this.imagePreview = null;
     this.scrollLock.unlock();
     this.cdr.markForCheck();
+  }
+
+  private syncVariantAttributes(): void {
+    const raw = this.categoryForm.variantConfig;
+    if (!raw?.trim()) { this.variantAttributes = []; return; }
+    try {
+      this.variantAttributes = JSON.parse(raw);
+    } catch {
+      this.variantAttributes = [];
+    }
+  }
+
+  private syncVariantConfigJson(): void {
+    if (this.variantAttributes.length === 0) {
+      this.categoryForm.variantConfig = '';
+      return;
+    }
+    this.categoryForm.variantConfig = JSON.stringify(this.variantAttributes);
+  }
+
+  addVariantAttribute(): void {
+    this.variantAttributes = [...this.variantAttributes, { name: '', type: 'select' }];
+    this.syncVariantConfigJson();
+    this.cdr.markForCheck();
+  }
+
+  removeVariantAttribute(index: number): void {
+    this.variantAttributes = this.variantAttributes.filter((_, i) => i !== index);
+    this.syncVariantConfigJson();
+    this.cdr.markForCheck();
+  }
+
+  onVariantAttributeChange(): void {
+    this.syncVariantConfigJson();
   }
 
   onImageFileSelected(event: Event): void {
@@ -159,12 +198,15 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     // Capture isEditing before any null assignment
     const isEditing = !!this.editingCategory;
     const editingId  = this.editingCategory?.id;
-    const payload = {
+    const payload: any = {
       name: this.categoryForm.name.trim(),
       description: this.categoryForm.description.trim() || undefined,
       imageUrl: this.categoryForm.imageUrl.trim() || undefined,
       displayOrder: this.categoryForm.displayOrder,
     };
+    if (this.categoryForm.variantConfig.trim()) {
+      payload.variantConfig = this.categoryForm.variantConfig.trim();
+    }
     const req$ = isEditing
       ? this.categoryService.updateCategory(editingId!, payload)
       : this.categoryService.createCategory(payload);

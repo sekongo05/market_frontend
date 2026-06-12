@@ -259,7 +259,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       imageUrl: this.selectedViewVariant?.imageUrl || this.selectedProduct.imageUrl,
       maxStock: this.selectedViewVariant?.stock ?? this.selectedProduct.stock,
       variantId: this.selectedViewVariant?.id,
-      selectedColor: this.selectedViewVariant?.colorName,
+      selectedColor: this.selectedViewVariant?.variantName,
       selectedColorHex: this.selectedViewVariant?.colorHex,
     });
     this.addedIds.add(this.selectedProduct.id);

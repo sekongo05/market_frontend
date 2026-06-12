@@ -128,8 +128,8 @@
               }
               @if (selectedVariant) {
                 <span class="ml-2 px-2.5 py-1 text-xs font-bold rounded-full border border-white/20 text-white"
-                      [style.background-color]="selectedVariant.colorHex + '99'">
-                  {{ selectedVariant.colorName }}
+                      [style.background-color]="(selectedVariant.colorHex || '#888') + '99'">
+                  {{ selectedVariant.variantName }}
                 </span>
               }
             </div>
@@ -277,115 +277,180 @@
 
 
 
-          <!-- Color + Quantity selector (multi-variant Alibaba style) -->
+          <!-- Variant selector: cascade mode ou color swatches -->
           @if (hasVariants) {
-            <div class="rounded-2xl luxury-card overflow-hidden">
-              <div class="flex items-center justify-between px-5 pt-5 pb-3">
-                <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">Couleurs</h3>
-                @if (totalSelectedQty > 0) {
-                  <span class="text-xs font-bold text-gold">
-                    {{ totalSelectedQty }} article{{ totalSelectedQty > 1 ? 's' : '' }} sélectionné{{ totalSelectedQty > 1 ? 's' : '' }}
-                  </span>
-                }
-              </div>
+            @if (isCascadeMode) {
+              <!-- Cascade selector style AliExpress -->
+              <div class="rounded-2xl luxury-card p-5 space-y-4">
+                <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">Options</h3>
 
-              <div class="flex flex-col divide-y divide-white/5">
-                @for (variant of product.variants; track variant.id) {
-                  <div
-                    (click)="selectVariant(variant)"
-                    class="flex items-center gap-3 px-5 py-3.5 cursor-pointer transition-all duration-200"
-                    [style.background-color]="getVariantQty(variant.id) > 0 ? 'rgba(212,175,55,0.07)' : (selectedVariant?.id === variant.id && variant.stock === 0 ? 'rgba(239,68,68,0.05)' : '')"
-                    [class.opacity-60]="variant.stock === 0">
-
-                    <!-- Color image or circle -->
-                    <div class="relative flex-shrink-0">
-                      @if (variant.imageUrl) {
-                        <div class="w-12 h-12 rounded-xl overflow-hidden border-2 transition-all duration-200 shadow"
-                             [style.border-color]="variant.stock === 0 ? 'rgba(239,68,68,0.5)' : selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.15)'">
-                          <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.colorName"
-                               class="w-full h-full object-cover"/>
-                        </div>
-                      } @else {
-                        <div class="w-12 h-12 rounded-xl border-2 shadow transition-all duration-200 flex items-center justify-center"
-                             [style.background-color]="variant.colorHex"
-                             [style.border-color]="variant.stock === 0 ? 'rgba(239,68,68,0.5)' : selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.25)'">
-                        </div>
-                      }
-                      <!-- Barre diagonale épuisé sur la pastille -->
-                      @if (variant.stock === 0) {
-                        <div class="absolute inset-0 rounded-xl overflow-hidden">
-                          <svg class="w-full h-full" viewBox="0 0 48 48" preserveAspectRatio="none">
-                            <line x1="4" y1="44" x2="44" y2="4" stroke="rgba(239,68,68,0.85)" stroke-width="3.5" stroke-linecap="round"/>
-                          </svg>
-                        </div>
-                      }
-                      <!-- Badge stock faible (manager uniquement) -->
-                      @if (isManager && variant.stock > 0 && variant.stock <= 3) {
-                        <div class="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-orange-500 border border-black/30
-                                    flex items-center justify-center animate-pulse">
-                          <span class="text-[9px] font-black text-white leading-none">{{ variant.stock }}</span>
-                        </div>
-                      }
-                      <!-- Dot indicator for selected color (seulement si dispo) -->
-                      @if (variant.stock > 0) {
-                        <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 transition-all duration-200"
-                             [style.background-color]="variant.colorHex"
-                             [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.3)'">
-                        </div>
+                @for (attr of cascadeAttributes; track attr.name; let i = $index) {
+                  @let values = cascadeAvailableValues(attr.name);
+                  @let isDisabled = i > 0 && !cascadeSelections[cascadeAttributes[i-1].name];
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="text-sm font-bold theme-text">{{ attr.name }}</label>
+                      @if (cascadeSelections[attr.name]) {
+                        <button type="button" (click)="selectCascadeAttribute(attr.name, null)"
+                          class="text-[10px] text-gold hover:underline">Effacer</button>
                       }
                     </div>
-
-                    <!-- Info -->
-                    <div class="flex-1 min-w-0">
-                      <p class="text-sm font-bold theme-text truncate">{{ variant.colorName }}</p>
-                      @if (variant.stock === 0) {
-                        <p class="text-xs text-red-400 font-semibold flex items-center gap-1">
-                          <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>
-                          Épuisé
-                        </p>
-                      } @else if (variant.stock <= 3) {
-                        <p class="text-xs text-orange-400 font-semibold flex items-center gap-1">
-                          <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse inline-block"></span>
-                          Presque épuisé
-                        </p>
-                      } @else {
-                        <p class="text-xs theme-muted">En stock</p>
+                    <div class="flex flex-wrap gap-2">
+                      @for (value of values; track value) {
+                        <button type="button"
+                          (click)="selectCascadeAttribute(attr.name, value)"
+                          [disabled]="isDisabled"
+                          class="px-4 py-2 rounded-xl border-2 text-sm font-semibold transition-all duration-150"
+                          [class.border-gold]="cascadeSelections[attr.name] === value"
+                          [class.bg-gold/10]="cascadeSelections[attr.name] === value"
+                          [class.text-gold]="cascadeSelections[attr.name] === value"
+                          [class.border-white/15]="cascadeSelections[attr.name] !== value"
+                          [class.theme-text]="cascadeSelections[attr.name] !== value"
+                          [class.opacity-30]="isDisabled"
+                          [class.cursor-not-allowed]="isDisabled">
+                          @if (attr.type === 'color' && value.startsWith('#')) {
+                            <span class="w-4 h-4 rounded-full inline-block mr-2 align-middle border border-white/20"
+                                  [style.background-color]="value"></span>
+                          }
+                          {{ value }}
+                        </button>
                       }
                     </div>
-
-                    <!-- Qty stepper -->
-                    @if (variant.stock > 0) {
-                      <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card flex-shrink-0"
-                           (click)="$event.stopPropagation()">
-                        <button
-                          (click)="adjustVariantQty(variant, -1)"
-                          [disabled]="getVariantQty(variant.id) === 0"
-                          class="w-9 h-9 flex items-center justify-center theme-muted
-                                 hover:text-gold hover:bg-white/5 transition-colors disabled:opacity-30">
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/>
-                          </svg>
-                        </button>
-                        <span class="w-8 text-center font-black text-sm"
-                              [class.gold-text]="getVariantQty(variant.id) > 0"
-                              [class.theme-muted]="getVariantQty(variant.id) === 0">
-                          {{ getVariantQty(variant.id) }}
-                        </span>
-                        <button
-                          (click)="adjustVariantQty(variant, 1)"
-                          [disabled]="getVariantQty(variant.id) >= variant.stock"
-                          class="w-9 h-9 flex items-center justify-center theme-muted
-                                 hover:text-gold hover:bg-white/5 transition-colors disabled:opacity-30">
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-                          </svg>
-                        </button>
-                      </div>
+                    @if (values.length === 0 && !isDisabled) {
+                      <p class="text-xs theme-muted mt-1">Aucune option disponible</p>
                     }
                   </div>
                 }
+
+                @if (cascadeMatchedVariant) {
+                  <div class="p-3 rounded-xl bg-gold/5 border border-gold/20 mt-2">
+                    <div class="flex items-center gap-3">
+                      @if (cascadeMatchedVariant.imageUrl) {
+                        <img [src]="cascadeMatchedVariant.imageUrl | mediaUrl" [alt]="cascadeMatchedVariant.variantName"
+                          class="w-12 h-12 rounded-lg object-cover flex-shrink-0"/>
+                      } @else if (cascadeMatchedVariant.colorHex) {
+                        <div class="w-12 h-12 rounded-lg flex-shrink-0 border border-white/10"
+                             [style.background-color]="cascadeMatchedVariant.colorHex"></div>
+                      }
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold theme-text truncate">{{ cascadeMatchedVariant.variantName }}</p>
+                        <p class="text-xs" [class.text-red-400]="cascadeMatchedVariant.stock === 0" [class.theme-muted]="cascadeMatchedVariant.stock > 0">
+                          @if (cascadeMatchedVariant.stock === 0) { Épuisé }
+                          @else if (cascadeMatchedVariant.stock <= 3) { Presque épuisé — {{ cascadeMatchedVariant.stock }} restant(s) }
+                          @else { En stock }
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                }
               </div>
-            </div>
+            } @else {
+              <!-- Color swatches mode (legacy) -->
+              <div class="rounded-2xl luxury-card overflow-hidden">
+                <div class="flex items-center justify-between px-5 pt-5 pb-3">
+                  <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">Couleurs</h3>
+                  @if (totalSelectedQty > 0) {
+                    <span class="text-xs font-bold text-gold">
+                      {{ totalSelectedQty }} article{{ totalSelectedQty > 1 ? 's' : '' }} sélectionné{{ totalSelectedQty > 1 ? 's' : '' }}
+                    </span>
+                  }
+                </div>
+
+                <div class="flex flex-col divide-y divide-white/5">
+                  @for (variant of product.variants; track variant.id) {
+                    <div
+                      (click)="selectVariant(variant)"
+                      class="flex items-center gap-3 px-5 py-3.5 cursor-pointer transition-all duration-200"
+                      [style.background-color]="getVariantQty(variant.id) > 0 ? 'rgba(212,175,55,0.07)' : (selectedVariant?.id === variant.id && variant.stock === 0 ? 'rgba(239,68,68,0.05)' : '')"
+                      [class.opacity-60]="variant.stock === 0">
+
+                      <!-- Color image or circle -->
+                      <div class="relative flex-shrink-0">
+                        @if (variant.imageUrl) {
+                          <div class="w-12 h-12 rounded-xl overflow-hidden border-2 transition-all duration-200 shadow"
+                               [style.border-color]="variant.stock === 0 ? 'rgba(239,68,68,0.5)' : selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.15)'">
+                            <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.variantName"
+                                 class="w-full h-full object-cover"/>
+                          </div>
+                        } @else {
+                          <div class="w-12 h-12 rounded-xl border-2 shadow transition-all duration-200 flex items-center justify-center"
+                               [style.background-color]="variant.colorHex || '#888'"
+                               [style.border-color]="variant.stock === 0 ? 'rgba(239,68,68,0.5)' : selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.25)'">
+                          </div>
+                        }
+                        @if (variant.stock === 0) {
+                          <div class="absolute inset-0 rounded-xl overflow-hidden">
+                            <svg class="w-full h-full" viewBox="0 0 48 48" preserveAspectRatio="none">
+                              <line x1="4" y1="44" x2="44" y2="4" stroke="rgba(239,68,68,0.85)" stroke-width="3.5" stroke-linecap="round"/>
+                            </svg>
+                          </div>
+                        }
+                        @if (isManager && variant.stock > 0 && variant.stock <= 3) {
+                          <div class="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-orange-500 border border-black/30
+                                      flex items-center justify-center animate-pulse">
+                            <span class="text-[9px] font-black text-white leading-none">{{ variant.stock }}</span>
+                          </div>
+                        }
+                        @if (variant.stock > 0) {
+                          <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 transition-all duration-200"
+                               [style.background-color]="variant.colorHex || '#888'"
+                               [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.3)'">
+                          </div>
+                        }
+                      </div>
+
+                      <!-- Info -->
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold theme-text truncate">{{ variant.variantName }}</p>
+                        @if (variant.stock === 0) {
+                          <p class="text-xs text-red-400 font-semibold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>
+                            Épuisé
+                          </p>
+                        } @else if (variant.stock <= 3) {
+                          <p class="text-xs text-orange-400 font-semibold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse inline-block"></span>
+                            Presque épuisé
+                          </p>
+                        } @else {
+                          <p class="text-xs theme-muted">En stock</p>
+                        }
+                      </div>
+
+                      <!-- Qty stepper -->
+                      @if (variant.stock > 0) {
+                        <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card flex-shrink-0"
+                             (click)="$event.stopPropagation()">
+                          <button
+                            (click)="adjustVariantQty(variant, -1)"
+                            [disabled]="getVariantQty(variant.id) === 0"
+                            class="w-9 h-9 flex items-center justify-center theme-muted
+                                   hover:text-gold hover:bg-white/5 transition-colors disabled:opacity-30">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/>
+                            </svg>
+                          </button>
+                          <span class="w-8 text-center font-black text-sm"
+                                [class.gold-text]="getVariantQty(variant.id) > 0"
+                                [class.theme-muted]="getVariantQty(variant.id) === 0">
+                            {{ getVariantQty(variant.id) }}
+                          </span>
+                          <button
+                            (click)="adjustVariantQty(variant, 1)"
+                            [disabled]="getVariantQty(variant.id) >= variant.stock"
+                            class="w-9 h-9 flex items-center justify-center theme-muted
+                                   hover:text-gold hover:bg-white/5 transition-colors disabled:opacity-30">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                            </svg>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           }
 
           <!-- CTA zone — adapté au rôle -->
@@ -467,12 +532,12 @@
                 <!-- CTA -->
                 @if (isLoggedIn) {
                 <button (click)="addToCart()"
-                  [disabled]="hasVariants && totalSelectedQty === 0"
+                  [disabled]="isCascadeMode ? !cascadeMatchedVariant : (hasVariants && totalSelectedQty === 0)"
                   class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
                          transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                   [class]="addedToCart
                     ? 'bg-green-500 text-white scale-[0.98]'
-                    : (hasVariants && totalSelectedQty === 0
+                    : ((isCascadeMode ? !cascadeMatchedVariant : (hasVariants && totalSelectedQty === 0))
                         ? 'bg-gold/30 text-black/60'
                         : 'bg-gold text-black hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5')">
                   @if (addedToCart) {
@@ -480,12 +545,14 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                     </svg>
                     Ajouté au panier !
-                  } @else if (hasVariants && totalSelectedQty === 0) {
+                  } @else if (isCascadeMode ? !cascadeMatchedVariant : (hasVariants && totalSelectedQty === 0)) {
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
-                    @if (selectedVariant?.stock === 0) {
+                    @if (isCascadeMode) {
+                      Sélectionnez toutes les options
+                    } @else if (selectedVariant?.stock === 0) {
                       Ce coloris est épuisé
                     } @else {
                       Choisissez une couleur
@@ -495,7 +562,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
-                    @if (hasVariants) {
+                    @if (hasVariants && !isCascadeMode) {
                       Ajouter au panier · {{ formattedTotalPrice }} FCFA
                     } @else {
                       <span class="hidden sm:inline">Ajouter au panier · {{ formattedPrice }} FCFA</span>

@@ -539,12 +539,12 @@
                 @if (pendingMediaIsVariant) {
                   <div class="grid grid-cols-2 gap-3">
                     <div class="space-y-1.5">
-                      <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Nom de la couleur *</label>
-                      <input type="text" [(ngModel)]="pendingMediaColor.colorName" placeholder="ex: Rouge, Bleu marine…"
+                      <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Nom de la variante *</label>
+                      <input type="text" [(ngModel)]="pendingMediaColor.variantName" placeholder="ex: Rouge, Bleu marine…"
                         class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none"/>
                     </div>
                     <div class="space-y-1.5">
-                      <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Couleur *</label>
+                      <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Couleur</label>
                       <div class="flex items-center gap-2">
                         <input type="color" [(ngModel)]="pendingMediaColor.colorHex"
                           class="w-10 h-9 rounded-lg cursor-pointer border theme-border bg-transparent p-0.5"/>
@@ -608,7 +608,7 @@
                     @if (getVariantForMedia(media.url); as matchedVariant) {
                       <div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
                         <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" [style.background-color]="matchedVariant.colorHex"></span>
-                        <span class="text-[10px] font-bold text-white">{{ matchedVariant.colorName }}</span>
+                        <span class="text-[10px] font-bold text-white">{{ matchedVariant.variantName }}</span>
                       </div>
                     } @else {
                       <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-indigo-600/80 backdrop-blur-sm">
@@ -669,22 +669,78 @@
             }
 
             <div class="p-4 rounded-xl border theme-border space-y-3" [class.border-gold]="editingVariant">
-              <p class="text-xs font-bold theme-text">{{ editingVariant ? 'Modifier la couleur' : 'Ajouter une couleur' }}</p>
+              <p class="text-xs font-bold theme-text">{{ editingVariant ? 'Modifier la variante' : 'Ajouter une variante' }}</p>
 
-              <div class="grid grid-cols-2 gap-3">
+              @if (categoryVariantAttributes.length > 0) {
+                <!-- Formulaire dynamique basé sur la config de la catégorie -->
+                @for (attr of categoryVariantAttributes; track attr.name) {
+                  <div>
+                    <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">{{ attr.name }} *</label>
+                    @if (attr.type === 'color') {
+                      <div class="flex items-center gap-2">
+                        <input type="color" [(ngModel)]="variantFormAttributes[attr.name]" [ngModelOptions]="{standalone: true}"
+                          class="w-10 h-9 rounded-lg border theme-border cursor-pointer p-0.5"/>
+                        <input type="text" [(ngModel)]="variantFormAttributes[attr.name]" [ngModelOptions]="{standalone: true}"
+                          placeholder="ex: Rouge" maxlength="50"
+                          class="theme-input flex-1 px-2 py-2 rounded-lg text-sm"/>
+                      </div>
+                      <div class="flex flex-wrap gap-1.5 mt-1.5">
+                        @for (opt of attributesAvailableValues[attr.name] || []; track opt.value) {
+                          <button type="button" (click)="variantFormAttributes[attr.name] = opt.value"
+                            class="px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors"
+                            [class.bg-gold/20]="variantFormAttributes[attr.name] === opt.value"
+                            [class.text-gold]="variantFormAttributes[attr.name] === opt.value"
+                            [class.bg-white/5]="variantFormAttributes[attr.name] !== opt.value"
+                            [class.theme-muted]="variantFormAttributes[attr.name] !== opt.value">
+                            {{ opt.value }}
+                          </button>
+                        }
+                      </div>
+                    } @else {
+                      <input type="text" [(ngModel)]="variantFormAttributes[attr.name]" [ngModelOptions]="{standalone: true}"
+                        placeholder="ex: {{ attr.name === 'Taille' ? 'M, L, XL…' : attr.name === 'Matériau' ? 'Or, Argent…' : 'Valeur…' }}"
+                        class="theme-input w-full px-3 py-2 rounded-lg text-sm"/>
+                      <div class="flex flex-wrap gap-1.5 mt-1.5">
+                        @for (opt of attributesAvailableValues[attr.name] || []; track opt.value) {
+                          <button type="button" (click)="variantFormAttributes[attr.name] = opt.value"
+                            class="px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors"
+                            [class.bg-gold/20]="variantFormAttributes[attr.name] === opt.value"
+                            [class.text-gold]="variantFormAttributes[attr.name] === opt.value"
+                            [class.bg-white/5]="variantFormAttributes[attr.name] !== opt.value"
+                            [class.theme-muted]="variantFormAttributes[attr.name] !== opt.value">
+                            {{ opt.value }}
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+                @if (generateVariantName()) {
+                  <div class="p-2 rounded-lg bg-gold/5 border border-gold/20">
+                    <p class="text-[10px] theme-muted">Nom généré : <span class="text-gold font-bold">{{ generateVariantName() }}</span></p>
+                  </div>
+                }
                 <div>
-                  <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Nom *</label>
-                  <input [(ngModel)]="newVariant.colorName" type="text" placeholder="ex: Rouge" class="theme-input w-full px-3 py-2 rounded-lg text-sm"/>
+                  <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Nom personnalisé <span class="font-normal normal-case">(optionnel)</span></label>
+                  <input [(ngModel)]="newVariant.variantName" type="text" placeholder="Auto-généré si vide" class="theme-input w-full px-3 py-2 rounded-lg text-sm"/>
                 </div>
-                <div>
-                  <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Couleur *</label>
-                  <div class="flex items-center gap-2">
-                    <input [(ngModel)]="newVariant.colorHex" type="color" class="w-10 h-9 rounded-lg border theme-border cursor-pointer p-0.5"/>
-                    <input [(ngModel)]="newVariant.colorHex" type="text" placeholder="#000000" maxlength="7"
-                           class="theme-input flex-1 px-2 py-2 rounded-lg text-xs font-mono"/>
+              } @else {
+                <!-- Formulaire couleur par défaut -->
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Nom *</label>
+                    <input [(ngModel)]="newVariant.variantName" type="text" placeholder="ex: Rouge" class="theme-input w-full px-3 py-2 rounded-lg text-sm"/>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Couleur</label>
+                    <div class="flex items-center gap-2">
+                      <input [(ngModel)]="newVariant.colorHex" type="color" class="w-10 h-9 rounded-lg border theme-border cursor-pointer p-0.5"/>
+                      <input [(ngModel)]="newVariant.colorHex" type="text" placeholder="#000000" maxlength="7"
+                             class="theme-input flex-1 px-2 py-2 rounded-lg text-xs font-mono"/>
+                    </div>
                   </div>
                 </div>
-              </div>
+              }
 
               <div>
                 <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Stock *</label>
@@ -692,7 +748,7 @@
               </div>
 
               <div>
-                <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Photo de cette couleur <span class="font-normal normal-case">(optionnel)</span></label>
+                <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Photo <span class="font-normal normal-case">(optionnel)</span></label>
                 @if (newVariantPreview) {
                   <div class="flex items-center gap-3">
                     <img [src]="newVariantPreview" class="w-14 h-14 rounded-xl object-cover border theme-border flex-shrink-0"/>
@@ -747,11 +803,11 @@
                   <div class="w-8 h-8 rounded-full flex-shrink-0 border-2 border-white/10 shadow"
                        [style.background-color]="variant.colorHex"></div>
                   @if (variant.imageUrl) {
-                    <img [src]="variant.imageUrl" [alt]="variant.colorName" class="w-8 h-8 rounded-lg object-cover flex-shrink-0"/>
+                     <img [src]="variant.imageUrl" [alt]="variant.variantName" class="w-8 h-8 rounded-lg object-cover flex-shrink-0"/>
                   }
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2">
-                      <p class="text-sm font-bold theme-text truncate">{{ variant.colorName }}</p>
+                      <p class="text-sm font-bold theme-text truncate">{{ variant.variantName }}</p>
                       @if (variant.stock === 0) {
                         <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-400 flex-shrink-0">Épuisé</span>
                       }
@@ -1278,7 +1334,7 @@
                           <img [src]="item.preview" class="w-10 h-10 rounded-lg object-cover flex-shrink-0"/>
                           <div class="w-5 h-5 rounded-full flex-shrink-0 border-2 border-white/10" [style.background-color]="item.colorHex"></div>
                           <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold theme-text truncate">{{ item.colorName }}</p>
+                            <p class="text-sm font-bold theme-text truncate">{{ item.variantName }}</p>
                             <p class="text-xs theme-muted">
                               {{ item.stock }} unité{{ item.stock > 1 ? 's' : '' }}
                               @if (i === 0) { <span class="text-gold ml-1">· image principale</span> }
@@ -1308,16 +1364,16 @@
 
                       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div class="space-y-1.5">
-                          <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Nom de la couleur *</label>
+                          <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Nom de la variante *</label>
                           <input type="text"
-                            [ngModel]="pendingCreationColor.colorName"
-                            (ngModelChange)="pendingCreationColor.colorName = $event; onCreationColorNameChange($event)"
+                            [ngModel]="pendingCreationColor.variantName"
+                            (ngModelChange)="pendingCreationColor.variantName = $event; onCreationColorNameChange($event)"
                             [ngModelOptions]="{standalone: true}"
                             placeholder="ex: Rouge, Bleu marine…"
                             class="w-full px-3 py-2 rounded-xl bg-black/[.06] border theme-border theme-text text-sm placeholder:theme-muted focus:border-gold/50 focus:outline-none"/>
                         </div>
                         <div class="space-y-1.5 min-w-0">
-                          <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Code couleur *</label>
+                          <label class="text-[10px] font-bold theme-muted uppercase tracking-wider">Code couleur</label>
                           <div class="flex items-center gap-2 min-w-0">
                             <input type="color" [(ngModel)]="pendingCreationColor.colorHex" [ngModelOptions]="{standalone:true}"
                               class="w-10 h-9 flex-shrink-0 rounded-lg cursor-pointer border theme-border bg-transparent p-0.5"/>
@@ -1357,7 +1413,7 @@
                       </div>
 
                       <button type="button" (click)="confirmCreationItem()"
-                        [disabled]="!pendingCreationFile || !pendingCreationColor.colorName.trim()"
+                        [disabled]="!pendingCreationFile || !pendingCreationColor.variantName.trim()"
                         class="w-full py-2.5 rounded-xl bg-gold text-black text-sm font-black disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-yellow-600/20 transition-all">
                         + Valider cette couleur
                       </button>

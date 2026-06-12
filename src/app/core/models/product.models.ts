@@ -13,10 +13,11 @@ export interface ProductMediaItem {
 
 export interface ProductVariant {
   id: number;
-  colorName: string;
-  colorHex: string;
+  variantName: string;
+  colorHex?: string;
   imageUrl?: string;
   stock: number;
+  attributes?: Record<string, string>;
   createdAt?: string;
 }
 

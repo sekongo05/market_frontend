@@ -66,7 +66,7 @@ export class AuthService {
     this._storage('remove', this.refreshTokenKey);
     this._storage('remove', 'current_user');
     this.currentUserSubject.next(null);
-    this.webSocketService.connect();
+    this.webSocketService.disconnect();
   }
 
   refreshToken(
