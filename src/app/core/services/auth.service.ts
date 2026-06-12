@@ -28,6 +28,8 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
 
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private refreshTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly PROACTIVE_REFRESH_MS = 25 * 60 * 1000;
 
   constructor(
     private apiService: ApiService,
@@ -62,6 +64,7 @@ export class AuthService {
   }
 
   logout(): void {
+    this._clearProactiveRefresh();
     this._storage('remove', this.tokenKey);
     this._storage('remove', this.refreshTokenKey);
     this._storage('remove', 'current_user');
@@ -109,13 +112,52 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+    const payload = this._getTokenPayload(token);
+    if (!payload?.exp) return false;
+    return Date.now() >= payload.exp * 1000;
+  }
+
   getCurrentUser(): CurrentUser | null {
     return this.currentUserSubject.value;
+  }
+
+  private _getTokenPayload(token: string): Record<string, unknown> | null {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      return JSON.parse(atob(parts[1]));
+    } catch {
+      return null;
+    }
+  }
+
+  private _scheduleProactiveRefresh(): void {
+    this._clearProactiveRefresh();
+    if (!this.isBrowser) return;
+    this.refreshTimer = setTimeout(() => {
+      const refreshToken = this.getRefreshToken();
+      if (refreshToken) {
+        this.refreshToken(refreshToken).subscribe({
+          error: () => this.logout(),
+        });
+      }
+    }, this.PROACTIVE_REFRESH_MS);
+  }
+
+  private _clearProactiveRefresh(): void {
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = null;
+    }
   }
 
   private setTokens(token: string, refreshToken: string): void {
     this._storage('set', this.tokenKey, token);
     this._storage('set', this.refreshTokenKey, refreshToken);
+    this._scheduleProactiveRefresh();
   }
 
   private setCurrentUser(user: AuthResponse): void {
@@ -132,18 +174,36 @@ export class AuthService {
 
   private loadUserFromToken(): void {
     const token = this.getToken();
-    if (token) {
-      const userJson = this._storage('get', 'current_user');
-      if (userJson) {
-        try {
-          const user: AuthResponse = JSON.parse(userJson);
-          this.currentUserSubject.next(user as CurrentUser);
-          this._connectWs(user);
-          return;
-        } catch (e) {
-          console.error('Failed to parse stored user', e);
-          this._storage('remove', 'current_user');
-        }
+    if (!token) {
+      if (this.isBrowser) {
+        this.webSocketService.connect();
+      }
+      return;
+    }
+
+    if (this.isTokenExpired()) {
+      const refreshToken = this.getRefreshToken();
+      if (refreshToken) {
+        this.refreshToken(refreshToken).subscribe({
+          error: () => this.logout(),
+        });
+      } else {
+        this.logout();
+      }
+      return;
+    }
+
+    const userJson = this._storage('get', 'current_user');
+    if (userJson) {
+      try {
+        const user: AuthResponse = JSON.parse(userJson);
+        this.currentUserSubject.next(user as CurrentUser);
+        this._connectWs(user);
+        this._scheduleProactiveRefresh();
+        return;
+      } catch (e) {
+        console.error('Failed to parse stored user', e);
+        this._storage('remove', 'current_user');
       }
     }
     if (this.isBrowser) {

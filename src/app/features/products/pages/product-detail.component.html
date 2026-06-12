@@ -491,8 +491,8 @@
             } @else {
               <div class="hidden lg:flex flex-col gap-3">
 
-                <!-- Qty selector (connecté seulement) -->
-                @if (isLoggedIn && !hasVariants) {
+                <!-- Qty selector -->
+                @if (!hasVariants) {
                   <div class="flex items-center gap-4">
                     <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
                     <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
@@ -530,7 +530,6 @@
                 }
 
                 <!-- CTA -->
-                @if (isLoggedIn) {
                 <button (click)="addToCart()"
                   [disabled]="isCascadeMode ? !cascadeMatchedVariant : (hasVariants && totalSelectedQty === 0)"
                   class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
@@ -570,7 +569,6 @@
                     }
                   }
                 </button>
-                }
 
                 <button (click)="goBack()"
                   class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm

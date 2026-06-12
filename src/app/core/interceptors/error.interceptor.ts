@@ -105,11 +105,17 @@ export class ErrorInterceptor implements HttpInterceptor {
     });
   }
 
+  private readonly _protectedRoutes = ['/admin', '/manager', '/checkout', '/orders', '/profile'];
+
   private _logout(): void {
     const returnUrl = this.router.url;
     this.authService.logout();
-    this.router.navigate(['/auth/login'], {
-      queryParams: returnUrl !== '/' ? { returnUrl } : undefined,
-    });
+
+    const isProtected = this._protectedRoutes.some(route => returnUrl.startsWith(route));
+    if (isProtected) {
+      this.router.navigate(['/auth/login'], {
+        queryParams: returnUrl !== '/' ? { returnUrl } : undefined,
+      });
+    }
   }
 }

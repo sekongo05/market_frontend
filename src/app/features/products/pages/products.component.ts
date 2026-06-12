@@ -249,7 +249,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   addToCartFromView(): void {
     if (!this.selectedProduct) return;
-    if (!this.authService.isAuthenticated()) { this.authPromptService.show(); return; }
     if ((this.selectedProduct.variants?.length ?? 0) > 0 && !this.selectedViewVariant) return;
     this.cartService.addToCart({
       productId: this.selectedProduct.id,
@@ -272,7 +271,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   addToCart(product: ProductResponse): void {
-    if (!this.authService.isAuthenticated()) { this.authPromptService.show(); return; }
     if ((product.variants?.length ?? 0) > 0) {
       this.openProductView(product);
       return;

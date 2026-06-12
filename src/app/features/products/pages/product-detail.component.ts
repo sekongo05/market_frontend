@@ -456,10 +456,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   addToCart(): void {
     if (!this.product) return;
-    if (!this.authService.isAuthenticated()) {
-      this.authPromptService.show();
-      return;
-    }
 
     if (this.isCascadeMode) {
       if (!this.cascadeMatchedVariant || this.quantity === 0) return;
@@ -541,10 +537,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   addRelatedToCart(product: ProductResponse): void {
-    if (!this.authService.isAuthenticated()) {
-      this.authPromptService.show();
-      return;
-    }
     this.cartService.addToCart({
       productId: product.id,
       productName: product.name,
