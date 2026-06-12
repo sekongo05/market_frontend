@@ -324,7 +324,20 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private _autoSelectVariant(): void {
     this.variantQty = new Map();
     this._initCascade();
-    if (this.isCascadeMode) return;
+    if (this.isCascadeMode) {
+      // Auto-select first in-stock variant & populate cascade selections
+      const first = this.product?.variants?.find(v => v.stock > 0) ?? this.product?.variants?.[0];
+      if (first && first.attributes) {
+        this.selectedVariant = first;
+        this.cascadeMatchedVariant = first;
+        for (const attr of this.cascadeAttributes) {
+          const val = first.attributes[attr.name] ?? null;
+          this.cascadeSelections[attr.name] = val;
+        }
+        this.cascadeSelections = { ...this.cascadeSelections };
+      }
+      return;
+    }
     if (!this.product?.variants?.length) {
       this.selectedVariant = null;
       return;
