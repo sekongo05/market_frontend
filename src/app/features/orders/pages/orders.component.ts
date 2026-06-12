@@ -101,40 +101,33 @@ export class OrdersComponent implements OnInit, OnDestroy {
   loadOrders(page = 0): void {
     this.loading = true;
     this.error = null;
-    this.orderService.getMyOrders(page, this.pageSize).subscribe({
-      next: (r) => {
-        if (r.success) {
-          const pg = r.data as PageResponse<OrderResponse>;
-          this.orders = pg.content;
-          this.currentPage = page;
-          this.totalPages = pg.totalPages;
-          const targetOrder = this.route.snapshot.queryParamMap.get('order');
-          if (targetOrder) this._focusOrder(targetOrder);
-        }
-        }
-        this.loading = false;
-        this.cdr.detectChanges();
-      },
-      error: (err: any) => {
-        this.error = err?.error?.message || 'Erreur lors du chargement des commandes';
-        this.loading = false;
-        this.cdr.detectChanges();
-      },
+    this.orderService.getMyOrders(page, this.pageSize).subscribe((r) => {
+      if (r.success) {
+        const pg = r.data as PageResponse<OrderResponse>;
+        this.orders = pg.content;
+        this.currentPage = page;
+        this.totalPages = pg.totalPages;
+        const targetOrder = this.route.snapshot.queryParamMap.get('order');
+        if (targetOrder) this._focusOrder(targetOrder);
+      }
+      this.loading = false;
+      this.cdr.detectChanges();
+    }, (err: any) => {
+      this.error = err?.error?.message || 'Erreur lors du chargement des commandes';
+      this.loading = false;
+      this.cdr.detectChanges();
     });
   }
 
   loadMyReturns(): void {
-    this.returnService.getMyReturns(0, 100).subscribe({
-      next: (r) => {
-        if (r.success) {
-          const pg = r.data as PageResponse<ReturnResponse>;
-          this.returnsMap = {};
-          pg.content.forEach(ret => { this.returnsMap[ret.orderId] = ret; });
-          this.cdr.detectChanges();
-        }
-      },
-      error: (err) => { console.error('Failed to load my returns', err); },
-    });
+    this.returnService.getMyReturns(0, 100).subscribe((r) => {
+      if (r.success) {
+        const pg = r.data as PageResponse<ReturnResponse>;
+        this.returnsMap = {};
+        pg.content.forEach(ret => { this.returnsMap[ret.orderId] = ret; });
+        this.cdr.detectChanges();
+      }
+    }, (err) => { console.error('Failed to load my returns', err); });
   }
 
   toggleDetails(id: number): void {
@@ -157,24 +150,21 @@ export class OrdersComponent implements OnInit, OnDestroy {
     this.cancelError = null;
     this.cancelErrorOrderId = null;
     this.cdr.detectChanges();
-    this.orderService.cancelOrder(order.id).subscribe({
-      next: (r) => {
-        if (r.success) {
-          const idx = this.orders.findIndex(o => o.id === order.id);
-          if (idx !== -1) { this.orders = [...this.orders]; this.orders[idx] = r.data; }
-        } else {
-          this.cancelError = r.message || 'Impossible d\'annuler cette commande';
-          this.cancelErrorOrderId = order.id;
-        }
-        this.cancellingId = null;
-        this.cdr.detectChanges();
-      },
-      error: (err: any) => {
-        this.cancelError = err?.error?.message || 'Impossible d\'annuler cette commande';
+    this.orderService.cancelOrder(order.id).subscribe((r) => {
+      if (r.success) {
+        const idx = this.orders.findIndex(o => o.id === order.id);
+        if (idx !== -1) { this.orders = [...this.orders]; this.orders[idx] = r.data; }
+      } else {
+        this.cancelError = r.message || 'Impossible d\'annuler cette commande';
         this.cancelErrorOrderId = order.id;
-        this.cancellingId = null;
-        this.cdr.detectChanges();
-      },
+      }
+      this.cancellingId = null;
+      this.cdr.detectChanges();
+    }, (err: any) => {
+      this.cancelError = err?.error?.message || 'Impossible d\'annuler cette commande';
+      this.cancelErrorOrderId = order.id;
+      this.cancellingId = null;
+      this.cdr.detectChanges();
     });
   }
 
@@ -234,23 +224,20 @@ export class OrdersComponent implements OnInit, OnDestroy {
     this.returnError = null;
     this.cdr.detectChanges();
 
-    this.returnService.createReturn({ orderId, reason }).subscribe({
-      next: (r) => {
-        if (r.success) {
-          this.returnsMap = { ...this.returnsMap, [orderId]: r.data };
-          this.returnSuccessOrderId = orderId;
-          this.returnFormOrderId = null;
-        } else {
-          this.returnError = r.message || 'Erreur lors de la demande de retour';
-        }
-        this.returnLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (err: any) => {
-        this.returnError = err?.error?.message || 'Erreur lors de la demande de retour';
-        this.returnLoading = false;
-        this.cdr.detectChanges();
-      },
+    this.returnService.createReturn({ orderId, reason }).subscribe((r) => {
+      if (r.success) {
+        this.returnsMap = { ...this.returnsMap, [orderId]: r.data };
+        this.returnSuccessOrderId = orderId;
+        this.returnFormOrderId = null;
+      } else {
+        this.returnError = r.message || 'Erreur lors de la demande de retour';
+      }
+      this.returnLoading = false;
+      this.cdr.detectChanges();
+    }, (err: any) => {
+      this.returnError = err?.error?.message || 'Erreur lors de la demande de retour';
+      this.returnLoading = false;
+      this.cdr.detectChanges();
     });
   }
 
@@ -330,4 +317,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   previousPage(): void { if (this.currentPage > 0) this.loadOrders(this.currentPage - 1); }
   nextPage(): void { if (this.currentPage < this.totalPages - 1) this.loadOrders(this.currentPage + 1); }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
