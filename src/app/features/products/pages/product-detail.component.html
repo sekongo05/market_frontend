@@ -280,7 +280,7 @@
                         @if (attr.type === 'color' && value.startsWith('#')) {
                           <button type="button" (click)="selectCascadeAttribute(attr.name, value)"
                             [disabled]="isDisabled"
-                            class="relative w-11 h-11 rounded-full border-2 transition-all flex-shrink-0"
+                            class="relative w-11 h-11 rounded-full border-2 transition-all flex-shrink-0 ring-1 ring-inset ring-black/10"
                             [class.border-gold]="cascadeSelections[attr.name] === value"
                             [class.border-white/20]="cascadeSelections[attr.name] !== value && !isDisabled"
                             [class.border-white/5]="isDisabled"
@@ -335,8 +335,8 @@
                         <img [src]="cascadeMatchedVariant.imageUrl | mediaUrl" [alt]="cascadeMatchedVariant.variantName"
                           class="w-12 h-12 rounded-lg object-cover flex-shrink-0"/>
                       } @else if (cascadeMatchedVariant.colorHex) {
-                        <div class="w-12 h-12 rounded-lg flex-shrink-0 border border-white/10"
-                             [style.background-color]="cascadeMatchedVariant.colorHex"></div>
+                         <div class="w-12 h-12 rounded-lg flex-shrink-0 border border-white/10 ring-1 ring-inset ring-black/10"
+                              [style.background-color]="cascadeMatchedVariant.colorHex"></div>
                       }
                       <div class="flex-1 min-w-0">
                         <p class="text-sm font-bold theme-text truncate">{{ cascadeMatchedVariant.variantName }}</p>
@@ -399,7 +399,7 @@
                                  class="w-full h-full object-cover"/>
                           </div>
                         } @else {
-                          <div class="w-12 h-12 rounded-xl border-2 shadow transition-all duration-200 flex items-center justify-center"
+                          <div class="w-12 h-12 rounded-xl border-2 shadow transition-all duration-200 flex items-center justify-center ring-1 ring-inset ring-black/10"
                                [style.background-color]="variant.colorHex || '#888'"
                                [style.border-color]="variant.stock === 0 ? 'rgba(239,68,68,0.5)' : selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.25)'">
                           </div>
@@ -418,7 +418,7 @@
                           </div>
                         }
                         @if (variant.stock > 0) {
-                          <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 transition-all duration-200"
+                          <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 transition-all duration-200 ring-1 ring-inset ring-black/10"
                                [style.background-color]="variant.colorHex || '#888'"
                                [style.border-color]="selectedVariant?.id === variant.id ? '#d4af37' : 'rgba(255,255,255,0.3)'">
                           </div>
