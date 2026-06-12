@@ -229,24 +229,22 @@
             <div class="h-0.5 w-16 bg-gold rounded-full"></div>
           </div>
 
-          <!-- Price block -->
-          <div class="sec-price p-5 rounded-2xl luxury-card">
-            <div class="flex items-end gap-4 flex-wrap">
-              <div>
-                <p class="text-xs theme-muted uppercase tracking-wider mb-1">Prix</p>
-                @if (hasDiscount) {
-                  <div class="flex items-baseline gap-2 flex-wrap">
-                    <p class="text-3xl sm:text-4xl font-black leading-none" style="color: #f97316">{{ formattedPrice }}</p>
-                    <span class="text-xl theme-muted line-through leading-none">{{ formattedOriginalPrice }}</span>
-                    <span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-sm font-black">-{{ product!.discountPercent }}%</span>
-                  </div>
-                } @else {
-                  <p class="text-3xl sm:text-4xl font-black gold-text leading-none">{{ formattedPrice }}</p>
-                }
-                <p class="text-sm theme-muted mt-1">FCFA</p>
+          <!-- Price -->
+          <div class="sec-price">
+            <p class="text-xs theme-muted uppercase tracking-wider">Prix</p>
+            @if (hasDiscount) {
+              <div class="flex items-baseline gap-2 flex-wrap mt-1">
+                <p class="text-3xl sm:text-4xl font-black leading-none" style="color: #f97316">{{ formattedPrice }}</p>
+                <span class="text-xl theme-muted line-through leading-none">{{ formattedOriginalPrice }}</span>
+                <span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-sm font-black">-{{ product!.discountPercent }}%</span>
+                <span class="text-sm theme-muted">FCFA</span>
               </div>
-
-            </div>
+            } @else {
+              <div class="flex items-baseline gap-2 mt-1">
+                <p class="text-3xl sm:text-4xl font-black gold-text leading-none">{{ formattedPrice }}</p>
+                <span class="text-sm theme-muted">FCFA</span>
+              </div>
+            }
           </div>
 
           <!-- Description -->
