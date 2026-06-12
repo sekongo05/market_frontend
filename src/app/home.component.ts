@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, PLATFORM_ID, afterNextRender } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -143,6 +143,19 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   ) {
     this._platformBrowser = isPlatformBrowser(this.platformId);
     this.currentUser$ = this.authService.currentUser$;
+
+    afterNextRender(() => {
+      this._loadPublicStats();
+      this._loadCategories();
+      this._loadFeatured();
+      this._loadBestsellers();
+      this._loadProducts();
+      this._loadReviews();
+      this._loadFirstOrderPromo();
+      this._initObserver();
+      this._subscribeStock();
+      if (this._platformBrowser) this._startPolling();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -155,10 +168,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         document.addEventListener('mousedown',  this._onCursorDown);
         document.addEventListener('mouseup',    this._onCursorUp);
       }
+      this._preloadAdjacent();
+      this._startAutoPlay();
+      this._startProgress();
     }
-    this._preloadAdjacent();
-    this._startAutoPlay();
-    this._startProgress();
     this.seo.set({
       title: 'Mode, Montres & Lifestyle en Côte d\'Ivoire',
       description: 'SDM STORE : boutique en ligne de mode, montres, bijoux, beauté et lifestyle. Livraison 24–48h partout en Côte d\'Ivoire.',
@@ -193,16 +206,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         hasMap: 'https://www.google.com/maps/search/SDM+STORE+Abidjan',
       },
     });
-    this._loadPublicStats();
-    this._loadCategories();
-    this._loadFeatured();
-    this._loadBestsellers();
-    this._loadProducts();
-    this._loadReviews();
-    this._loadFirstOrderPromo();
-    this._initObserver();
-    this._subscribeStock();
-    if (this._platformBrowser) this._startPolling();
   }
 
   ngOnDestroy(): void {
