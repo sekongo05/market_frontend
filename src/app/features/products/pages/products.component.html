@@ -11,15 +11,12 @@
             </svg>
             Accueil
           </a>
-          <p class="text-[9px] font-bold uppercase tracking-[0.4em] mb-1.5" style="color:rgba(212,175,55,0.8);">
-            {{ selectedCategoryId ? 'Collection' : 'Catalogue' }}
-          </p>
+          @if (selectedCategoryId) {
+            <p class="text-[9px] font-bold uppercase tracking-[0.4em] mb-1.5" style="color:rgba(212,175,55,0.8);">Collection</p>
+          }
           <h1 class="text-2xl sm:text-3xl font-black theme-text tracking-tight uppercase">
             {{ selectedCategoryName ?? 'Catalogue' }}
           </h1>
-          @if (!loading && totalItems > 0) {
-            <p class="text-xs theme-muted mt-1">{{ totalItems }} article{{ totalItems > 1 ? 's' : '' }}</p>
-          }
         </div>
 
         <div class="flex flex-col gap-2 w-full md:flex-row md:w-auto md:items-center">
@@ -30,7 +27,7 @@
                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
             </svg>
-            <input
+            <input #searchInput
               [ngModel]="searchQuery"
               (ngModelChange)="onSearchChange($event)"
               (keyup.enter)="search()"
@@ -164,6 +161,28 @@
               <span>0 FCFA</span>
               <span>{{ PRICE_MAX | number:'1.0-0':'fr-FR' }} FCFA</span>
             </div>
+
+            <!-- Price text inputs -->
+            <div class="flex items-center gap-2 mt-3">
+              <div class="flex-1">
+                <label class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1 block">Min</label>
+                <input type="number" [ngModel]="minPriceInput"
+                  (ngModelChange)="onMinPriceInput($event)"
+                  [min]="0" [max]="maxPriceSlider"
+                  placeholder="0"
+                  class="theme-input w-full px-3 py-2 text-sm text-center"/>
+              </div>
+              <span class="text-xs theme-muted mt-5">—</span>
+              <div class="flex-1">
+                <label class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1 block">Max</label>
+                <input type="number" [ngModel]="maxPriceInput"
+                  (ngModelChange)="onMaxPriceInput($event)"
+                  [min]="minPriceSlider" [max]="PRICE_MAX"
+                  placeholder="Max"
+                  class="theme-input w-full px-3 py-2 text-sm text-center"/>
+              </div>
+              <span class="text-xs mt-5" style="color:#d4af37">FCFA</span>
+            </div>
           </div>
 
           <!-- Séparateur vertical -->
@@ -190,6 +209,48 @@
           </div>
         </div>
       </div>
+    </div>
+  }
+
+  <!-- ── Active filter chips ──────────────────────────────────────── -->
+  @if (hasActiveFilters && !isManager) {
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center gap-2">
+      @if (selectedCategoryId) {
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border"
+              style="border-color:rgba(212,175,55,0.3);background:rgba(212,175,55,0.08);color:#d4af37;">
+          {{ selectedCategory?.name ?? 'Catégorie' }}
+          <button (click)="selectCategory(null)" class="hover:opacity-60">✕</button>
+        </span>
+      }
+      @if (searchQuery) {
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border"
+              style="border-color:rgba(212,175,55,0.3);background:rgba(212,175,55,0.08);color:#d4af37;">
+          "{{ searchQuery }}"
+          <button (click)="clearSearch()" class="hover:opacity-60">✕</button>
+        </span>
+      }
+      @if (minPriceSlider > 0 || maxPriceSlider < PRICE_MAX) {
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border"
+              style="border-color:rgba(212,175,55,0.3);background:rgba(212,175,55,0.08);color:#d4af37;">
+          @if (minPriceSlider > 0) { {{ minPriceSlider | number:'1.0-0':'fr-FR' }} } @else { 0 }
+          — @if (maxPriceSlider < PRICE_MAX) { {{ maxPriceSlider | number:'1.0-0':'fr-FR' }} } @else { Max }
+          <button (click)="minPriceSlider = 0; maxPriceSlider = PRICE_MAX; minPriceInput = ''; maxPriceInput = ''; loadProducts(0)" class="hover:opacity-60">✕</button>
+        </span>
+      }
+      @if (inStockOnly) {
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border"
+              style="border-color:rgba(212,175,55,0.3);background:rgba(212,175,55,0.08);color:#d4af37;">
+          En stock
+          <button (click)="inStockOnly = false; loadProducts(0)" class="hover:opacity-60">✕</button>
+        </span>
+      }
+      @if (sortOption !== 'newest') {
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border"
+              style="border-color:rgba(212,175,55,0.3);background:rgba(212,175,55,0.08);color:#d4af37;">
+          {{ { 'price_asc': 'Prix ↑', 'price_desc': 'Prix ↓', 'name_asc': 'A-Z' }[sortOption] }}
+          <button (click)="sortOption = 'newest'; loadProducts(0)" class="hover:opacity-60">✕</button>
+        </span>
+      }
     </div>
   }
 
@@ -383,7 +444,7 @@
             Cette collection est vide pour l'instant.
           }
         </p>
-        <button (click)="searchQuery = ''; selectedCategoryId = null; loadProducts(0)" class="empty-state__btn">
+        <button (click)="clearFilters()" class="empty-state__btn">
           Voir tout le catalogue
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>

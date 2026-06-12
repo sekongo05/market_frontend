@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Subject, interval, fromEvent, merge } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subject, Subscription, interval, fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
 import { SEARCH_DEBOUNCE, PRICE_DEBOUNCE } from '../../../core/constants';
 import { ProductService } from '../../../core/services/product.service';
@@ -39,8 +39,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
   totalPages = 0;
   searchQuery = '';
 
+  @ViewChild('searchInput', { static: false }) searchInputRef?: ElementRef<HTMLInputElement>;
+
   private readonly searchSubject = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
+  private productsSub?: Subscription;
 
   // Modal state
   showModal = false;
@@ -89,6 +92,24 @@ export class ProductsComponent implements OnInit, OnDestroy {
     if (this.maxPriceSlider < this.minPriceSlider) this.maxPriceSlider = this.minPriceSlider;
     this.maxPriceInput = this.maxPriceSlider < this.PRICE_MAX ? String(this.maxPriceSlider) : '';
     this._debouncedApply();
+  }
+
+  onMinPriceInput(value: string): void {
+    this.minPriceInput = value;
+    const v = parseFloat(value);
+    if (!isNaN(v) && v >= 0 && v <= this.maxPriceSlider) {
+      this.minPriceSlider = v;
+      this.loadProducts(0);
+    }
+  }
+
+  onMaxPriceInput(value: string): void {
+    this.maxPriceInput = value;
+    const v = parseFloat(value);
+    if (!isNaN(v) && v >= this.minPriceSlider && v <= this.PRICE_MAX) {
+      this.maxPriceSlider = v;
+      this.loadProducts(0);
+    }
   }
 
   private _debouncedApply(): void {
@@ -183,6 +204,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private router: Router,
     private scrollLock: ScrollLockService,
     private seo: SeoService,
   ) {}
@@ -297,15 +319,30 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const slugParam     = this.route.snapshot.queryParamMap.get('categorie');
     const searchParam   = this.route.snapshot.queryParamMap.get('search');
     const featuredParam = this.route.snapshot.queryParamMap.get('featured');
+    const sortParam     = this.route.snapshot.queryParamMap.get('sort');
+    const minPriceParam = this.route.snapshot.queryParamMap.get('minPrice');
+    const maxPriceParam = this.route.snapshot.queryParamMap.get('maxPrice');
+    const inStockParam  = this.route.snapshot.queryParamMap.get('inStock');
+    const pageParam     = this.route.snapshot.queryParamMap.get('page');
+
     if (featuredParam === 'true') this.featuredOnly = true;
+    if (sortParam && ['newest','price_asc','price_desc','name_asc'].includes(sortParam)) this.sortOption = sortParam as SortOption;
+    if (minPriceParam) { const v = parseFloat(minPriceParam); if (!isNaN(v)) { this.minPriceSlider = v; this.minPriceInput = String(v); } }
+    if (maxPriceParam) { const v = parseFloat(maxPriceParam); if (!isNaN(v)) { this.maxPriceSlider = v; this.maxPriceInput = String(v); } }
+    if (inStockParam === 'true') this.inStockOnly = true;
+
+    let initialPage = 0;
+    if (pageParam) { const v = parseInt(pageParam, 10); if (!isNaN(v) && v >= 0) initialPage = v; }
+
     if (slugParam) {
       this.pendingCategorySlug = slugParam;
       this.loading = true;
+      this.currentPage = initialPage;
     } else if (searchParam) {
       this.searchQuery = searchParam;
-      this.loadProducts();
+      this.loadProducts(initialPage);
     } else {
-      this.loadProducts();
+      this.loadProducts(initialPage);
     }
     this.loadCategories();
     this.searchSubject.pipe(
@@ -639,6 +676,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   // ─── Catalogue ──────────────────────────────────────────────────────────────
 
   loadProducts(page: number = 0): void {
+    this.productsSub?.unsubscribe();
     this.loading = true;
     this.error = null;
 
@@ -653,7 +691,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     if (this.inStockOnly) params.inStock = true;
     if (this.featuredOnly) params.featured = true;
 
-    this.productService.getProducts(params).pipe(
+    this.productsSub = this.productService.getProducts(params).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (response) => {
@@ -665,6 +703,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
           this.currentPage = page;
         }
         this.loading = false;
+        this._syncUrl();
         this.cdr.detectChanges();
       },
       error: () => {
@@ -673,8 +712,35 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.currentPage = 0;
         this.error = 'Impossible de charger les produits. Veuillez réessayer.';
         this.loading = false;
+        this._syncUrl();
         this.cdr.detectChanges();
       },
+    });
+  }
+
+  private _syncUrl(): void {
+    const queryParams: Record<string, string | null> = {};
+    queryParams.search = this.searchQuery || null;
+    if (this.selectedCategoryId) {
+      const cat = this.categories.find(c => c.id === this.selectedCategoryId);
+      queryParams.categorie = cat?.slug || null;
+    } else {
+      queryParams.categorie = null;
+    }
+    queryParams.sort = this.sortOption !== 'newest' ? this.sortOption : null;
+    queryParams.minPrice = this.minPriceSlider > 0 ? String(this.minPriceSlider) : null;
+    queryParams.maxPrice = this.maxPriceSlider < this.PRICE_MAX ? String(this.maxPriceSlider) : null;
+    queryParams.inStock = this.inStockOnly ? 'true' : null;
+    queryParams.page = this.currentPage > 0 ? String(this.currentPage) : null;
+    if (this.featuredOnly) {
+      queryParams.featured = 'true';
+    } else {
+      queryParams.featured = null;
+    }
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      replaceUrl: true,
     });
   }
 
@@ -685,14 +751,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
           this.categories = response.data;
           if (this.pendingCategorySlug) {
             const slug = this.pendingCategorySlug.toLowerCase();
-            const cat = this.categories.find(c => c.slug.toLowerCase().includes(slug));
+            const cat = this.categories.find(c => c.slug.toLowerCase() === slug);
             if (cat) this.selectedCategoryId = cat.id;
             this.pendingCategorySlug = null;
-            this.loadProducts(0);
+            this.loadProducts(this.currentPage);
           }
         } else if (this.pendingCategorySlug) {
           this.pendingCategorySlug = null;
-          this.loadProducts(0);
+          this.loadProducts(this.currentPage);
         }
         this.cdr.detectChanges();
       },
@@ -707,16 +773,19 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   onSearchChange(value: string): void {
-    this.searchSubject.next(value);
+    this.searchSubject.next(value.trim());
   }
 
   clearSearch(): void {
+    this.searchQuery = '';
     this.searchSubject.next('');
+    this.loadProducts(0);
   }
 
   selectCategory(id: number | null): void {
     this.selectedCategoryId = id;
     this.searchQuery = '';
+    this.searchSubject.next(''); // flush pending debounced search
     this.loadProducts(0);
   }
 
@@ -729,7 +798,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     return Array.from(map.values());
   }
 
-  search(): void { this.loadProducts(0); }
+  search(): void {
+    const value = this.searchInputRef?.nativeElement?.value?.trim() ?? '';
+    if (value !== this.searchQuery) {
+      this.searchQuery = value;
+    }
+    this.loadProducts(0);
+  }
 
   onSortChange(sort: string): void {
     this.sortOption = sort as SortOption;
@@ -748,12 +823,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.maxPriceSlider = this.PRICE_MAX;
     this.inStockOnly = false;
     this.featuredOnly = false;
+    this.searchQuery = '';
+    this.selectedCategoryId = null;
     this.loadProducts(0);
     this.cdr.detectChanges();
   }
 
   get hasActiveFilters(): boolean {
-    return this.sortOption !== 'newest' || this.minPriceSlider > 0 || this.maxPriceSlider < this.PRICE_MAX || this.inStockOnly;
+    return this.sortOption !== 'newest' || this.minPriceSlider > 0 || this.maxPriceSlider < this.PRICE_MAX || this.inStockOnly || !!this.searchQuery || this.selectedCategoryId != null;
   }
 
   previousPage(): void {

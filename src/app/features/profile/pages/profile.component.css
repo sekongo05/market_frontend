@@ -2,3 +2,11 @@
 @media (max-width: 640px) {
   .hero-orb { display: none; }
 }
+
+@keyframes avatar-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.04); }
+}
+.avatar-glow {
+  animation: avatar-pulse 3s ease-in-out infinite;
+}

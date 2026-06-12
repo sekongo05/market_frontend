@@ -6,3 +6,5 @@ export const PAGE_SIZE_ORDERS = 15;
 export const PAGE_SIZE_USERS = 15;
 export const PAGE_SIZE_RETURNS = 15;
 export const DELIVERY_PAGE_SIZE = 50;
+
+export const WHATSAPP_NUMBER = '2250153761320';

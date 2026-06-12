@@ -2,7 +2,7 @@ import {
   Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
   AfterViewInit, HostListener
 } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 import { Subject, interval, fromEvent, merge } from 'rxjs';
@@ -82,7 +82,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location,
     private productService: ProductService,
     private cartService: CartService,
     private authService: AuthService,
@@ -95,11 +94,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   ) {}
 
   goBack(): void {
-    if (window.history.length > 1) {
-      this.location.back();
-    } else {
-      this.router.navigate(['/products']);
-    }
+    this.router.navigate(['/products']);
   }
 
   get isManager(): boolean {
@@ -113,6 +108,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get isLoggedIn(): boolean {
     return this.authService.isAuthenticated();
+  }
+
+  get whatsappUrl(): string {
+    return this.wa.buildUrl(this.product.slug);
   }
 
   ngOnInit(): void {

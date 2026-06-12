@@ -19,17 +19,26 @@
 
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
         <div class="relative flex-shrink-0">
-          <div class="absolute -inset-1.5 rounded-[22px] opacity-70 blur" style="background: linear-gradient(135deg, #f5d442, #b8941e, #7a5c0a)"></div>
-          <div class="relative w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] rounded-[20px] flex items-center justify-center text-3xl font-black text-white shadow-2xl"
-               style="background: linear-gradient(135deg, #f5d442, #b8941e)">
+          <!-- Outer glow layers -->
+          <div class="absolute -inset-3 rounded-[28px] opacity-40 blur-2xl avatar-glow" style="background: radial-gradient(circle, #f5d442 0%, #b8941e 40%, transparent 70%)"></div>
+          <div class="absolute -inset-1.5 rounded-[22px] opacity-60 blur" style="background: linear-gradient(135deg, #f5d442, #b8941e, #7a5c0a)"></div>
+          <!-- Ring -->
+          <div class="absolute -inset-[3px] rounded-[23px] opacity-30" style="background: linear-gradient(135deg, #f5d44280, #b8941e40, #7a5c0a20)"></div>
+          <!-- Avatar body -->
+          <div class="relative w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] rounded-[20px] flex items-center justify-center shadow-2xl overflow-hidden"
+               style="background: linear-gradient(145deg, #f5d442, #b8941e, #9a7a10)">
             @if (loading && !user) {
               <div class="w-8 h-8 rounded-full border-2 border-white/30 border-t-white/80 animate-spin"></div>
             } @else {
-              {{ initials }}
+              <!-- Subtle inner shimmer overlay -->
+              <div class="absolute inset-0 opacity-20" style="background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 50%)"></div>
+              <span class="relative text-2xl sm:text-3xl font-bold tracking-tight text-white drop-shadow-lg" style="font-feature-settings:'palt';">{{ initials }}</span>
             }
           </div>
-          <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-lg border-2 border-[#0d0d0d] flex items-center justify-center shadow">
-            <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <!-- Status dot -->
+          <div class="absolute -bottom-1 -right-1 w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] rounded-lg flex items-center justify-center shadow-lg"
+               style="background: linear-gradient(135deg, #22c55e, #15803d);">
+            <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
             </svg>
           </div>
@@ -101,39 +110,69 @@
         </div>
       }
 
-      <!-- Tabs -->
-      <div class="flex items-center gap-1 mt-8 p-1 rounded-2xl w-fit mx-auto sm:mx-0" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08)">
-        <button (click)="activeTab = 'profile'; clearMessages()"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
-          [class]="activeTab === 'profile' ? 'bg-gold text-black shadow-lg shadow-yellow-600/20' : 'text-white/40 hover:text-white/70'">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-          </svg>
-          Mon profil
-        </button>
-        <button (click)="activeTab = 'security'; clearMessages()"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
-          [class]="activeTab === 'security' ? 'bg-gold text-black shadow-lg shadow-yellow-600/20' : 'text-white/40 hover:text-white/70'">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-          </svg>
-          Sécurité
-        </button>
-        <button (click)="activeTab = 'addresses'; clearMessages(); loadAddresses()"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
-          [class]="activeTab === 'addresses' ? 'bg-gold text-black shadow-lg shadow-yellow-600/20' : 'text-white/40 hover:text-white/70'">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-          Adresses
-        </button>
-      </div>
+
     </div>
   </div>
 
   <!-- ══ Corps ════════════════════════════════════════════════════════ -->
   <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- Profile summary card -->
+    @if (user) {
+      <div class="luxury-card rounded-3xl p-5 sm:p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xs font-bold uppercase tracking-wider theme-muted">Résumé du profil</h2>
+          <span class="text-[10px] font-bold text-gold bg-gold/10 px-2.5 py-1 rounded-full">Principal</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider theme-muted block mb-1">Nom</span>
+            <span class="font-bold theme-text">{{ user.prenom }} {{ user.nom }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider theme-muted block mb-1">Email</span>
+            <span class="theme-text break-all">{{ user.email }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider theme-muted block mb-1">Téléphone</span>
+            <span class="theme-text">{{ hasPhone ? user.phone : 'Non renseigné' }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider theme-muted block mb-1">Membre depuis</span>
+            <span class="theme-text">{{ memberSince || '–' }}</span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Tabs -->
+    <div class="flex items-center gap-1 mb-6 p-1 rounded-2xl w-fit" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08)">
+      <button (click)="activeTab = 'profile'; clearMessages()"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
+        [class]="activeTab === 'profile' ? 'bg-gold text-black shadow-lg shadow-yellow-600/20' : 'text-white/40 hover:text-white/70'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        Mon profil
+      </button>
+      <button (click)="activeTab = 'security'; clearMessages()"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
+        [class]="activeTab === 'security' ? 'bg-gold text-black shadow-lg shadow-yellow-600/20' : 'text-white/40 hover:text-white/70'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+        Sécurité
+      </button>
+      <button (click)="activeTab = 'addresses'; clearMessages(); loadAddresses()"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
+        [class]="activeTab === 'addresses' ? 'bg-gold text-black shadow-lg shadow-yellow-600/20' : 'text-white/40 hover:text-white/70'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Adresses
+      </button>
+    </div>
 
     <!-- Toasts -->
     @if (successMessage) {
@@ -164,9 +203,39 @@
       </div>
     }
 
-    <!-- Actions rapides + Commandes récentes -->
+    <!-- Tab content -->
+    @if (!loading || user) {
+      @switch (activeTab) {
+        @case ('profile') {
+          @defer (on immediate) {
+            @if (user) {
+              <app-profile-info [user]="user" [isManager]="isManager" [saving]="saving" (saveProfile)="updateProfile($event)" />
+            }
+          }
+        }
+        @case ('security') {
+          @defer (on viewport) {
+            <app-profile-security [changing]="changingPassword" (changePassword)="changePassword($event)" />
+          } @placeholder {
+            <div class="skeleton h-80 rounded-3xl"></div>
+          }
+        }
+        @case ('addresses') {
+          @defer (on viewport) {
+            <app-profile-addresses
+              [addresses]="addresses" [loading]="loadingAddresses" [saving]="savingAddress"
+              (add)="addAddress($event)" (update)="updateAddress($event)"
+              (remove)="deleteAddress($event)" (setDefault)="setDefaultAddress($event)" />
+          } @placeholder {
+            <div class="skeleton h-64 rounded-3xl"></div>
+          }
+        }
+      }
+    }
+
+    <!-- ══ Actions rapides + Commandes récentes ═══════════════════════ -->
     @if (!isManager && user) {
-      <div class="grid grid-cols-2 gap-3 mb-6">
+      <div class="grid grid-cols-2 gap-3 mt-8">
         <a routerLink="/orders" class="luxury-card rounded-2xl p-4 flex items-center gap-3 group hover:border-gold/30 transition-all">
           <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background: rgba(184,148,30,0.12); border: 1px solid rgba(184,148,30,0.2)">
             <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,7 +264,7 @@
     }
 
     @if (recentOrders.length > 0) {
-      <div class="mb-6 luxury-card rounded-3xl overflow-hidden">
+      <div class="mt-6 luxury-card rounded-3xl overflow-hidden">
         <div class="px-6 sm:px-8 pt-5 pb-4 border-b theme-border flex items-center justify-between">
           <div class="flex items-center gap-2">
             <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -218,36 +287,6 @@
           }
         </div>
       </div>
-    }
-
-    <!-- Tabs avec @defer -->
-    @if (!loading || user) {
-      @switch (activeTab) {
-        @case ('profile') {
-          @defer (on immediate) {
-            @if (user) {
-              <app-profile-info [user]="user" [isManager]="isManager" [saving]="saving" (saveProfile)="updateProfile($event)" />
-            }
-          }
-        }
-        @case ('security') {
-          @defer (on viewport) {
-            <app-profile-security [changing]="changingPassword" (changePassword)="changePassword($event)" />
-          } @placeholder {
-            <div class="skeleton h-80 rounded-3xl"></div>
-          }
-        }
-        @case ('addresses') {
-          @defer (on viewport) {
-            <app-profile-addresses
-              [addresses]="addresses" [loading]="loadingAddresses" [saving]="savingAddress"
-              (add)="addAddress($event)" (update)="updateAddress($event)"
-              (remove)="deleteAddress($event)" (setDefault)="setDefaultAddress($event)" />
-          } @placeholder {
-            <div class="skeleton h-64 rounded-3xl"></div>
-          }
-        }
-      }
     }
 
   </div>
