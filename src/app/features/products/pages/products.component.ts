@@ -124,9 +124,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
   // Toast notification
   toastMessage: string | null = null;
   private toastTimer?: ReturnType<typeof setTimeout>;
-  // Product IDs the authenticated user has already ordered
-  orderedProductIds = new Set<number>();
-
   // Product quick-view panel
   selectedProduct: ProductResponse | null = null;
   selectedProductQty = 1;
@@ -357,14 +354,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
-    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
-      if (user) {
-        this._loadOrderedProductIds();
-      } else {
-        this.orderedProductIds = new Set();
-        this.cdr.detectChanges();
-      }
-    });
+    // No longer tracking ordered product IDs for "Déjà acheté" badge
 
     this.wsService.stockUpdate$
       .pipe(takeUntil(this.destroy$))
@@ -414,22 +404,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
     clearTimeout(this.priceDebounceTimer);
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  private _loadOrderedProductIds(): void {
-    this.orderService.getMyOrders(0, 50).pipe(takeUntil(this.destroy$)).subscribe({
-      next: r => {
-        if (r.success) {
-          const ids = new Set<number>();
-          for (const order of r.data.content) {
-            for (const item of order.items) ids.add(item.productId);
-          }
-          this.orderedProductIds = ids;
-          this.cdr.detectChanges();
-        }
-      },
-      error: (err) => { console.error('Failed to load my orders for product IDs', err); },
-    });
   }
 
   get isManager(): boolean {

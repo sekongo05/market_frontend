@@ -917,7 +917,7 @@
     </div>
 
     <!-- ── Sticky CTA mobile (hidden on desktop) ── -->
-    @if (isLoggedIn && !isManager) {
+    @if (!isManager) {
       <div class="lg:hidden fixed left-0 right-0 z-[46] theme-surface border-t theme-border"
            style="bottom: calc(var(--bottom-nav-h, 60px) + env(safe-area-inset-bottom, 0px))">
         <div class="flex items-center gap-3 px-4 py-3">
@@ -935,19 +935,19 @@
             </div>
           } @else {
             <button (click)="addToCart()"
-              [disabled]="hasVariants && totalSelectedQty === 0"
+              [disabled]="isCascadeMode ? !cascadeMatchedVariant : (hasVariants && totalSelectedQty === 0)"
               class="flex items-center gap-2 px-5 py-3.5 rounded-xl font-bold text-sm flex-shrink-0
                      transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               [class]="addedToCart
                 ? 'bg-green-500 text-white'
-                : (hasVariants && totalSelectedQty === 0 ? 'bg-gold/30 text-black/60' : 'bg-gold text-black')">
+                : ((isCascadeMode ? !cascadeMatchedVariant : (hasVariants && totalSelectedQty === 0)) ? 'bg-gold/30 text-black/60' : 'bg-gold text-black')">
               @if (addedToCart) {
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                 </svg>
                 Ajouté !
-              } @else if (hasVariants && totalSelectedQty === 0) {
-                Choisissez une couleur
+              } @else if (isCascadeMode ? !cascadeMatchedVariant : (hasVariants && totalSelectedQty === 0)) {
+                Choisissez vos options
               } @else {
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

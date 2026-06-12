@@ -406,15 +406,6 @@
           <span class="text-[13px] text-gold/60">FCFA</span>
         </div>
 
-        <!-- Déjà acheté -->
-        @if (!isManager && orderedProductIds.has(product.id)) {
-          <div class="flex items-center gap-1 mt-0.5">
-            <svg class="w-2.5 h-2.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-            </svg>
-            <span class="text-[9px] font-bold text-emerald-500/80">Déjà acheté</span>
-          </div>
-        }
 
       </a>
     </ng-template>
@@ -615,15 +606,6 @@
           <div>
             <p class="text-xs text-gold font-semibold uppercase tracking-widest mb-2">{{ selectedProduct.category.name }}</p>
             <h1 class="text-3xl lg:text-4xl font-black theme-text leading-tight mb-3">{{ selectedProduct.name }}</h1>
-            @if (!isManager && orderedProductIds.has(selectedProduct.id)) {
-              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 mb-3 rounded-full
-                          bg-emerald-500/12 border border-emerald-500/30 text-emerald-500 text-xs font-bold">
-                <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                </svg>
-                Vous avez déjà commandé cet article
-              </div>
-            }
             <p class="text-sm theme-muted leading-relaxed">{{ selectedProduct.description }}</p>
           </div>
 
