@@ -410,8 +410,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         }
         this.categoriesLoading = false;
         this.cdr.detectChanges();
+        this._observeScrollReveals();
       },
-      error: (err) => { console.error('Failed to load categories', err); this.categoriesLoading = false; this.cdr.detectChanges(); },
+      error: (err) => { console.error('Failed to load categories', err); this.categoriesLoading = false; this.cdr.detectChanges(); this._observeScrollReveals(); },
     });
   }
 
@@ -427,8 +428,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         }
         this.featuredLoading = false;
         this.cdr.detectChanges();
+        this._observeScrollReveals();
       },
-      error: (err) => { console.error('Failed to load featured', err); this.featuredLoading = false; this.cdr.detectChanges(); },
+      error: (err) => { console.error('Failed to load featured', err); this.featuredLoading = false; this.cdr.detectChanges(); this._observeScrollReveals(); },
     });
   }
 
@@ -441,8 +443,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         }
         this.bestsellersLoading = false;
         this.cdr.detectChanges();
+        this._observeScrollReveals();
       },
-      error: (err) => { console.error('Failed to load bestsellers', err); this.bestsellersLoading = false; this.cdr.detectChanges(); },
+      error: (err) => { console.error('Failed to load bestsellers', err); this.bestsellersLoading = false; this.cdr.detectChanges(); this._observeScrollReveals(); },
     });
   }
 
@@ -456,8 +459,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         }
         this.newProductsLoading = false;
         this.cdr.detectChanges();
+        this._observeScrollReveals();
       },
-      error: (err) => { console.error('Failed to load products', err); this.newProductsLoading = false; this.cdr.detectChanges(); },
+      error: (err) => { console.error('Failed to load products', err); this.newProductsLoading = false; this.cdr.detectChanges(); this._observeScrollReveals(); },
     });
   }
 
@@ -475,6 +479,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
             this._count('statReviews',    this.publicStats.totalReviews,     1800);
           }
           this.cdr.detectChanges();
+          this._observeScrollReveals();
         }
       },
       error: (err) => { console.error('Stats load failed', err); },
@@ -551,10 +556,18 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
     if (this._platformBrowser) {
-      document.querySelectorAll('.scroll-reveal').forEach(el => this._observer!.observe(el));
+      this._observeScrollReveals();
       const stats = document.getElementById('stats-row');
       if (stats) this._observer.observe(stats);
     }
+  }
+
+  private _observeScrollReveals(): void {
+    if (!this._observer) return;
+    document.querySelectorAll('.scroll-reveal').forEach(el => {
+      if (el.classList.contains('in-view')) return;
+      this._observer!.observe(el);
+    });
   }
 
   private _count(prop: 'statProducts'|'statCategories'|'statClients'|'statReviews', target: number, ms: number): void {
