@@ -678,21 +678,24 @@
                     <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">{{ attr.name }} *</label>
                     @if (attr.type === 'color') {
                       <div class="flex items-center gap-2">
-                        <input type="color" [(ngModel)]="variantFormAttributes[attr.name]" [ngModelOptions]="{standalone: true}"
+                        <input type="color" [ngModel]="variantFormAttributes[attr.name]" (ngModelChange)="onColorAttributeInput(attr.name, $event)" [ngModelOptions]="{standalone: true}"
                           class="w-10 h-9 rounded-lg border theme-border cursor-pointer p-0.5"/>
-                        <input type="text" [(ngModel)]="variantFormAttributes[attr.name]" [ngModelOptions]="{standalone: true}"
-                          placeholder="ex: Rouge" maxlength="50"
-                          class="theme-input flex-1 px-2 py-2 rounded-lg text-sm"/>
+                        <input type="text" [ngModel]="variantFormAttributes[attr.name]" (ngModelChange)="onColorAttributeInput(attr.name, $event)" [ngModelOptions]="{standalone: true}"
+                          placeholder="ex: Rouge ou #FF0000" maxlength="7"
+                          class="theme-input flex-1 px-2 py-2 rounded-lg text-sm font-mono"/>
                       </div>
                       <div class="flex flex-wrap gap-1.5 mt-1.5">
                         @for (opt of attributesAvailableValues[attr.name] || []; track opt.value) {
                           <button type="button" (click)="variantFormAttributes[attr.name] = opt.value"
-                            class="px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors"
+                            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors"
                             [class.bg-gold/20]="variantFormAttributes[attr.name] === opt.value"
                             [class.text-gold]="variantFormAttributes[attr.name] === opt.value"
                             [class.bg-white/5]="variantFormAttributes[attr.name] !== opt.value"
                             [class.theme-muted]="variantFormAttributes[attr.name] !== opt.value">
-                            {{ opt.value }}
+                            @if (opt.value.startsWith('#')) {
+                              <span class="w-2.5 h-2.5 rounded-full border border-white/10 flex-shrink-0" [style.background]="opt.value"></span>
+                            }
+                            <span>{{ opt.value }}</span>
                           </button>
                         }
                       </div>
@@ -703,12 +706,12 @@
                       <div class="flex flex-wrap gap-1.5 mt-1.5">
                         @for (opt of attributesAvailableValues[attr.name] || []; track opt.value) {
                           <button type="button" (click)="variantFormAttributes[attr.name] = opt.value"
-                            class="px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors"
+                            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors"
                             [class.bg-gold/20]="variantFormAttributes[attr.name] === opt.value"
                             [class.text-gold]="variantFormAttributes[attr.name] === opt.value"
                             [class.bg-white/5]="variantFormAttributes[attr.name] !== opt.value"
                             [class.theme-muted]="variantFormAttributes[attr.name] !== opt.value">
-                            {{ opt.value }}
+                            <span>{{ opt.value }}</span>
                           </button>
                         }
                       </div>

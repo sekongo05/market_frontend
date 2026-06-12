@@ -743,6 +743,16 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     });
   }
 
+  onColorAttributeInput(attrName: string, value: string): void {
+    const trimmed = value.trim();
+    if (/^#[0-9A-Fa-f]{6}$/.test(trimmed)) {
+      this.variantFormAttributes[attrName] = trimmed.toUpperCase();
+      return;
+    }
+    const hex = this.COLOR_MAP[trimmed.toLowerCase()];
+    this.variantFormAttributes[attrName] = hex ?? trimmed;
+  }
+
   saveVariant(): void {
     if (!this.editingProduct) return;
     if (this.categoryVariantAttributes.length > 0) {
