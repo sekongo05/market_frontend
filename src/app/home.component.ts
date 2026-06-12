@@ -376,6 +376,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   get hasFeatured(): boolean { return !this.featuredLoading && this.featuredProducts.length > 0; }
   get hasBestsellers(): boolean { return !this.bestsellersLoading && this.bestsellers.length > 0; }
   get hasNewProducts(): boolean { return !this.newProductsLoading && this.newProducts.length > 0; }
+  get hasGapSections(): boolean { return this.featuredLoading || this.hasFeatured || this.hasBestsellers; }
 
   get editorialStats(): { v: string; l: string }[] {
     const p = this.publicStats;

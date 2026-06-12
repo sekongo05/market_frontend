@@ -279,7 +279,9 @@
   <!-- ════════════════════════════════════════════════════════════════
        3. NOS UNIVERS — catégories dynamiques
   ════════════════════════════════════════════════════════════════════ -->
-  <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;">
+  <section class="scroll-reveal"
+           style="padding-top:clamp(60px,8vw,110px);padding-left:0;padding-right:0;"
+           [style.paddingBottom]="hasGapSections ? 'clamp(60px,8vw,110px)' : '0'">
     <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14">
       <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
       <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-2"
@@ -583,7 +585,9 @@
   <!-- ════════════════════════════════════════════════════════════════
        6. NOUVEAUTÉS
   ════════════════════════════════════════════════════════════════════ -->
-  <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;">
+  <section class="scroll-reveal"
+           style="padding-left:0;padding-right:0;padding-bottom:clamp(60px,8vw,110px);"
+           [style.paddingTop]="hasGapSections ? 'clamp(60px,8vw,110px)' : '0'">
     <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
       <div>
         <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
