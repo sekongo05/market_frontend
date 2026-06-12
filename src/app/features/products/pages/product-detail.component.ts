@@ -262,6 +262,16 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     return [...values];
   }
 
+  cascadeValueOutOfStock(attrName: string, value: string): boolean {
+    const filtered = (this.product?.variants ?? []).filter(v => {
+      for (const [key, val] of Object.entries(this.cascadeSelections)) {
+        if (val && key !== attrName && v.attributes?.[key] !== val) return false;
+      }
+      return v.attributes?.[attrName] === value;
+    });
+    return filtered.length > 0 && filtered.every(v => v.stock === 0);
+  }
+
   selectCascadeAttribute(attrName: string, value: string | null): void {
     this.cascadeSelections = { ...this.cascadeSelections, [attrName]: value };
     // Clear subsequent selections
@@ -330,6 +340,17 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     if (match) {
       this.selectedVariant = match;
       this.quantity = Math.min(this.quantity, Math.max(1, this.effectiveStock));
+      // Sync cascade selections if in cascade mode
+      if (this.isCascadeMode && match.attributes) {
+        for (const attr of this.cascadeAttributes) {
+          const val = match.attributes[attr.name] ?? null;
+          if (this.cascadeSelections[attr.name] !== val) {
+            this.cascadeSelections[attr.name] = val;
+          }
+        }
+        this.cascadeSelections = { ...this.cascadeSelections };
+        this.cascadeMatchedVariant = match;
+      }
     }
   }
 
@@ -450,7 +471,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   setQuantity(q: number): void {
     if (!this.product) return;
-    this.quantity = Math.max(1, Math.min(q, this.product.stock));
+    const maxStock = this.isCascadeMode && this.cascadeMatchedVariant
+      ? this.cascadeMatchedVariant.stock
+      : this.product.stock;
+    this.quantity = Math.max(1, Math.min(q, maxStock));
     this.cdr.detectChanges();
   }
 

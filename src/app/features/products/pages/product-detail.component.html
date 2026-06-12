@@ -297,27 +297,54 @@
                     </div>
                     <div class="flex flex-wrap gap-2">
                       @for (value of values; track value) {
-                        <button type="button"
-                          (click)="selectCascadeAttribute(attr.name, value)"
-                          [disabled]="isDisabled"
-                          class="px-4 py-2 rounded-xl border-2 text-sm font-semibold transition-all duration-150"
-                          [class.border-gold]="cascadeSelections[attr.name] === value"
-                          [class.bg-gold/10]="cascadeSelections[attr.name] === value"
-                          [class.text-gold]="cascadeSelections[attr.name] === value"
-                          [class.border-white/15]="cascadeSelections[attr.name] !== value"
-                          [class.theme-text]="cascadeSelections[attr.name] !== value"
-                          [class.opacity-30]="isDisabled"
-                          [class.cursor-not-allowed]="isDisabled">
-                          @if (attr.type === 'color' && value.startsWith('#')) {
-                            <span class="w-4 h-4 rounded-full inline-block mr-2 align-middle border border-white/20"
-                                  [style.background-color]="value"></span>
-                          }
-                          {{ value }}
-                        </button>
+                        @let isOutOfStock = cascadeValueOutOfStock(attr.name, value);
+                        @if (attr.type === 'color' && value.startsWith('#')) {
+                          <button type="button" (click)="selectCascadeAttribute(attr.name, value)"
+                            [disabled]="isDisabled"
+                            class="relative w-11 h-11 rounded-full border-2 transition-all flex-shrink-0"
+                            [class.border-gold]="cascadeSelections[attr.name] === value"
+                            [class.border-white/20]="cascadeSelections[attr.name] !== value && !isDisabled"
+                            [class.border-white/5]="isDisabled"
+                            [class.opacity-20]="isDisabled"
+                            [class.cursor-not-allowed]="isDisabled"
+                            [title]="value + (isOutOfStock ? ' — Épuisé' : '')"
+                            [style.background-color]="value">
+                            @if (isOutOfStock) {
+                              <span class="absolute inset-0 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-red-400 drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                              </span>
+                            }
+                          </button>
+                        } @else {
+                          <button type="button" (click)="selectCascadeAttribute(attr.name, value)"
+                            [disabled]="isDisabled"
+                            class="relative px-4 py-2 rounded-xl border-2 text-sm font-semibold transition-all duration-150"
+                            [class.border-gold]="cascadeSelections[attr.name] === value"
+                            [class.bg-gold/10]="cascadeSelections[attr.name] === value"
+                            [class.text-gold]="cascadeSelections[attr.name] === value"
+                            [class.border-white/15]="cascadeSelections[attr.name] !== value && !isDisabled"
+                            [class.theme-text]="cascadeSelections[attr.name] !== value"
+                            [class.opacity-30]="isDisabled"
+                            [class.cursor-not-allowed]="isDisabled">
+                            <span [class.opacity-40]="isOutOfStock && !isDisabled">{{ value }}</span>
+                            @if (isOutOfStock && !isDisabled) {
+                              <span class="ml-1.5 text-[10px] font-bold text-red-400">Épuisé</span>
+                            }
+                          </button>
+                        }
                       }
                     </div>
                     @if (values.length === 0 && !isDisabled) {
                       <p class="text-xs theme-muted mt-1">Aucune option disponible</p>
+                    }
+                    @if (isDisabled) {
+                      <p class="text-[10px] theme-muted mt-1.5 opacity-50">
+                        @if (i > 0) {
+                          Sélectionnez d'abord « {{ cascadeAttributes[i-1].name }} »
+                        }
+                      </p>
                     }
                   </div>
                 }
@@ -341,6 +368,26 @@
                         </p>
                       </div>
                     </div>
+                    @if (cascadeMatchedVariant.stock > 0) {
+                      <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gold/10">
+                        <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
+                        <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
+                          <button type="button" (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1"
+                            class="qty-btn w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-black/5 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                            </svg>
+                          </button>
+                          <span class="w-12 text-center font-black theme-text text-sm">{{ quantity }}</span>
+                          <button type="button" (click)="setQuantity(quantity + 1)" [disabled]="quantity >= cascadeMatchedVariant.stock"
+                            class="qty-btn w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-black/5 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    }
                   </div>
                 }
               </div>
