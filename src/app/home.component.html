@@ -395,8 +395,9 @@
   <!-- ════════════════════════════════════════════════════════════════
        4. SÉLECTION DE LA SEMAINE — produits featured
   ════════════════════════════════════════════════════════════════════ -->
-  @if (!featuredLoading && featuredProducts.length > 0) {
-    <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;background:#fcf8f0;border-top:1px solid rgba(212,175,55,0.15);border-bottom:1px solid rgba(212,175,55,0.15);">
+  @if (featuredLoading || hasFeatured || hasBestsellers) {
+    @if (!featuredLoading && featuredProducts.length > 0) {
+      <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;background:#fcf8f0;border-top:1px solid rgba(212,175,55,0.15);border-bottom:1px solid rgba(212,175,55,0.15);">
       <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
         <div>
           <div class="flex items-center gap-2 mb-3">
@@ -575,6 +576,7 @@
         </div>
       }
     </section>
+  }
   }
 
 

@@ -383,6 +383,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.authService.logout();
     this.closeAll();
     this.toastService.info(`À bientôt${name ? ' ' + name : ''} !`);
+    this.router.navigate(['/']);
   }
 
   loadUnreadCount(): void {
