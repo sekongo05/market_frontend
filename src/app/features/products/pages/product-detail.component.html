@@ -259,38 +259,30 @@
           <div class="sec-variants">
           @if (hasVariants) {
             @if (isCascadeMode) {
-              <!-- Cascade selector style AliExpress -->
-              <div class="rounded-2xl luxury-card p-5 space-y-4">
-                <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">Options</h3>
-
+              <div class="space-y-5">
                 @for (attr of cascadeAttributes; track attr.name; let i = $index) {
                   @let values = cascadeAvailableValues(attr.name);
                   @let isDisabled = i > 0 && !cascadeSelections[cascadeAttributes[i-1].name];
                   <div>
-                    <div class="flex items-center justify-between mb-2">
-                      <label class="text-sm font-bold theme-text">{{ attr.name }}</label>
-                      @if (cascadeSelections[attr.name]) {
-                        <button type="button" (click)="selectCascadeAttribute(attr.name, null)"
-                          class="text-[10px] text-gold hover:underline">Effacer</button>
-                      }
-                    </div>
+                    <label class="text-sm font-bold theme-text block mb-2.5">{{ attr.name }}</label>
                     <div class="flex flex-wrap gap-2">
                       @for (value of values; track value) {
                         @let isOutOfStock = cascadeValueOutOfStock(attr.name, value);
                         @if (attr.type === 'color' && value.startsWith('#')) {
                           <button type="button" (click)="selectCascadeAttribute(attr.name, value)"
                             [disabled]="isDisabled"
-                            class="relative w-11 h-11 rounded-full border-2 transition-all flex-shrink-0 ring-1 ring-inset ring-black/10"
-                            [class.border-gold]="cascadeSelections[attr.name] === value"
-                            [class.border-white/20]="cascadeSelections[attr.name] !== value && !isDisabled"
-                            [class.border-white/5]="isDisabled"
+                            class="relative w-9 h-9 rounded-full ring-1 ring-inset ring-black/10 transition-all flex-shrink-0"
+                            [class.outline]="cascadeSelections[attr.name] === value"
+                            [class.outline-2]="cascadeSelections[attr.name] === value"
+                            [class.outline-offset-2]="cascadeSelections[attr.name] === value"
+                            [class.outline-gold]="cascadeSelections[attr.name] === value"
                             [class.opacity-20]="isDisabled"
                             [class.cursor-not-allowed]="isDisabled"
                             [title]="value + (isOutOfStock ? ' — Épuisé' : '')"
                             [style.background-color]="value">
                             @if (isOutOfStock) {
                               <span class="absolute inset-0 flex items-center justify-center">
-                                <svg class="w-5 h-5 text-red-400 drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-red-400 drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
                               </span>
@@ -299,7 +291,7 @@
                         } @else {
                           <button type="button" (click)="selectCascadeAttribute(attr.name, value)"
                             [disabled]="isDisabled"
-                            class="relative px-4 py-2 rounded-xl border-2 text-sm font-semibold transition-all duration-150"
+                            class="relative px-4 py-2 rounded-lg border text-sm font-semibold transition-all"
                             [class.border-gold]="cascadeSelections[attr.name] === value"
                             [class.bg-gold/10]="cascadeSelections[attr.name] === value"
                             [class.text-gold]="cascadeSelections[attr.name] === value"
@@ -315,58 +307,6 @@
                         }
                       }
                     </div>
-                    @if (values.length === 0 && !isDisabled) {
-                      <p class="text-xs theme-muted mt-1">Aucune option disponible</p>
-                    }
-                    @if (isDisabled) {
-                      <p class="text-[10px] theme-muted mt-1.5 opacity-50">
-                        @if (i > 0) {
-                          Sélectionnez d'abord « {{ cascadeAttributes[i-1].name }} »
-                        }
-                      </p>
-                    }
-                  </div>
-                }
-
-                @if (cascadeMatchedVariant) {
-                  <div class="p-3 rounded-xl bg-gold/5 border border-gold/20 mt-2">
-                    <div class="flex items-center gap-3">
-                      @if (cascadeMatchedVariant.imageUrl) {
-                        <img [src]="cascadeMatchedVariant.imageUrl | mediaUrl" [alt]="cascadeMatchedVariant.variantName"
-                          class="w-12 h-12 rounded-lg object-cover flex-shrink-0"/>
-                      } @else if (cascadeMatchedVariant.colorHex) {
-                         <div class="w-12 h-12 rounded-lg flex-shrink-0 border border-white/10 ring-1 ring-inset ring-black/10"
-                              [style.background-color]="cascadeMatchedVariant.colorHex"></div>
-                      }
-                      <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold theme-text truncate">{{ cascadeMatchedVariant.variantName }}</p>
-                        <p class="text-xs" [class.text-red-400]="cascadeMatchedVariant.stock === 0" [class.theme-muted]="cascadeMatchedVariant.stock > 0">
-                          @if (cascadeMatchedVariant.stock === 0) { Épuisé }
-                          @else if (cascadeMatchedVariant.stock <= 3) { Presque épuisé — {{ cascadeMatchedVariant.stock }} restant(s) }
-                          @else { En stock }
-                        </p>
-                      </div>
-                    </div>
-                    @if (cascadeMatchedVariant.stock > 0) {
-                      <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gold/10">
-                        <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
-                        <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
-                          <button type="button" (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1"
-                            class="qty-btn w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-black/5 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                            </svg>
-                          </button>
-                          <span class="w-12 text-center font-black theme-text text-sm">{{ quantity }}</span>
-                          <button type="button" (click)="setQuantity(quantity + 1)" [disabled]="quantity >= cascadeMatchedVariant.stock"
-                            class="qty-btn w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-black/5 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    }
                   </div>
                 }
               </div>
@@ -543,8 +483,48 @@
                   </div>
                 }
 
-                <!-- Récap sélection variantes -->
-                @if (hasVariants && totalSelectedQty > 0) {
+                <!-- Cascade summary -->
+                @if (isCascadeMode && cascadeMatchedVariant) {
+                  <div class="p-4 rounded-2xl bg-gold/5 border border-gold/15">
+                    <div class="flex items-center gap-3">
+                      @if (cascadeMatchedVariant.imageUrl) {
+                        <img [src]="cascadeMatchedVariant.imageUrl | mediaUrl" [alt]="cascadeMatchedVariant.variantName"
+                          class="w-14 h-14 rounded-lg object-cover flex-shrink-0"/>
+                      } @else if (cascadeMatchedVariant.colorHex) {
+                        <div class="w-14 h-14 rounded-lg flex-shrink-0 border border-white/10 ring-1 ring-inset ring-black/10"
+                             [style.background-color]="cascadeMatchedVariant.colorHex"></div>
+                      }
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold theme-text truncate">{{ cascadeMatchedVariant.variantName }}</p>
+                        <p class="text-xs" [class.text-red-400]="cascadeMatchedVariant.stock === 0" [class.theme-muted]="cascadeMatchedVariant.stock > 0">
+                          @if (cascadeMatchedVariant.stock === 0) { Épuisé }
+                          @else if (cascadeMatchedVariant.stock <= 3) { Presque épuisé — {{ cascadeMatchedVariant.stock }} restant(s) }
+                          @else { En stock }
+                        </p>
+                      </div>
+                    </div>
+                    @if (cascadeMatchedVariant.stock > 0) {
+                      <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gold/10">
+                        <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
+                        <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
+                          <button type="button" (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1"
+                            class="qty-btn w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-black/5 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                            </svg>
+                          </button>
+                          <span class="w-12 text-center font-black theme-text text-sm">{{ quantity }}</span>
+                          <button type="button" (click)="setQuantity(quantity + 1)" [disabled]="quantity >= cascadeMatchedVariant.stock"
+                            class="qty-btn w-10 h-10 flex items-center justify-center theme-muted hover:text-gold hover:bg-black/5 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else if (hasVariants && totalSelectedQty > 0) {
                   <div class="p-4 rounded-2xl bg-gold/8 border border-gold/20 flex items-center justify-between gap-3">
                     <div>
                       <p class="text-xs theme-muted mb-0.5">Total sélectionné</p>
@@ -934,6 +914,23 @@
               Épuisé
             </div>
           } @else {
+            @if (isCascadeMode && cascadeMatchedVariant) {
+              <div class="flex items-center rounded-lg border theme-border overflow-hidden flex-shrink-0">
+                <button type="button" (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1"
+                  class="w-9 h-9 flex items-center justify-center theme-muted hover:bg-black/5 transition-colors disabled:opacity-30">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                  </svg>
+                </button>
+                <span class="w-8 text-center font-black theme-text text-xs">{{ quantity }}</span>
+                <button type="button" (click)="setQuantity(quantity + 1)" [disabled]="quantity >= cascadeMatchedVariant.stock"
+                  class="w-9 h-9 flex items-center justify-center theme-muted hover:bg-black/5 transition-colors disabled:opacity-30">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                </button>
+              </div>
+            }
             <button (click)="addToCart()"
               [disabled]="isCascadeMode ? !cascadeMatchedVariant : (hasVariants && totalSelectedQty === 0)"
               class="flex items-center gap-2 px-5 py-3.5 rounded-xl font-bold text-sm flex-shrink-0
