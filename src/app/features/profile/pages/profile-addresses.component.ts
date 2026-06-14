@@ -25,13 +25,13 @@ import { Address, AddressRequest } from '../../../core/models/user.models';
       <div class="space-y-3 mb-4">
         @for (addr of addresses; track addr.id) {
           <div class="bg-white rounded-xl p-4 border transition-all duration-200"
-               [class.border-amber-300]="addr.isDefault"
+               [class.border-gray-300]="addr.isDefault"
                [class.border-gray-100]="!addr.isDefault">
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-start gap-3 min-w-0">
                 <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                     [class]="addr.isDefault ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50 border border-gray-200'">
-                  <svg class="w-4 h-4" [class.text-amber-600]="addr.isDefault" [class.text-gray-400]="!addr.isDefault" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     [class]="addr.isDefault ? 'bg-gray-100 border border-gray-200' : 'bg-gray-50 border border-gray-200'">
+                  <svg class="w-4 h-4" [class.text-gray-600]="addr.isDefault" [class.text-gray-400]="!addr.isDefault" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
@@ -40,7 +40,7 @@ import { Address, AddressRequest } from '../../../core/models/user.models';
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-sm font-bold text-gray-900">{{ addr.label }}</span>
                     @if (addr.isDefault) {
-                      <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200">Par défaut</span>
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold text-gray-600 bg-gray-100 border border-gray-200">Par défaut</span>
                     }
                   </div>
                   <p class="text-sm text-gray-500 mt-0.5">{{ addr.prenom }} {{ addr.nom }}</p>
@@ -52,7 +52,7 @@ import { Address, AddressRequest } from '../../../core/models/user.models';
               <div class="flex items-center gap-1 flex-shrink-0">
                 @if (!addr.isDefault) {
                   <button (click)="setDefault.emit(addr.id)" title="Définir par défaut"
-                    class="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-amber-50 text-gray-400 hover:text-amber-600">
+                    class="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-gray-100 text-gray-400 hover:text-gray-600">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
                     </svg>
@@ -90,7 +90,7 @@ import { Address, AddressRequest } from '../../../core/models/user.models';
 
       @if (addresses.length < MAX_ADDRESSES && !showForm) {
         <button (click)="openForm()"
-          class="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border-2 border-dashed border-gray-300 text-gray-500 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50">
+          class="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border-2 border-dashed border-gray-300 text-gray-500 hover:border-gray-400 hover:text-gray-700 hover:bg-gray-50">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
@@ -118,7 +118,7 @@ import { Address, AddressRequest } from '../../../core/models/user.models';
                 @for (lbl of LABELS; track lbl) {
                   <button type="button" (click)="addressForm.patchValue({label: lbl})"
                     class="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
-                    [class]="addressForm.get('label')?.value === lbl ? 'bg-amber-50 border border-amber-300 text-amber-700' : 'bg-gray-50 border border-gray-200 text-gray-500 hover:border-gray-300'">
+                    [class]="addressForm.get('label')?.value === lbl ? 'bg-gray-100 border border-gray-300 text-gray-700' : 'bg-gray-50 border border-gray-200 text-gray-500 hover:border-gray-300'">
                     {{ lbl }}
                   </button>
                 }
@@ -129,49 +129,49 @@ import { Address, AddressRequest } from '../../../core/models/user.models';
               <div>
                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Prénom</label>
                 <input formControlName="prenom" type="text" placeholder="Moussa"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Nom</label>
                 <input formControlName="nom" type="text" placeholder="Koné"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors">
               </div>
             </div>
 
             <div>
               <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Téléphone</label>
               <input formControlName="phone" type="tel" placeholder="0700000000"
-                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors">
             </div>
 
             <div>
               <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Quartier / Rue</label>
               <input formControlName="quartier" type="text" placeholder="Cocody Riviera 2, Rue des Jardins"
-                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Ville</label>
                 <input formControlName="ville" type="text" placeholder="Abidjan"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Pays</label>
                 <input formControlName="pays" type="text" placeholder="Côte d'Ivoire"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors">
               </div>
             </div>
 
             <div>
               <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Complément <span class="text-gray-400 normal-case font-normal">(optionnel)</span></label>
               <input formControlName="complement" type="text" placeholder="Bâtiment A, Appartement 3..."
-                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors">
             </div>
 
             <label class="flex items-center gap-3 cursor-pointer group">
               <input formControlName="isDefault" type="checkbox" class="sr-only peer">
-              <div class="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 transition-all border-2 border-gray-300 peer-checked:border-amber-600 peer-checked:bg-amber-600">
+              <div class="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 transition-all border-2 border-gray-300 peer-checked:border-gray-800 peer-checked:bg-gray-800">
                 @if (addressForm.get('isDefault')?.value) {
                   <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
@@ -184,7 +184,7 @@ import { Address, AddressRequest } from '../../../core/models/user.models';
             <div class="flex items-center justify-end gap-3 pt-2">
               <button type="button" (click)="closeForm()" class="px-5 py-2.5 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">Annuler</button>
               <button type="submit" [disabled]="addressForm.invalid || saving"
-                class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-amber-600 hover:bg-amber-700 shadow-sm">
+                class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-gray-800 hover:bg-gray-900 shadow-sm">
                 @if (saving) {
                   <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>

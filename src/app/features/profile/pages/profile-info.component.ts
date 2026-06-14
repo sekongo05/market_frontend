@@ -12,8 +12,8 @@ import { UserResponse } from '../../../core/models/user.models';
     <div>
       <div class="flex items-center justify-between gap-3 mb-6">
         <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>
           </div>
@@ -24,7 +24,7 @@ import { UserResponse } from '../../../core/models/user.models';
         </div>
         @if (!editing) {
           <button (click)="startEditing()"
-            class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-amber-600 hover:bg-amber-50 transition-colors flex-shrink-0">
+            class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
             </svg>
@@ -58,15 +58,15 @@ import { UserResponse } from '../../../core/models/user.models';
         <form [formGroup]="form" (ngSubmit)="save()" class="space-y-5">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nom <span class="text-amber-600">*</span></label>
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nom <span class="text-gray-400">*</span></label>
               <input type="text" formControlName="nom"
-                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 font-medium focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors"
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                 [class.border-red-400]="form.get('nom')?.invalid && form.get('nom')?.touched"/>
             </div>
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Prénom <span class="text-amber-600">*</span></label>
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Prénom <span class="text-gray-400">*</span></label>
               <input type="text" formControlName="prenom"
-                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 font-medium focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors"
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                 [class.border-red-400]="form.get('prenom')?.invalid && form.get('prenom')?.touched"/>
             </div>
           </div>
@@ -77,17 +77,17 @@ import { UserResponse } from '../../../core/models/user.models';
           </div>
 
           <div class="space-y-1.5">
-            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Téléphone <span class="text-amber-600">*</span></label>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Téléphone <span class="text-gray-400">*</span></label>
             <input type="tel" formControlName="phone" placeholder="+225 07 000 00 00"
-              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 font-medium focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors"/>
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"/>
           </div>
 
           @if (!hasPhone) {
-            <div class="flex items-start gap-2.5 px-3 py-3 rounded-lg bg-amber-50 border border-amber-200">
-              <svg class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-start gap-2.5 px-3 py-3 rounded-lg bg-gray-50 border border-gray-200">
+              <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              <p class="text-xs text-amber-700 leading-relaxed">Votre numéro WhatsApp est indispensable pour recevoir les mises à jour de vos commandes.</p>
+              <p class="text-xs text-gray-500 leading-relaxed">Votre numéro WhatsApp est indispensable pour recevoir les mises à jour de vos commandes.</p>
             </div>
           }
 
@@ -97,7 +97,7 @@ import { UserResponse } from '../../../core/models/user.models';
               Annuler
             </button>
             <button type="submit" [disabled]="form.invalid || !form.dirty || saving"
-              class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-amber-600 hover:bg-amber-700 shadow-sm">
+              class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-gray-800 hover:bg-gray-900 shadow-sm">
               @if (saving) {
                 <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>

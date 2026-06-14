@@ -11,8 +11,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   template: `
     <div>
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0">
-          <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
           </svg>
         </div>
@@ -26,21 +26,21 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 
         <div class="space-y-1.5">
           <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            Mot de passe actuel <span class="text-amber-600">*</span>
+            Mot de passe actuel <span class="text-gray-400">*</span>
           </label>
           <div class="relative">
             <input [type]="showOld ? 'text' : 'password'" formControlName="oldPassword"
               placeholder="••••••••" autocomplete="current-password"
-              class="w-full px-4 py-2.5 pr-11 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors"/>
+              class="w-full px-4 py-2.5 pr-11 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"/>
             <button type="button" (click)="showOld = !showOld"
-              class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all">
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
               </svg>
             </button>
           </div>
           <div class="flex justify-end">
-            <a routerLink="/auth/forgot-password" class="text-xs font-semibold text-amber-600 hover:text-amber-700 hover:underline">Mot de passe oublié ?</a>
+            <a routerLink="/auth/forgot-password" class="text-xs font-semibold text-gray-600 hover:text-gray-800 hover:underline">Mot de passe oublié ?</a>
           </div>
         </div>
 
@@ -52,14 +52,14 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 
         <div class="space-y-1.5">
           <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            Nouveau mot de passe <span class="text-amber-600">*</span>
+            Nouveau mot de passe <span class="text-gray-400">*</span>
           </label>
           <div class="relative">
             <input [type]="showNew ? 'text' : 'password'" formControlName="newPassword"
               placeholder="••••••••" autocomplete="new-password"
-              class="w-full px-4 py-2.5 pr-11 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors"/>
+              class="w-full px-4 py-2.5 pr-11 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"/>
             <button type="button" (click)="showNew = !showNew"
-              class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all">
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
               </svg>
@@ -71,7 +71,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
                 @for (i of [1,2,3,4]; track i) {
                   <div class="h-1.5 flex-1 rounded-full transition-all duration-300"
                     [ngClass]="strength.score >= i
-                      ? (strength.score === 1 ? 'bg-red-500' : strength.score === 2 ? 'bg-amber-500' : strength.score === 3 ? 'bg-amber-300' : 'bg-green-500')
+                      ? (strength.score === 1 ? 'bg-red-500' : strength.score === 2 ? 'bg-gray-500' : strength.score === 3 ? 'bg-gray-400' : 'bg-green-500')
                       : 'bg-gray-200'">
                   </div>
                 }
@@ -93,14 +93,14 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 
         <div class="space-y-1.5">
           <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            Confirmer le mot de passe <span class="text-amber-600">*</span>
+            Confirmer le mot de passe <span class="text-gray-400">*</span>
           </label>
           <div class="relative">
             <input [type]="showConfirm ? 'text' : 'password'" formControlName="confirmPassword"
               placeholder="••••••••" autocomplete="new-password"
-              class="w-full px-4 py-2.5 pr-11 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors"/>
+              class="w-full px-4 py-2.5 pr-11 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"/>
             <button type="button" (click)="showConfirm = !showConfirm"
-              class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all">
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
               </svg>
@@ -114,16 +114,16 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
           }
         </div>
 
-        <div class="flex items-start gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
-          <svg class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-gray-50 border border-gray-200">
+          <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          <p class="text-xs text-amber-700 leading-relaxed">Utilisez au moins 8 caractères avec des lettres, chiffres et symboles pour un mot de passe sécurisé.</p>
+          <p class="text-xs text-gray-500 leading-relaxed">Utilisez au moins 8 caractères avec des lettres, chiffres et symboles pour un mot de passe sécurisé.</p>
         </div>
 
         <div class="flex justify-end pt-4 border-t border-gray-100">
           <button type="submit" [disabled]="form.invalid || changing || form.get('newPassword')?.value !== form.get('confirmPassword')?.value"
-            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-amber-600 hover:bg-amber-700 shadow-sm">
+            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-gray-800 hover:bg-gray-900 shadow-sm">
             @if (changing) {
               <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -170,8 +170,8 @@ export class ProfileSecurityComponent {
     const map = [
       { label: '', color: '' },
       { label: 'Trop faible',  color: 'text-red-500' },
-      { label: 'Faible',       color: 'text-amber-600' },
-      { label: 'Correct',      color: 'text-amber-500' },
+      { label: 'Faible',       color: 'text-gray-500' },
+      { label: 'Correct',      color: 'text-gray-500' },
       { label: 'Fort',         color: 'text-green-600' },
     ];
     return { score, ...map[score] };
