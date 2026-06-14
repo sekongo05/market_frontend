@@ -40,7 +40,7 @@ import { SdmLogoComponent } from '../../../shared/components/logo.component';
         } @else {
           <!-- Header -->
           <div class="text-center mb-8">
-            <a routerLink="/"><app-sdm-logo [size]="96" [showSlogan]="false" class="inline-block mb-6"></app-sdm-logo></a>
+            <a routerLink="/" class="inline-block mb-6 hover:opacity-80 transition-opacity"><app-sdm-logo [size]="68"></app-sdm-logo></a>
             <h1 class="text-xl font-bold text-white">Mot de passe oublié</h1>
             <p class="text-gray-400 mt-2 text-sm leading-relaxed">
               Saisissez l'email lié à votre compte, nous vous enverrons<br class="hidden sm:inline" />
