@@ -1,16 +1,6 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './shared/components/layout.component';
 import { HomeComponent } from './home.component';
-import { LoginComponent, RegisterComponent, ForgotPasswordComponent, ResetPasswordComponent } from './features/auth/pages';
-import { ProductsComponent, ProductDetailComponent } from './features/products/pages';
-import { OrdersComponent, CheckoutComponent } from './features/orders/pages';
-import { ProfileComponent } from './features/profile/pages';
-import { ADMIN_ROUTES } from './features/admin/admin.routes';
-import { MANAGER_ROUTES } from './features/manager/manager.routes';
-import { HelpComponent } from './features/help/help.component';
-import { PrivacyComponent } from './features/privacy/privacy.component';
-import { AuthenticityComponent } from './features/authenticity/authenticity.component';
-import { ReturnsComponent } from './features/returns/returns.component';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { UserRole } from './core/models/common.models';
@@ -20,49 +10,67 @@ export const APP_ROUTES: Routes = [
     component: LayoutComponent,
     children: [
       { path: '', component: HomeComponent },
-      { path: 'products', component: ProductsComponent },
-      { path: 'products/:id', component: ProductDetailComponent },
+      {
+        path: 'products',
+        loadComponent: () => import('./features/products/pages/products.component').then(m => m.ProductsComponent),
+      },
+      {
+        path: 'products/:id',
+        loadComponent: () => import('./features/products/pages/product-detail.component').then(m => m.ProductDetailComponent),
+      },
       {
         path: 'orders',
-        component: OrdersComponent,
+        loadComponent: () => import('./features/orders/pages/orders.component').then(m => m.OrdersComponent),
         canActivate: [authGuard],
       },
       {
         path: 'checkout',
-        component: CheckoutComponent,
+        loadComponent: () => import('./features/orders/pages/checkout.component').then(m => m.CheckoutComponent),
         canActivate: [authGuard],
       },
       {
         path: 'profile',
-        component: ProfileComponent,
+        loadComponent: () => import('./features/profile/pages/profile.component').then(m => m.ProfileComponent),
         canActivate: [authGuard],
       },
       {
         path: 'admin',
         canActivate: [authGuard, roleGuard],
         data: { roles: [UserRole.ADMIN] },
-        children: ADMIN_ROUTES,
+        loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES),
       },
       {
         path: 'manager',
         canActivate: [authGuard, roleGuard],
         data: { roles: [UserRole.MANAGER, UserRole.ADMIN] },
-        children: MANAGER_ROUTES,
+        loadChildren: () => import('./features/manager/manager.routes').then(m => m.MANAGER_ROUTES),
       },
-{ path: 'help', component: HelpComponent },
-      { path: 'privacy', component: PrivacyComponent },
-      { path: 'qualite', component: AuthenticityComponent },
-      { path: 'returns', component: ReturnsComponent },
+      {
+        path: 'help',
+        loadComponent: () => import('./features/help/help.component').then(m => m.HelpComponent),
+      },
+      {
+        path: 'privacy',
+        loadComponent: () => import('./features/privacy/privacy.component').then(m => m.PrivacyComponent),
+      },
+      {
+        path: 'qualite',
+        loadComponent: () => import('./features/authenticity/authenticity.component').then(m => m.AuthenticityComponent),
+      },
+      {
+        path: 'returns',
+        loadComponent: () => import('./features/returns/returns.component').then(m => m.ReturnsComponent),
+      },
     ],
   },
   {
     path: 'auth',
-    children: [
-      { path: 'login', component: LoginComponent },
-      { path: 'register', component: RegisterComponent },
-      { path: 'forgot-password', component: ForgotPasswordComponent },
-      { path: 'reset-password', component: ResetPasswordComponent },
-    ],
+    loadChildren: () => import('./features/auth/pages').then(m => [
+      { path: 'login', component: m.LoginComponent },
+      { path: 'register', component: m.RegisterComponent },
+      { path: 'forgot-password', component: m.ForgotPasswordComponent },
+      { path: 'reset-password', component: m.ResetPasswordComponent },
+    ]),
   },
   { path: '**', redirectTo: '' },
 ];

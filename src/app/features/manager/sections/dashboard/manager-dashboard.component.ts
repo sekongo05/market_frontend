@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { interval, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DashboardService } from '../../../../core/services/dashboard.service';
 
@@ -25,7 +25,6 @@ export class ManagerDashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadManagerStats();
-    interval(60000).pipe(takeUntil(this.destroy$)).subscribe(() => this.loadManagerStats());
   }
 
   ngOnDestroy(): void {

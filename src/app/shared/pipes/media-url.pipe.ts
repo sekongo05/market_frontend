@@ -2,17 +2,18 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 const MEDIA_BASE = environment.apiUrl.replace(/\/api$/, '');
+const CLOUDINARY_PATTERN = /res\.cloudinary\.com/;
 
-/**
- * Transforms relative media URLs returned by the backend (e.g. /uploads/products/xxx.jpg)
- * into absolute URLs pointing to the backend server.
- * External URLs (http/https) are returned as-is.
- */
 @Pipe({ name: 'mediaUrl', standalone: true })
 export class MediaUrlPipe implements PipeTransform {
-  transform(url: string | null | undefined, fallback = ''): string {
+  transform(url: string | null | undefined, w?: number | string, fallback = ''): string {
     if (!url) return fallback;
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      if (w && CLOUDINARY_PATTERN.test(url)) {
+        return url.replace('/image/upload/', `/image/upload/w_${w},c_fill,q_auto,f_auto/`);
+      }
+      return url;
+    }
     return MEDIA_BASE + url;
   }
 }

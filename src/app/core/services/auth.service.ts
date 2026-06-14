@@ -176,9 +176,6 @@ export class AuthService {
   private loadUserFromToken(): void {
     const token = this.getToken();
     if (!token) {
-      if (this.isBrowser) {
-        this.webSocketService.connect();
-      }
       return;
     }
 
@@ -206,9 +203,6 @@ export class AuthService {
         console.error('Failed to parse stored user', e);
         this._storage('remove', 'current_user');
       }
-    }
-    if (this.isBrowser) {
-      this.webSocketService.connect();
     }
   }
 

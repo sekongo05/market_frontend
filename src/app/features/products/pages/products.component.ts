@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subject, Subscription, interval, fromEvent, merge } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
 import { SEARCH_DEBOUNCE, PRICE_DEBOUNCE } from '../../../core/constants';
 import { ProductService } from '../../../core/services/product.service';
@@ -377,15 +377,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
         }
       });
 
-    if (typeof window !== 'undefined') {
-      merge(
-        interval(30000),
-        fromEvent(window, 'focus'),
-      ).pipe(takeUntil(this.destroy$)).subscribe(() => {
-        this.loadProducts(this.currentPage);
-        this.loadCategories();
-      });
-    }
   }
 
   showToast(message: string): void {

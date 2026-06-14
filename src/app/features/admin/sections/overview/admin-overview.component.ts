@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Subject, interval, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DashboardService, DashboardStats, MonthlyRevenueItem, TopProductItem, DailyCaisseResponse, DailyActivityItem } from '../../../../core/services/dashboard.service';
 import { WebSocketService } from '../../../../core/services/websocket.service';
@@ -41,7 +41,6 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
   readonly orderStatusLabel = orderStatusLabel;
   readonly orderStatusClass = orderStatusClass;
 
-  private refreshSub?: Subscription;
   private readonly destroy$ = new Subject<void>();
 
   constructor(
@@ -54,14 +53,12 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadStats();
     this.loadDailyCaisse();
-    this.refreshSub = interval(60_000).subscribe(() => this.loadStats());
     this.wsService.orderEvent$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.loadStats();
     });
   }
 
   ngOnDestroy(): void {
-    this.refreshSub?.unsubscribe();
     this.destroy$.next();
     this.destroy$.complete();
   }

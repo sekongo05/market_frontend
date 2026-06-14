@@ -41,8 +41,8 @@ export class WebSocketService implements OnDestroy {
       brokerURL: environment.wsUrl,
       connectHeaders: headers,
       reconnectDelay: 5000,
-      heartbeatIncoming: 10000,
-      heartbeatOutgoing: 10000,
+      heartbeatIncoming: 30000,
+      heartbeatOutgoing: 30000,
       onConnect: () => {
         // Nettoyer les anciens abonnements pour éviter les doublons
         // après une reconnexion automatique

@@ -18,7 +18,7 @@ import { CategoryResponse } from './core/models/category.models';
 import { PageResponse } from './core/models/common.models';
 import { PromoService } from './core/services/promo.service';
 import { PublicPromoResponse } from './core/models/promo.models';
-import { Subject, interval, fromEvent, merge } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil, retry } from 'rxjs/operators';
 
 @Component({
@@ -59,12 +59,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   // ── Hero slideshow ──────────────────────────────────────────────
   readonly heroSlides = [
     { imageUrl: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=80&fm=webp', label: 'Montres de prestige' },
-    { imageUrl: '/mt.png', label: 'Maillots toutes nations' },
-    { imageUrl: '/campus.png', label: 'Baskets & Sneakers' },
-    { imageUrl: '/sans_fil.png', label: 'Écouteurs sans fil' },
-    { imageUrl: '/lalé.png', label: 'Smartphones & Tech' },
-    { imageUrl: '/cas.png', label: 'Casquettes & Accessoires' },
-    { imageUrl: '/macccc.png', label: 'Ordinateurs & PC' },
+    { imageUrl: '/mt.webp', label: 'Maillots toutes nations' },
+    { imageUrl: '/campus.webp', label: 'Baskets & Sneakers' },
+    { imageUrl: '/sans_fil.webp', label: 'Écouteurs sans fil' },
+    { imageUrl: '/lalé.webp', label: 'Smartphones & Tech' },
+    { imageUrl: '/cas.webp', label: 'Casquettes & Accessoires' },
+    { imageUrl: '/macccc.webp', label: 'Ordinateurs & PC' },
   ];
 
   currentSlide = 0;
@@ -133,7 +133,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       this._loadFirstOrderPromo();
       this._initObserver();
       this._subscribeStock();
-      if (this._platformBrowser) this._startPolling();
     });
   }
 
@@ -488,21 +487,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => { console.error('Failed to load reviews', err); this.reviewsLoading = false; this.cdr.detectChanges(); },
-    });
-  }
-
-  private _startPolling(): void {
-    merge(
-      interval(30000),
-      fromEvent(window, 'focus'),
-    ).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this._loadProducts();
-      this._loadFeatured();
-      this._loadBestsellers();
-      this._loadCategories();
-      this._loadPublicStats();
-      this._loadReviews();
-      this._loadFirstOrderPromo();
     });
   }
 

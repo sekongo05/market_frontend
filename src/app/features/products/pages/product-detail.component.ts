@@ -5,7 +5,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
-import { Subject, interval, fromEvent, merge } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil, switchMap } from 'rxjs/operators';
 
 import { FormsModule } from '@angular/forms';
@@ -170,26 +170,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         setTimeout(() => this._initScrollReveal(), 0);
       },
     });
-
-    if (typeof window !== 'undefined') {
-      merge(
-        interval(30000),
-        fromEvent(window, 'focus'),
-      ).pipe(takeUntil(this.destroy$)).subscribe(() => {
-        if (this._currentProductId) {
-          this.productService.getProductById(this._currentProductId).subscribe(response => {
-            if (response.success && response.data) {
-              this.product = response.data;
-              this._buildGallery();
-              this._loadRelated();
-              this._loadReviews();
-              this._loadRating();
-              this.cdr.detectChanges();
-            }
-          });
-        }
-      });
-    }
   }
 
   ngAfterViewInit(): void { /* observer started after product loads */ }
