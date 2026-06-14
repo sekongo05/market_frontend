@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { timeout, catchError, of } from 'rxjs';
 import { SdmLogoComponent } from '../../../shared/components/logo.component';
 
 @Component({
@@ -25,7 +26,7 @@ import { SdmLogoComponent } from '../../../shared/components/logo.component';
           </a>
 
           <!-- Logo centré (mobile) -->
-          <div class="text-center lg:hidden mb-8">
+          <div class="flex justify-center lg:hidden mb-8">
             <app-sdm-logo [size]="64"></app-sdm-logo>
           </div>
 
@@ -132,16 +133,20 @@ export class ForgotPasswordComponent {
     if (this.form.invalid) return;
 
     this.loading = true;
-    this.authService.forgotPassword({ email: this.form.value.email }).subscribe({
-      next: () => {
+    this.authService.forgotPassword({ email: this.form.value.email })
+      .pipe(
+        timeout(15_000),
+        catchError(err => {
+          this.loading = false;
+          this.error = 'Erreur lors de l\'envoi';
+          return of(null);
+        })
+      )
+      .subscribe(res => {
+        if (res === null) return;
         this.loading = false;
         this.success = true;
         this.toast.success('Email envoyé si le compte existe');
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = err?.error?.message || 'Erreur lors de l\'envoi';
-      },
-    });
+      });
   }
 }
