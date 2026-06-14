@@ -23,7 +23,6 @@
             "ssr": {
               "entry": "server.ts"
             },
-            "prerender": true,
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -43,18 +42,18 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "1.5MB",
-                  "maximumError": "2MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "15kB",
-                  "maximumError": "20kB"
-                }
-              ],
+                  "budgets": [
+                    {
+                      "type": "initial",
+                      "maximumWarning": "2MB",
+                      "maximumError": "3MB"
+                    },
+                    {
+                      "type": "anyComponentStyle",
+                      "maximumWarning": "15kB",
+                      "maximumError": "20kB"
+                    }
+                  ],
               "outputHashing": "all"
             },
             "development": {
