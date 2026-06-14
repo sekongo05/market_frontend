@@ -15,18 +15,18 @@ import { SdmLogoComponent } from '../../../shared/components/logo.component';
       <div class="w-full flex items-center justify-center p-6 sm:p-10">
         <div class="w-full max-w-md">
 
-          <!-- Top row: retour + logo mobile -->
-          <div class="flex items-center justify-between mb-10">
-            <a routerLink="/auth/login"
-              class="inline-flex items-center gap-1.5 text-xs font-semibold theme-muted hover:text-gold transition-colors group">
-              <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-              </svg>
-              Retour
-            </a>
-            <div>
-              <app-sdm-logo [size]="68" [showSlogan]="true"></app-sdm-logo>
-            </div>
+          <!-- Back link -->
+          <a routerLink="/auth/login"
+            class="inline-flex items-center gap-1.5 text-xs font-semibold theme-muted hover:text-gold transition-colors group mb-10">
+            <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Retour
+          </a>
+
+          <!-- Logo centré (mobile) -->
+          <div class="text-center lg:hidden mb-8">
+            <app-sdm-logo [size]="64"></app-sdm-logo>
           </div>
 
           <div class="mb-8">
