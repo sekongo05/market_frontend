@@ -40,12 +40,7 @@ import { SdmLogoComponent } from '../../../shared/components/logo.component';
         } @else {
           <!-- Header -->
           <div class="text-center mb-8">
-            <a routerLink="/"><app-sdm-logo class="inline-block mb-6" /></a>
-            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
-              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-            </div>
+            <a routerLink="/"><app-sdm-logo [size]="96" [showSlogan]="false" class="inline-block mb-6"></app-sdm-logo></a>
             <h1 class="text-xl font-bold text-white">Mot de passe oublié</h1>
             <p class="text-gray-400 mt-2 text-sm leading-relaxed">
               Saisissez l'email lié à votre compte, nous vous enverrons<br class="hidden sm:inline" />
