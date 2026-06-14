@@ -1,8 +1,8 @@
 import {
   Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
-  AfterViewInit, HostListener
+  AfterViewInit, HostListener, Inject, PLATFORM_ID
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 import { Subject } from 'rxjs';
@@ -17,6 +17,7 @@ import { WebSocketService } from '../../../core/services/websocket.service';
 import { ReviewService } from '../../../core/services/review.service';
 import { WhatsappService } from '../../../core/services/whatsapp.service';
 import { SeoService } from '../../../core/services/seo.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { ProductMediaItem, ProductResponse, ProductVariant } from '../../../core/models/product.models';
 import { ReviewResponse, ProductRatingResponse } from '../../../core/models/review.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
@@ -80,6 +81,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private observer?: IntersectionObserver;
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
@@ -91,6 +93,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private cdr: ChangeDetectorRef,
     private wa: WhatsappService,
     private seo: SeoService,
+    private toast: ToastService,
   ) {}
 
   goBack(): void {
@@ -108,6 +111,22 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get isLoggedIn(): boolean {
     return this.authService.isAuthenticated();
+  }
+
+  shareProduct(): void {
+    if (!isPlatformBrowser(this.platformId) || !this.product) return;
+    const url = window.location.href;
+    const title = this.product.name;
+    const text = `${title} — SDM STORE`;
+    if (navigator.share) {
+      navigator.share({ title, text, url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        this.toast.success('Lien copié dans le presse-papiers');
+      }).catch(() => {
+        this.toast.error('Impossible de copier le lien');
+      });
+    }
   }
 
   get whatsappUrl(): string {
