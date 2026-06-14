@@ -800,51 +800,7 @@
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════
-        9. COMMENT ÇA MARCHE
-  ════════════════════════════════════════════════════════════════════ -->
-  <section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
-    <div class="max-w-5xl mx-auto px-5 sm:px-8 lg:px-12">
-      <div class="mb-14 sm:mb-20">
-        <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
-        <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-2"
-           style="color:rgba(212,175,55,0.65);transition-delay:80ms">Simple &amp; rapide</p>
-        <h2 class="r-up font-black theme-text tracking-tight leading-none"
-            style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">COMMENT ÇA MARCHE</h2>
-      </div>
-      <div class="relative">
-        <div class="sm:hidden absolute pointer-events-none"
-             style="left:27px;top:28px;bottom:28px;width:1px;
-                    background:linear-gradient(to bottom,rgba(212,175,55,0.06),rgba(212,175,55,0.45) 18%,rgba(212,175,55,0.45) 82%,rgba(212,175,55,0.06));"></div>
-        <div class="r-line absolute hidden sm:block"
-             style="top:28px;left:28px;right:28px;height:1px;
-                    background:linear-gradient(to right,rgba(212,175,55,0.5),rgba(212,175,55,0.08));transition-delay:250ms;"></div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-6">
-          @for (step of steps; track step.n; let i = $index) {
-            <div class="r-up relative flex sm:flex-col gap-6 sm:gap-0" [style.transition-delay.ms]="i * 120 + 300">
-              <div class="relative flex-shrink-0 sm:mb-8 z-10">
-                <div class="w-14 h-14 flex items-center justify-center relative theme-surface"
-                     style="border:1px solid rgba(212,175,55,0.3);">
-                  <svg class="w-6 h-6" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="step.icon"/>
-                  </svg>
-                  <span class="absolute -top-3 -right-3 w-6 h-6 flex items-center justify-center text-[9px] font-black text-black"
-                        style="background:#d4af37;">{{ step.n }}</span>
-                </div>
-              </div>
-              <div>
-                <h3 class="font-black theme-text text-base sm:text-lg mb-2 tracking-tight">{{ step.title }}</h3>
-                <p class="theme-muted text-sm leading-relaxed">{{ step.desc }}</p>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ════════════════════════════════════════════════════════════════
-       10. STATS
+        9. STATS
   ════════════════════════════════════════════════════════════════════ -->
   <section id="stats-row" class="border-t scroll-reveal relative overflow-hidden"
            style="border-color:rgba(212,175,55,0.1);">
@@ -989,51 +945,46 @@
   <!-- ════════════════════════════════════════════════════════════════
         13. CTA FINAL
   ════════════════════════════════════════════════════════════════════ -->
-  <section class="relative border-t overflow-hidden scroll-reveal"
+  <section class="relative border-t scroll-reveal"
            style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,10vw,120px) 1.5rem;">
-    <div class="cta-halo absolute inset-0 pointer-events-none"
-         style="background:radial-gradient(ellipse at center,rgba(212,175,55,0.07) 0%,transparent 60%);"></div>
-    <div class="absolute top-0 left-0 w-16 h-16 pointer-events-none hidden lg:block r-scale"
-         style="border-top:1px solid rgba(212,175,55,0.22);border-left:1px solid rgba(212,175,55,0.22);transition-delay:400ms"></div>
-    <div class="absolute bottom-0 right-0 w-16 h-16 pointer-events-none hidden lg:block r-scale"
-         style="border-bottom:1px solid rgba(212,175,55,0.22);border-right:1px solid rgba(212,175,55,0.22);transition-delay:400ms"></div>
-
-    <!-- Décorations (test : valeurs fixes) -->
-    <div style="position:absolute;pointer-events:none;top:60px;right:40px;width:90px;height:90px;border-radius:50%;border:2px solid rgba(212,175,55,0.35);background:rgba(212,175,55,0.05);"></div>
-    <div style="position:absolute;pointer-events:none;bottom:80px;left:30px;width:55px;height:55px;border-radius:50%;border:2px solid rgba(212,175,55,0.25);background:rgba(212,175,55,0.03);"></div>
-    <div style="position:absolute;pointer-events:none;top:40px;left:calc(50% - 120px);width:8px;height:8px;border-radius:50%;background:rgba(212,175,55,0.45);"></div>
-    <div style="position:absolute;pointer-events:none;bottom:60px;right:calc(50% - 80px);width:6px;height:6px;border-radius:50%;background:rgba(212,175,55,0.35);"></div>
-
     <div class="relative max-w-2xl mx-auto text-center">
       <div class="r-line w-8 h-[1px] mx-auto mb-8" style="background:#d4af37;"></div>
       <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-6"
          style="color:rgba(212,175,55,0.58);transition-delay:100ms">
-        Rejoignez {{ publicStats ? (publicStats.totalClients + '+ clients') : 'notre communauté' }}</p>
-      <h2 class="font-black theme-text leading-[0.88] tracking-tight mb-10"
+        Prêt à shopper ?
+      </p>
+      <h2 class="font-black theme-text leading-[0.88] tracking-tight mb-8"
           style="font-size:clamp(3rem,9vw,6.5rem);">
-        <span class="r-up block" style="transition-delay:160ms">VOTRE</span>
-        <span class="r-up block" style="transition-delay:260ms">PROCHAINE</span>
-        <span class="r-up gold-shimmer block" style="transition-delay:360ms">PIÈCE</span>
-        <span class="r-up block" style="transition-delay:460ms">EST LÀ.</span>
+        <span class="r-up block" style="transition-delay:160ms">VOTRE STYLE</span>
+        <span class="r-up gold-shimmer block" style="transition-delay:360ms">VOUS ATTEND</span>
       </h2>
+      <p class="r-up theme-muted text-sm mb-10" style="transition-delay:460ms">
+        Livraison 24-48h Abidjan · 72h intérieur · Paiement à la livraison
+      </p>
       <div class="r-up flex flex-col sm:flex-row justify-center gap-4" style="transition-delay:560ms">
         <a routerLink="/products"
            class="inline-flex items-center justify-center gap-3 px-10 py-5 font-black text-sm uppercase tracking-[0.2em] text-black transition-all hover:-translate-y-0.5 active:scale-[0.97]"
            style="background:#d4af37;box-shadow:0 12px 40px rgba(212,175,55,0.25);">
-          Trouver ma pièce
+          Voir le catalogue
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
           </svg>
         </a>
-        @if (!(currentUser$ | async)) {
-          <a routerLink="/auth/register"
-             class="inline-flex items-center justify-center px-10 py-5 font-bold text-xs uppercase tracking-[0.2em] border-2 transition-all duration-300 hover:border-gold/60 hover:text-gold"
-             style="color:rgba(0,0,0,0.5);border-color:rgba(0,0,0,0.12);">
-            Créer mon compte
-          </a>
-        }
+        <a href="https://wa.me/2250153761320" target="_blank" rel="noopener"
+           class="inline-flex items-center justify-center gap-3 px-10 py-5 font-black text-sm uppercase tracking-[0.2em] text-white transition-all hover:-translate-y-0.5 active:scale-[0.97]"
+           style="background:#25D366;box-shadow:0 12px 40px rgba(37,211,102,0.25);">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          Commander sur WhatsApp
+        </a>
       </div>
-      <div class="r-line w-8 h-[1px] mx-auto mt-12" style="background:#d4af37;opacity:0.4;transition-delay:700ms;"></div>
+      @if (!(currentUser$ | async)) {
+        <p class="r-up text-xs theme-muted mt-6" style="transition-delay:620ms">
+          Pas encore de compte ?
+          <a routerLink="/auth/register" class="text-gold font-semibold hover:underline">Créer un compte</a>
+        </p>
+      }
     </div>
   </section>
 
