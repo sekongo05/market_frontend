@@ -116,15 +116,18 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   shareProduct(): void {
     if (!isPlatformBrowser(this.platformId) || !this.product) return;
     const url = window.location.href;
-    const title = this.product.name;
-    const text = `${title} — SDM STORE`;
+    const name = this.product.name;
+    const price = this.formattedPrice + ' FCFA';
+    const title = name;
+    const text = `${name} — ${price} | SDM STORE`;
+    const clipboardMsg = `${name} — ${price}\n\nDisponible sur SDM STORE :\n${url}`;
     if (navigator.share) {
       navigator.share({ title, text, url }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(url).then(() => {
-        this.toast.success('Lien copié dans le presse-papiers');
+      navigator.clipboard.writeText(clipboardMsg).then(() => {
+        this.toast.success('Message copié, prêt à être partagé !');
       }).catch(() => {
-        this.toast.error('Impossible de copier le lien');
+        this.toast.error('Impossible de copier le message');
       });
     }
   }
