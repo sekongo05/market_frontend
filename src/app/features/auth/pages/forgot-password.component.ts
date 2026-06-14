@@ -11,89 +11,73 @@ import { SdmLogoComponent } from '../../../shared/components/logo.component';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, SdmLogoComponent],
   template: `
-    <div class="relative min-h-screen flex items-center justify-center bg-[#070502] overflow-hidden px-4 py-12">
-      <!-- Ambient orbs -->
-      <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute -top-40 -right-40 w-96 h-96 bg-[#d4af37]/5 rounded-full blur-[120px]"></div>
-        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-[#d4af37]/3 rounded-full blur-[120px]"></div>
-      </div>
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md">
 
-      <div class="relative w-full max-w-md">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+          <a routerLink="/" class="inline-block mb-6 hover:opacity-80 transition-opacity">
+            <app-sdm-logo [size]="64"></app-sdm-logo>
+          </a>
+          <h1 class="text-xl font-bold text-gray-900">Mot de passe oublié</h1>
+          <p class="text-sm text-gray-500 mt-2">
+            Saisissez l'email lié à votre compte. Nous vous enverrons un lien de réinitialisation.
+          </p>
+        </div>
+
         <!-- Success state -->
         @if (success) {
-          <div class="text-center">
-            <div class="w-16 h-16 rounded-full bg-[#d4af37]/10 flex items-center justify-center mx-auto mb-6">
-              <svg class="w-8 h-8 text-[#d4af37]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <div class="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm">
+            <div class="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h2 class="text-xl font-bold text-white mb-2">Email envoyé</h2>
-            <p class="text-gray-400 text-sm mb-6 leading-relaxed">
-              Si un compte existe avec cette adresse, vous recevrez<br class="hidden sm:inline" />
-              un lien de réinitialisation sous quelques minutes.
+            <h2 class="text-lg font-bold text-gray-900 mb-1">Email envoyé</h2>
+            <p class="text-sm text-gray-500 mb-6 leading-relaxed">
+              Si un compte existe avec cette adresse, vous recevrez un lien de réinitialisation sous quelques minutes.
             </p>
             <a routerLink="/auth/login"
-              class="inline-block px-6 py-2.5 rounded-xl bg-[#d4af37] text-black font-bold text-sm uppercase tracking-widest hover:bg-[#e0b845] transition-colors">
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-gray-800 hover:bg-gray-900 transition-colors shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5l-7.5-7.5 7.5-7.5m-7.5 7.5H21" />
+              </svg>
               Retour à la connexion
             </a>
           </div>
         } @else {
-          <!-- Header -->
-          <div class="text-center mb-8">
-            <a routerLink="/" class="inline-block mb-6 hover:opacity-80 transition-opacity"><app-sdm-logo [size]="68"></app-sdm-logo></a>
-            <h1 class="text-xl font-bold text-white">Mot de passe oublié</h1>
-            <p class="text-gray-400 mt-2 text-sm leading-relaxed">
-              Saisissez l'email lié à votre compte, nous vous enverrons<br class="hidden sm:inline" />
-              un lien pour réinitialiser votre mot de passe.
-            </p>
-          </div>
-
           <!-- Card -->
-          <div class="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-6 sm:p-8">
+          <div class="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm">
             <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
-              <!-- Email -->
+
               <div>
-                <label for="email" class="block text-sm font-semibold text-gray-300 mb-1.5">Adresse email</label>
+                <label for="email" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Adresse email</label>
                 <div class="relative">
-                  <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                    </svg>
-                  </span>
                   <input id="email" type="email" formControlName="email"
-                    class="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border text-white placeholder-gray-500 outline-none transition-all duration-200"
-                    [class.border-white/10]="!submitted || !form.controls['email'].errors"
-                    [class.border-red-400/40]="submitted && form.controls['email'].errors"
-                    placeholder="vous@exemple.com" />
+                    placeholder="vous@exemple.com"
+                    class="w-full px-4 py-3 rounded-lg border bg-gray-50 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+                    [class.border-gray-200]="!submitted || !form.controls['email'].errors"
+                    [class.border-red-400]="submitted && form.controls['email'].errors"/>
                 </div>
                 @if (submitted && form.controls['email'].errors) {
-                  <p class="text-red-400 text-xs mt-1.5 flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                    </svg>
-                    Email valide requis
-                  </p>
+                  <p class="text-xs text-red-500 mt-1.5">Email valide requis</p>
                 }
               </div>
 
               @if (error) {
-                <div class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+                <div class="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm text-center">
                   {{ error }}
                 </div>
               }
 
               <button type="submit" [disabled]="loading"
-                class="relative w-full py-3 rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-200 overflow-hidden"
-                [class.bg-[#d4af37] text-black hover:bg-[#e0b845] active:scale-[0.98]]="!loading"
-                [class.bg-white/5 text-gray-500 cursor-not-allowed]="loading">
+                class="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-gray-800 hover:bg-gray-900 shadow-sm">
                 @if (loading) {
-                  <span class="flex items-center justify-center gap-2">
-                    <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                    </svg>
-                    Envoi en cours…
-                  </span>
+                  <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                  </svg>
+                  Envoi en cours…
                 } @else {
                   Envoyer le lien
                 }
@@ -104,14 +88,15 @@ import { SdmLogoComponent } from '../../../shared/components/logo.component';
           <!-- Back link -->
           <div class="text-center mt-6">
             <a routerLink="/auth/login"
-              class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              class="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5l-7.5-7.5 7.5-7.5m-7.5 7.5H21" />
               </svg>
               Retour à la connexion
             </a>
           </div>
         }
+
       </div>
     </div>
   `,
