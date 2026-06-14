@@ -71,7 +71,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
                 @for (i of [1,2,3,4]; track i) {
                   <div class="h-1.5 flex-1 rounded-full transition-all duration-300"
                     [ngClass]="strength.score >= i
-                      ? (strength.score === 1 ? 'bg-red-500' : strength.score === 2 ? 'bg-orange-400' : strength.score === 3 ? 'bg-yellow-400' : 'bg-green-400')
+                      ? (strength.score === 1 ? 'bg-red-500' : strength.score === 2 ? 'bg-amber-500' : strength.score === 3 ? 'bg-amber-300' : 'bg-green-500')
                       : 'bg-gray-200'">
                   </div>
                 }
@@ -170,8 +170,8 @@ export class ProfileSecurityComponent {
     const map = [
       { label: '', color: '' },
       { label: 'Trop faible',  color: 'text-red-500' },
-      { label: 'Faible',       color: 'text-orange-500' },
-      { label: 'Correct',      color: 'text-yellow-600' },
+      { label: 'Faible',       color: 'text-amber-600' },
+      { label: 'Correct',      color: 'text-amber-500' },
       { label: 'Fort',         color: 'text-green-600' },
     ];
     return { score, ...map[score] };
