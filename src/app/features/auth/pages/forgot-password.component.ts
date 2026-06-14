@@ -14,8 +14,8 @@ import { SdmLogoComponent } from '../../../shared/components/logo.component';
     <div class="relative min-h-screen flex items-center justify-center bg-[#070502] overflow-hidden px-4 py-12">
       <!-- Ambient orbs -->
       <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute -top-40 -right-40 w-96 h-96 bg-[#d4af37]/5 rounded-full blur-[120px]" />
-        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-[#d4af37]/3 rounded-full blur-[120px]" />
+        <div class="absolute -top-40 -right-40 w-96 h-96 bg-[#d4af37]/5 rounded-full blur-[120px]"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-[#d4af37]/3 rounded-full blur-[120px]"></div>
       </div>
 
       <div class="relative w-full max-w-md">
