@@ -11,8 +11,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   template: `
     <div>
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center flex-shrink-0">
-          <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
           </svg>
         </div>
@@ -114,16 +114,16 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
           }
         </div>
 
-        <div class="flex items-start gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200">
-          <svg class="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
+          <svg class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          <p class="text-xs text-orange-700 leading-relaxed">Utilisez au moins 8 caractères avec des lettres, chiffres et symboles pour un mot de passe sécurisé.</p>
+          <p class="text-xs text-amber-700 leading-relaxed">Utilisez au moins 8 caractères avec des lettres, chiffres et symboles pour un mot de passe sécurisé.</p>
         </div>
 
         <div class="flex justify-end pt-4 border-t border-gray-100">
           <button type="submit" [disabled]="form.invalid || changing || form.get('newPassword')?.value !== form.get('confirmPassword')?.value"
-            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-orange-500 hover:bg-orange-600 shadow-sm">
+            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-amber-600 hover:bg-amber-700 shadow-sm">
             @if (changing) {
               <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
