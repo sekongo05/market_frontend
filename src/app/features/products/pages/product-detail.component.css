@@ -26,6 +26,7 @@
 .sec-cta   { order: 4; }
 .sec-wa    { order: 5; }
 .sec-trust { order: 6; }
+.sec-share { order: 7; }
 @media (min-width: 640px) {
   .sec-title { order: 0; }
   .sec-price { order: 1; }
@@ -34,4 +35,5 @@
   .sec-cta   { order: 4; }
   .sec-wa    { order: 5; }
   .sec-trust { order: 6; }
+  .sec-share { order: 7; }
 }
