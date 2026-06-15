@@ -525,6 +525,9 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         if (!variant) return;
         const unitPrice = variant.price ?? this.product!.salePrice ?? this.product!.price;
         this.cartService.addToCart({
+          productId: this.product!.id,
+          productName: this.product!.name,
+          price: unitPrice,
           quantity: qty,
           imageUrl: variant.imageUrl || this.product!.imageUrl,
           maxStock: variant.stock,

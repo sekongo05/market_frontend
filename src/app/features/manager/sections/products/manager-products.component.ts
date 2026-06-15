@@ -352,7 +352,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   get isStep1Valid(): boolean {
     const f = this.productForm;
-    if (this.selectedCategoryHasVariants) {
+    if (this.hasVariantsToggle) {
       return !!(f.get('name')?.valid && f.get('description')?.valid && f.get('categoryId')?.value && f.get('gender')?.value);
     }
     return !!(f.get('name')?.valid && f.get('description')?.valid && f.get('categoryId')?.value && f.get('gender')?.value && f.get('stock')?.valid);
@@ -573,7 +573,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
       this.toast.show('Produit mis à jour ✓');
     } else {
       const newId = Math.max(...this.products.map(p => p.id), 0) + 1;
-      this.products = [{ id: newId, name: data.name, slug: data.name.toLowerCase().replace(/\s+/g, '-'), description: data.description, price: +data.price, stock: +data.stock, gender: data.gender, imageUrl: data.imageUrl, category, active: true, featured: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }, ...this.products];
+      this.products = [{ id: newId, name: data.name, slug: data.name.toLowerCase().replace(/\s+/g, '-'), description: data.description, price: +data.price, stock: +data.stock, gender: data.gender, imageUrl: data.imageUrl, category, active: true, featured: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), attributes: [] }, ...this.products];
       this.toast.show('Produit ajouté ✓');
     }
     this._computeStats();
