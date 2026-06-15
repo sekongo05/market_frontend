@@ -24,14 +24,12 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   categoryToggleId: number | null = null;
   showCategoryForm = false;
   editingCategory: CategoryResponse | null = null;
-  categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0, variantConfig: '' };
+  categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0 };
   categoryFormLoading = false;
   categoryFormError: string | null = null;
   imageUploading = false;
   imagePreview: string | null = null;
   imageDragOver = false;
-
-  variantAttributes: { name: string; type: string; options?: string[] }[] = [];
 
   // Confirmation dialog before deactivating
   pendingToggleCat: CategoryResponse | null = null;
@@ -74,8 +72,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
   openCategoryForm(): void {
     this.editingCategory = null;
-    this.categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0, variantConfig: '' };
-    this.variantAttributes = [];
+    this.categoryForm = { name: '', description: '', imageUrl: '', displayOrder: 0 };
     this.categoryFormError = null;
     this.imagePreview = null;
     this.showCategoryForm = true;
@@ -90,9 +87,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       description: cat.description ?? '',
       imageUrl: cat.imageUrl ?? '',
       displayOrder: cat.displayOrder ?? 0,
-      variantConfig: cat.variantConfig ?? '',
     };
-    this.syncVariantAttributes();
     this.categoryFormError = null;
     this.imagePreview = cat.imageUrl || null;
     this.showCategoryForm = true;
@@ -109,65 +104,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  private syncVariantAttributes(): void {
-    const raw = this.categoryForm.variantConfig;
-    if (!raw?.trim()) { this.variantAttributes = []; return; }
-    try {
-      this.variantAttributes = JSON.parse(raw);
-    } catch {
-      this.variantAttributes = [];
-    }
-  }
 
-  private syncVariantConfigJson(): void {
-    if (this.variantAttributes.length === 0) {
-      this.categoryForm.variantConfig = '';
-      return;
-    }
-    const clean = this.variantAttributes.map(a => ({
-      ...a,
-      options: a.type === 'select'
-        ? (a.options ?? []).filter(o => o.trim())
-        : undefined,
-    }));
-    this.categoryForm.variantConfig = JSON.stringify(clean);
-  }
-
-  addVariantAttribute(): void {
-    this.variantAttributes = [...this.variantAttributes, { name: '', type: 'select', options: [] }];
-    this.syncVariantConfigJson();
-    this.cdr.markForCheck();
-  }
-
-  removeVariantAttribute(index: number): void {
-    this.variantAttributes = this.variantAttributes.filter((_, i) => i !== index);
-    this.syncVariantConfigJson();
-    this.cdr.markForCheck();
-  }
-
-  onVariantAttributeChange(): void {
-    this.syncVariantConfigJson();
-  }
-
-  onVariantAttributeTypeChange(attr: { name: string; type: string; options?: string[] }): void {
-    if (attr.type === 'select') {
-      if (!attr.options) attr.options = [''];
-    } else {
-      delete attr.options;
-    }
-    this.syncVariantConfigJson();
-  }
-
-  addOption(attr: { options?: string[] }): void {
-    if (!attr.options) attr.options = [];
-    attr.options.push('');
-    this.onVariantAttributeChange();
-  }
-
-  removeOption(attr: { options?: string[] }, index: number): void {
-    if (attr.options) attr.options = attr.options.filter((_, i) => i !== index);
-    this.syncVariantConfigJson();
-  }
 
   onImageFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -230,9 +167,6 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       imageUrl: this.categoryForm.imageUrl.trim() || undefined,
       displayOrder: this.categoryForm.displayOrder,
     };
-    if (this.categoryForm.variantConfig.trim()) {
-      payload.variantConfig = this.categoryForm.variantConfig.trim();
-    }
     const req$ = isEditing
       ? this.categoryService.updateCategory(editingId!, payload)
       : this.categoryService.createCategory(payload);

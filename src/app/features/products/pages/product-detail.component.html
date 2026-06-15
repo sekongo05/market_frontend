@@ -260,26 +260,26 @@
           @if (hasVariants) {
             @if (isCascadeMode) {
               <div class="space-y-5">
-                @for (attr of cascadeAttributes; track attr.name; let i = $index) {
-                  @let values = cascadeAvailableValues(attr.name);
-                  @let isDisabled = i > 0 && !cascadeSelections[cascadeAttributes[i-1].name];
+                @for (attr of cascadeAttributes; track attr.id; let i = $index) {
+                  @let values = cascadeAvailableValues(attr);
+                  @let isDisabled = i > 0 && !cascadeSelections[cascadeAttributes[i-1].id];
                   <div>
                     <label class="text-sm font-bold theme-text block mb-2.5">{{ attr.name }}</label>
                     <div class="flex flex-wrap gap-2">
-                      @for (value of values; track value) {
-                        @let isOutOfStock = cascadeValueOutOfStock(attr.name, value);
-                        @if (attr.type === 'color' && value.startsWith('#')) {
-                          <button type="button" (click)="selectCascadeAttribute(attr.name, value)"
+                      @for (val of values; track val.id) {
+                        @let isOutOfStock = cascadeValueOutOfStock(attr, val.id);
+                        @if (val.colorHex) {
+                          <button type="button" (click)="selectCascadeAttribute(attr, cascadeSelections[attr.id] === val.id ? null : val.id)"
                             [disabled]="isDisabled"
                             class="relative w-9 h-9 rounded-full ring-1 ring-inset ring-black/10 transition-all flex-shrink-0"
-                            [class.outline]="cascadeSelections[attr.name] === value"
-                            [class.outline-2]="cascadeSelections[attr.name] === value"
-                            [class.outline-offset-2]="cascadeSelections[attr.name] === value"
-                            [class.outline-gold]="cascadeSelections[attr.name] === value"
+                            [class.outline]="cascadeSelections[attr.id] === val.id"
+                            [class.outline-2]="cascadeSelections[attr.id] === val.id"
+                            [class.outline-offset-2]="cascadeSelections[attr.id] === val.id"
+                            [class.outline-gold]="cascadeSelections[attr.id] === val.id"
                             [class.opacity-20]="isDisabled"
                             [class.cursor-not-allowed]="isDisabled"
-                            [title]="value + (isOutOfStock ? ' — Épuisé' : '')"
-                            [style.background-color]="value">
+                            [title]="val.value + (isOutOfStock ? ' — Épuisé' : '')"
+                            [style.background-color]="val.colorHex">
                             @if (isOutOfStock) {
                               <span class="absolute inset-0 flex items-center justify-center">
                                 <svg class="w-4 h-4 text-red-400 drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,17 +289,17 @@
                             }
                           </button>
                         } @else {
-                          <button type="button" (click)="selectCascadeAttribute(attr.name, value)"
+                          <button type="button" (click)="selectCascadeAttribute(attr, cascadeSelections[attr.id] === val.id ? null : val.id)"
                             [disabled]="isDisabled"
                             class="relative px-4 py-2 rounded-lg border text-sm font-semibold transition-all"
-                            [class.border-gold]="cascadeSelections[attr.name] === value"
-                            [class.bg-gold/10]="cascadeSelections[attr.name] === value"
-                            [class.text-gold]="cascadeSelections[attr.name] === value"
-                            [class.border-white/15]="cascadeSelections[attr.name] !== value && !isDisabled"
-                            [class.theme-text]="cascadeSelections[attr.name] !== value"
+                            [class.border-gold]="cascadeSelections[attr.id] === val.id"
+                            [class.bg-gold/10]="cascadeSelections[attr.id] === val.id"
+                            [class.text-gold]="cascadeSelections[attr.id] === val.id"
+                            [class.border-white/15]="cascadeSelections[attr.id] !== val.id && !isDisabled"
+                            [class.theme-text]="cascadeSelections[attr.id] !== val.id"
                             [class.opacity-30]="isDisabled"
                             [class.cursor-not-allowed]="isDisabled">
-                            <span [class.opacity-40]="isOutOfStock && !isDisabled">{{ value }}</span>
+                            <span [class.opacity-40]="isOutOfStock && !isDisabled">{{ val.value }}</span>
                             @if (isOutOfStock && !isDisabled) {
                               <span class="ml-1.5 text-[10px] font-bold text-red-400">Épuisé</span>
                             }

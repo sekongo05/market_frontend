@@ -2,16 +2,25 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ProductVariant } from '../models/product.models';
-
-export interface ApiResponse<T> { success: boolean; data: T; message?: string; }
+import { ApiResponse } from '../models/common.models';
+import {
+  ProductVariant,
+  ProductAttributeResponse,
+  ProductAttributeRequest,
+  GenerateVariantsRequest,
+} from '../models/product.models';
 
 export interface ProductVariantRequest {
   variantName: string;
   colorHex?: string;
   imageUrl?: string;
   stock: number;
-  attributes?: Record<string, string>;
+  sku?: string;
+  barcode?: string;
+  weight?: number;
+  active?: boolean;
+  price?: number;
+  attributeValueIds?: number[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -19,6 +28,8 @@ export class ProductVariantService {
   private readonly base = `${environment.apiUrl}/products`;
 
   constructor(private http: HttpClient) {}
+
+  // ── Variants ──────────────────────────────────────────────────────────
 
   getVariants(productId: number): Observable<ApiResponse<ProductVariant[]>> {
     return this.http.get<ApiResponse<ProductVariant[]>>(`${this.base}/${productId}/variants`);
@@ -34,5 +45,35 @@ export class ProductVariantService {
 
   deleteVariant(productId: number, variantId: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.base}/${productId}/variants/${variantId}`);
+  }
+
+  // ── Attributs ─────────────────────────────────────────────────────────
+
+  getAttributes(productId: number): Observable<ApiResponse<ProductAttributeResponse[]>> {
+    return this.http.get<ApiResponse<ProductAttributeResponse[]>>(`${this.base}/${productId}/attributes`);
+  }
+
+  addAttribute(productId: number, req: ProductAttributeRequest): Observable<ApiResponse<ProductAttributeResponse>> {
+    return this.http.post<ApiResponse<ProductAttributeResponse>>(`${this.base}/${productId}/attributes`, req);
+  }
+
+  updateAttribute(productId: number, attributeId: number, req: ProductAttributeRequest): Observable<ApiResponse<ProductAttributeResponse>> {
+    return this.http.put<ApiResponse<ProductAttributeResponse>>(`${this.base}/${productId}/attributes/${attributeId}`, req);
+  }
+
+  deleteAttribute(productId: number, attributeId: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.base}/${productId}/attributes/${attributeId}`);
+  }
+
+  addAttributeValue(productId: number, attributeId: number, req: { value: string; colorHex?: string; imageUrl?: string }): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.base}/${productId}/attributes/${attributeId}/values`, req);
+  }
+
+  deleteAttributeValue(productId: number, valueId: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.base}/${productId}/attributes/values/${valueId}`);
+  }
+
+  generateVariants(productId: number, req: GenerateVariantsRequest): Observable<ApiResponse<ProductVariant[]>> {
+    return this.http.post<ApiResponse<ProductVariant[]>>(`${this.base}/${productId}/attributes/generate-variants`, req);
   }
 }

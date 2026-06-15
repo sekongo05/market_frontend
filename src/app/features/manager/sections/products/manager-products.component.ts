@@ -13,7 +13,7 @@ import { ProductVariantService, ProductVariantRequest } from '../../../../core/s
 import { WebSocketService } from '../../../../core/services/websocket.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
 import { ManagerToastService } from '../../shared/manager-toast.service';
-import { ProductResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender } from '../../../../core/models/product.models';
+import { ProductResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender, ProductAttributeResponse } from '../../../../core/models/product.models';
 import { CategoryResponse } from '../../../../core/models/category.models';
 import { PageResponse } from '../../../../core/models/common.models';
 
@@ -81,44 +81,29 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   newVariantFile: File | null = null;
   newVariantPreview: string | null = null;
   variantFormAttributes: Record<string, string> = {};
+  variantAttributeValueIds: number[] = [];
 
-  get categoryVariantAttributes(): { name: string; type: string; options?: string[] }[] {
-    const cfg = this.editingProduct?.category?.variantConfig;
-    if (!cfg) return [];
-    try { return JSON.parse(cfg); } catch { return []; }
-  }
-
-  get selectedCategoryHasVariants(): boolean {
-    const catId = this.productForm?.get('categoryId')?.value;
-    if (!catId) return false;
-    const cat = this.categories.find(c => c.id === +catId);
-    return !!cat?.variantConfig;
-  }
-
-  get selectedCategoryVariantAttributes(): { name: string; type: string; options?: string[] }[] {
-    const catId = this.productForm?.get('categoryId')?.value;
-    if (!catId) return [];
-    const cat = this.categories.find(c => c.id === +catId);
-    if (!cat?.variantConfig) return [];
-    try { return JSON.parse(cat.variantConfig); } catch { return []; }
-  }
+  // ── Attributs du produit ──────────────────────────────────────────────
+  productAttributes: ProductAttributeResponse[] = [];
+  attributesLoading = false;
+  attributeSaving = false;
+  attributeError: string | null = null;
+  addAttributeOpen = false;
+  newAttributeName = '';
+  editingAttribute: ProductAttributeResponse | null = null;
+  newValueInputs: { value: string; colorHex: string }[] = [];
 
   get attributesAvailableValues(): Record<string, { value: string; count: number }[]> {
-    const result: Record<string, Set<string>> = {};
-    for (const attr of this.categoryVariantAttributes) {
-      result[attr.name] = new Set();
+    const result: Record<string, { value: string; count: number }[]> = {};
+    for (const attr of this.productAttributes) {
+      result[attr.name] = attr.values.map(v => ({
+        value: v.value,
+        count: this.productVariants.filter(vr =>
+          vr.attributeValues?.some(av => av.id === v.id)
+        ).length,
+      }));
     }
-    for (const v of this.productVariants) {
-      if (v.id === this.editingVariant?.id) continue;
-      for (const [key, val] of Object.entries(v.attributes ?? {})) {
-        if (result[key]) result[key].add(val);
-      }
-    }
-    const out: Record<string, { value: string; count: number }[]> = {};
-    for (const [key, set] of Object.entries(result)) {
-      out[key] = [...set].map(value => ({ value, count: this.productVariants.filter(v => v.attributes?.[key] === value).length }));
-    }
-    return out;
+    return result;
   }
 
   generateVariantName(): string {
@@ -447,13 +432,18 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.drawerTab = 'info';
     this.productMedia = product.media ?? [];
     this.productVariants = product.variants ?? [];
+    this.productAttributes = product.attributes ?? [];
+    this.attributesLoading = false; this.attributeSaving = false; this.attributeError = null;
+    this.addAttributeOpen = false; this.newAttributeName = ''; this.editingAttribute = null; this.newValueInputs = [];
     this.variantError = null; this.editingVariant = null;
     this.newVariant = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+    this.variantFormAttributes = {}; this.variantAttributeValueIds = [];
     this.initForm(product);
     this.drawerOpen = true;
     this.scrollLock.lock();
     this.loadMedia(product.id);
     this.loadVariants(product.id);
+    this.loadAttributes(product.id);
     this.cdr.markForCheck();
     setTimeout(() => document.getElementById('manager-drawer-body')?.scrollTo(0, 0), 0);
   }
@@ -762,7 +752,173 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   clearVariantImage(): void { this.newVariantFile = null; this.newVariantPreview = null; this.newVariant = { ...this.newVariant, imageUrl: '' }; this.cdr.markForCheck(); }
 
-  onColorAttributeInput(attrName: string, value: string): void {
+  // ── Attributs du produit ─────────────────────────────────────────────
+
+  loadAttributes(productId: number): void {
+    this.attributesLoading = true;
+    this.productVariantService.getAttributes(productId).subscribe({
+      next: (r) => {
+        if (this.editingProduct?.id !== productId) return;
+        if (r.success) this.productAttributes = r.data;
+        this.attributesLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.attributesLoading = false; this.cdr.markForCheck(); },
+    });
+  }
+
+  openAddAttribute(): void {
+    this.editingAttribute = null;
+    this.newAttributeName = '';
+    this.newValueInputs = [{ value: '', colorHex: '#000000' }];
+    this.attributeError = null;
+    this.addAttributeOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  openEditAttribute(attr: ProductAttributeResponse): void {
+    this.editingAttribute = attr;
+    this.newAttributeName = attr.name;
+    this.newValueInputs = attr.values.length > 0
+      ? attr.values.map(v => ({ value: v.value, colorHex: v.colorHex || '#000000' }))
+      : [{ value: '', colorHex: '#000000' }];
+    this.attributeError = null;
+    this.addAttributeOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  cancelAttributeForm(): void {
+    this.addAttributeOpen = false;
+    this.editingAttribute = null;
+    this.newAttributeName = '';
+    this.newValueInputs = [];
+    this.attributeError = null;
+    this.cdr.markForCheck();
+  }
+
+  addAttributeValueInput(): void {
+    this.newValueInputs = [...this.newValueInputs, { value: '', colorHex: '#000000' }];
+    this.cdr.markForCheck();
+  }
+
+  removeAttributeValueInput(index: number): void {
+    this.newValueInputs = this.newValueInputs.filter((_, i) => i !== index);
+    this.cdr.markForCheck();
+  }
+
+  saveAttribute(): void {
+    if (!this.editingProduct || !this.newAttributeName.trim()) return;
+    this.attributeSaving = true;
+    this.attributeError = null;
+    const productId = this.editingProduct.id;
+    const values = this.newValueInputs
+      .filter(v => v.value.trim())
+      .map(v => ({ value: v.value.trim(), colorHex: v.colorHex !== '#000000' ? v.colorHex : undefined }));
+    const req = { name: this.newAttributeName.trim(), values };
+
+    if (this.editingAttribute) {
+      this.productVariantService.updateAttribute(productId, this.editingAttribute.id, req).subscribe({
+        next: (r) => {
+          if (r.success) {
+            this.productAttributes = this.productAttributes.map(a => a.id === r.data.id ? r.data : a);
+            this.cancelAttributeForm();
+          }
+          this.attributeSaving = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.attributeError = err?.error?.message || "Erreur lors de l'enregistrement";
+          this.attributeSaving = false;
+          this.cdr.markForCheck();
+        },
+      });
+    } else {
+      this.productVariantService.addAttribute(productId, req).subscribe({
+        next: (r) => {
+          if (r.success) {
+            this.productAttributes = [...this.productAttributes, r.data];
+            this.cancelAttributeForm();
+          }
+          this.attributeSaving = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.attributeError = err?.error?.message || "Erreur lors de l'ajout";
+          this.attributeSaving = false;
+          this.cdr.markForCheck();
+        },
+      });
+    }
+  }
+
+  deleteAttribute(attributeId: number): void {
+    if (!this.editingProduct || !confirm('Supprimer cet attribut et toutes ses valeurs ?')) return;
+    this.productVariantService.deleteAttribute(this.editingProduct.id, attributeId).subscribe({
+      next: () => {
+        this.productAttributes = this.productAttributes.filter(a => a.id !== attributeId);
+        this.cdr.markForCheck();
+      },
+      error: () => this.toast.show("Erreur de suppression", 'error'),
+    });
+  }
+
+  deleteAttributeValue(valueId: number): void {
+    if (!this.editingProduct) return;
+    this.productVariantService.deleteAttributeValue(this.editingProduct.id, valueId).subscribe({
+      next: () => {
+        this.productAttributes = this.productAttributes.map(a => ({
+          ...a,
+          values: a.values.filter(v => v.id !== valueId),
+        }));
+        this.cdr.markForCheck();
+      },
+      error: () => this.toast.show("Erreur de suppression", 'error'),
+    });
+  }
+
+  generateVariantsFromAttributes(): void {
+    if (!this.editingProduct || this.productAttributes.length === 0) return;
+    const allValueIds = this.productAttributes.flatMap(a => a.values.map(v => v.id));
+    if (allValueIds.length === 0) return;
+    this.variantSaving = true;
+    this.productVariantService.generateVariants(this.editingProduct.id, {
+      attributeValueIds: allValueIds,
+      defaultStock: 0,
+    }).subscribe({
+      next: (r) => {
+        if (r.success) {
+          this.productVariants = [...this.productVariants, ...r.data];
+          this.toast.show(`${r.data.length} variante(s) générée(s) ✓`);
+        }
+        this.variantSaving = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.variantError = err?.error?.message || "Erreur de génération";
+        this.variantSaving = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  toggleAttributeValue(valueId: number): void {
+    const idx = this.variantAttributeValueIds.indexOf(valueId);
+    if (idx >= 0) {
+      this.variantAttributeValueIds = this.variantAttributeValueIds.filter(id => id !== valueId);
+    } else {
+      this.variantAttributeValueIds = [...this.variantAttributeValueIds, valueId];
+    }
+    const attrValues = this.productAttributes.flatMap(a => a.values);
+    const selectedValues = attrValues.filter(v => this.variantAttributeValueIds.includes(v.id));
+    this.newVariant.variantName = selectedValues.map(v => v.value).join(' / ');
+    if (selectedValues.length > 0) {
+      const hexValue = selectedValues.find(v => v.colorHex);
+      if (hexValue) this.newVariant.colorHex = hexValue.colorHex;
+    }
+    this.cdr.markForCheck();
+  }
+
+  onClickColorAttributeInput(attrName: string, value: string): void {
     const trimmed = value.trim();
     if (/^#[0-9A-Fa-f]{6}$/.test(trimmed)) {
       this.variantFormAttributes[attrName] = trimmed.toUpperCase();
@@ -774,13 +930,12 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   saveVariant(): void {
     if (!this.editingProduct) return;
-    if (this.categoryVariantAttributes.length > 0) {
-      this.newVariant.attributes = { ...this.variantFormAttributes };
+    if (this.productAttributes.length > 0) {
       const autoName = this.generateVariantName();
       if (!this.newVariant.variantName.trim()) {
         this.newVariant.variantName = autoName;
       }
-      if (!autoName) { this.variantError = 'Remplissez au moins un attribut'; return; }
+      if (!autoName && this.variantAttributeValueIds.length === 0) { this.variantError = 'Sélectionnez au moins une valeur d\'attribut ou saisissez un nom'; return; }
     } else {
       if (!this.newVariant.variantName.trim()) { this.variantError = 'Le nom de la variante est requis'; return; }
       if (!/^#[0-9A-Fa-f]{6}$/.test(this.newVariant.colorHex ?? '')) { this.variantError = 'Couleur hex invalide (ex: #FF5733)'; return; }
@@ -789,7 +944,18 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.variantError = null;
     const targetProductId = this.editingProduct.id;
     const doSave = (imageUrl: string) => {
-      const payload = { ...this.newVariant, imageUrl };
+      const payload: ProductVariantRequest = {
+        variantName: this.newVariant.variantName,
+        colorHex: this.newVariant.colorHex,
+        imageUrl,
+        stock: this.newVariant.stock,
+        sku: this.newVariant.sku,
+        barcode: this.newVariant.barcode,
+        weight: this.newVariant.weight,
+        active: this.newVariant.active ?? true,
+        price: this.newVariant.price,
+        attributeValueIds: this.variantAttributeValueIds.length > 0 ? this.variantAttributeValueIds : undefined,
+      };
       const req$ = this.editingVariant
         ? this.productVariantService.updateVariant(targetProductId, this.editingVariant.id, payload)
         : this.productVariantService.addVariant(targetProductId, payload);
@@ -799,10 +965,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
             this.productVariants = this.editingVariant
               ? this.productVariants.map(v => v.id === r.data.id ? r.data : v)
               : [...this.productVariants, r.data];
-            this.editingVariant = null;
-            this.newVariant = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
-            this.variantFormAttributes = {};
-            this.newVariantFile = null; this.newVariantPreview = null;
+            this.cancelEditVariant();
           }
           this.variantSaving = false;
           this.cdr.markForCheck();
@@ -823,8 +986,19 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   startEditVariant(variant: ProductVariant): void {
     this.editingVariant = variant;
-    this.newVariant = { variantName: variant.variantName, colorHex: variant.colorHex || '#000000', imageUrl: variant.imageUrl || '', stock: variant.stock, attributes: variant.attributes };
-    this.variantFormAttributes = variant.attributes ? { ...variant.attributes } : {};
+    this.newVariant = {
+      variantName: variant.variantName,
+      colorHex: variant.colorHex || '#000000',
+      imageUrl: variant.imageUrl || '',
+      stock: variant.stock,
+      sku: variant.sku,
+      barcode: variant.barcode,
+      weight: variant.weight,
+      active: variant.active,
+      price: variant.price,
+    };
+    this.variantAttributeValueIds = variant.attributeValues?.map(av => av.id) ?? [];
+    this.variantFormAttributes = {};
     this.newVariantFile = null; this.newVariantPreview = variant.imageUrl || null;
     this.variantError = null;
     this.cdr.markForCheck();
@@ -834,7 +1008,9 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.editingVariant = null;
     this.newVariant = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
     this.variantFormAttributes = {};
-    this.newVariantFile = null; this.newVariantPreview = null; this.variantError = null;
+    this.variantAttributeValueIds = [];
+    this.newVariantFile = null; this.newVariantPreview = null;
+    this.variantError = null;
     this.cdr.markForCheck();
   }
 

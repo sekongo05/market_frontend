@@ -11,14 +11,35 @@ export interface ProductMediaItem {
   altText?: string;
 }
 
+export interface ProductAttributeValueResponse {
+  id: number;
+  value: string;
+  colorHex?: string;
+  imageUrl?: string;
+  sortOrder: number;
+}
+
+export interface ProductAttributeResponse {
+  id: number;
+  name: string;
+  values: ProductAttributeValueResponse[];
+  sortOrder: number;
+}
+
 export interface ProductVariant {
   id: number;
   variantName: string;
   colorHex?: string;
   imageUrl?: string;
   stock: number;
-  attributes?: Record<string, string>;
+  sku?: string;
+  barcode?: string;
+  weight?: number;
+  active: boolean;
+  price?: number;
+  attributeValues: ProductAttributeValueResponse[];
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ProductResponse {
@@ -35,6 +56,7 @@ export interface ProductResponse {
   imageUrl: string;
   media?: ProductMediaItem[];
   variants?: ProductVariant[];
+  attributes: ProductAttributeResponse[];
   category: CategoryResponse;
   active: boolean;
   featured: boolean;
@@ -72,4 +94,21 @@ export interface GetProductsParams {
   inStock?: boolean;
   active?: boolean;
   featured?: boolean;
+}
+
+export interface ProductAttributeRequest {
+  name: string;
+  values: ProductAttributeValueRequest[];
+}
+
+export interface ProductAttributeValueRequest {
+  value: string;
+  colorHex?: string;
+  imageUrl?: string;
+}
+
+export interface GenerateVariantsRequest {
+  attributeValueIds: number[];
+  defaultStock?: number;
+  defaultPrice?: number;
 }

@@ -18,7 +18,7 @@ import { ReviewService } from '../../../core/services/review.service';
 import { WhatsappService } from '../../../core/services/whatsapp.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { ProductMediaItem, ProductResponse, ProductVariant } from '../../../core/models/product.models';
+import { ProductMediaItem, ProductResponse, ProductVariant, ProductAttributeResponse, ProductAttributeValueResponse } from '../../../core/models/product.models';
 import { ReviewResponse, ProductRatingResponse } from '../../../core/models/review.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
@@ -71,9 +71,9 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   selectedVariant: ProductVariant | null = null;
   variantQty = new Map<number, number>();
 
-  // Cascade selection (variantes dynamiques par catégorie)
-  cascadeAttributes: { name: string; type: string }[] = [];
-  cascadeSelections: Record<string, string | null> = {};
+  // Cascade selection (variantes par attributs produit)
+  cascadeAttributes: ProductAttributeResponse[] = [];
+  cascadeSelections: Record<number, number | null> = {}; // attributeValueId → selected valueId
   cascadeMatchedVariant: ProductVariant | null = null;
 
   private _currentProductId: number | null = null;
@@ -248,39 +248,49 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     if (!this.product?.variants) return [];
     const sel = this.cascadeSelections;
     return this.product.variants.filter(v => {
-      for (const [key, val] of Object.entries(sel)) {
-        if (val && v.attributes?.[key] !== val) return false;
+      for (const attrId of Object.keys(sel)) {
+        const selectedValueId = sel[+attrId];
+        if (selectedValueId != null) {
+          const hasValue = v.attributeValues?.some(av => av.id === selectedValueId);
+          if (!hasValue) return false;
+        }
       }
       return true;
     });
   }
 
-  cascadeAvailableValues(attrName: string): string[] {
-    const values = new Set<string>();
-    for (const v of this.cascadeFilteredVariants) {
-      const val = v.attributes?.[attrName];
-      if (val) values.add(val);
-    }
-    return [...values];
+  cascadeAvailableValues(attr: ProductAttributeResponse): ProductAttributeValueResponse[] {
+    const filteredVariants = this.cascadeFilteredVariants;
+    const attrValueIds = new Set(filteredVariants.flatMap(v =>
+      v.attributeValues?.filter(av =>
+        attr.values.some(pa => pa.id === av.id)
+      ).map(av => av.id) ?? []
+    ));
+    return attr.values.filter(v => attrValueIds.has(v.id));
   }
 
-  cascadeValueOutOfStock(attrName: string, value: string): boolean {
-    const filtered = (this.product?.variants ?? []).filter(v => {
-      for (const [key, val] of Object.entries(this.cascadeSelections)) {
-        if (val && key !== attrName && v.attributes?.[key] !== val) return false;
+  cascadeValueOutOfStock(attr: ProductAttributeResponse, valueId: number): boolean {
+    if (!this.product?.variants) return false;
+    const filtered = this.product.variants.filter(v => {
+      for (const [attrIdStr, selValId] of Object.entries(this.cascadeSelections)) {
+        const aId = +attrIdStr;
+        if (selValId != null && aId !== attr.id) {
+          const hasValue = v.attributeValues?.some(av => av.id === selValId);
+          if (!hasValue) return false;
+        }
       }
-      return v.attributes?.[attrName] === value;
+      return v.attributeValues?.some(av => av.id === valueId);
     });
     return filtered.length > 0 && filtered.every(v => v.stock === 0);
   }
 
-  selectCascadeAttribute(attrName: string, value: string | null): void {
-    this.cascadeSelections = { ...this.cascadeSelections, [attrName]: value };
+  selectCascadeAttribute(attr: ProductAttributeResponse, valueId: number | null): void {
+    this.cascadeSelections[attr.id] = valueId;
     // Clear subsequent selections
     let found = false;
-    for (const attr of this.cascadeAttributes) {
-      if (found) this.cascadeSelections[attr.name] = null;
-      if (attr.name === attrName) found = true;
+    for (const a of this.cascadeAttributes) {
+      if (found) this.cascadeSelections[a.id] = null;
+      if (a.id === attr.id) found = true;
     }
     this.cascadeSelections = { ...this.cascadeSelections };
     // Check if we have a unique match
@@ -302,41 +312,42 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private _initCascade(): void {
-    const cfg = this.product?.category?.variantConfig;
-    if (cfg) {
-      try {
-        this.cascadeAttributes = JSON.parse(cfg);
-        this.cascadeSelections = {};
-        this.cascadeMatchedVariant = null;
-        for (const attr of this.cascadeAttributes) {
-          this.cascadeSelections[attr.name] = null;
-        }
-        // Auto-select first variant if only one
-        const variants = this.product?.variants ?? [];
-        if (variants.length === 1) {
-          this.cascadeMatchedVariant = variants[0];
-          this.selectVariant(variants[0]);
-        }
-        return;
-      } catch { /* invalid JSON, fall through */ }
+    this.cascadeAttributes = this.product?.attributes ?? [];
+    this.cascadeSelections = {};
+    this.cascadeMatchedVariant = null;
+    for (const attr of this.cascadeAttributes) {
+      this.cascadeSelections[attr.id] = null;
     }
-    this.cascadeAttributes = [];
+    const variants = this.product?.variants ?? [];
+    if (variants.length === 1) {
+      this.cascadeMatchedVariant = variants[0];
+      this.selectVariant(variants[0]);
+      this._syncCascadeFromVariant(variants[0]);
+    }
+  }
+
+  private _syncCascadeFromVariant(variant: ProductVariant): void {
+    if (!variant.attributeValues) return;
+    for (const attr of this.cascadeAttributes) {
+      const matchedAv = variant.attributeValues.find(av =>
+        attr.values.some(pa => pa.id === av.id)
+      );
+      if (matchedAv) {
+        this.cascadeSelections[attr.id] = matchedAv.id;
+      }
+    }
+    this.cascadeSelections = { ...this.cascadeSelections };
   }
 
   private _autoSelectVariant(): void {
     this.variantQty = new Map();
     this._initCascade();
     if (this.isCascadeMode) {
-      // Auto-select first in-stock variant & populate cascade selections
       const first = this.product?.variants?.find(v => v.stock > 0) ?? this.product?.variants?.[0];
-      if (first && first.attributes) {
+      if (first) {
         this.selectedVariant = first;
         this.cascadeMatchedVariant = first;
-        for (const attr of this.cascadeAttributes) {
-          const val = first.attributes[attr.name] ?? null;
-          this.cascadeSelections[attr.name] = val;
-        }
-        this.cascadeSelections = { ...this.cascadeSelections };
+        this._syncCascadeFromVariant(first);
       }
       return;
     }
@@ -344,7 +355,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       this.selectedVariant = null;
       return;
     }
-    // Gallery sync: highlight first in-stock variant
     this.selectedVariant =
       this.product.variants.find(v => v.stock > 0) ?? this.product.variants[0];
   }
@@ -355,15 +365,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     if (match) {
       this.selectedVariant = match;
       this.quantity = Math.min(this.quantity, Math.max(1, this.effectiveStock));
-      // Sync cascade selections if in cascade mode
-      if (this.isCascadeMode && match.attributes) {
-        for (const attr of this.cascadeAttributes) {
-          const val = match.attributes[attr.name] ?? null;
-          if (this.cascadeSelections[attr.name] !== val) {
-            this.cascadeSelections[attr.name] = val;
-          }
-        }
-        this.cascadeSelections = { ...this.cascadeSelections };
+      if (this.isCascadeMode) {
+        this._syncCascadeFromVariant(match);
         this.cascadeMatchedVariant = match;
       }
     }
@@ -502,7 +505,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       this.cartService.addToCart({
         productId: this.product.id,
         productName: this.product.name,
-        price: this.product.salePrice ?? this.product.price,
+        price: variant.price ?? this.product.salePrice ?? this.product.price,
         quantity: this.quantity,
         imageUrl: variant.imageUrl || this.product.imageUrl,
         maxStock: variant.stock,
@@ -516,15 +519,12 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       setTimeout(() => { this.addedToCart = false; this.cdr.detectChanges(); }, 2500);
     } else if (this.hasVariants) {
       if (this.totalSelectedQty === 0) return;
-      const unitPrice = this.product.salePrice ?? this.product.price;
       let added = false;
       this.variantQty.forEach((qty, variantId) => {
         const variant = this.product!.variants!.find(v => v.id === variantId);
         if (!variant) return;
+        const unitPrice = variant.price ?? this.product!.salePrice ?? this.product!.price;
         this.cartService.addToCart({
-          productId: this.product!.id,
-          productName: this.product!.name,
-          price: unitPrice,
           quantity: qty,
           imageUrl: variant.imageUrl || this.product!.imageUrl,
           maxStock: variant.stock,
