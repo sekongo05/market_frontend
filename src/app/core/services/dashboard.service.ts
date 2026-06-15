@@ -73,9 +73,8 @@ export interface TopProductItem {
 export interface DailyCaisseResponse {
   date: string;
   ordersCount: number;
-  paidOrdersCount: number;
+  deliveredOrdersCount: number;
   totalRevenue: number;
-  pendingRevenue: number;
   newCustomersCount: number;
 }
 

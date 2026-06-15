@@ -3,8 +3,6 @@ import { Observable } from 'rxjs';
 import { ApiResponse, PageResponse } from '../models/common.models';
 import {
   ProductResponse,
-  CreateProductRequest,
-  UpdateProductRequest,
   GetProductsParams,
 } from '../models/product.models';
 import { ApiService } from './api.service';

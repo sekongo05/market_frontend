@@ -68,18 +68,6 @@ export interface ProductResponse {
   marginPercent?: number;
 }
 
-export interface CreateProductRequest {
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  gender: Gender;
-  imageUrl: string;
-  categoryId: number;
-}
-
-export interface UpdateProductRequest extends CreateProductRequest {}
-
 export type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'name_asc';
 
 export interface GetProductsParams {

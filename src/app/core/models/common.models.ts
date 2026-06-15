@@ -21,6 +21,7 @@ export enum UserRole {
   CUSTOMER = 'CUSTOMER',
   MANAGER = 'MANAGER',
   ADMIN = 'ADMIN',
+  COMPTABLE = 'COMPTABLE',
 }
 
 export enum OrderStatus {
@@ -29,6 +30,13 @@ export enum OrderStatus {
   SHIPPED   = 'SHIPPED',
   DELIVERED = 'DELIVERED',
   CANCELLED = 'CANCELLED',
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
 }
 
 export enum DeliveryStatus {

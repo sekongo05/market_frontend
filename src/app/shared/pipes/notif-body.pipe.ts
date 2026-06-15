@@ -1,12 +1,12 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Pipe, PipeTransform, SecurityContext } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Pipe({ name: 'notifBody', standalone: true })
 export class NotifBodyPipe implements PipeTransform {
 
   constructor(private sanitizer: DomSanitizer) {}
 
-  transform(html: string | null | undefined): SafeHtml {
+  transform(html: string | null | undefined): string {
     if (!html) return '';
 
     const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -51,7 +51,7 @@ export class NotifBodyPipe implements PipeTransform {
 
     // Les badges <span style="background:…"> gardent leurs couleurs sémantiques.
 
-    return this.sanitizer.bypassSecurityTrustHtml(source.body.innerHTML);
+    return this.sanitizer.sanitize(SecurityContext.HTML, source.body.innerHTML) ?? '';
   }
 
   private findEmailContentTd(doc: Document): Element | null {

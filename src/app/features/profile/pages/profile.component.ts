@@ -1,6 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserResponse, UserFullProfileResponse, Address, AddressRequest } from '../../../core/models/user.models';
@@ -16,7 +18,8 @@ import { ProfileAddressesComponent } from './profile-addresses.component';
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
   readonly orderStatusLabel = orderStatusLabel;
   readonly orderStatusClass = orderStatusClass;
 
@@ -43,6 +46,11 @@ export class ProfileComponent implements OnInit {
     this.loadUserProfile();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   get recentOrders() { return this.fullProfile?.recentOrders ?? []; }
   get isManager(): boolean { const r = this.authService.getCurrentUser()?.role; return r === 'MANAGER' || r === 'ADMIN'; }
   get initials(): string { if (!this.user) return '?'; return `${this.user.prenom[0]}${this.user.nom[0]}`.toUpperCase(); }
@@ -53,7 +61,7 @@ export class ProfileComponent implements OnInit {
 
   loadUserProfile(): void {
     this.loading = true;
-    this.userService.getProfile().subscribe({
+    this.userService.getProfile().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success && r.data) {
           this.user = r.data;
@@ -67,7 +75,7 @@ export class ProfileComponent implements OnInit {
   }
 
   private loadFullProfile(id: number): void {
-    this.userService.getFullProfile(id).subscribe({
+    this.userService.getFullProfile(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => { if (r.success && r.data) { this.fullProfile = r.data; this.cdr.detectChanges(); } },
       error: (err) => { console.error('Failed to load profile', err); },
     });
@@ -76,7 +84,7 @@ export class ProfileComponent implements OnInit {
   updateProfile(data: { nom: string; prenom: string; phone: string }): void {
     this.saving = true;
     this.clearMessages();
-    this.userService.updateProfile(data).subscribe({
+    this.userService.updateProfile(data).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) { this.user = r.data; this._showSuccess('Profil mis à jour avec succès'); }
         else { this._showError('Une erreur est survenue'); }
@@ -90,7 +98,7 @@ export class ProfileComponent implements OnInit {
   changePassword(data: { oldPassword: string; newPassword: string }): void {
     this.changingPassword = true;
     this.clearMessages();
-    this.userService.changePassword(data).subscribe({
+    this.userService.changePassword(data).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) { this._showSuccess('Mot de passe modifié avec succès'); }
         else { this._showError(r.message || 'Ancien mot de passe incorrect'); }
@@ -103,7 +111,7 @@ export class ProfileComponent implements OnInit {
 
   loadAddresses(): void {
     this.loadingAddresses = true;
-    this.userService.getAddresses().subscribe({
+    this.userService.getAddresses().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => { if (r.success) this.addresses = r.data; this.loadingAddresses = false; this.cdr.detectChanges(); },
       error: () => { this.loadingAddresses = false; this.cdr.detectChanges(); },
     });
@@ -112,7 +120,7 @@ export class ProfileComponent implements OnInit {
   addAddress(data: AddressRequest): void {
     this.savingAddress = true;
     this.clearMessages();
-    this.userService.createAddress(data).subscribe({
+    this.userService.createAddress(data).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) { this.loadAddresses(); this._showSuccess('Adresse ajoutée'); }
         this.savingAddress = false;
@@ -125,7 +133,7 @@ export class ProfileComponent implements OnInit {
   updateAddress(ev: { id: number; data: AddressRequest }): void {
     this.savingAddress = true;
     this.clearMessages();
-    this.userService.updateAddress(ev.id, ev.data).subscribe({
+    this.userService.updateAddress(ev.id, ev.data).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success) { this.loadAddresses(); this._showSuccess('Adresse mise à jour'); }
         this.savingAddress = false;
@@ -136,14 +144,14 @@ export class ProfileComponent implements OnInit {
   }
 
   deleteAddress(id: number): void {
-    this.userService.deleteAddress(id).subscribe({
+    this.userService.deleteAddress(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => { this.loadAddresses(); this._showSuccess('Adresse supprimée'); this.cdr.detectChanges(); },
       error: () => { this._showError('Erreur lors de la suppression'); this.cdr.detectChanges(); },
     });
   }
 
   setDefaultAddress(id: number): void {
-    this.userService.setDefaultAddress(id).subscribe({
+    this.userService.setDefaultAddress(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => { if (r.success) { this.loadAddresses(); this._showSuccess('Adresse par défaut mise à jour'); } this.cdr.detectChanges(); },
       error: () => { this._showError('Erreur'); this.cdr.detectChanges(); },
     });

@@ -437,22 +437,18 @@
           </div>
         </div>
         @if (dailyCaisse) {
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="p-3 bg-black/[.03] rounded-2xl text-center">
               <p class="text-2xl font-black theme-text">{{ dailyCaisse.ordersCount }}</p>
               <p class="text-xs theme-muted mt-1">Commandes</p>
             </div>
             <div class="p-3 bg-green-50 rounded-2xl text-center">
-              <p class="text-2xl font-black text-green-700">{{ dailyCaisse.paidOrdersCount }}</p>
-              <p class="text-xs theme-muted mt-1">Payées</p>
+              <p class="text-2xl font-black text-green-700">{{ dailyCaisse.deliveredOrdersCount }}</p>
+              <p class="text-xs theme-muted mt-1">Livrées</p>
             </div>
             <div class="p-3 bg-gold/8 border border-gold/15 rounded-2xl text-center">
               <p class="text-base sm:text-xl font-black text-gold truncate">{{ formatAmount(dailyCaisse.totalRevenue) }}</p>
               <p class="text-xs theme-muted mt-1">CA validé (FCFA)</p>
-            </div>
-            <div class="p-3 bg-black/[.03] rounded-2xl text-center">
-              <p class="text-base sm:text-xl font-black theme-text truncate">{{ formatAmount(dailyCaisse.pendingRevenue) }}</p>
-              <p class="text-xs theme-muted mt-1">CA en attente</p>
             </div>
             <div class="p-3 bg-violet-50 rounded-2xl text-center">
               <p class="text-2xl font-black text-violet-700">{{ dailyCaisse.newCustomersCount }}</p>
