@@ -27,6 +27,30 @@
       </div>
     }
 
+    <!-- ── Paiement feedback (retour GeniusPay) ────────────────────────── -->
+    @if (paymentFeedback) {
+      <div class="flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-medium"
+           [style]="paymentFeedback.type === 'success'
+             ? 'background:rgba(34,197,94,0.10);border:1px solid rgba(34,197,94,0.25);color:#4ade80'
+             : 'background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#f87171'">
+        @if (paymentFeedback.type === 'success') {
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        } @else {
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        }
+        <span class="flex-1">{{ paymentFeedback.message }}</span>
+        <button (click)="dismissPaymentFeedback()" class="shrink-0 opacity-60 hover:opacity-100 transition-opacity">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    }
+
     <!-- ── Skeletons ───────────────────────────────────────────────────── -->
     @if (loading) {
       @for (i of [1,2,3]; track i) {
@@ -261,6 +285,34 @@
                 <div class="rounded-xl px-4 py-3" style="background:rgba(255,255,255,0.04)">
                   <p class="text-xs font-bold theme-muted mb-1.5">Livraison</p>
                   <p class="text-sm font-bold theme-text">{{ deliveryLabel(order.deliveryStatus) }}</p>
+                </div>
+              </div>
+
+              <!-- Statut paiement -->
+              <div>
+                <div class="rounded-xl px-4 py-3" style="background:rgba(255,255,255,0.04)">
+                  <p class="text-xs font-bold theme-muted mb-1.5">Paiement</p>
+                  @if (order.paymentStatus === 'PAID') {
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                      <span class="text-sm font-bold text-green-400">Payée</span>
+                    </div>
+                  } @else if (order.paymentStatus === 'FAILED') {
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                      <span class="text-sm font-bold text-red-400">Échoué</span>
+                    </div>
+                  } @else if (order.paymentStatus === 'REFUNDED') {
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                      <span class="text-sm font-bold text-yellow-400">Remboursée</span>
+                    </div>
+                  } @else {
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                      <span class="text-sm font-bold" style="color:#d4af37">En attente de paiement</span>
+                    </div>
+                  }
                 </div>
               </div>
 

@@ -18,8 +18,11 @@ import { CategoryResponse } from './core/models/category.models';
 import { PageResponse } from './core/models/common.models';
 import { PromoService } from './core/services/promo.service';
 import { PublicPromoResponse } from './core/models/promo.models';
+import { environment } from '../environments/environment';
 import { Subject } from 'rxjs';
 import { takeUntil, retry } from 'rxjs/operators';
+
+const NEW_PRODUCT_DAYS = 21;
 
 @Component({
   selector: 'app-home',
@@ -31,6 +34,8 @@ import { takeUntil, retry } from 'rxjs/operators';
 })
 export class HomeComponent implements AfterViewInit, OnDestroy {
   currentUser$;
+
+  whatsAppUrl = `https://wa.me/${environment.whatsAppNumber}`;
 
   categories: CategoryResponse[] = [];
   featuredProducts: ProductResponse[] = [];
@@ -219,7 +224,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   isNew(product: ProductResponse): boolean {
     if (!product.createdAt) return false;
-    return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= 21;
+    return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= NEW_PRODUCT_DAYS;
   }
 
   quickAdd(product: ProductResponse, event: Event): void {
@@ -352,9 +357,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   get hasDeals(): boolean { return !this.newProductsLoading && this.discountProducts.length > 0; }
   get hasFeatured(): boolean { return !this.featuredLoading && this.featuredProducts.length > 0; }
-  get hasBestsellers(): boolean { return !this.bestsellersLoading && this.bestsellers.length > 0; }
   get hasNewProducts(): boolean { return !this.newProductsLoading && this.newProducts.length > 0; }
-  get hasGapSections(): boolean { return this.featuredLoading || this.hasFeatured || this.hasBestsellers; }
+  get hasGapSections(): boolean { return this.featuredLoading || this.hasFeatured || (!this.bestsellersLoading && this.bestsellers.length > 0); }
 
   get editorialStats(): { v: string; l: string }[] {
     const p = this.publicStats;

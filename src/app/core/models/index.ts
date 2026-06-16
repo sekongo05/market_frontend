@@ -7,3 +7,4 @@ export * from './delivery.models';
 export * from './notification.models';
 export * from './stock.models';
 export * from './common.models';
+export * from './payment.models';

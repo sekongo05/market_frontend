@@ -454,10 +454,17 @@
   user-select: none;
 }
 
-/* Cache le curseur natif sur les zones produit */
-.cursor-hover-zone,
-.cursor-hover-zone * {
-  cursor: none !important;
+/* Sur les zones décoratives, on garde le curseur natif visible
+   pour ne pas casser la navigation clavier (WCAG 2.1.1) */
+.cursor-hover-zone { cursor: auto; }
+.cursor-hover-zone a,
+.cursor-hover-zone button,
+.cursor-hover-zone [role="button"],
+.cursor-hover-zone input,
+.cursor-hover-zone select,
+.cursor-hover-zone textarea,
+.cursor-hover-zone [tabindex]:not([tabindex="-1"]) {
+  cursor: pointer;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

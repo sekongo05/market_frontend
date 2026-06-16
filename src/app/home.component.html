@@ -1,5 +1,12 @@
 <div class="theme-bg">
 
+  <!-- ════ SKIP‑TO‑CONTENT ════ -->
+  <a href="#main-content"
+     class="skip-to-content absolute -top-full left-0 z-[100000] bg-gold text-black font-bold px-4 py-2
+            focus:top-0 focus:outline-none focus:ring-2 focus:ring-gold/60 transition-all duration-200">
+    Aller au contenu principal
+  </a>
+
   <!-- ════ CURSEUR PERSONNALISÉ ════ -->
   <div id="sdm-cursor" aria-hidden="true">
     <div class="sdm-cursor-ring"></div>
@@ -29,16 +36,18 @@
          [class.swiping]="_isTransitioning">
 
       @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
-        <img [src]="slide.imageUrl"
-             [alt]="slide.label"
-             class="hero-slide absolute inset-0 w-full h-full object-cover"
-             [class.active]="i === currentSlide"
-             [class.prev]="i === currentSlide - 1 || (currentSlide === 0 && i === heroSlides.length - 1)"
-             [class.next]="i === currentSlide + 1 || (currentSlide === heroSlides.length - 1 && i === 0)"
-             [class.no-ken]="i === 1"
-             [attr.fetchpriority]="i === 0 ? 'high' : 'low'"
-             (load)="i === 0 ? onHeroImgLoad() : null"
-             (error)="onSlideError($event)"/>
+        @if (i === currentSlide || i === (currentSlide + 1) % heroSlides.length || i === (currentSlide - 1 + heroSlides.length) % heroSlides.length) {
+          <img [src]="slide.imageUrl"
+               [alt]="slide.label"
+               class="hero-slide absolute inset-0 w-full h-full object-cover"
+               [class.active]="i === currentSlide"
+               [class.prev]="i === (currentSlide - 1 + heroSlides.length) % heroSlides.length && i !== currentSlide"
+               [class.next]="i === (currentSlide + 1) % heroSlides.length && i !== currentSlide"
+               [class.no-ken]="i === 1"
+               [attr.fetchpriority]="i === 0 ? 'high' : 'low'"
+               (load)="i === currentSlide ? onHeroImgLoad() : null"
+               (error)="onSlideError($event)"/>
+        }
       }
 
       <!-- Overlay progress bar -->
@@ -105,7 +114,7 @@
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style="background:#d4af37;"></span>
             <span class="relative inline-flex rounded-full h-2 w-2" style="background:#d4af37;"></span>
           </div>
-          <p class="text-[11px] uppercase tracking-[0.45em] font-bold" style="color:rgba(212,175,55,0.72);">
+          <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.45em] font-bold" style="color:rgba(212,175,55,0.72);">
             SDM Store
           </p>
         </div>
@@ -171,7 +180,7 @@
 
         <!-- Trust chips -->
         <div class="flex flex-wrap gap-2 mb-10">
-          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
                 style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.88);">
             <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -179,16 +188,16 @@
             </svg>
             Qualité vérifiée
           </span>
-          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
+          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
                 style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
             Livraison 24–48h
           </span>
-          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
+          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
                 style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
             Paiement à la livraison
           </span>
           @if (!(currentUser$ | async) && firstOrderPromo) {
-            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold"
+            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold"
                   style="background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.5);color:#d4af37;">
               <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -202,9 +211,9 @@
 
       <div class="hero-sig hidden lg:flex items-center gap-5 mt-auto pt-20"
            style="color:rgba(255,255,255,0.38);">
-        <span class="text-[10px] uppercase tracking-[0.4em]">Est. 2020</span>
+        <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em]">Est. 2020</span>
         <div class="w-6 h-[1px]" style="background:rgba(255,255,255,0.2)"></div>
-        <span class="text-[10px] uppercase tracking-[0.4em]">Abidjan · CI</span>
+        <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em]">Abidjan · CI</span>
       </div>
     </div>
 
@@ -219,7 +228,7 @@
         }
       </div>
       <p class="text-xs font-black text-white leading-none">{{ publicStats ? (publicStats.totalClients + '+') : '…' }} clients</p>
-      <p class="text-[9px] font-semibold" style="color:rgba(212,175,55,0.55);">nous font confiance · {{ avgRatingDisplay() }}/5</p>
+      <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-semibold" style="color:rgba(212,175,55,0.55);">nous font confiance · {{ avgRatingDisplay() }}/5</p>
     </div>
 
     <div class="absolute bottom-7 right-6 hidden lg:flex flex-col items-center gap-1.5" style="z-index:10;">
@@ -279,12 +288,12 @@
   <!-- ════════════════════════════════════════════════════════════════
        3. NOS UNIVERS — catégories dynamiques
   ════════════════════════════════════════════════════════════════════ -->
-  <section class="scroll-reveal"
+  <section id="main-content" class="scroll-reveal"
            style="padding-top:clamp(60px,8vw,110px);padding-left:0;padding-right:0;"
            [style.paddingBottom]="hasGapSections ? 'clamp(60px,8vw,110px)' : '0'">
     <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14">
       <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
-      <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-2"
+      <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
          style="color:rgba(212,175,55,0.65);transition-delay:80ms">Explorer nos univers</p>
       <h2 class="r-up font-black theme-text tracking-tight leading-none"
           style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">NOS COLLECTIONS</h2>
@@ -333,7 +342,7 @@
             <div class="absolute inset-0" style="background:linear-gradient(135deg,#1a1000,#0a0800);"></div>
           }
           <div class="absolute inset-0 bg-gradient-to-t from-black/92 via-black/10 to-transparent"></div>
-          <div class="absolute top-5 left-5 px-3 py-1.5 text-[8px] uppercase tracking-[0.4em] font-black"
+          <div class="absolute top-5 left-5 px-3 py-1.5 text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em] font-black"
                style="background:rgba(212,175,55,0.14);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.85);">
             Notre spécialité
           </div>
@@ -342,7 +351,7 @@
                 style="font-size:clamp(2rem,5vw,4rem);">{{ categories[0].name }}</h3>
             <div class="flex items-center gap-4">
               <div class="h-[1px] w-8 transition-all duration-700 group-hover:w-20" style="background:#d4af37;"></div>
-              <span class="text-[9px] uppercase tracking-[0.4em] transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+              <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em] transition-opacity duration-500 opacity-0 group-hover:opacity-100"
                     style="color:#d4af37;">Explorer →</span>
             </div>
           </div>
@@ -406,13 +415,13 @@
             <svg class="w-3.5 h-3.5" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
             </svg>
-            <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold" style="color:rgba(212,175,55,0.65);">Nos coups de cœur</p>
+            <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold" style="color:rgba(212,175,55,0.65);">Nos coups de cœur</p>
           </div>
           <h2 class="r-up font-black theme-text tracking-tight leading-none"
               style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">SÉLECTION</h2>
         </div>
         <a routerLink="/products" [queryParams]="{featured: true}"
-           class="r-up text-[9px] sm:text-[10px] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
+           class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
            style="color:rgba(0,0,0,0.25);border-color:rgba(0,0,0,0.12);transition-delay:180ms">Voir tout</a>
       </div>
 
@@ -433,20 +442,20 @@
                 <svg class="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                 </svg>
-                <span class="text-[8px] font-black text-black uppercase tracking-wider">Vedette</span>
+                <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-black uppercase tracking-wider">Vedette</span>
               </div>
               @if (product.discountPercent && product.discountPercent > 0) {
-                <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[9px] font-black px-2 py-0.5 tracking-wider uppercase">
+                <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 tracking-wider uppercase">
                   −{{ product.discountPercent }}%
                 </span>
               }
               @if (product.stock === 0) {
                 <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <span class="text-white/70 text-[10px] font-black uppercase tracking-widest">Épuisé</span>
+                  <span class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
                 </div>
               }
             </div>
-            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1 text-gold">{{ product.category.name }}</p>
+            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">{{ product.category.name }}</p>
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
@@ -455,7 +464,7 @@
               } @else {
                 <span class="font-black text-sm theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               }
-              <span class="text-[9px] theme-muted">FCFA</span>
+              <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
             </div>
           </a>
         }
@@ -469,7 +478,7 @@
             <svg class="w-3.5 h-3.5" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
             </svg>
-            <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold" style="color:rgba(212,175,55,0.65);">Nos coups de cœur</p>
+            <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold" style="color:rgba(212,175,55,0.65);">Nos coups de cœur</p>
           </div>
           <h2 class="r-up font-black theme-text tracking-tight leading-none"
               style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">SÉLECTION</h2>
@@ -493,25 +502,39 @@
   <!-- ════════════════════════════════════════════════════════════════
        5. MEILLEURES VENTES
   ════════════════════════════════════════════════════════════════════ -->
-  @if (hasBestsellers) {
-    <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;">
-      <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
-        <div>
-          <div class="flex items-center gap-2 mb-3">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-60"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-            </span>
-            <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold text-red-600">Les plus achetés</p>
-          </div>
-          <h2 class="r-up font-black theme-text tracking-tight leading-none"
-              style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">MEILLEURES<br>VENTES</h2>
+  <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;">
+    <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-60"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+          </span>
+          <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold text-red-600">Les plus achetés</p>
         </div>
-        <a routerLink="/products"
-           class="r-up text-[9px] sm:text-[10px] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
-           style="color:rgba(0,0,0,0.35);border-color:rgba(0,0,0,0.14);transition-delay:180ms">Voir tout</a>
+        <h2 class="r-up font-black theme-text tracking-tight leading-none"
+            style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">MEILLEURES<br>VENTES</h2>
       </div>
+      @if (!bestsellersLoading && bestsellers.length > 0) {
+        <a routerLink="/products"
+           class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
+           style="color:rgba(0,0,0,0.35);border-color:rgba(0,0,0,0.14);transition-delay:180ms">Voir tout</a>
+      }
+    </div>
 
+    @if (bestsellersLoading) {
+      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
+                  sm:grid sm:grid-cols-4 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
+        @for (_ of skeletonArray; track $index) {
+          <div class="flex-shrink-0 w-[60vw] sm:w-auto">
+            <div style="aspect-ratio:3/4;" class="rounded-lg bg-white/30 animate-pulse mb-3"></div>
+            <div class="h-2 w-16 rounded bg-white/30 animate-pulse mb-1.5"></div>
+            <div class="h-3 w-28 rounded bg-white/30 animate-pulse mb-2"></div>
+            <div class="h-3 w-20 rounded bg-white/30 animate-pulse"></div>
+          </div>
+        }
+      </div>
+    } @else if (bestsellers.length > 0) {
       <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right
                   sm:grid sm:grid-cols-4 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
         @for (product of bestsellers.slice(0,4); track product.id; let idx = $index) {
@@ -524,20 +547,20 @@
                    (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
               <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
               <!-- Rang -->
-              <div class="absolute top-2.5 left-2.5 w-7 h-7 flex items-center justify-center text-[10px] font-black text-white"
+              <div class="absolute top-2.5 left-2.5 w-7 h-7 flex items-center justify-center text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
                    style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.15);">#{{ idx + 1 }}</div>
               @if (product.discountPercent && product.discountPercent > 0) {
-                <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[9px] font-black px-2 py-0.5 uppercase">
+                <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 uppercase">
                   −{{ product.discountPercent }}%
                 </span>
               }
               @if (product.stock === 0) {
                 <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <span class="text-white/70 text-[10px] font-black uppercase tracking-widest">Épuisé</span>
+                  <span class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
                 </div>
               }
             </div>
-            <p class="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-bold mb-1 text-gold">{{ product.category.name }}</p>
+            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">{{ product.category.name }}</p>
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
@@ -546,7 +569,7 @@
               } @else {
                 <span class="font-black text-sm theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               }
-              <span class="text-[9px] theme-muted">FCFA</span>
+              <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
             </div>
           </a>
         }
@@ -564,7 +587,7 @@
                 <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                      (error)="$any($event.target).src='https://placehold.co/56x56/0a0a0a/d4af37?text=SDM'"/>
-                <span class="absolute top-0 left-0 w-4 h-4 flex items-center justify-center text-[8px] font-black text-white"
+                <span class="absolute top-0 left-0 w-4 h-4 flex items-center justify-center text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
                       style="background:rgba(0,0,0,0.7);">#{{ idx + 5 }}</span>
               </div>
               <div class="min-w-0">
@@ -577,9 +600,8 @@
           }
         </div>
       }
-    </section>
-  }
-  }
+    }
+  </section>
 
 
   <!-- ════════════════════════════════════════════════════════════════
@@ -591,13 +613,13 @@
     <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
       <div>
         <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
-        <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-2"
+        <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
            style="color:rgba(212,175,55,0.65);transition-delay:80ms">Vient d'arriver</p>
         <h2 class="r-up font-black theme-text tracking-tight leading-none"
             style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">NOUVEAUTÉS</h2>
       </div>
       <a routerLink="/products"
-         class="r-up text-[9px] sm:text-[10px] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
+         class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
          style="color:rgba(0,0,0,0.35);border-color:rgba(0,0,0,0.14);transition-delay:200ms">Tout voir</a>
     </div>
 
@@ -629,7 +651,7 @@
 
                 <!-- Badge promo (orange) -->
                 @if (product.discountPercent && product.discountPercent > 0) {
-                  <span class="absolute top-2 right-2 bg-orange-500 text-white text-[9px] font-black px-2 py-0.5 uppercase z-10">
+                  <span class="absolute top-2 right-2 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 uppercase z-10">
                     −{{ product.discountPercent }}%
                   </span>
                 }
@@ -637,7 +659,7 @@
                 <!-- Stock épuisé -->
                 @if (product.stock === 0) {
                   <div class="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
-                    <span class="text-white/70 text-[10px] font-black uppercase tracking-widest">Épuisé</span>
+                    <span class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
                   </div>
                 }
               </div>
@@ -689,8 +711,8 @@
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
             </span>
-            <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold text-orange-500/70">Offres limitées</p>
-            <span class="r-up inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-wider"
+            <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold text-orange-500/70">Offres limitées</p>
+            <span class="r-up inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-wider"
                   style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.25);color:#f97316;transition-delay:160ms">
               <span class="relative flex h-1.5 w-1.5">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60"></span>
@@ -705,7 +727,7 @@
           </h2>
         </div>
         <a routerLink="/products"
-           class="r-up text-[9px] sm:text-[10px] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-orange-600"
+           class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-orange-600"
            style="color:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.1);transition-delay:180ms">Voir tout</a>
       </div>
 
@@ -721,11 +743,11 @@
                    (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/f97316?text=SDM'"/>
               <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
               @if (product.discountPercent) {
-                <div class="absolute top-3 left-3 px-3 py-1.5 text-[10px] font-black text-white"
+                <div class="absolute top-3 left-3 px-3 py-1.5 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
                      style="background:#f97316;">−{{ product.discountPercent }}%</div>
               }
             </div>
-            <p class="text-[8px] uppercase tracking-[0.3em] font-bold mb-1 text-orange-500/60">{{ product.category.name }}</p>
+            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-orange-500/60">{{ product.category.name }}</p>
             <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-1">{{ product.name }}</p>
             <div class="flex items-baseline gap-1.5">
               @if (product.salePrice) {
@@ -734,7 +756,7 @@
               } @else {
                 <span class="font-black text-sm theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
               }
-              <span class="text-[9px] theme-muted">FCFA</span>
+              <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
             </div>
           </a>
         }
@@ -758,7 +780,7 @@
         </div>
         <div class="r-right lg:flex-[48] flex flex-col justify-center" style="transition-delay:200ms;">
           <div class="gold-line-pulse w-6 h-[1px] mb-10" style="background:#d4af37;"></div>
-          <p class="text-[9px] uppercase tracking-[0.55em] font-bold mb-6" style="color:rgba(212,175,55,0.65);">Notre engagement</p>
+          <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-6" style="color:rgba(212,175,55,0.65);">Notre engagement</p>
           <h2 class="font-black text-white leading-[0.88] tracking-tight mb-8"
               style="font-size:clamp(2.4rem,5.5vw,4rem);">
             L'ÉLÉGANCE<br>EST UN<br>
@@ -792,7 +814,7 @@
         @for (s of editorialStats; track s.l; let i = $index) {
           <div class="text-center">
             <p class="font-black theme-text text-2xl sm:text-3xl leading-none mb-1.5">{{ s.v }}</p>
-            <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:rgba(0,0,0,0.35);">{{ s.l }}</p>
+            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-semibold uppercase tracking-wider" style="color:rgba(0,0,0,0.35);">{{ s.l }}</p>
           </div>
         }
       </div>
@@ -818,7 +840,7 @@
                style="border-color:rgba(212,175,55,0.08);" [style.transition-delay.ms]="i * 90">
             <p class="stat-num font-black leading-none mb-2 tabular-nums"
                style="color:#d4af37;font-size:clamp(2.5rem,6vw,4rem);">{{ stat.value }}{{ stat.suffix }}</p>
-            <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.3em] theme-muted">{{ stat.label }}</p>
+            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-[0.3em] theme-muted">{{ stat.label }}</p>
           </div>
         }
       </div>
@@ -833,7 +855,7 @@
     <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
       <div class="mb-12 sm:mb-16">
         <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
-        <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-2"
+        <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
            style="color:rgba(212,175,55,0.65);transition-delay:80ms">Notre engagement</p>
         <h2 class="r-up font-black theme-text tracking-tight leading-none"
             style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">L'EXCELLENCE<br>PARTOUT</h2>
@@ -874,7 +896,7 @@
         <div class="mb-12 sm:mb-16 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
           <div>
             <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
-            <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-2"
+            <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
                style="color:rgba(212,175,55,0.65);transition-delay:80ms">Avis vérifiés</p>
             <h2 class="r-up font-black theme-text tracking-tight leading-none"
                 style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">CE QU'ILS DISENT</h2>
@@ -892,7 +914,7 @@
                     </svg>
                   }
                 </div>
-                <p class="text-[9px] theme-muted mt-1 whitespace-nowrap">{{ publicStats.totalReviews }}+ avis</p>
+                <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted mt-1 whitespace-nowrap">{{ publicStats.totalReviews }}+ avis</p>
               </div>
             </div>
           }
@@ -921,7 +943,7 @@
               <div class="flex items-center justify-between pt-3 border-t" style="border-color:rgba(212,175,55,0.1);">
                 <div>
                   <p class="text-xs font-black theme-text">{{ reviewInitials(review.customerName) }}</p>
-                  <p class="text-[10px] font-medium" style="color:rgba(212,175,55,0.55);">{{ review.productName }}</p>
+                  <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-medium" style="color:rgba(212,175,55,0.55);">{{ review.productName }}</p>
                 </div>
                 @if (review.purchased) {
                   <div class="flex items-center gap-1 px-2 py-1 rounded-full"
@@ -929,7 +951,7 @@
                     <svg class="w-2.5 h-2.5" style="color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                     </svg>
-                    <span class="text-[8px] font-bold uppercase tracking-wider" style="color:#10b981;">Achat vérifié</span>
+                    <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider" style="color:#10b981;">Achat vérifié</span>
                   </div>
                 }
               </div>
@@ -949,7 +971,7 @@
            style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,10vw,120px) 1.5rem;">
     <div class="relative max-w-2xl mx-auto text-center">
       <div class="r-line w-8 h-[1px] mx-auto mb-8" style="background:#d4af37;"></div>
-      <p class="r-up text-[9px] uppercase tracking-[0.55em] font-bold mb-6"
+      <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-6"
          style="color:rgba(212,175,55,0.58);transition-delay:100ms">
         Prêt à shopper ?
       </p>
@@ -970,7 +992,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
           </svg>
         </a>
-        <a href="https://wa.me/2250153761320" target="_blank" rel="noopener"
+        <a [href]="whatsAppUrl" target="_blank" rel="noopener"
            class="inline-flex items-center justify-center gap-3 px-10 py-5 font-black text-sm uppercase tracking-[0.2em] text-white transition-all hover:-translate-y-0.5 active:scale-[0.97]"
            style="background:#128C7E;box-shadow:0 12px 40px rgba(18,140,126,0.25);">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OrderService } from '../../../core/services/order.service';
@@ -27,6 +27,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
   currentPage = 0;
   pageSize = 10;
   totalPages = 0;
+
+  // Payment feedback (return from GeniusPay)
+  paymentFeedback: { type: 'success' | 'error'; message: string } | null = null;
 
   // Inline expand / cancel
   expandedId: number | null = null;
@@ -61,6 +64,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
     private wsService: WebSocketService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   @HostListener('document:keydown.escape')
@@ -70,6 +74,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.handlePaymentReturn();
     this.loadOrders();
     this.loadMyReturns();
     this.wsService.orderStatusUpdate$
@@ -85,6 +90,28 @@ export class OrdersComponent implements OnInit, OnDestroy {
     this.wsService.notification$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.loadMyReturns());
+  }
+
+  private handlePaymentReturn(): void {
+    const payment = this.route.snapshot.queryParamMap.get('payment');
+    if (!payment) return;
+
+    if (payment === 'success') {
+      this.paymentFeedback = { type: 'success', message: 'Paiement confirmé ! Merci pour votre commande.' };
+    } else if (payment === 'failed') {
+      this.paymentFeedback = { type: 'error', message: 'Le paiement a échoué. Vous pouvez réessayer depuis vos commandes.' };
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { payment: null, reference: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  dismissPaymentFeedback(): void {
+    this.paymentFeedback = null;
   }
 
   private _focusOrder(orderNumber: string): void {

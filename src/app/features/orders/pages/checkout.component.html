@@ -1,21 +1,31 @@
-<!-- ── SUCCESS SCREEN ── -->
+<!-- ── REDIRECT TO GENIUSPAY ── -->
 @if (checkoutSuccess) {
   <div class="min-h-screen flex items-center justify-center px-4"
        style="background:var(--color-bg,#faf9f6)">
     <div class="flex flex-col items-center gap-6 text-center max-w-sm">
-      <div class="w-20 h-20 rounded-full bg-green-500/12 border-2 border-green-500/30 flex items-center justify-center">
-        <svg class="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+      <div class="w-20 h-20 rounded-full bg-gold/10 border-2 border-gold/20 flex items-center justify-center">
+        <svg class="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
         </svg>
       </div>
       <div>
-        <h2 class="text-2xl font-black mb-2" style="color:#111111">Commande confirmée !</h2>
-        <p class="text-sm" style="color:#6b7280">Vous allez être redirigé vers vos commandes…</p>
+        <h2 class="text-2xl font-black mb-2" style="color:#111111">Redirection vers le paiement</h2>
+        <p class="text-sm" style="color:#6b7280">
+          Vous allez être redirigé vers la page sécurisée
+          <strong style="color:#d4af37">GeniusPay</strong>
+          pour choisir votre moyen de paiement.
+        </p>
       </div>
-      <div class="flex gap-1">
-        <span class="w-2 h-2 rounded-full bg-gold animate-bounce" style="animation-delay:0ms"></span>
-        <span class="w-2 h-2 rounded-full bg-gold animate-bounce" style="animation-delay:150ms"></span>
-        <span class="w-2 h-2 rounded-full bg-gold animate-bounce" style="animation-delay:300ms"></span>
+      <svg class="w-8 h-8 text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+      <div class="flex items-center gap-4 text-xs" style="color:#9ca3af">
+        <span>Wave</span>
+        <span>Orange Money</span>
+        <span>MTN</span>
+        <span>Carte</span>
       </div>
     </div>
   </div>
@@ -327,19 +337,31 @@
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
-                Envoi en cours…
+                Préparation du paiement…
               } @else {
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
-                Confirmer la commande · {{ finalTotal | number:'1.0-0':'fr-FR' }}&thinsp;FCFA
+                Payer {{ finalTotal | number:'1.0-0':'fr-FR' }}&thinsp;FCFA
               }
             </button>
 
             <!-- Payment methods -->
-            <p class="text-center text-xs" style="color:#9ca3af">
-              Paiement à la livraison · Wave CI · Orange Money
-            </p>
+            <div class="text-center space-y-1">
+              <p class="text-xs" style="color:#6b7280">
+                Paiement sécurisé par <strong style="color:#d4af37">GeniusPay</strong>
+              </p>
+              <div class="flex items-center justify-center gap-3 text-[11px]" style="color:#9ca3af">
+                <span>Wave</span>
+                <span class="w-px h-3" style="background:rgba(0,0,0,0.12)"></span>
+                <span>Orange Money</span>
+                <span class="w-px h-3" style="background:rgba(0,0,0,0.12)"></span>
+                <span>MTN</span>
+                <span class="w-px h-3" style="background:rgba(0,0,0,0.12)"></span>
+                <span>Carte</span>
+              </div>
+            </div>
           </div>
         </div>
       }

@@ -8,6 +8,7 @@ import { debounceTime, takeUntil, timeout } from 'rxjs/operators';
 import { CartService, CartItem } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { OrderService } from '../../../core/services/order.service';
+import { PaymentService } from '../../../core/services/payment.service';
 import { PromoService } from '../../../core/services/promo.service';
 import { PromoCheckResponse } from '../../../core/models/promo.models';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
@@ -50,6 +51,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     readonly cartService: CartService,
     private authService: AuthService,
     private orderService: OrderService,
+    private paymentService: PaymentService,
     private promoService: PromoService,
     private router: Router,
   ) {}
@@ -157,12 +159,31 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     this.orderService.createOrder(payload).pipe(timeout(30000)).subscribe({
       next: res => {
-        this.checkoutLoading = false;
         if (res.success) {
           this.checkoutSuccess = true;
           this.cartService.clearCart();
-          setTimeout(() => this.router.navigate(['/orders']), 2500);
+          const orderId = res.data.id;
+          const baseUrl = window.location.origin;
+          this.paymentService.initiate({
+            orderId,
+            successUrl: `${baseUrl}/orders?payment=success`,
+            errorUrl: `${baseUrl}/orders?payment=failed`,
+          }).subscribe({
+            next: paymentRes => {
+              if (paymentRes.success) {
+                window.location.href = paymentRes.data.checkoutUrl;
+              } else {
+                this.checkoutLoading = false;
+                this.checkoutError = 'Erreur lors de l\'initiation du paiement. Veuillez réessayer.';
+              }
+            },
+            error: () => {
+              this.checkoutLoading = false;
+              this.checkoutError = 'Erreur lors de l\'initiation du paiement. Veuillez contacter le support.';
+            },
+          });
         } else {
+          this.checkoutLoading = false;
           this.checkoutError = 'Erreur lors de la commande, veuillez réessayer';
         }
       },
