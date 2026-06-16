@@ -16,7 +16,7 @@ Application frontend complète pour le Market, intégrée avec l'API backend Mar
 | 👤 Profil | ✅ Complète | Infos, changement MDP |
 | 👨‍💼 Admin | ✅ Dashboard | Stats, gestion produits |
 | 🔔 Notifications | ✅ Service prêt | À afficher en UI |
-
+ddd
 ## 🚀 Démarrage rapide (3 étapes)
 
 ### 1️⃣ Mettre à jour Node.js (CRITIQUE)
@@ -56,7 +56,8 @@ La page s'ouvre automatiquement à: **http://localhost:4200** 🎉
 
 - **[QUICK_START.md](QUICK_START.md)** → Guide 30 secondes
 - **[FRONTEND_SETUP.md](FRONTEND_SETUP.md)** → Docs techniques complètes
-- **[INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md)** → Panier & Paiement Wave
+- **[INTEGRATION_GUIDE.
+md](INTEGRATION_GUIDE.md)** → Panier & Paiement Wave
 - **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** → Résumé complet du projet
 - **[DEVELOPMENT_CHECKLIST.md](DEVELOPMENT_CHECKLIST.md)** → Roadmap 5 semaines
 
