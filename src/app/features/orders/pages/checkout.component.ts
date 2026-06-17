@@ -173,11 +173,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
               if (paymentRes.success) {
                 window.location.href = paymentRes.data.checkoutUrl;
               } else {
+                this.checkoutSuccess = false;
                 this.checkoutLoading = false;
                 this.checkoutError = 'Erreur lors de l\'initiation du paiement. Veuillez réessayer.';
               }
             },
             error: () => {
+              this.checkoutSuccess = false;
               this.checkoutLoading = false;
               this.checkoutError = 'Erreur lors de l\'initiation du paiement. Veuillez contacter le support.';
             },
