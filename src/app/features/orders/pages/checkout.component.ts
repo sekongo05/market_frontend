@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil, timeout } from 'rxjs/operators';
+import { Subject, EMPTY } from 'rxjs';
+import { takeUntil, timeout, concatMap } from 'rxjs/operators';
 
 import { CartService, CartItem } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -117,6 +117,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.promoError = null;
   }
 
+  cancelRedirect(): void {
+    this.checkoutSuccess = false;
+    this.checkoutLoading = false;
+    this.checkoutError = null;
+  }
+
   placeOrder(): void {
     this.checkoutError = null;
 
@@ -157,39 +163,37 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       payload.promoCode = this.promoCheckResult.code;
     }
 
-    this.orderService.createOrder(payload).pipe(timeout(30000)).subscribe({
-      next: res => {
-        if (res.success) {
-          this.checkoutSuccess = true;
-          this.cartService.clearCart();
-          const orderId = res.data.id;
-          const baseUrl = window.location.origin;
-          this.paymentService.initiate({
-            orderId,
-            successUrl: `${baseUrl}/orders?payment=success`,
-            errorUrl: `${baseUrl}/orders?payment=failed`,
-          }).subscribe({
-            next: paymentRes => {
-              if (paymentRes.success) {
-                window.location.href = paymentRes.data.checkoutUrl;
-              } else {
-                this.checkoutSuccess = false;
-                this.checkoutLoading = false;
-                this.checkoutError = 'Erreur lors de l\'initiation du paiement. Veuillez réessayer.';
-              }
-            },
-            error: () => {
-              this.checkoutSuccess = false;
-              this.checkoutLoading = false;
-              this.checkoutError = 'Erreur lors de l\'initiation du paiement. Veuillez contacter le support.';
-            },
-          });
-        } else {
+    this.orderService.createOrder(payload).pipe(
+      timeout(30000),
+      takeUntil(this.destroy$),
+      concatMap(res => {
+        if (!res.success) {
           this.checkoutLoading = false;
           this.checkoutError = 'Erreur lors de la commande, veuillez réessayer';
+          return EMPTY;
+        }
+        this.checkoutSuccess = true;
+        const orderId = res.data.id;
+        const baseUrl = window.location.origin;
+        return this.paymentService.initiate({
+          orderId,
+          successUrl: `${baseUrl}/orders?payment=success`,
+          errorUrl: `${baseUrl}/orders?payment=failed`,
+        }).pipe(takeUntil(this.destroy$));
+      }),
+    ).subscribe({
+      next: paymentRes => {
+        if (paymentRes && paymentRes.success) {
+          this.cartService.clearCart();
+          window.location.href = paymentRes.data.checkoutUrl;
+        } else if (paymentRes) {
+          this.checkoutSuccess = false;
+          this.checkoutLoading = false;
+          this.checkoutError = 'Erreur lors de l\'initiation du paiement. Veuillez réessayer.';
         }
       },
       error: err => {
+        this.checkoutSuccess = false;
         this.checkoutLoading = false;
         this.checkoutError = err?.name === 'TimeoutError'
           ? 'Le serveur met trop de temps à répondre. Veuillez réessayer.'
