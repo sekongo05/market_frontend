@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
-import { debounceTime, takeUntil, timeout } from 'rxjs/operators';
+import { takeUntil, timeout } from 'rxjs/operators';
 
 import { CartService, CartItem } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -57,7 +57,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.cartService.cart$.pipe(debounceTime(300), takeUntil(this.destroy$)).subscribe(items => {
+    this.cartService.cart$.pipe(takeUntil(this.destroy$)).subscribe(items => {
       this.cartItems = items;
       this.cartTotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
       if (this.promoCheckResult?.valid) this.checkPromo();
