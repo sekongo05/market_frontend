@@ -183,10 +183,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       }),
     ).subscribe({
       next: paymentRes => {
-        if (paymentRes && paymentRes.success) {
+        if (paymentRes && paymentRes.success && paymentRes.data?.checkoutUrl) {
           this.cartService.clearCart();
           window.location.href = paymentRes.data.checkoutUrl;
-        } else if (paymentRes) {
+        } else if (paymentRes && paymentRes.success) {
           this.checkoutSuccess = false;
           this.checkoutLoading = false;
           this.checkoutError = 'Erreur lors de l\'initiation du paiement. Veuillez réessayer.';
