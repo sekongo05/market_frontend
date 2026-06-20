@@ -50,7 +50,7 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
     this.wsService.orderEvent$
       .pipe(takeUntil(this.destroy$))
       .subscribe(event => {
-        this.pendingOrdersCount = event.pendingCount;
+        this.pendingOrdersCount = event.confirmedCount;
         this.cdr.markForCheck();
       });
   }

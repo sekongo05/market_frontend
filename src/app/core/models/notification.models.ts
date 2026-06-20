@@ -35,7 +35,7 @@ export interface WsStockUpdate {
 
 export interface WsOrderEvent {
   orderNumber: string;
-  pendingCount: number;
+  confirmedCount: number;
 }
 
 export interface WsOrderStatusUpdate {

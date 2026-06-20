@@ -165,7 +165,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.webSocketService.orderEvent$
       .pipe(takeUntil(this.destroy$))
       .subscribe(event => {
-        this.pendingOrdersCount = event.pendingCount;
+        this.pendingOrdersCount = event.confirmedCount;
         this.cdr.detectChanges();
       });
   }

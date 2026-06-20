@@ -5,6 +5,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OrderService } from '../../../core/services/order.service';
+import { PaymentService } from '../../../core/services/payment.service';
 import { ReturnService } from '../../../core/services/return.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { OrderResponse } from '../../../core/models/order.models';
@@ -60,6 +61,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   constructor(
     private orderService: OrderService,
+    private paymentService: PaymentService,
     private returnService: ReturnService,
     private wsService: WebSocketService,
     private cdr: ChangeDetectorRef,
@@ -99,7 +101,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
     if (payment === 'success') {
       this.paymentFeedback = { type: 'success', message: 'Paiement confirmé ! Merci pour votre commande.' };
     } else if (payment === 'failed') {
-      this.paymentFeedback = { type: 'error', message: 'Le paiement a échoué. Vous pouvez réessayer depuis vos commandes.' };
+      this.paymentFeedback = { type: 'error', message: 'Le paiement a échoué. Vous pouvez réessayer ci-dessous.' };
     }
 
     this.router.navigate([], {
@@ -296,6 +298,36 @@ export class OrdersComponent implements OnInit, OnDestroy {
       COMPLETED: 'M5 13l4 4L19 7',
     };
     return m[status] ?? 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+  }
+
+  // ── Paiement ──────────────────────────────────────────────────────────────
+
+  payingId: number | null = null;
+
+  retryPayment(order: OrderResponse): void {
+    if (this.payingId === order.id) return;
+    this.payingId = order.id;
+    this.cdr.detectChanges();
+
+    const baseUrl = window.location.origin;
+    this.paymentService.initiate({
+      orderId: order.id,
+      successUrl: `${baseUrl}/orders?payment=success`,
+      errorUrl: `${baseUrl}/orders?payment=failed`,
+    }).subscribe({
+      next: (res) => {
+        if (res.success && res.data?.checkoutUrl) {
+          window.location.href = res.data.checkoutUrl;
+        } else {
+          this.payingId = null;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.payingId = null;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   // ── Labels & styles ───────────────────────────────────────────────────────

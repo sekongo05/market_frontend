@@ -4,23 +4,22 @@
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
 
     <button (click)="statusFilter = OrderStatus.PENDING; applyFilter()"
-      class="theme-surface border rounded-2xl p-4 text-left transition-all hover:scale-[1.02]"
-      [ngClass]="pendingCount > 0 ? 'border-amber-500/40 shadow-lg shadow-amber-500/10' : 'theme-border'">
-      <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">En attente</p>
-      <p class="text-3xl font-black leading-none" [ngClass]="pendingCount > 0 ? 'text-amber-400' : 'theme-text'">{{ pendingCount }}</p>
-      @if (pendingCount > 0) {
-        <span class="inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold text-amber-400">
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
-          Action requise
-        </span>
-      }
+      class="theme-surface border theme-border rounded-2xl p-4 text-left transition-all hover:scale-[1.02]">
+      <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Attente paiement</p>
+      <p class="text-3xl font-black leading-none theme-text">{{ pendingCount }}</p>
     </button>
 
     <button (click)="statusFilter = OrderStatus.CONFIRMED; applyFilter()"
-      class="theme-surface border theme-border rounded-2xl p-4 text-left transition-all hover:scale-[1.02] hover:border-blue-500/40">
-      <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">Confirmées</p>
-      <p class="text-3xl font-black leading-none text-blue-400">{{ confirmedCount }}</p>
-      <p class="text-[10px] theme-muted mt-1.5">En préparation</p>
+      class="theme-surface border rounded-2xl p-4 text-left transition-all hover:scale-[1.02]"
+      [ngClass]="confirmedCount > 0 ? 'border-blue-500/40 shadow-lg shadow-blue-500/10' : 'theme-border'">
+      <p class="text-[10px] font-bold theme-muted uppercase tracking-wider mb-1">À expédier</p>
+      <p class="text-3xl font-black leading-none" [ngClass]="confirmedCount > 0 ? 'text-blue-400' : 'theme-text'">{{ confirmedCount }}</p>
+      @if (confirmedCount > 0) {
+        <span class="inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold text-blue-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping"></span>
+          Action requise
+        </span>
+      }
     </button>
 
     <button (click)="statusFilter = OrderStatus.SHIPPED; applyFilter()"
@@ -62,12 +61,12 @@
         }
       </div>
 
-      @if (pendingCount > 0) {
-        <button (click)="statusFilter = OrderStatus.PENDING; applyFilter()"
+      @if (confirmedCount > 0) {
+        <button (click)="statusFilter = OrderStatus.CONFIRMED; applyFilter()"
           class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black animate-pulse-slow"
-          style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#f59e0b">
-          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-flex"></span>
-          {{ pendingCount }} en attente
+          style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4);color:#60a5fa">
+          <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping inline-flex"></span>
+          {{ confirmedCount }} à expédier
         </button>
       }
 

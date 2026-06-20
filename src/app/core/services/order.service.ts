@@ -31,10 +31,6 @@ export class OrderService {
     return this.apiService.get('/orders', params);
   }
 
-  validateOrder(id: number): Observable<ApiResponse<OrderResponse>> {
-    return this.apiService.patch(`/orders/${id}/validate`);
-  }
-
   updateOrderStatus(id: number, status: string): Observable<ApiResponse<OrderResponse>> {
     return this.apiService.patch(`/orders/${id}/status?status=${status}`);
   }

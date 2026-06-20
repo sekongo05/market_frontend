@@ -340,8 +340,19 @@
                       <svg class="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
-                      <p class="text-xs text-yellow-300 font-medium">Votre commande est en attente de confirmation par notre équipe.</p>
+                      <p class="text-xs text-yellow-300 font-medium">Votre commande est en attente de paiement.</p>
                     </div>
+                    @if (order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED') {
+                      <button (click)="retryPayment(order)" [disabled]="payingId === order.id"
+                        class="w-full flex items-center justify-center gap-2 py-3 bg-gold text-black font-black rounded-xl text-sm hover:bg-amber-400 disabled:opacity-50 transition-all">
+                        @if (payingId === order.id) {
+                          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        } @else {
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                          {{ order.paymentStatus === 'FAILED' ? 'Réessayer le paiement' : 'Payer maintenant' }}
+                        }
+                      </button>
+                    }
                   }
                   @if (order.orderStatus === 'CONFIRMED') {
                     <div class="flex items-start gap-3 p-3 rounded-xl"

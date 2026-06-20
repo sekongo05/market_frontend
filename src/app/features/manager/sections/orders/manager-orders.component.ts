@@ -48,7 +48,6 @@ export class ManagerOrdersComponent implements OnInit, OnDestroy {
 
   readonly orderStatuses = Object.values(OrderStatus);
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
-    PENDING:   OrderStatus.CONFIRMED,
     CONFIRMED: OrderStatus.SHIPPED,
     SHIPPED:   OrderStatus.DELIVERED,
     DELIVERED: null,
@@ -153,10 +152,7 @@ export class ManagerOrdersComponent implements OnInit, OnDestroy {
     const next = this.nextStatusMap[order.orderStatus];
     if (!next) return;
     this.statusUpdatingId = order.id;
-    const request$ = order.orderStatus === 'PENDING'
-      ? this.orderService.validateOrder(order.id)
-      : this.orderService.updateOrderStatus(order.id, next);
-    request$.subscribe({
+    this.orderService.updateOrderStatus(order.id, next).subscribe({
       next: (r) => {
         if (r.success) {
           const idx = this.allOrders.findIndex(o => o.id === order.id);

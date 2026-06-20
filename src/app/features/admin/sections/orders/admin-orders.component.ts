@@ -58,7 +58,6 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   readonly OrderStatus = OrderStatus;
   readonly orderStatuses = Object.values(OrderStatus);
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
-    PENDING:   OrderStatus.CONFIRMED,
     CONFIRMED: OrderStatus.SHIPPED,
     SHIPPED:   OrderStatus.DELIVERED,
     DELIVERED: null,
@@ -139,11 +138,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   /* ── Badges urgence ── */
   getOrderBadges(order: OrderResponse): OrderBadge[] {
     const badges: OrderBadge[] = [];
-    const hoursOld = (Date.now() - new Date(order.createdAt).getTime()) / 3_600_000;
     const hoursSinceUpdate = (Date.now() - new Date(order.updatedAt).getTime()) / 3_600_000;
-
-    if (order.orderStatus === 'PENDING' && hoursOld > 24)
-      badges.push({ label: 'Urgent', classes: 'bg-red-500/15 text-red-400 border border-red-500/25' });
 
     if (order.orderStatus === 'CONFIRMED' && hoursSinceUpdate > 48)
       badges.push({ label: 'Retard', classes: 'bg-orange-500/15 text-orange-400 border border-orange-500/25' });
@@ -155,9 +150,6 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   }
 
   isUrgentOrder(order: OrderResponse): boolean {
-    if (order.orderStatus === 'PENDING') {
-      return (Date.now() - new Date(order.createdAt).getTime()) / 3_600_000 > 24;
-    }
     if (order.orderStatus === 'CONFIRMED') {
       return (Date.now() - new Date(order.updatedAt).getTime()) / 3_600_000 > 48;
     }
@@ -221,19 +213,8 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadPendingCount(): void {
-    this.orderService.getAllOrders({ page: 0, size: 1, status: OrderStatus.PENDING }).subscribe({
-      next: (r) => {
-        if (r.success) this.pendingCount = (r.data as PageResponse<OrderResponse>).totalElements;
-        this.cdr.markForCheck();
-      },
-      error: (err) => { console.error('Failed to load pending count', err); },
-    });
-  }
-
   loadStatusCounts(): void {
-    this.loadPendingCount();
-    ([OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.DELIVERED] as OrderStatus[]).forEach(status => {
+    ([OrderStatus.PENDING, OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.DELIVERED] as OrderStatus[]).forEach(status => {
       this.orderService.getAllOrders({ page: 0, size: 1, status }).subscribe({
         next: (r) => {
           if (!r.success) return;
@@ -268,10 +249,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     const next = this.nextStatusMap[order.orderStatus];
     if (!next) return;
     this.statusUpdatingId = order.id;
-    const req$ = order.orderStatus === 'PENDING'
-      ? this.orderService.validateOrder(order.id)
-      : this.orderService.updateOrderStatus(order.id, next);
-    req$.subscribe({
+    this.orderService.updateOrderStatus(order.id, next).subscribe({
       next: (r) => {
         if (r.success) {
           this._patchOrder(order.id, r.data);
@@ -328,7 +306,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
 
   private sortByUrgency(): void {
     const rank = (o: OrderResponse) =>
-      this.isUrgentOrder(o) ? 0 : o.orderStatus === 'PENDING' ? 1 : 2;
+      this.isUrgentOrder(o) ? 0 : 1;
     this.allOrders = [...this.allOrders].sort((a, b) => rank(a) - rank(b));
   }
 
