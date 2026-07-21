@@ -41,7 +41,7 @@ export class HelpComponent {
     // ── Paiement
     {
       q: 'Quels modes de paiement sont acceptés ?',
-      a: 'Nous acceptons le paiement par Wave CI, Orange Money ou en espèces à la livraison.'
+      a: 'Nous acceptons les paiements sécurisés en ligne via la plateforme GeniusPay. Vous pouvez payer par Wave, Orange Money, MTN Mobile Money, ou par carte bancaire (Visa/Mastercard).'
     },
     // ── Codes promo
     {

@@ -5,12 +5,14 @@ import { Subscription } from 'rxjs';
 import { NavbarComponent } from './navbar.component';
 import { ToastComponent } from './toast.component';
 import { AuthService } from '../../core/services/auth.service';
+import { CartService } from '../../core/services/cart.service';
 import { SdmLogoComponent } from './logo.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterModule, NavbarComponent, ToastComponent, SdmLogoComponent],
+  imports: [RouterModule, CommonModule, NavbarComponent, ToastComponent, SdmLogoComponent],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +27,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    public cartService: CartService
   ) {}
 
   ngOnInit(): void {
