@@ -1,8 +1,7 @@
 <div class="theme-bg">
 
   <!-- ════ SKIP‑TO‑CONTENT ════ -->
-  <a href="#main-content"
-     class="skip-to-content absolute -top-full left-0 z-[100000] bg-gold text-black font-bold px-4 py-2
+  <a href="#main-content" class="skip-to-content absolute -top-full left-0 z-[100000] bg-gold text-black font-bold px-4 py-2
             focus:top-0 focus:outline-none focus:ring-2 focus:ring-gold/60 transition-all duration-200">
     Aller au contenu principal
   </a>
@@ -16,105 +15,107 @@
   <!-- ════════════════════════════════════════════════════════════════
        1. HERO
   ════════════════════════════════════════════════════════════════════ -->
-  <section class="relative min-h-screen overflow-hidden hero-spotlight"
-           (mousemove)="onHeroMouseMove($event)"
-           (mouseleave)="onHeroMouseLeave($event)">
+  <section class="relative min-h-screen overflow-hidden hero-spotlight" (mousemove)="onHeroMouseMove($event)"
+    (mouseleave)="onHeroMouseLeave($event)">
 
     <!-- ════ SKELETON LOADER ════ -->
     @if (!slidesLoaded) {
-      <div class="absolute inset-0 z-30 flex items-center justify-center" style="background:#07060a;">
-        <div class="flex flex-col items-center gap-4">
-          <div class="w-16 h-16 rounded-full skeleton-loader"></div>
-          <div class="h-3 w-40 rounded skeleton-loader"></div>
-          <div class="h-2 w-56 rounded skeleton-loader"></div>
-        </div>
+    <div class="absolute inset-0 z-30 flex items-center justify-center" style="background:#07060a;">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-16 h-16 rounded-full skeleton-loader"></div>
+        <div class="h-3 w-40 rounded skeleton-loader"></div>
+        <div class="h-2 w-56 rounded skeleton-loader"></div>
       </div>
+    </div>
     }
 
     <!-- ════ SLIDES ════ -->
-    <div class="hero-parallax absolute inset-0"
-         [class.swiping]="_isTransitioning">
+    <div class="hero-parallax absolute inset-0" [class.swiping]="_isTransitioning">
 
       @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
-        @if (i === currentSlide || i === (currentSlide + 1) % heroSlides.length || i === (currentSlide - 1 + heroSlides.length) % heroSlides.length) {
-          <img [src]="slide.imageUrl"
-               [alt]="slide.label"
-               class="hero-slide absolute inset-0 w-full h-full object-cover"
-               [class.active]="i === currentSlide"
-               [class.prev]="i === (currentSlide - 1 + heroSlides.length) % heroSlides.length && i !== currentSlide"
-               [class.next]="i === (currentSlide + 1) % heroSlides.length && i !== currentSlide"
-               [class.no-ken]="i === 1"
-               [attr.fetchpriority]="i === 0 ? 'high' : 'low'"
-               (load)="i === currentSlide ? onHeroImgLoad() : null"
-               (error)="onSlideError($event)"/>
-        }
+      @if (i === currentSlide || i === (currentSlide + 1) % heroSlides.length || i === (currentSlide - 1 +
+      heroSlides.length) % heroSlides.length) {
+      <img [src]="slide.imageUrl" [alt]="slide.label" class="hero-slide absolute inset-0 w-full h-full object-cover"
+        [class.active]="i === currentSlide"
+        [class.prev]="i === (currentSlide - 1 + heroSlides.length) % heroSlides.length && i !== currentSlide"
+        [class.next]="i === (currentSlide + 1) % heroSlides.length && i !== currentSlide" [class.no-ken]="i === 1"
+        [attr.fetchpriority]="i === 0 ? 'high' : 'low'" (load)="i === currentSlide ? onHeroImgLoad() : null"
+        (error)="onSlideError($event)" />
+      }
       }
 
       <!-- Overlay progress bar -->
       <div class="absolute bottom-0 left-0 right-0 z-20 h-[3px] bg-white/10">
         @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
-          <div class="hero-progress-bar absolute inset-y-0 left-0"
-               [class.active]="i === currentSlide"
-               [style.width.%]="i === currentSlide ? progressValue : 0">
-          </div>
+        <div class="hero-progress-bar absolute inset-y-0 left-0" [class.active]="i === currentSlide"
+          [style.width.%]="i === currentSlide ? progressValue : 0">
+        </div>
         }
       </div>
 
       <!-- Navigation dots -->
       @if (slidesLoaded) {
-        <div class="hero-dots z-20">
-          @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
-            <button (click)="goToSlide(i)"
-                    [class.active]="i === currentSlide"
-                    class="hero-dot"
-                    [attr.aria-label]="'Aller à ' + slide.label">
-              <span class="hero-dot-inner"></span>
-              <span class="hero-dot-label">{{ slide.label }}</span>
-            </button>
-          }
-        </div>
+      <div class="hero-dots z-20">
+        @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
+        <button (click)="goToSlide(i)" [class.active]="i === currentSlide" class="hero-dot"
+          [attr.aria-label]="'Aller à ' + slide.label">
+          <span class="hero-dot-inner"></span>
+          <span class="hero-dot-label">{{ slide.label }}</span>
+        </button>
+        }
+      </div>
       }
 
       <!-- Category label -->
       @if (slidesLoaded) {
-        <div class="absolute top-5 right-5 sm:top-8 sm:right-8 z-20">
-          <span class="hero-slide-label">{{ heroSlides[currentSlide].label }}</span>
-        </div>
+      <div class="absolute top-5 right-5 sm:top-8 sm:right-8 z-20">
+        <span class="hero-slide-label">{{ heroSlides[currentSlide].label }}</span>
+      </div>
       }
     </div>
 
     <!-- Gradients overlay -->
-    <div class="absolute inset-0" style="z-index:1;
+    <div class="absolute inset-0"
+      style="z-index:1;
          background:linear-gradient(105deg,rgba(4,4,4,0.98) 0%,rgba(4,4,4,0.75) 38%,rgba(4,4,4,0.2) 60%,transparent 78%)"></div>
     <div class="absolute inset-0 lg:hidden" style="z-index:1;
          background:linear-gradient(to top,rgba(4,4,4,0.98) 0%,rgba(4,4,4,0.3) 48%,transparent 68%)"></div>
-    <div class="absolute inset-0 pointer-events-none" style="z-index:2;box-shadow:inset 0 0 120px rgba(0,0,0,0.3)"></div>
-    <div class="absolute inset-0 pointer-events-none opacity-20" style="z-index:2;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%224%22 height=%224%22><path d=%22M0 0h1v1H0zm2 2h1v1H2z%22 fill=%22%23fff%22 opacity=%22.08%22/></svg>');background-size:4px 4px;"></div>
+    <div class="absolute inset-0 pointer-events-none" style="z-index:2;box-shadow:inset 0 0 120px rgba(0,0,0,0.3)">
+    </div>
+    <div class="absolute inset-0 pointer-events-none opacity-20"
+      style="z-index:2;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%224%22 height=%224%22><path d=%22M0 0h1v1H0zm2 2h1v1H2z%22 fill=%22%23fff%22 opacity=%22.08%22/></svg>');background-size:4px 4px;">
+    </div>
     <div class="hero-line-v absolute top-0 left-0 w-[1px] hidden lg:block"
-         style="height:clamp(220px,42vh,460px);z-index:5;background:linear-gradient(to bottom,rgba(212,175,55,0.6),transparent)"></div>
+      style="height:clamp(220px,42vh,460px);z-index:5;background:linear-gradient(to bottom,rgba(212,175,55,0.6),transparent)">
+    </div>
 
-    <span class="particle hidden md:block" style="z-index:5;width:2px;height:2px;left:21%;bottom:29%;animation-duration:5.5s;animation-delay:0s;"></span>
-    <span class="particle hidden md:block" style="z-index:5;width:1px;height:1px;left:36%;bottom:21%;animation-duration:7.2s;animation-delay:1.3s;"></span>
-    <span class="particle hidden md:block" style="z-index:5;width:3px;height:3px;left:50%;bottom:34%;animation-duration:6.1s;animation-delay:2.6s;background:rgba(212,175,55,0.4);"></span>
-    <span class="particle hidden md:block" style="z-index:5;width:2px;height:2px;left:64%;bottom:17%;animation-duration:8.4s;animation-delay:0.8s;"></span>
-    <span class="particle hidden md:block" style="z-index:5;width:1px;height:1px;left:74%;bottom:31%;animation-duration:5.2s;animation-delay:3.4s;"></span>
+    <span class="particle hidden md:block"
+      style="z-index:5;width:2px;height:2px;left:21%;bottom:29%;animation-duration:5.5s;animation-delay:0s;"></span>
+    <span class="particle hidden md:block"
+      style="z-index:5;width:1px;height:1px;left:36%;bottom:21%;animation-duration:7.2s;animation-delay:1.3s;"></span>
+    <span class="particle hidden md:block"
+      style="z-index:5;width:3px;height:3px;left:50%;bottom:34%;animation-duration:6.1s;animation-delay:2.6s;background:rgba(212,175,55,0.4);"></span>
+    <span class="particle hidden md:block"
+      style="z-index:5;width:2px;height:2px;left:64%;bottom:17%;animation-duration:8.4s;animation-delay:0.8s;"></span>
+    <span class="particle hidden md:block"
+      style="z-index:5;width:1px;height:1px;left:74%;bottom:31%;animation-duration:5.2s;animation-delay:3.4s;"></span>
 
     <!-- ════ CONTENU ANIMÉ PAR SLIDE ════ -->
     <div class="relative flex flex-col justify-end lg:justify-center min-h-screen
                 px-7 sm:px-12 lg:px-16 xl:px-24
-                pb-20 pt-28 sm:pt-36 lg:pb-0 lg:pt-0 lg:max-w-[56%]"
-         style="z-index:10">
+                pb-20 pt-28 sm:pt-36 lg:pb-0 lg:pt-0 lg:max-w-[56%]" style="z-index:10">
 
       <div class="hero-content visible">
-        <div class="hidden lg:block w-8 h-[1px] mb-14 hero-content-line"
-             style="background:#d4af37;"></div>
+        <div class="hidden lg:block w-8 h-[1px] mb-14 hero-content-line" style="background:#d4af37;"></div>
 
         <div class="flex items-center gap-2.5 mb-7 sm:mb-9 hero-content-eyebrow">
           <div class="relative flex h-2 w-2 flex-shrink-0">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style="background:#d4af37;"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60"
+              style="background:#d4af37;"></span>
             <span class="relative inline-flex rounded-full h-2 w-2" style="background:#d4af37;"></span>
           </div>
-          <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.45em] font-bold" style="color:rgba(212,175,55,0.72);">
+          <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.45em] font-bold"
+            style="color:rgba(212,175,55,0.72);">
             SDM Store
           </p>
         </div>
@@ -123,33 +124,31 @@
           <span class="hero-wrap">
             <span class="hero-word" style="font-size:clamp(2rem,5.5vw,4rem);">L'ÉLÉGANCE</span>
           </span>
-          <span class="hero-wrap"> 
+          <span class="hero-wrap">
             <span class="hero-word gold-shimmer" style="font-size:clamp(2rem,5.5vw,4rem);">AU QUOTIDIEN</span>
           </span>
         </h1>
 
         <p class="max-w-xs leading-relaxed mb-8 hero-content-desc"
-           style="color:rgba(255,255,255,0.65);font-size:0.875rem;">
+          style="color:rgba(255,255,255,0.65);font-size:0.875rem;">
           L'authentique, livré chez vous.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-3 mb-8 hero-content-ctas">
-          <a routerLink="/products"
-             class="inline-flex items-center gap-3 px-7 py-4 text-xs uppercase tracking-[0.2em] font-black text-black
+          <a routerLink="/products" class="inline-flex items-center gap-3 px-7 py-4 text-xs uppercase tracking-[0.2em] font-black text-black
                     hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
-             style="background:#d4af37;box-shadow:0 8px 28px rgba(212,175,55,0.3)">
+            style="background:#d4af37;box-shadow:0 8px 28px rgba(212,175,55,0.3)">
             Explorer la boutique
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </a>
           @if (!(currentUser$ | async)) {
-            <a routerLink="/auth/register"
-               class="inline-flex items-center justify-center px-7 py-4 text-xs uppercase tracking-[0.2em] font-bold
+          <a routerLink="/auth/register" class="inline-flex items-center justify-center px-7 py-4 text-xs uppercase tracking-[0.2em] font-bold
                       border hover:border-white/30 hover:text-white/80 transition-all duration-300"
-               style="color:rgba(255,255,255,0.48);border-color:rgba(255,255,255,0.14);">
-              Créer un compte
-            </a>
+            style="color:rgba(255,255,255,0.48);border-color:rgba(255,255,255,0.14);">
+            Créer un compte
+          </a>
           }
         </div>
       </div>
@@ -159,58 +158,63 @@
         <!-- Barre de recherche -->
         <div class="mb-4 sm:mb-6 flex gap-2 max-w-md w-full">
           <div class="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl"
-               style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);">
-            <svg class="w-4 h-4 flex-shrink-0" style="color:rgba(212,175,55,0.6);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);">
+            <svg class="w-4 h-4 flex-shrink-0" style="color:rgba(212,175,55,0.6);" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input [(ngModel)]="searchQuery"
-                   (keydown)="onSearchKey($event)"
-                   type="text"
-                   placeholder="Rechercher un article…"
-                   class="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none min-w-0"/>
+            <input [(ngModel)]="searchQuery" (keydown)="onSearchKey($event)" type="text"
+              placeholder="Rechercher un article…"
+              class="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none min-w-0" />
           </div>
           <button (click)="search()" aria-label="Lancer la recherche"
-                  class="px-4 py-3 text-black transition-all hover:-translate-y-0.5 flex items-center justify-center flex-shrink-0"
-                  style="background:#d4af37;">
+            class="px-4 py-3 text-black transition-all hover:-translate-y-0.5 flex items-center justify-center flex-shrink-0"
+            style="background:#d4af37;">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
         </div>
 
         <!-- Trust chips -->
         <div class="flex flex-wrap gap-2 mb-10">
-          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
-                style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.88);">
+          <span
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
+            style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.88);">
             <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
             Qualité vérifiée
           </span>
-          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
-                style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
+          <span
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
+            style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
             Livraison 24–48h
           </span>
-          <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
-                style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
+          <span
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
+            style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.68);">
             Paiement sécurisé en ligne
           </span>
           @if (!(currentUser$ | async) && firstOrderPromo) {
-            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold"
-                  style="background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.5);color:#d4af37;">
-              <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-              </svg>
-              1er achat : <span class="font-mono ml-1">{{ firstOrderPromo.code }}</span>&nbsp;(-{{ firstOrderPromo.discountPercent }}%)
-            </span>
+          <span
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold"
+            style="background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.5);color:#d4af37;">
+            <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+            </svg>
+            1er achat : <span class="font-mono ml-1">{{ firstOrderPromo.code }}</span>&nbsp;(-{{
+            firstOrderPromo.discountPercent }}%)
+          </span>
           }
         </div>
       </div>
 
-      <div class="hero-sig hidden lg:flex items-center gap-5 mt-auto pt-20"
-           style="color:rgba(255,255,255,0.38);">
+      <div class="hero-sig hidden lg:flex items-center gap-5 mt-auto pt-20" style="color:rgba(255,255,255,0.38);">
         <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em]">Est. 2020</span>
         <div class="w-6 h-[1px]" style="background:rgba(255,255,255,0.2)"></div>
         <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em]">Abidjan · CI</span>
@@ -219,16 +223,19 @@
 
     <!-- Badge flottant -->
     <div class="hero-badge absolute bottom-12 right-14 hidden xl:flex flex-col gap-1.5 px-5 py-4"
-         style="z-index:10;background:rgba(7,6,2,0.85);border:1px solid rgba(212,175,55,0.24);backdrop-filter:blur(20px);">
+      style="z-index:10;background:rgba(7,6,2,0.85);border:1px solid rgba(212,175,55,0.24);backdrop-filter:blur(20px);">
       <div class="flex items-center gap-0.5 mb-0.5">
         @for (i of [1,2,3,4,5]; track i) {
-          <svg class="w-3 h-3" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-          </svg>
+        <svg class="w-3 h-3" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
         }
       </div>
-      <p class="text-xs font-black text-white leading-none">{{ publicStats ? (publicStats.totalClients + '+') : '…' }} clients</p>
-      <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-semibold" style="color:rgba(212,175,55,0.55);">nous font confiance · {{ avgRatingDisplay() }}/5</p>
+      <p class="text-xs font-black text-white leading-none">{{ publicStats ? (publicStats.totalClients + '+') : '…' }}
+        clients</p>
+      <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-semibold" style="color:rgba(212,175,55,0.55);">nous font
+        confiance · {{ avgRatingDisplay() }}/5</p>
     </div>
 
     <div class="absolute bottom-7 right-6 hidden lg:flex flex-col items-center gap-1.5" style="z-index:10;">
@@ -240,7 +247,8 @@
   <!-- ════════════════════════════════════════════════════════════════
        MARQUEE BAND — double bande après le hero
   ════════════════════════════════════════════════════════════════════ -->
-  <div class="marquee-band-wrap" style="background:#07060a;border-top:1px solid rgba(212,175,55,0.18);border-bottom:1px solid rgba(212,175,55,0.10);">
+  <div class="marquee-band-wrap"
+    style="background:#07060a;border-top:1px solid rgba(212,175,55,0.18);border-bottom:1px solid rgba(212,175,55,0.10);">
     <!-- Bande 1 — défile vers la gauche -->
     <div class="overflow-hidden py-2.5" style="border-bottom:1px solid rgba(212,175,55,0.07);">
       <div class="marquee-track">
@@ -263,21 +271,35 @@
     <div class="overflow-hidden py-2.5 hidden sm:block">
       <div class="marquee-track marquee-reverse">
         <span class="marquee-item marquee-item--dim">SDM STORE</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">ABIDJAN · YAMOUSSOUKRO · BOUAKÉ</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">MONTRES &amp; BIJOUX</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">PARFUMS &amp; BEAUTÉ</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">SACS &amp; CHAUSSURES</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">MAROQUINERIE &amp; PRÊT-À-PORTER</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">AMBIANCE &amp; LIFESTYLE</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">SUIVEZ-NOUS SUR INSTAGRAM</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">ABIDJAN · YAMOUSSOUKRO · BOUAKÉ</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">MONTRES &amp; BIJOUX</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">PARFUMS &amp; BEAUTÉ</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">SACS &amp; CHAUSSURES</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">MAROQUINERIE &amp; PRÊT-À-PORTER</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">AMBIANCE &amp; LIFESTYLE</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">SUIVEZ-NOUS SUR INSTAGRAM</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
         <span class="marquee-item marquee-item--dim">SDM STORE</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">ABIDJAN · YAMOUSSOUKRO · BOUAKÉ</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">MONTRES &amp; BIJOUX</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">PARFUMS &amp; BEAUTÉ</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">SACS &amp; CHAUSSURES</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">MAROQUINERIE &amp; PRÊT-À-PORTER</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">AMBIANCE &amp; LIFESTYLE</span><span class="marquee-sep marquee-sep--dim">·</span>
-        <span class="marquee-item marquee-item--dim">SUIVEZ-NOUS SUR INSTAGRAM</span><span class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">ABIDJAN · YAMOUSSOUKRO · BOUAKÉ</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">MONTRES &amp; BIJOUX</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">PARFUMS &amp; BEAUTÉ</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">SACS &amp; CHAUSSURES</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">MAROQUINERIE &amp; PRÊT-À-PORTER</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">AMBIANCE &amp; LIFESTYLE</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
+        <span class="marquee-item marquee-item--dim">SUIVEZ-NOUS SUR INSTAGRAM</span><span
+          class="marquee-sep marquee-sep--dim">·</span>
       </div>
     </div>
   </div>
@@ -289,116 +311,115 @@
        3. NOS UNIVERS — catégories dynamiques
   ════════════════════════════════════════════════════════════════════ -->
   <section id="main-content" class="scroll-reveal"
-           style="padding-top:clamp(60px,8vw,110px);padding-left:0;padding-right:0;"
-           [style.paddingBottom]="hasGapSections ? 'clamp(60px,8vw,110px)' : '0'">
+    style="padding-top:clamp(60px,8vw,110px);padding-left:0;padding-right:0;"
+    [style.paddingBottom]="hasGapSections ? 'clamp(60px,8vw,110px)' : '0'">
     <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14">
       <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
       <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
-         style="color:rgba(212,175,55,0.65);transition-delay:80ms">Explorer nos univers</p>
+        style="color:rgba(212,175,55,0.65);transition-delay:80ms">Explorer nos univers</p>
       <h2 class="r-up font-black theme-text tracking-tight leading-none"
-          style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">NOS COLLECTIONS</h2>
+        style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">NOS COLLECTIONS</h2>
     </div>
 
     @if (categoriesLoading) {
-      <div class="flex gap-3 px-5 sm:px-8 lg:px-12">
-        <!-- Card principale -->
-        <div class="skeleton flex-[58] relative" style="height:clamp(260px,45vw,500px);border-radius:0;">
-          <div class="absolute top-5 left-5 h-5 w-24 rounded-sm" style="background:rgba(0,0,0,0.08);"></div>
-          <div class="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
-            <div class="h-8 rounded-sm" style="width:55%;background:rgba(0,0,0,0.10);"></div>
-            <div class="h-[1px] w-8" style="background:rgba(0,0,0,0.14);"></div>
+    <div class="flex gap-3 px-5 sm:px-8 lg:px-12">
+      <!-- Card principale -->
+      <div class="skeleton flex-[58] relative" style="height:clamp(260px,45vw,500px);border-radius:0;">
+        <div class="absolute top-5 left-5 h-5 w-24 rounded-sm" style="background:rgba(0,0,0,0.08);"></div>
+        <div class="absolute bottom-6 left-6 right-6 flex flex-col gap-3">
+          <div class="h-8 rounded-sm" style="width:55%;background:rgba(0,0,0,0.10);"></div>
+          <div class="h-[1px] w-8" style="background:rgba(0,0,0,0.14);"></div>
+        </div>
+      </div>
+      <!-- Cards secondaires -->
+      <div class="flex flex-col gap-1 flex-[42]">
+        <div class="skeleton flex-1 relative" style="border-radius:0;">
+          <div class="absolute bottom-4 left-4 right-4 flex flex-col gap-2">
+            <div class="h-5 w-1/2 rounded-sm" style="background:rgba(0,0,0,0.09);"></div>
+            <div class="h-[1px] w-5" style="background:rgba(0,0,0,0.10);"></div>
           </div>
         </div>
-        <!-- Cards secondaires -->
-        <div class="flex flex-col gap-1 flex-[42]">
-          <div class="skeleton flex-1 relative" style="border-radius:0;">
-            <div class="absolute bottom-4 left-4 right-4 flex flex-col gap-2">
-              <div class="h-5 w-1/2 rounded-sm" style="background:rgba(0,0,0,0.09);"></div>
-              <div class="h-[1px] w-5" style="background:rgba(0,0,0,0.10);"></div>
-            </div>
-          </div>
-          <div class="skeleton flex-1 relative" style="border-radius:0;">
-            <div class="absolute bottom-4 left-4 right-4 flex flex-col gap-2">
-              <div class="h-5 w-2/3 rounded-sm" style="background:rgba(0,0,0,0.09);"></div>
-              <div class="h-[1px] w-5" style="background:rgba(0,0,0,0.10);"></div>
-            </div>
+        <div class="skeleton flex-1 relative" style="border-radius:0;">
+          <div class="absolute bottom-4 left-4 right-4 flex flex-col gap-2">
+            <div class="h-5 w-2/3 rounded-sm" style="background:rgba(0,0,0,0.09);"></div>
+            <div class="h-[1px] w-5" style="background:rgba(0,0,0,0.10);"></div>
           </div>
         </div>
       </div>
+    </div>
     }
 
     @if (!categoriesLoading && categories.length > 0) {
-      <div class="flex flex-col lg:flex-row gap-3 px-5 sm:px-8 lg:px-12">
-        <!-- Première catégorie — hero large -->
-        <a [href]="'/products?categorie=' + categories[0].slug"
-           (click)="goToCategory(categories[0].slug); $event.preventDefault()"
-           class="glint-card bracket-card cursor-hover-zone group relative overflow-hidden cursor-pointer block r-scale"
-           [class]="categories.length > 1 ? 'lg:flex-[58]' : 'w-full'"
-           style="height:clamp(260px,58vw,680px);transition-delay:200ms;">
-          @if (categories[0].imageUrl) {
-            <img [src]="categories[0].imageUrl" [alt]="categories[0].name" loading="lazy"
-                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-1000 ease-out"/>
-          } @else {
-            <div class="absolute inset-0" style="background:linear-gradient(135deg,#1a1000,#0a0800);"></div>
-          }
-          <div class="absolute inset-0 bg-gradient-to-t from-black/92 via-black/10 to-transparent"></div>
-          <div class="absolute top-5 left-5 px-3 py-1.5 text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em] font-black"
-               style="background:rgba(212,175,55,0.14);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.85);">
-            Notre spécialité
+    <div class="flex flex-col lg:flex-row gap-3 px-5 sm:px-8 lg:px-12">
+      <!-- Première catégorie — hero large -->
+      <a [href]="'/products?categorie=' + categories[0].slug"
+        (click)="goToCategory(categories[0].slug); $event.preventDefault()"
+        class="glint-card bracket-card cursor-hover-zone group relative overflow-hidden cursor-pointer block r-scale"
+        [class]="categories.length > 1 ? 'lg:flex-[58]' : 'w-full'"
+        style="height:clamp(260px,58vw,680px);transition-delay:200ms;">
+        @if (categories[0].imageUrl) {
+        <img [src]="categories[0].imageUrl" [alt]="categories[0].name" loading="lazy"
+          class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-1000 ease-out" />
+        } @else {
+        <div class="absolute inset-0" style="background:linear-gradient(135deg,#1a1000,#0a0800);"></div>
+        }
+        <div class="absolute inset-0 bg-gradient-to-t from-black/92 via-black/10 to-transparent"></div>
+        <div
+          class="absolute top-5 left-5 px-3 py-1.5 text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em] font-black"
+          style="background:rgba(212,175,55,0.14);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.85);">
+          Notre spécialité
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-9">
+          <h3 class="text-white font-black tracking-tight leading-none mb-4 uppercase"
+            style="font-size:clamp(2rem,5vw,4rem);">{{ categories[0].name }}</h3>
+          <div class="flex items-center gap-4">
+            <div class="h-[1px] w-8 transition-all duration-700 group-hover:w-20" style="background:#d4af37;"></div>
+            <span
+              class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em] transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+              style="color:#d4af37;">Explorer →</span>
           </div>
-          <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-9">
-            <h3 class="text-white font-black tracking-tight leading-none mb-4 uppercase"
-                style="font-size:clamp(2rem,5vw,4rem);">{{ categories[0].name }}</h3>
-            <div class="flex items-center gap-4">
-              <div class="h-[1px] w-8 transition-all duration-700 group-hover:w-20" style="background:#d4af37;"></div>
-              <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em] transition-opacity duration-500 opacity-0 group-hover:opacity-100"
-                    style="color:#d4af37;">Explorer →</span>
-            </div>
+        </div>
+      </a>
+
+      <!-- Autres catégories -->
+      @if (categories.length > 1) {
+      <div class="flex flex-row lg:flex-col gap-1 lg:flex-[42] r-scale" style="transition-delay:340ms;">
+        @for (cat of categories.slice(1, 3); track cat.id) {
+        <a [href]="'/products?categorie=' + cat.slug" (click)="goToCategory(cat.slug); $event.preventDefault()"
+          class="glint-card bracket-card cursor-hover-zone group relative overflow-hidden cursor-pointer block flex-1 h-[42vw] lg:h-0 lg:flex-1">
+          @if (cat.imageUrl) {
+          <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy"
+            class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-1000 ease-out" />
+          } @else {
+          <div class="absolute inset-0" style="background:linear-gradient(135deg,#12100a,#080600);"></div>
+          }
+          <div class="absolute inset-0 bg-gradient-to-t from-black/88 via-black/10 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+            <h3 class="text-white font-black tracking-tight leading-none mb-2.5 uppercase"
+              style="font-size:clamp(1.4rem,3.5vw,2.2rem);">{{ cat.name }}</h3>
+            <div class="h-[1px] w-5 transition-all duration-700 group-hover:w-14" style="background:#d4af37;"></div>
           </div>
         </a>
-
-        <!-- Autres catégories -->
-        @if (categories.length > 1) {
-          <div class="flex flex-row lg:flex-col gap-1 lg:flex-[42] r-scale" style="transition-delay:340ms;">
-            @for (cat of categories.slice(1, 3); track cat.id) {
-              <a [href]="'/products?categorie=' + cat.slug"
-                 (click)="goToCategory(cat.slug); $event.preventDefault()"
-                 class="glint-card bracket-card cursor-hover-zone group relative overflow-hidden cursor-pointer block flex-1 h-[42vw] lg:h-0 lg:flex-1">
-                @if (cat.imageUrl) {
-                  <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy"
-                       class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-1000 ease-out"/>
-                } @else {
-                  <div class="absolute inset-0" style="background:linear-gradient(135deg,#12100a,#080600);"></div>
-                }
-                <div class="absolute inset-0 bg-gradient-to-t from-black/88 via-black/10 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-                  <h3 class="text-white font-black tracking-tight leading-none mb-2.5 uppercase"
-                      style="font-size:clamp(1.4rem,3.5vw,2.2rem);">{{ cat.name }}</h3>
-                  <div class="h-[1px] w-5 transition-all duration-700 group-hover:w-14" style="background:#d4af37;"></div>
-                </div>
-              </a>
-            }
-          </div>
         }
       </div>
-
-      <!-- Catégories supplémentaires en pills -->
-      @if (categories.length > 3) {
-        <div class="flex flex-wrap gap-2 px-5 sm:px-8 lg:px-12 mt-4">
-          @for (cat of categories.slice(3); track cat.id) {
-            <a [href]="'/products?categorie=' + cat.slug"
-               (click)="goToCategory(cat.slug); $event.preventDefault()"
-               class="flex items-center gap-2 px-4 py-2.5 border text-sm font-bold transition-all hover:border-gold/50 hover:text-gold cursor-pointer r-up"
-               style="border-color:rgba(0,0,0,0.12);color:rgba(0,0,0,0.5);"
-               [style.transition-delay.ms]="($index) * 60 + 200">
-              <span class="uppercase">{{ cat.name }}</span>
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-              </svg>
-            </a>
-          }
-        </div>
       }
+    </div>
+
+    <!-- Catégories supplémentaires en pills -->
+    @if (categories.length > 3) {
+    <div class="flex flex-wrap gap-2 px-5 sm:px-8 lg:px-12 mt-4">
+      @for (cat of categories.slice(3); track cat.id) {
+      <a [href]="'/products?categorie=' + cat.slug" (click)="goToCategory(cat.slug); $event.preventDefault()"
+        class="flex items-center gap-2 px-4 py-2.5 border text-sm font-bold transition-all hover:border-gold/50 hover:text-gold cursor-pointer r-up"
+        style="border-color:rgba(0,0,0,0.12);color:rgba(0,0,0,0.5);" [style.transition-delay.ms]="($index) * 60 + 200">
+        <span class="uppercase">{{ cat.name }}</span>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+      }
+    </div>
+    }
     }
   </section>
 
@@ -407,95 +428,108 @@
        4. SÉLECTION DE LA SEMAINE — produits featured
   ════════════════════════════════════════════════════════════════════ -->
   @if (featuredLoading || hasFeatured || hasBestsellers) {
-    @if (!featuredLoading && featuredProducts.length > 0) {
-      <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;background:#fcf8f0;border-top:1px solid rgba(212,175,55,0.15);border-bottom:1px solid rgba(212,175,55,0.15);">
-      <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
-        <div>
-          <div class="flex items-center gap-2 mb-3">
-            <svg class="w-3.5 h-3.5" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-            </svg>
-            <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold" style="color:rgba(212,175,55,0.65);">Nos coups de cœur</p>
-          </div>
-          <h2 class="r-up font-black theme-text tracking-tight leading-none"
-              style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">SÉLECTION</h2>
+  @if (!featuredLoading && featuredProducts.length > 0) {
+  <section class="scroll-reveal"
+    style="padding:clamp(60px,8vw,110px) 0;background:#fcf8f0;border-top:1px solid rgba(212,175,55,0.15);border-bottom:1px solid rgba(212,175,55,0.15);">
+    <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-3.5 h-3.5" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold"
+            style="color:rgba(212,175,55,0.65);">Nos coups de cœur</p>
         </div>
-        <a routerLink="/products" [queryParams]="{featured: true}"
-           class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
-           style="color:rgba(0,0,0,0.25);border-color:rgba(0,0,0,0.12);transition-delay:180ms">Voir tout</a>
+        <h2 class="r-up font-black theme-text tracking-tight leading-none"
+          style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">SÉLECTION</h2>
       </div>
+      <a routerLink="/products" [queryParams]="{featured: true}"
+        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
+        style="color:rgba(0,0,0,0.25);border-color:rgba(0,0,0,0.12);transition-delay:180ms">Voir tout</a>
+    </div>
 
-      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
+    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
                   sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
-        @for (product of featuredProducts; track product.id; let idx = $index) {
-          <a [routerLink]="['/products', product.slug]"
-             class="card-appear group flex-shrink-0 w-[52vw] sm:w-auto cursor-pointer block snap-start"
-             [style.animation-delay.ms]="idx * 75">
-            <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-              <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
-                   class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
-                   (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-              <!-- Badge vedette -->
-              <div class="absolute top-2.5 left-2.5 flex items-center gap-1 px-2 py-1"
-                   style="background:rgba(212,175,55,0.9);">
-                <svg class="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-                <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-black uppercase tracking-wider">Vedette</span>
-              </div>
-              @if (product.discountPercent && product.discountPercent > 0) {
-                <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 tracking-wider uppercase">
-                  −{{ product.discountPercent }}%
-                </span>
-              }
-              @if (product.stock === 0) {
-                <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <span class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
-                </div>
-              }
-            </div>
-            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">{{ product.category.name }}</p>
-            <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
-            <div class="flex items-baseline gap-1.5">
-              @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
-                <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-              } @else {
-                <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-              }
-              <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
-            </div>
-          </a>
-        }
-      </div>
-    </section>
-  } @else if (featuredLoading) {
-    <section style="padding:clamp(60px,8vw,110px) 0;background:#fcf8f0;border-top:1px solid rgba(212,175,55,0.15);border-bottom:1px solid rgba(212,175,55,0.15);">
-      <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
-        <div>
-          <div class="flex items-center gap-2 mb-3">
-            <svg class="w-3.5 h-3.5" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+      @for (product of featuredProducts; track product.id; let idx = $index) {
+      <a [routerLink]="['/products', product.slug]"
+        class="card-appear group flex-shrink-0 w-[52vw] sm:w-auto cursor-pointer block snap-start"
+        [style.animation-delay.ms]="idx * 75">
+        <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
+          <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+            class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+            (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          <!-- Badge vedette -->
+          <div class="absolute top-2.5 left-2.5 flex items-center gap-1 px-2 py-1"
+            style="background:rgba(212,175,55,0.9);">
+            <svg class="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
-            <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold" style="color:rgba(212,175,55,0.65);">Nos coups de cœur</p>
+            <span
+              class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-black uppercase tracking-wider">Vedette</span>
           </div>
-          <h2 class="r-up font-black theme-text tracking-tight leading-none"
-              style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">SÉLECTION</h2>
+          @if (product.discountPercent && product.discountPercent > 0) {
+          <span
+            class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 tracking-wider uppercase">
+            −{{ product.discountPercent }}%
+          </span>
+          }
+          @if (product.stock === 0) {
+          <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <span
+              class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
+          </div>
+          }
         </div>
+        <p
+          class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">
+          {{ product.category.name }}</p>
+        <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
+        <div class="flex items-baseline gap-1.5">
+          @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
+          <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR'
+            }}</span>
+          <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+          } @else {
+          <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+          }
+          <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
+        </div>
+      </a>
+      }
+    </div>
+  </section>
+  } @else if (featuredLoading) {
+  <section
+    style="padding:clamp(60px,8vw,110px) 0;background:#fcf8f0;border-top:1px solid rgba(212,175,55,0.15);border-bottom:1px solid rgba(212,175,55,0.15);">
+    <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-3.5 h-3.5" style="color:#d4af37;" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold"
+            style="color:rgba(212,175,55,0.65);">Nos coups de cœur</p>
+        </div>
+        <h2 class="r-up font-black theme-text tracking-tight leading-none"
+          style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">SÉLECTION</h2>
       </div>
-      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
+    </div>
+    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
                   sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
-        @for (_ of skeletonArray; track $index) {
-          <div class="flex-shrink-0 w-[52vw] sm:w-auto">
-            <div style="aspect-ratio:3/4;" class="rounded-lg bg-white/30 animate-pulse mb-3"></div>
-            <div class="h-2 w-16 rounded bg-white/30 animate-pulse mb-1.5"></div>
-            <div class="h-3 w-28 rounded bg-white/30 animate-pulse mb-2"></div>
-            <div class="h-3 w-20 rounded bg-white/30 animate-pulse"></div>
-          </div>
-        }
+      @for (_ of skeletonArray; track $index) {
+      <div class="flex-shrink-0 w-[52vw] sm:w-auto">
+        <div style="aspect-ratio:3/4;" class="rounded-lg bg-white/30 animate-pulse mb-3"></div>
+        <div class="h-2 w-16 rounded bg-white/30 animate-pulse mb-1.5"></div>
+        <div class="h-3 w-28 rounded bg-white/30 animate-pulse mb-2"></div>
+        <div class="h-3 w-20 rounded bg-white/30 animate-pulse"></div>
       </div>
-    </section>
+      }
+    </div>
+  </section>
   }
 
 
@@ -510,96 +544,103 @@
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-60"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
           </span>
-          <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold text-red-600">Les plus achetés</p>
+          <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold text-red-600">Les
+            plus achetés</p>
         </div>
         <h2 class="r-up font-black theme-text tracking-tight leading-none"
-            style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">MEILLEURES<br>VENTES</h2>
+          style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">MEILLEURES<br>VENTES</h2>
       </div>
       @if (!bestsellersLoading && bestsellers.length > 0) {
-        <a routerLink="/products"
-           class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
-           style="color:rgba(0,0,0,0.35);border-color:rgba(0,0,0,0.14);transition-delay:180ms">Voir tout</a>
+      <a routerLink="/products"
+        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
+        style="color:rgba(0,0,0,0.35);border-color:rgba(0,0,0,0.14);transition-delay:180ms">Voir tout</a>
       }
     </div>
 
     @if (bestsellersLoading) {
-      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
+    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none
                   sm:grid sm:grid-cols-4 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
-        @for (_ of skeletonArray; track $index) {
-          <div class="flex-shrink-0 w-[60vw] sm:w-auto">
-            <div style="aspect-ratio:3/4;" class="rounded-lg bg-white/30 animate-pulse mb-3"></div>
-            <div class="h-2 w-16 rounded bg-white/30 animate-pulse mb-1.5"></div>
-            <div class="h-3 w-28 rounded bg-white/30 animate-pulse mb-2"></div>
-            <div class="h-3 w-20 rounded bg-white/30 animate-pulse"></div>
-          </div>
-        }
+      @for (_ of skeletonArray; track $index) {
+      <div class="flex-shrink-0 w-[60vw] sm:w-auto">
+        <div style="aspect-ratio:3/4;" class="rounded-lg bg-white/30 animate-pulse mb-3"></div>
+        <div class="h-2 w-16 rounded bg-white/30 animate-pulse mb-1.5"></div>
+        <div class="h-3 w-28 rounded bg-white/30 animate-pulse mb-2"></div>
+        <div class="h-3 w-20 rounded bg-white/30 animate-pulse"></div>
       </div>
+      }
+    </div>
     } @else if (bestsellers.length > 0) {
-      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
+    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
                   sm:grid sm:grid-cols-4 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
-        @for (product of bestsellers.slice(0,4); track product.id; let idx = $index) {
-          <a [routerLink]="['/products', product.slug]"
-             class="card-appear group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block snap-start"
-             [style.animation-delay.ms]="idx * 80">
-            <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-              <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
-                   class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
-                   (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-              <!-- Rang -->
-              <div class="absolute top-2.5 left-2.5 w-7 h-7 flex items-center justify-center text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
-                   style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.15);">#{{ idx + 1 }}</div>
-              @if (product.discountPercent && product.discountPercent > 0) {
-                <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 uppercase">
-                  −{{ product.discountPercent }}%
-                </span>
-              }
-              @if (product.stock === 0) {
-                <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <span class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
-                </div>
-              }
-            </div>
-            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">{{ product.category.name }}</p>
-            <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
-            <div class="flex items-baseline gap-1.5">
-              @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
-                <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-              } @else {
-                <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-              }
-              <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
-            </div>
-          </a>
-        }
-      </div>
-
-      <!-- Rang 5-8 sur desktop -->
-      @if (bestsellers.length > 4) {
-        <div class="hidden lg:grid grid-cols-4 gap-4 px-8 lg:px-12 mt-4">
-          @for (product of bestsellers.slice(4, 8); track product.id; let idx = $index) {
-            <a [routerLink]="['/products', product.slug]"
-               class="card-appear group cursor-pointer flex items-center gap-3 p-3 border transition-colors hover:border-gold/25"
-               style="border-color:rgba(212,175,55,0.1);"
-               [style.animation-delay.ms]="(idx + 4) * 80">
-              <div class="flex-shrink-0 w-14 h-14 overflow-hidden relative">
-                <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
-                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                     (error)="$any($event.target).src='https://placehold.co/56x56/0a0a0a/d4af37?text=SDM'"/>
-                <span class="absolute top-0 left-0 w-4 h-4 flex items-center justify-center text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
-                      style="background:rgba(0,0,0,0.7);">#{{ idx + 5 }}</span>
-              </div>
-              <div class="min-w-0">
-                <p class="font-bold theme-text text-xs leading-tight line-clamp-2 mb-1">{{ product.name }}</p>
-                <p class="font-black text-xs" style="color:#d4af37;">
-                  {{ (product.salePrice ?? product.price) | number:'1.0-0':'fr-FR' }} FCFA
-                </p>
-              </div>
-            </a>
+      @for (product of bestsellers.slice(0,4); track product.id; let idx = $index) {
+      <a [routerLink]="['/products', product.slug]"
+        class="card-appear group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block snap-start"
+        [style.animation-delay.ms]="idx * 80">
+        <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
+          <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+            class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+            (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          <!-- Rang -->
+          <div
+            class="absolute top-2.5 left-2.5 w-7 h-7 flex items-center justify-center text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
+            style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.15);">#{{ idx + 1 }}</div>
+          @if (product.discountPercent && product.discountPercent > 0) {
+          <span
+            class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 uppercase">
+            −{{ product.discountPercent }}%
+          </span>
+          }
+          @if (product.stock === 0) {
+          <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <span
+              class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
+          </div>
           }
         </div>
+        <p
+          class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">
+          {{ product.category.name }}</p>
+        <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
+        <div class="flex items-baseline gap-1.5">
+          @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
+          <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR'
+            }}</span>
+          <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+          } @else {
+          <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+          }
+          <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
+        </div>
+      </a>
       }
+    </div>
+
+    <!-- Rang 5-8 sur desktop -->
+    @if (bestsellers.length > 4) {
+    <div class="hidden lg:grid grid-cols-4 gap-4 px-8 lg:px-12 mt-4">
+      @for (product of bestsellers.slice(4, 8); track product.id; let idx = $index) {
+      <a [routerLink]="['/products', product.slug]"
+        class="card-appear group cursor-pointer flex items-center gap-3 p-3 border transition-colors hover:border-gold/25"
+        style="border-color:rgba(212,175,55,0.1);" [style.animation-delay.ms]="(idx + 4) * 80">
+        <div class="flex-shrink-0 w-14 h-14 overflow-hidden relative">
+          <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            (error)="$any($event.target).src='https://placehold.co/56x56/0a0a0a/d4af37?text=SDM'" />
+          <span
+            class="absolute top-0 left-0 w-4 h-4 flex items-center justify-center text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
+            style="background:rgba(0,0,0,0.7);">#{{ idx + 5 }}</span>
+        </div>
+        <div class="min-w-0">
+          <p class="font-bold theme-text text-xs leading-tight line-clamp-2 mb-1">{{ product.name }}</p>
+          <p class="font-black text-xs" style="color:#d4af37;">
+            {{ (product.salePrice ?? product.price) | number:'1.0-0':'fr-FR' }} FCFA
+          </p>
+        </div>
+      </a>
+      }
+    </div>
+    }
     }
   </section>
   }
@@ -607,93 +648,96 @@
   <!-- ════════════════════════════════════════════════════════════════
        6. NOUVEAUTÉS
   ════════════════════════════════════════════════════════════════════ -->
-  <section class="scroll-reveal"
-           style="padding-left:0;padding-right:0;padding-bottom:clamp(60px,8vw,110px);"
-           [style.paddingTop]="hasGapSections ? 'clamp(60px,8vw,110px)' : '0'">
+  <section class="scroll-reveal" style="padding-left:0;padding-right:0;padding-bottom:clamp(60px,8vw,110px);"
+    [style.paddingTop]="hasGapSections ? 'clamp(60px,8vw,110px)' : '0'">
     <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
       <div>
         <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
         <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
-           style="color:rgba(212,175,55,0.65);transition-delay:80ms">Vient d'arriver</p>
+          style="color:rgba(212,175,55,0.65);transition-delay:80ms">Vient d'arriver</p>
         <h2 class="r-up font-black theme-text tracking-tight leading-none"
-            style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">NOUVEAUTÉS</h2>
+          style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">NOUVEAUTÉS</h2>
       </div>
       <a routerLink="/products"
-         class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
-         style="color:rgba(0,0,0,0.35);border-color:rgba(0,0,0,0.14);transition-delay:200ms">Tout voir</a>
+        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
+        style="color:rgba(0,0,0,0.35);border-color:rgba(0,0,0,0.14);transition-delay:200ms">Tout voir</a>
     </div>
 
     @if (newProductsLoading) {
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 px-5 sm:px-8 lg:px-12">
-        @for (i of [1,2,3,4]; track i) {
-          <div>
-            <div class="skeleton relative mb-1.5 rounded-xl" style="aspect-ratio:3/4;"></div>
-            <div class="skeleton h-3.5 w-full mb-1" style="border-radius:2px;"></div>
-            <div class="skeleton h-4 w-20" style="border-radius:2px;"></div>
-          </div>
-        }
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 px-5 sm:px-8 lg:px-12">
+      @for (i of [1,2,3,4]; track i) {
+      <div>
+        <div class="skeleton relative mb-1.5 rounded-xl" style="aspect-ratio:3/4;"></div>
+        <div class="skeleton h-3.5 w-full mb-1" style="border-radius:2px;"></div>
+        <div class="skeleton h-4 w-20" style="border-radius:2px;"></div>
       </div>
+      }
+    </div>
     }
 
     @if (!newProductsLoading && hasNewProducts) {
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 px-5 sm:px-8 lg:px-12">
-        @for (product of newProducts; track product.id; let idx = $index) {
-          <div class="card-appear group relative"
-               [style.animation-delay.ms]="idx * 75">
-            <!-- Lien principal vers la fiche produit -->
-            <a [routerLink]="['/products', product.slug]"
-               class="block cursor-pointer">
-              <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-1.5 border transition-colors duration-300 rounded-xl"
-                    style="aspect-ratio:3/4;border-color:rgba(212,175,55,0.12);">
-                <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
-                     class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
-                     (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'"/>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 px-5 sm:px-8 lg:px-12">
+      @for (product of newProducts; track product.id; let idx = $index) {
+      <div class="card-appear group relative" [style.animation-delay.ms]="idx * 75">
+        <!-- Lien principal vers la fiche produit -->
+        <a [routerLink]="['/products', product.slug]" class="block cursor-pointer">
+          <div
+            class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-1.5 border transition-colors duration-300 rounded-xl"
+            style="aspect-ratio:3/4;border-color:rgba(212,175,55,0.12);">
+            <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+              class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+              (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'" />
 
-                <!-- Badge promo (orange) -->
-                @if (product.discountPercent && product.discountPercent > 0) {
-                  <span class="absolute top-2 right-2 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 uppercase z-10">
-                    −{{ product.discountPercent }}%
-                  </span>
-                }
+            <!-- Badge promo (orange) -->
+            @if (product.discountPercent && product.discountPercent > 0) {
+            <span
+              class="absolute top-2 right-2 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 uppercase z-10">
+              −{{ product.discountPercent }}%
+            </span>
+            }
 
-                <!-- Stock épuisé -->
-                @if (product.stock === 0) {
-                  <div class="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
-                    <span class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
-                  </div>
-                }
-              </div>
-            </a>
-
-            <!-- Infos sous l'image -->
-            <a [routerLink]="['/products', product.slug]" class="block">
-              <p class="font-semibold theme-text text-sm leading-snug mb-0.5 line-clamp-2 hover:text-gold transition-colors">{{ product.name }}</p>
-            </a>
-            <div class="flex items-baseline gap-1.5">
-              @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-                <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
-                <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-              } @else {
-                <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-              }
-              <span class="text-[13px] text-gold/60">FCFA</span>
+            <!-- Stock épuisé -->
+            @if (product.stock === 0) {
+            <div class="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+              <span
+                class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
             </div>
+            }
           </div>
-        }
+        </a>
+
+        <!-- Infos sous l'image -->
+        <a [routerLink]="['/products', product.slug]" class="block">
+          <p
+            class="font-semibold theme-text text-sm leading-snug mb-0.5 line-clamp-2 hover:text-gold transition-colors">
+            {{ product.name }}</p>
+        </a>
+        <div class="flex items-baseline gap-1.5">
+          @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
+          <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR'
+            }}</span>
+          <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+          } @else {
+          <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+          }
+          <span class="text-[13px] text-gold/60">FCFA</span>
+        </div>
       </div>
+      }
+    </div>
     }
 
     @if (!newProductsLoading && !hasNewProducts) {
-      <div class="px-5 sm:px-8">
-        <a routerLink="/products"
-           class="inline-flex items-center gap-3 px-6 py-3.5 border font-bold text-xs uppercase tracking-[0.2em] transition-all hover:text-gold"
-           style="color:rgba(0,0,0,0.42);border-color:rgba(0,0,0,0.14);">
-          Voir le catalogue complet
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
-        </a>
-      </div>
+    <div class="px-5 sm:px-8">
+      <a routerLink="/products"
+        class="inline-flex items-center gap-3 px-6 py-3.5 border font-bold text-xs uppercase tracking-[0.2em] transition-all hover:text-gold"
+        style="color:rgba(0,0,0,0.42);border-color:rgba(0,0,0,0.14);">
+        Voir le catalogue complet
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+    </div>
     }
   </section>
 
@@ -702,320 +746,372 @@
        7. VENTES FLASH
   ════════════════════════════════════════════════════════════════════ -->
   @if (hasDeals) {
-    <div aria-hidden="true" class="sdm-sep sdm-sep--to-dark-warm"></div>
-    <section class="scroll-reveal" style="padding:clamp(60px,8vw,110px) 0;background:linear-gradient(135deg,#0e0500 0%,#0a0a0a 50%,#0e0500 100%);">
-      <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
-        <div>
-          <div class="flex items-center gap-2 mb-3">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+  <div aria-hidden="true" class="sdm-sep sdm-sep--to-dark-warm"></div>
+  <section class="scroll-reveal"
+    style="padding:clamp(60px,8vw,110px) 0;background:linear-gradient(135deg,#0e0500 0%,#0a0a0a 50%,#0e0500 100%);">
+    <div class="px-5 sm:px-8 lg:px-12 mb-10 sm:mb-14 flex items-end justify-between">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+          </span>
+          <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold text-orange-500/70">
+            Offres limitées</p>
+          <span
+            class="r-up inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-wider"
+            style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.25);color:#f97316;transition-delay:160ms">
+            <span class="relative flex h-1.5 w-1.5">
+              <span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60"></span>
+              <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-orange-500"></span>
             </span>
-            <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold text-orange-500/70">Offres limitées</p>
-            <span class="r-up inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-wider"
-                  style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.25);color:#f97316;transition-delay:160ms">
-              <span class="relative flex h-1.5 w-1.5">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60"></span>
-                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-orange-500"></span>
-              </span>
-              Temps limité
-            </span>
-          </div>
-          <h2 class="r-up font-black theme-text tracking-tight leading-none"
-              style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">
-            VENTES<br><span style="color:#f97316;">FLASH</span>
-          </h2>
+            Temps limité
+          </span>
         </div>
-        <a routerLink="/products"
-           class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-orange-600"
-           style="color:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.1);transition-delay:180ms">Voir tout</a>
-      </div>
-
-      <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
-                  sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
-        @for (product of discountProducts; track product.id; let idx = $index) {
-          <a [routerLink]="['/products', product.slug]"
-             class="card-appear group flex-shrink-0 w-[70vw] sm:w-auto cursor-pointer block snap-start"
-             [style.animation-delay.ms]="idx * 80">
-            <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-              <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
-                   class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700"
-                   (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/f97316?text=SDM'"/>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-              @if (product.discountPercent) {
-                <div class="absolute top-3 left-3 px-3 py-1.5 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
-                     style="background:#f97316;">−{{ product.discountPercent }}%</div>
-              }
-            </div>
-            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-orange-500/60">{{ product.category.name }}</p>
-            <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-1">{{ product.name }}</p>
-            <div class="flex items-baseline gap-1.5">
-              @if (product.salePrice) {
-                <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR' }}</span>
-                <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-              } @else {
-                <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-              }
-              <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
-            </div>
-          </a>
-        }
-      </div>
-    </section>
-  }
-
-
-  <!-- ════════════════════════════════════════════════════════════════
-       8. SECTION ÉDITORIALE
-  ════════════════════════════════════════════════════════════════════ -->
-  <section class="scroll-reveal overflow-hidden"
-           style="padding:clamp(60px,8vw,110px) 0;background:linear-gradient(135deg,#060606 0%,#0c0a03 50%,#060606 100%);">
-    <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-      <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-stretch">
-        <div class="r-left relative lg:flex-[52] overflow-hidden" style="min-height:clamp(320px,55vw,640px);transition-delay:100ms;">
-          <img src="/seko.webp"
-               alt="Éditorial SDM Store" loading="lazy"
-               class="absolute inset-0 w-full h-full object-cover object-center hover:scale-[1.04] transition-transform duration-1000 ease-out"/>
-          <div class="absolute inset-0" style="background:linear-gradient(to bottom,transparent 55%,rgba(6,6,6,0.55) 100%)"></div>
-        </div>
-        <div class="r-right lg:flex-[48] flex flex-col justify-center" style="transition-delay:200ms;">
-          <div class="gold-line-pulse w-6 h-[1px] mb-10" style="background:#d4af37;"></div>
-          <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-6" style="color:rgba(212,175,55,0.65);">Notre engagement</p>
-          <h2 class="font-black text-white leading-[0.88] tracking-tight mb-8"
-              style="font-size:clamp(2.4rem,5.5vw,4rem);">
-            L'ÉLÉGANCE<br>EST UN<br>
-            <span class="gold-shimmer" style="animation-delay:0s;">CHOIX.</span>
-          </h2>
-          <p class="leading-relaxed mb-10 text-sm" style="color:rgba(255,255,255,0.38);max-width:28rem;">
-            Chaque pièce est choisie pour son caractère, sa rareté et son savoir-faire. Rien de banal, tout de l'exception.
-          </p>
-          <a routerLink="/products"
-             class="self-start inline-flex items-center gap-3 px-8 py-4 text-xs font-black uppercase tracking-[0.2em] text-black transition-all duration-300 hover:-translate-y-0.5"
-             style="background:#d4af37;box-shadow:0 8px 32px rgba(212,175,55,0.3);">
-            Découvrir la collection
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <div aria-hidden="true" class="sdm-sep sdm-sep--from-editorial"></div>
-
-  <!-- ════════════════════════════════════════════════════════════════
-        STATS — preuve sociale
-  ════════════════════════════════════════════════════════════════════ -->
-  <section class="scroll-reveal border-b" style="border-color:rgba(212,175,55,0.08);padding:clamp(40px,6vw,80px) 0;">
-    <div class="max-w-5xl mx-auto px-5 sm:px-8 lg:px-12">
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-8">
-        @for (s of editorialStats; track s.l; let i = $index) {
-          <div class="text-center">
-            <p class="font-black theme-text text-2xl sm:text-3xl leading-none mb-1.5">{{ s.v }}</p>
-            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-semibold uppercase tracking-wider" style="color:rgba(0,0,0,0.35);">{{ s.l }}</p>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- ════════════════════════════════════════════════════════════════
-        9. STATS
-  ════════════════════════════════════════════════════════════════════ -->
-  <section id="stats-row" class="border-t scroll-reveal relative overflow-hidden"
-           style="border-color:rgba(212,175,55,0.1);">
-    <div class="absolute inset-0 pointer-events-none"
-         style="background:radial-gradient(ellipse at 50% 50%, rgba(212,175,55,0.05) 0%, transparent 65%)"></div>
-    <div class="relative max-w-5xl mx-auto px-5 sm:px-8">
-      <div class="grid grid-cols-2 sm:grid-cols-4">
-        @for (stat of [
-          { value: statProducts,   suffix: '+', label: 'Références' },
-          { value: statCategories, suffix: '',  label: 'Catégories' },
-          { value: statClients,    suffix: '+', label: 'Clients' },
-          { value: statReviews,    suffix: '+', label: 'Avis vérifiés' }
-        ]; track stat.label; let i = $index) {
-          <div class="r-up flex flex-col items-center justify-center py-14 px-4 text-center border-r border-b sm:border-b-0 last:border-r-0"
-               style="border-color:rgba(212,175,55,0.08);" [style.transition-delay.ms]="i * 90">
-            <p class="stat-num font-black leading-none mb-2 tabular-nums"
-               style="color:#d4af37;font-size:clamp(2.5rem,6vw,4rem);">{{ stat.value }}{{ stat.suffix }}</p>
-            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-[0.3em] theme-muted">{{ stat.label }}</p>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ════════════════════════════════════════════════════════════════
-       11. PROMESSES
-  ════════════════════════════════════════════════════════════════════ -->
-  <section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
-    <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-      <div class="mb-12 sm:mb-16">
-        <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
-        <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
-           style="color:rgba(212,175,55,0.65);transition-delay:80ms">Notre engagement</p>
         <h2 class="r-up font-black theme-text tracking-tight leading-none"
-            style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">L'EXCELLENCE<br>PARTOUT</h2>
+          style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">
+          VENTES<br><span style="color:#f97316;">FLASH</span>
+        </h2>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
-        @for (p of [
-          { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',     title: 'Livraison rapide',        desc: '24–48h Abidjan · 72h intérieur CI.' },
-          { icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', title: 'Retour 3 jours', desc: 'Remboursement garanti sans friction.' },
-          { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Paiements Sécurisés', desc: 'Vos paiements sont traités en toute sécurité en ligne via GeniusPay.' },
-          { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Qualité vérifiée', desc: 'Chaque article inspecté avant expédition.' }
-        ]; track p.title; let i = $index) {
-          <div class="r-up border p-6 sm:p-8 flex flex-col gap-5 group hover:border-gold/40 transition-colors duration-300"
-               style="border-color:rgba(212,175,55,0.12);" [style.transition-delay.ms]="i * 90 + 200">
-            <div class="w-10 h-10 border flex items-center justify-center flex-shrink-0 group-hover:border-gold/40 transition-colors"
-                 style="border-color:rgba(212,175,55,0.2);">
-              <svg class="w-4.5 h-4.5" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" [attr.d]="p.icon"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-black theme-text text-sm sm:text-base mb-2 tracking-tight">{{ p.title }}</h3>
-              <p class="theme-muted text-xs sm:text-sm leading-relaxed">{{ p.desc }}</p>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ════════════════════════════════════════════════════════════════
-        12. AVIS CLIENTS
-  ════════════════════════════════════════════════════════════════════ -->
-  @if (!reviewsLoading && featuredReviews.length > 0) {
-    <section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-
-        <div class="mb-12 sm:mb-16 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-          <div>
-            <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
-            <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
-               style="color:rgba(212,175,55,0.65);transition-delay:80ms">Avis vérifiés</p>
-            <h2 class="r-up font-black theme-text tracking-tight leading-none"
-                style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">CE QU'ILS DISENT</h2>
-          </div>
-          <!-- Score global -->
-          @if (publicStats && publicStats.totalReviews > 0) {
-            <div class="flex items-center gap-4 p-4 border" style="border-color:rgba(212,175,55,0.2);background:rgba(212,175,55,0.04);">
-              <div class="text-center">
-                <p class="font-black text-4xl leading-none" style="color:#d4af37;">{{ avgRatingDisplay() }}</p>
-                <div class="flex items-center gap-0.5 mt-1 justify-center">
-                  @for (star of starArray(); track star) {
-                    <svg class="w-3 h-3" [style.color]="star <= publicStats!.averageRating ? '#d4af37' : 'rgba(212,175,55,0.2)'"
-                         fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                  }
-                </div>
-                <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted mt-1 whitespace-nowrap">{{ publicStats.totalReviews }}+ avis</p>
-              </div>
-            </div>
-          }
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          @for (review of featuredReviews; track review.id; let i = $index) {
-            <div class="r-up flex flex-col gap-4 p-6 border"
-                 style="border-color:rgba(0,0,0,0.09);background:#ffffff;"
-                 [style.transition-delay.ms]="i * 80 + 200">
-              <div class="flex items-center gap-0.5">
-                @for (star of starArray(); track star) {
-                  <svg class="w-3.5 h-3.5" [style.color]="star <= review.rating ? '#d4af37' : 'rgba(212,175,55,0.2)'"
-                       fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                }
-              </div>
-              <p class="text-sm leading-relaxed flex-1 theme-muted">
-                @if (review.comment) {
-                  "{{ review.comment.length > 140 ? (review.comment.slice(0, 140) + '…') : review.comment }}"
-                } @else {
-                  "Très satisfait(e) de mon achat."
-                }
-              </p>
-              <div class="flex items-center justify-between pt-3 border-t" style="border-color:rgba(212,175,55,0.1);">
-                <div>
-                  <p class="text-xs font-black theme-text">{{ reviewInitials(review.customerName) }}</p>
-                  <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-medium" style="color:rgba(212,175,55,0.55);">{{ review.productName }}</p>
-                </div>
-                @if (review.purchased) {
-                  <div class="flex items-center gap-1 px-2 py-1 rounded-full"
-                       style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);">
-                    <svg class="w-2.5 h-2.5" style="color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider" style="color:#10b981;">Achat vérifié</span>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-        </div>
-
-      </div>
-    </section>
-  }
-
-
-  <!-- ════════════════════════════════════════════════════════════════
-        13. CTA FINAL
-  ════════════════════════════════════════════════════════════════════ -->
-  <section class="relative border-t scroll-reveal overflow-hidden"
-           style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,10vw,120px) 1.5rem;background:linear-gradient(to bottom, transparent, rgba(212,175,55,0.03));">
-    
-    <!-- Effet de lumière de fond -->
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-      <div class="w-96 h-96 rounded-full blur-[100px]" style="background:radial-gradient(circle, rgba(212,175,55,0.4) 0%, transparent 70%);"></div>
+      <a routerLink="/products"
+        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-orange-600"
+        style="color:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.1);transition-delay:180ms">Voir tout</a>
     </div>
 
-    <div class="relative max-w-2xl mx-auto text-center z-10">
-      <div class="r-line w-8 h-[1px] mx-auto mb-8" style="background:#d4af37;"></div>
-      <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-6"
-         style="color:rgba(212,175,55,0.58);transition-delay:100ms">
-        Prêt à shopper ?
-      </p>
-      <h2 class="font-black theme-text leading-[0.88] tracking-tight mb-8"
-          style="font-size:clamp(3rem,9vw,6.5rem);">
-        <span class="r-up block" style="transition-delay:160ms">VOTRE STYLE</span>
-        <span class="r-up gold-shimmer block" style="transition-delay:360ms">VOUS ATTEND</span>
-      </h2>
-      <p class="r-up theme-muted text-sm mb-10" style="transition-delay:460ms">
-        Livraison 24-48h Abidjan · 72h intérieur · Paiements sécurisés en ligne via GeniusPay
-      </p>
-      <div class="r-up flex flex-col sm:flex-row justify-center gap-4" style="transition-delay:560ms">
-        <a routerLink="/products"
-           class="inline-flex items-center justify-center gap-3 px-10 py-5 font-black text-sm uppercase tracking-[0.2em] text-black transition-all hover:-translate-y-0.5 active:scale-[0.97] rounded-xl"
-           style="background:#d4af37;box-shadow:0 12px 40px rgba(212,175,55,0.25);">
-          Voir le catalogue
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
-        </a>
-        <a [href]="whatsAppUrl" target="_blank" rel="noopener"
-           class="inline-flex items-center justify-center gap-3 px-10 py-5 font-black text-sm uppercase tracking-[0.2em] text-white transition-all hover:-translate-y-0.5 active:scale-[0.97] rounded-xl relative overflow-hidden group"
-           style="background: linear-gradient(135deg, #25D366, #128C7E); box-shadow: 0 12px 40px rgba(37,211,102,0.25);">
-          <!-- Effet de brillance (shimmer) -->
-          <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
-          <svg class="w-5 h-5 relative z-10" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-          <span class="relative z-10">Commander sur WhatsApp</span>
-        </a>
-      </div>
-      @if (!(currentUser$ | async)) {
-        <p class="r-up text-xs theme-muted mt-6" style="transition-delay:620ms">
-          Pas encore de compte ?
-          <a routerLink="/auth/register" class="text-gold font-semibold hover:underline">Créer un compte</a>
-        </p>
+    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
+                  sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
+      @for (product of discountProducts; track product.id; let idx = $index) {
+      <a [routerLink]="['/products', product.slug]"
+        class="card-appear group flex-shrink-0 w-[70vw] sm:w-auto cursor-pointer block snap-start"
+        [style.animation-delay.ms]="idx * 80">
+        <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
+          <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+            class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700"
+            (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/f97316?text=SDM'" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          @if (product.discountPercent) {
+          <div class="absolute top-3 left-3 px-3 py-1.5 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
+            style="background:#f97316;">−{{ product.discountPercent }}%</div>
+          }
+        </div>
+        <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-orange-500/60">{{
+          product.category.name }}</p>
+        <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-1">{{ product.name }}</p>
+        <div class="flex items-baseline gap-1.5">
+          @if (product.salePrice) {
+          <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR'
+            }}</span>
+          <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+          } @else {
+          <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
+          }
+          <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
+        </div>
+      </a>
       }
     </div>
   </section>
-</div>
+  }
 
+
+  <!-- ════════════════════════════════════════════════════════════════
+       8. SECTION ÉDITORIALE (NOUVEAU DESIGN AVANT-GARDE)
+  ════════════════════════════════════════════════════════════════════ -->
+  <section class="scroll-reveal relative overflow-hidden py-24 lg:py-32 bg-[#030303]">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative">
+
+        <!-- Image block -->
+        <div
+          class="r-right lg:col-span-8 lg:col-start-5 row-start-1 relative h-[60vh] min-h-[450px] lg:min-h-[700px] overflow-hidden"
+          style="transition-delay:200ms;">
+          <img src="/seko.webp" alt="Éditorial SDM Store" loading="lazy"
+            class="absolute inset-0 w-full h-full object-cover object-top filter grayscale-[0.3] hover:grayscale-0 hover:scale-105 transition-all duration-[1.5s] ease-out" />
+          <!-- Overlay sombre pour intégration -->
+          <div
+            class="absolute inset-0 bg-gradient-to-l from-[#030303]/20 via-transparent to-[#030303] lg:to-transparent">
+          </div>
+        </div>
+
+        <!-- Text Block (Overlapping) -->
+        <div class="r-left lg:col-span-6 lg:col-start-1 row-start-1 relative z-10 mt-[-100px] lg:mt-0 lg:-mr-16"
+          style="transition-delay:100ms;">
+          <div
+            class="p-8 lg:p-14 backdrop-blur-2xl bg-[#080808]/80 border-t border-l border-[#d4af37]/20 shadow-2xl relative overflow-hidden">
+
+            <!-- Décoration de fond -->
+            <div class="absolute top-0 right-0 w-48 h-48 bg-[#d4af37]/5 blur-3xl rounded-full"></div>
+
+            <div class="flex items-center gap-4 mb-8">
+              <div class="w-12 h-[1px] bg-[#d4af37]"></div>
+              <p class="text-[0.65rem] lg:text-xs uppercase tracking-[0.4em] font-bold text-[#d4af37]">La philosophie
+                SDM</p>
+            </div>
+
+            <h2 class="font-black text-white leading-[0.9] tracking-tighter mb-8"
+              style="font-size:clamp(3.2rem,6.5vw,6rem);">
+              L'ÉLÉGANCE<br>
+              <span class="font-light italic text-[#d4af37]"
+                style="font-family:'Bodoni Moda', serif; font-size: 0.85em;">est un</span><br>
+              <span class="gold-shimmer">CHOIX.</span>
+            </h2>
+
+            <p class="leading-relaxed mb-10 text-sm lg:text-base font-light"
+              style="color:rgba(255,255,255,0.45);max-width:28rem;">
+              Au-delà des tendances éphémères, nous cultivons le goût de l'exception. Chaque pièce de notre collection
+              est méticuleusement sélectionnée pour son caractère intemporel, sa rareté et l'excellence de son
+              savoir-faire.
+            </p>
+
+            <a routerLink="/products"
+              class="group relative inline-flex items-center gap-4 px-0 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white overflow-hidden">
+              <span class="relative z-10 transition-colors duration-300 group-hover:text-[#d4af37]">Explorer la
+                galerie</span>
+              <div
+                class="relative z-10 w-8 h-[1px] bg-white transition-all duration-300 group-hover:w-16 group-hover:bg-[#d4af37]">
+              </div>
+            </a>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+
+<div aria-hidden="true" class="sdm-sep sdm-sep--from-editorial"></div>
+
+<!-- ════════════════════════════════════════════════════════════════
+        STATS — preuve sociale
+  ════════════════════════════════════════════════════════════════════ -->
+<section class="scroll-reveal border-b" style="border-color:rgba(212,175,55,0.08);padding:clamp(40px,6vw,80px) 0;">
+  <div class="max-w-5xl mx-auto px-5 sm:px-8 lg:px-12">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8">
+      @for (s of editorialStats; track s.l; let i = $index) {
+      <div class="text-center">
+        <p class="font-black theme-text text-2xl sm:text-3xl leading-none mb-1.5">{{ s.v }}</p>
+        <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-semibold uppercase tracking-wider"
+          style="color:rgba(0,0,0,0.35);">{{ s.l }}</p>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════
+        9. STATS
+  ════════════════════════════════════════════════════════════════════ -->
+<section id="stats-row" class="border-t scroll-reveal relative overflow-hidden"
+  style="border-color:rgba(212,175,55,0.1);">
+  <div class="absolute inset-0 pointer-events-none"
+    style="background:radial-gradient(ellipse at 50% 50%, rgba(212,175,55,0.05) 0%, transparent 65%)"></div>
+  <div class="relative max-w-5xl mx-auto px-5 sm:px-8">
+    <div class="grid grid-cols-2 sm:grid-cols-4">
+      @for (stat of [
+      { value: statProducts, suffix: '+', label: 'Références' },
+      { value: statCategories, suffix: '', label: 'Catégories' },
+      { value: statClients, suffix: '+', label: 'Clients' },
+      { value: statReviews, suffix: '+', label: 'Avis vérifiés' }
+      ]; track stat.label; let i = $index) {
+      <div
+        class="r-up flex flex-col items-center justify-center py-14 px-4 text-center border-r border-b sm:border-b-0 last:border-r-0"
+        style="border-color:rgba(212,175,55,0.08);" [style.transition-delay.ms]="i * 90">
+        <p class="stat-num font-black leading-none mb-2 tabular-nums"
+          style="color:#d4af37;font-size:clamp(2.5rem,6vw,4rem);">{{ stat.value }}{{ stat.suffix }}</p>
+        <p
+          class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-[0.3em] theme-muted">
+          {{ stat.label }}</p>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+       11. PROMESSES
+  ════════════════════════════════════════════════════════════════════ -->
+<section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+    <div class="mb-12 sm:mb-16">
+      <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
+      <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
+        style="color:rgba(212,175,55,0.65);transition-delay:80ms">Notre engagement</p>
+      <h2 class="r-up font-black theme-text tracking-tight leading-none"
+        style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">L'EXCELLENCE<br>PARTOUT</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
+      @for (p of [
+      { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', title: 'Livraison rapide', desc:
+      '24–48h Abidjan · 72h intérieur CI.' },
+      { icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357
+      2H15', title: 'Retour 3 jours', desc: 'Remboursement garanti sans friction.' },
+      { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0
+      5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Paiements
+      Sécurisés', desc: 'Vos paiements sont traités en toute sécurité en ligne via GeniusPay.' },
+      { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0
+      5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Qualité vérifiée',
+      desc: 'Chaque article inspecté avant expédition.' }
+      ]; track p.title; let i = $index) {
+      <div class="r-up border p-6 sm:p-8 flex flex-col gap-5 group hover:border-gold/40 transition-colors duration-300"
+        style="border-color:rgba(212,175,55,0.12);" [style.transition-delay.ms]="i * 90 + 200">
+        <div
+          class="w-10 h-10 border flex items-center justify-center flex-shrink-0 group-hover:border-gold/40 transition-colors"
+          style="border-color:rgba(212,175,55,0.2);">
+          <svg class="w-4.5 h-4.5" style="color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" [attr.d]="p.icon" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-black theme-text text-sm sm:text-base mb-2 tracking-tight">{{ p.title }}</h3>
+          <p class="theme-muted text-xs sm:text-sm leading-relaxed">{{ p.desc }}</p>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+        12. AVIS CLIENTS
+  ════════════════════════════════════════════════════════════════════ -->
+@if (!reviewsLoading && featuredReviews.length > 0) {
+<section class="border-t scroll-reveal" style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,8vw,110px) 0;">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+
+    <div class="mb-12 sm:mb-16 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+      <div>
+        <div class="r-line w-8 h-[1px] mb-3" style="background:#d4af37;"></div>
+        <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-2"
+          style="color:rgba(212,175,55,0.65);transition-delay:80ms">Avis vérifiés</p>
+        <h2 class="r-up font-black theme-text tracking-tight leading-none"
+          style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">CE QU'ILS DISENT</h2>
+      </div>
+      <!-- Score global -->
+      @if (publicStats && publicStats.totalReviews > 0) {
+      <div class="flex items-center gap-4 p-4 border"
+        style="border-color:rgba(212,175,55,0.2);background:rgba(212,175,55,0.04);">
+        <div class="text-center">
+          <p class="font-black text-4xl leading-none" style="color:#d4af37;">{{ avgRatingDisplay() }}</p>
+          <div class="flex items-center gap-0.5 mt-1 justify-center">
+            @for (star of starArray(); track star) {
+            <svg class="w-3 h-3" [style.color]="star <= publicStats!.averageRating ? '#d4af37' : 'rgba(212,175,55,0.2)'"
+              fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            }
+          </div>
+          <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted mt-1 whitespace-nowrap">{{ publicStats.totalReviews
+            }}+ avis</p>
+        </div>
+      </div>
+      }
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (review of featuredReviews; track review.id; let i = $index) {
+      <div class="r-up flex flex-col gap-4 p-6 border" style="border-color:rgba(0,0,0,0.09);background:#ffffff;"
+        [style.transition-delay.ms]="i * 80 + 200">
+        <div class="flex items-center gap-0.5">
+          @for (star of starArray(); track star) {
+          <svg class="w-3.5 h-3.5" [style.color]="star <= review.rating ? '#d4af37' : 'rgba(212,175,55,0.2)'"
+            fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          }
+        </div>
+        <p class="text-sm leading-relaxed flex-1 theme-muted">
+          @if (review.comment) {
+          "{{ review.comment.length > 140 ? (review.comment.slice(0, 140) + '…') : review.comment }}"
+          } @else {
+          "Très satisfait(e) de mon achat."
+          }
+        </p>
+        <div class="flex items-center justify-between pt-3 border-t" style="border-color:rgba(212,175,55,0.1);">
+          <div>
+            <p class="text-xs font-black theme-text">{{ reviewInitials(review.customerName) }}</p>
+            <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-medium" style="color:rgba(212,175,55,0.55);">{{
+              review.productName }}</p>
+          </div>
+          @if (review.purchased) {
+          <div class="flex items-center gap-1 px-2 py-1 rounded-full"
+            style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);">
+            <svg class="w-2.5 h-2.5" style="color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
+              style="color:#10b981;">Achat vérifié</span>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+
+  </div>
+</section>
+}
+
+
+<!-- ════════════════════════════════════════════════════════════════
+        13. CTA FINAL
+  ════════════════════════════════════════════════════════════════════ -->
+<section class="relative border-t scroll-reveal overflow-hidden"
+  style="border-color:rgba(212,175,55,0.1);padding:clamp(60px,10vw,120px) 1.5rem;background:linear-gradient(to bottom, transparent, rgba(212,175,55,0.03));">
+
+  <!-- Effet de lumière de fond -->
+  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+    <div class="w-96 h-96 rounded-full blur-[100px]"
+      style="background:radial-gradient(circle, rgba(212,175,55,0.4) 0%, transparent 70%);"></div>
+  </div>
+
+  <div class="relative max-w-2xl mx-auto text-center z-10">
+    <div class="r-line w-8 h-[1px] mx-auto mb-8" style="background:#d4af37;"></div>
+    <p class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.55em] font-bold mb-6"
+      style="color:rgba(212,175,55,0.58);transition-delay:100ms">
+      Prêt à shopper ?
+    </p>
+    <h2 class="font-black theme-text leading-[0.88] tracking-tight mb-8" style="font-size:clamp(3rem,9vw,6.5rem);">
+      <span class="r-up block" style="transition-delay:160ms">VOTRE STYLE</span>
+      <span class="r-up gold-shimmer block" style="transition-delay:360ms">VOUS ATTEND</span>
+    </h2>
+    <p class="r-up theme-muted text-sm mb-10" style="transition-delay:460ms">
+      Livraison 24-48h Abidjan · 72h intérieur · Paiements sécurisés en ligne via GeniusPay
+    </p>
+    <div class="r-up flex flex-col sm:flex-row justify-center gap-4" style="transition-delay:560ms">
+      <a routerLink="/products"
+        class="inline-flex items-center justify-center gap-3 px-10 py-5 font-black text-sm uppercase tracking-[0.2em] text-black transition-all hover:-translate-y-0.5 active:scale-[0.97] rounded-xl"
+        style="background:#d4af37;box-shadow:0 12px 40px rgba(212,175,55,0.25);">
+        Voir le catalogue
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+      <a [href]="whatsAppUrl" target="_blank" rel="noopener"
+        class="inline-flex items-center justify-center gap-3 px-10 py-5 font-black text-sm uppercase tracking-[0.2em] text-white transition-all hover:-translate-y-0.5 active:scale-[0.97] rounded-xl relative overflow-hidden group"
+        style="background: linear-gradient(135deg, #25D366, #128C7E); box-shadow: 0 12px 40px rgba(37,211,102,0.25);">
+        <!-- Effet de brillance (shimmer) -->
+        <span
+          class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+        <svg class="w-5 h-5 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+        <span class="relative z-10">Commander sur WhatsApp</span>
+      </a>
+    </div>
+    @if (!(currentUser$ | async)) {
+    <p class="r-up text-xs theme-muted mt-6" style="transition-delay:620ms">
+      Pas encore de compte ?
+      <a routerLink="/auth/register" class="text-gold font-semibold hover:underline">Créer un compte</a>
+    </p>
+    }
+  </div>
+</section>
+</div>
