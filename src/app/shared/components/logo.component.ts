@@ -15,7 +15,8 @@ import { CommonModule } from '@angular/common';
 
       <!-- ── Slogan ── -->
       <div *ngIf="showSlogan"
-           class="flex flex-col justify-center h-full py-1 shrink-0"
+           [ngClass]="hideSloganOnMobile ? 'hidden sm:flex' : 'flex'"
+           class="flex-col justify-center h-full py-1 shrink-0"
            style="border-left: 1px solid rgba(212,175,55,0.4); padding-left: 1rem;">
         <span class="block leading-tight font-black uppercase text-[10px] sm:text-[12px]"
               style="color:#b89018; letter-spacing:0.15em;">La boutique</span>
@@ -28,6 +29,7 @@ import { CommonModule } from '@angular/common';
 export class SdmLogoComponent {
   @Input() size: number = 56;
   @Input() showSlogan: boolean = true;
+  @Input() hideSloganOnMobile: boolean = false;
 }
 
 export { SdmLogoComponent as LogoComponent };
