@@ -361,15 +361,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   get hasNewProducts(): boolean { return !this.newProductsLoading && this.newProducts.length > 0; }
   get hasGapSections(): boolean { return this.featuredLoading || this.hasFeatured || (!this.bestsellersLoading && this.bestsellers.length > 0); }
 
-  get editorialStats(): { v: string; l: string }[] {
-    const p = this.publicStats;
-    return [
-      { v: p ? p.activeProducts   + '+' : '…', l: 'Références en stock' },
-      { v: p ? p.activeCategories + ''  : '…', l: 'Catégories' },
-      { v: '24h',                               l: 'Livraison Abidjan' },
-      { v: '100%',                              l: 'Articles vérifiés' },
-    ];
-  }
+
 
   reviewInitials(name: string): string {
     const parts = name.trim().split(' ');

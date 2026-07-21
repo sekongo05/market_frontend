@@ -12,8 +12,8 @@
          ? 'bg-[#0a0a0a]/98 border-b border-[#b8941e]/25 shadow-[0_4px_32px_rgba(0,0,0,0.55)]'
          : 'bg-[#0a0a0a]/92 border-b border-[#b8941e]/12'"  >
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-[84px] gap-0 sm:gap-6">
+    <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-[84px] gap-1 sm:gap-6">
 
         <!-- ── LOGO ── -->
         <a routerLink="/"
@@ -400,12 +400,12 @@
         </div>
 
         <!-- ── MOBILE ACTIONS ── -->
-        <div class="flex lg:hidden items-center gap-0.5">
+        <div class="flex lg:hidden items-center gap-1">
 
           <!-- Bouton recherche -->
           <button (click)="toggleMobileSearch()"
             [attr.aria-label]="mobileSearchOpen ? 'Fermer la recherche' : 'Ouvrir la recherche'"
-            class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0"
+            class="min-w-[38px] min-h-[38px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0"
             [class]="mobileSearchOpen ? 'text-[#d4af37] bg-[rgba(212,175,55,.12)]' : 'hover:text-[#d4af37] hover:bg-[rgba(212,175,55,.09)]'"
             style="color:rgba(255,255,255,0.60)">
             @if (mobileSearchOpen) {
@@ -422,7 +422,7 @@
           <!-- Notifications (mobile, logged-in only) -->
           @if (currentUser) {
             <div class="relative" data-notif-panel>
-              <button (click)="toggleNotifications()" aria-label="Notifications" class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 relative hover:text-[#d4af37] hover:bg-[rgba(212,175,55,.09)]" style="color:rgba(255,255,255,0.60)">
+              <button (click)="toggleNotifications()" aria-label="Notifications" class="min-w-[38px] min-h-[38px] w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 relative hover:text-[#d4af37] hover:bg-[rgba(212,175,55,.09)]" style="color:rgba(255,255,255,0.60)">
                 <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -563,7 +563,7 @@
           <button (click)="toggleMobile()"
             [attr.aria-label]="mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
             [attr.aria-expanded]="mobileOpen"
-            class="min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
+            class="min-w-[38px] min-h-[38px] w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-[5px] transition-all duration-200
                    hover:bg-white/8 flex-shrink-0">
             <span class="block w-5 h-[1.5px] rounded-full transition-all duration-300"
                   style="background:rgba(255,255,255,0.72)"
