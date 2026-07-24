@@ -119,13 +119,9 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
   get revenueGrowthPositive(): boolean { return this.revenueGrowthPct >= 0; }
 
   get completionRate(): number {
-    if (!this.stats?.ordersByStatus) return 0;
-    const get = (s: string) => this.stats!.ordersByStatus.find(x => x.status === s)?.count ?? 0;
-    const delivered = get('DELIVERED');
-    const cancelled = get('CANCELLED');
-    const confirmed = get('CONFIRMED');
-    const total = delivered + cancelled + confirmed;
-    return total === 0 ? 0 : Math.round((delivered / total) * 100);
+    if (!this.stats?.ordersByStatus || !this.stats.totalOrders) return 0;
+    const delivered = this.stats.ordersByStatus.find(x => x.status === 'DELIVERED')?.count ?? 0;
+    return Math.round((delivered / this.stats.totalOrders) * 100);
   }
 
   get insights(): Insight[] {
