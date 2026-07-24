@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -123,6 +123,7 @@ export class ForgotPasswordComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private toast: ToastService,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({ email: ['', [Validators.required, Validators.email]] });
   }
@@ -139,6 +140,7 @@ export class ForgotPasswordComponent {
         catchError(err => {
           this.loading = false;
           this.error = 'Erreur lors de l\'envoi';
+          this.cdr.detectChanges();
           return of(null);
         })
       )
@@ -146,6 +148,7 @@ export class ForgotPasswordComponent {
         if (res === null) return;
         this.loading = false;
         this.success = true;
+        this.cdr.detectChanges();
         this.toast.success('Email envoyé si le compte existe');
       });
   }

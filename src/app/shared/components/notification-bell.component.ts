@@ -162,9 +162,14 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   }
 
   private _extractOrderNumber(n: NotificationResponse): string | null {
+    // Check for "N° 12345" or "N° CMD-12345"
+    const numMatch = n.subject.match(/N°\s*([A-Z0-9-]+)/i);
+    if (numMatch) return numMatch[1];
+
     const m = n.subject.match(/\b(?:CMD|ORD)[-\s][A-Z0-9-]+\b/i);
     if (m) return m[0].replace(/\s+/, '-');
-    return n.subject.match(/(\b[A-Z0-9][A-Z0-9-]{3,}\b)$/i)?.[1] ?? null;
+    
+    return n.subject.match(/(\b[A-Z0-9][A-Z0-9-]{3,}\b)/i)?.[1] ?? null;
   }
 
   markAsRead(n: NotificationResponse): void {
@@ -191,6 +196,9 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
       switch (n.type) {
         case NotificationType.ORDER_CREATED:
         case NotificationType.ORDER_CANCELLED:
+        case NotificationType.PAYMENT_CONFIRMED:
+        case NotificationType.PAYMENT_FAILED:
+        case NotificationType.PAYMENT_REFUNDED:
           return isAdmin ? '/admin/orders' : isManager ? '/manager/orders' : '/orders';
         case NotificationType.ORDER_CONFIRMED:
         case NotificationType.ORDER_STATUS_CHANGED:

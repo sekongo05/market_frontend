@@ -61,6 +61,9 @@ export enum NotificationType {
   WELCOME              = 'WELCOME',
   STOCK_LOW            = 'STOCK_LOW',
   STOCK_ALERT          = 'STOCK_ALERT',
+  PAYMENT_CONFIRMED    = 'PAYMENT_CONFIRMED',
+  PAYMENT_FAILED       = 'PAYMENT_FAILED',
+  PAYMENT_REFUNDED     = 'PAYMENT_REFUNDED',
 }
 
 export enum StockMovementType {

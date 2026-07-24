@@ -91,7 +91,10 @@ export class OrdersComponent implements OnInit, OnDestroy {
       });
     this.wsService.notification$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.loadMyReturns());
+      .subscribe(() => {
+        this.loadOrders(this.currentPage);
+        this.loadMyReturns();
+      });
   }
 
   private handlePaymentReturn(): void {

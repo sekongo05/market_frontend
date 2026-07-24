@@ -9,17 +9,19 @@ import { ProductResponse } from '../../../../core/models/product.models';
 import { CashFlowResponse } from '../../../../core/models/expense.models';
 import { PinGateComponent } from './pin-gate.component';
 import { PinSetupComponent } from './pin-setup.component';
+import { PinResetComponent } from './pin-reset.component';
 
 @Component({
   selector: 'app-admin-finance',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, PinGateComponent, PinSetupComponent],
+  imports: [CommonModule, RouterLink, PinGateComponent, PinSetupComponent, PinResetComponent],
   templateUrl: './admin-finance.component.html',
 })
 export class AdminFinanceComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   view = signal<'loading' | 'setup' | 'pin' | 'dashboard'>('loading');
+  showResetModal = signal(false);
   activeTab = signal<'report' | 'margins' | 'stock' | 'cashflow'>('report');
 
   // Rapport financier

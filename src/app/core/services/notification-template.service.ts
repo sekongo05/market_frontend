@@ -155,6 +155,36 @@ export class NotificationTemplateService {
       borderClass: 'border-amber-200',
       bannerClass: 'bg-amber-50',
     },
+
+    [NotificationType.PAYMENT_CONFIRMED]: {
+      label: 'Paiement confirmé',
+      iconPath: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+      iconViewBox: '0 0 24 24',
+      colorClass: 'text-emerald-700',
+      bgClass: 'bg-emerald-100',
+      borderClass: 'border-emerald-200',
+      bannerClass: 'bg-emerald-50',
+    },
+
+    [NotificationType.PAYMENT_FAILED]: {
+      label: 'Échec du paiement',
+      iconPath: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+      iconViewBox: '0 0 24 24',
+      colorClass: 'text-red-700',
+      bgClass: 'bg-red-100',
+      borderClass: 'border-red-200',
+      bannerClass: 'bg-red-50',
+    },
+
+    [NotificationType.PAYMENT_REFUNDED]: {
+      label: 'Paiement remboursé',
+      iconPath: 'M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6',
+      iconViewBox: '0 0 24 24',
+      colorClass: 'text-violet-700',
+      bgClass: 'bg-violet-100',
+      borderClass: 'border-violet-200',
+      bannerClass: 'bg-violet-50',
+    },
   };
 
   get(type: NotificationType): NotifTemplate {

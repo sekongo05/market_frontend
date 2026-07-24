@@ -125,6 +125,14 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  updateCurrentUser(data: Partial<CurrentUser>): void {
+    const current = this.getCurrentUser();
+    if (current) {
+      const updated = { ...current, ...data };
+      this.setCurrentUser(updated as AuthResponse);
+    }
+  }
+
   private _getTokenPayload(token: string): Record<string, unknown> | null {
     try {
       const parts = token.split('.');
@@ -142,7 +150,12 @@ export class AuthService {
       const refreshToken = this.getRefreshToken();
       if (refreshToken) {
         this.refreshToken(refreshToken).subscribe({
-          error: () => this.logout(),
+          error: (err) => {
+            // Uniquement si erreur client (4xx). Ne pas déconnecter si erreur réseau (0)
+            if (err && err.status >= 400 && err.status < 500) {
+              this.logout();
+            }
+          }
         });
       }
     }, this.PROACTIVE_REFRESH_MS);
@@ -175,34 +188,36 @@ export class AuthService {
 
   private loadUserFromToken(): void {
     const token = this.getToken();
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
-    if (this.isTokenExpired()) {
-      const refreshToken = this.getRefreshToken();
-      if (refreshToken) {
-        this.refreshToken(refreshToken).subscribe({
-          error: () => this.logout(),
-        });
-      } else {
-        this.logout();
-      }
-      return;
-    }
-
+    // Toujours charger l'utilisateur depuis le cache local pour éviter que l'UI ne clignote
     const userJson = this._storage('get', 'current_user');
     if (userJson) {
       try {
         const user: AuthResponse = JSON.parse(userJson);
         this.currentUserSubject.next(user as CurrentUser);
         this._connectWs(user);
-        this._scheduleProactiveRefresh();
-        return;
       } catch (e) {
         console.error('Failed to parse stored user', e);
         this._storage('remove', 'current_user');
       }
+    }
+
+    if (this.isTokenExpired()) {
+      const refreshToken = this.getRefreshToken();
+      if (refreshToken) {
+        this.refreshToken(refreshToken).subscribe({
+          error: (err) => {
+            if (err && err.status >= 400 && err.status < 500) {
+              this.logout();
+            }
+          }
+        });
+      } else {
+        this.logout();
+      }
+    } else {
+      this._scheduleProactiveRefresh();
     }
   }
 

@@ -86,7 +86,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.clearMessages();
     this.userService.updateProfile(data).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
-        if (r.success) { this.user = r.data; this._showSuccess('Profil mis à jour avec succès'); }
+        if (r.success) { 
+          this.user = r.data; 
+          this.authService.updateCurrentUser({ nom: r.data.nom, prenom: r.data.prenom, phone: r.data.phone });
+          this._showSuccess('Profil mis à jour avec succès'); 
+        }
         else { this._showError('Une erreur est survenue'); }
         this.saving = false;
         this.cdr.detectChanges();

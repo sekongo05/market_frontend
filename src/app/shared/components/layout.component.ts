@@ -14,8 +14,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterModule, CommonModule, NavbarComponent, ToastComponent, SdmLogoComponent],
   templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./layout.component.css']
 })
 export class LayoutComponent implements OnInit, OnDestroy {
   navigating = false;

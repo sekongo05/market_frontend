@@ -105,6 +105,20 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
       this.loadStatusCounts();
       this.cdr.markForCheck();
     });
+
+    this.wsService.notification$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.loadAllOrders(this.ordersPage);
+      this.loadStatusCounts();
+      this.cdr.markForCheck();
+    });
+
+    this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe((event) => {
+      if (event.module === 'orders' || event.module === 'finance') {
+        this.loadAllOrders(this.ordersPage);
+        this.loadStatusCounts();
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   ngOnDestroy(): void {

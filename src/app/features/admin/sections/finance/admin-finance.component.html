@@ -21,15 +21,23 @@
             <h1 class="text-2xl font-black theme-text">Finance</h1>
             <p class="text-sm theme-muted mt-0.5">Données confidentielles</p>
           </div>
-          <button (click)="lock()"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold theme-muted border theme-border hover:text-red-400 hover:border-red-400/30 transition-colors active:scale-[0.97]">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
-            Verrouiller
-          </button>
-        </div>
+          <div class="flex items-center gap-2">
+            <button (click)="showResetModal.set(true)"
+                    class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold theme-muted border theme-border hover:text-gold hover:border-gold/30 transition-colors active:scale-[0.97]">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              Changer PIN
+            </button>
+            <button (click)="lock()"
+                    class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold theme-muted border theme-border hover:text-red-400 hover:border-red-400/30 transition-colors active:scale-[0.97]">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              Verrouiller
+            </button>
+          </div>
 
         <!-- Onglets -->
         <div class="flex gap-1 p-1 rounded-2xl bg-black/[.06] border theme-border mb-6 flex-wrap">
@@ -645,6 +653,9 @@
         }
 
       </div>
+      @if (showResetModal()) { 
+        <app-pin-reset (cancel)="showResetModal.set(false)" (resetDone)="showResetModal.set(false)"/> 
+      }
     }
 
   }

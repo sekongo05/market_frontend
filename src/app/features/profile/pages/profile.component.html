@@ -68,9 +68,9 @@
     }
 
     <!-- Tabs -->
-    <div class="flex items-center gap-1 mb-5 p-1 bg-white rounded-xl shadow-sm" role="tablist">
+    <div class="flex items-center gap-1 mb-5 p-1 bg-white rounded-xl shadow-sm overflow-x-auto scrollbar-none" role="tablist">
       <button (click)="activeTab = 'profile'; clearMessages()" role="tab"
-        class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200"
+        class="flex-1 min-w-[100px] flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200"
         [class]="activeTab === 'profile' ? 'text-black' : 'theme-muted hover:text-gold'"
         [style]="activeTab === 'profile' ? 'background: linear-gradient(135deg, #f5cc42, #d4af37);' : ''">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +79,7 @@
         Profil
       </button>
       <button (click)="activeTab = 'security'; clearMessages()" role="tab"
-        class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200"
+        class="flex-1 min-w-[100px] flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200"
         [class]="activeTab === 'security' ? 'text-black' : 'theme-muted hover:text-gold'"
         [style]="activeTab === 'security' ? 'background: linear-gradient(135deg, #f5cc42, #d4af37);' : ''">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +88,7 @@
         Sécurité
       </button>
       <button (click)="activeTab = 'addresses'; clearMessages(); loadAddresses()" role="tab"
-        class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200"
+        class="flex-1 min-w-[100px] flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200"
         [class]="activeTab === 'addresses' ? 'text-black' : 'theme-muted hover:text-gold'"
         [style]="activeTab === 'addresses' ? 'background: linear-gradient(135deg, #f5cc42, #d4af37);' : ''">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

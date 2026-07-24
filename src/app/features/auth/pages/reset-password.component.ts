@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -69,6 +69,7 @@ import { SdmLogoComponent } from '../../../shared/components/logo.component';
                   <p class="mt-1.5 text-xs font-medium" style="color:#f87171;">
                     @if (form.controls['newPassword'].errors['required']) { Mot de passe requis }
                     @else if (form.controls['newPassword'].errors['minlength']) { Minimum 8 caractères }
+                    @else if (form.controls['newPassword'].errors['pattern']) { 1 majuscule et 1 chiffre requis }
                   </p>
                 }
               </div>
@@ -129,9 +130,10 @@ export class ResetPasswordComponent implements OnInit {
     private toast: ToastService,
     private route: ActivatedRoute,
     private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
-      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      newPassword: ['', [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[A-Z])(?=.*\\d).+')]],
       confirmPassword: ['', [Validators.required]],
     }, { validators: this.passwordMatchValidator });
   }
@@ -159,11 +161,13 @@ export class ResetPasswordComponent implements OnInit {
       next: () => {
         this.loading = false;
         this.success = true;
+        this.cdr.detectChanges();
         this.toast.success('Mot de passe réinitialisé');
       },
       error: (err) => {
         this.loading = false;
         this.error = err?.error?.message || 'Erreur lors de la réinitialisation';
+        this.cdr.detectChanges();
       },
     });
   }
