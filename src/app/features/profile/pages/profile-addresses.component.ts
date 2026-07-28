@@ -101,7 +101,7 @@ import { Address, AddressRequest } from '../../../core/models/user.models';
         <div class="bg-white rounded-xl border theme-border overflow-hidden mt-4">
           <div class="px-5 pt-5 pb-4 border-b theme-border">
             <div class="flex items-center justify-between">
-              <h3 class="text-base font-bold theme-text">{{ editing ? 'Modifier l\'adresse' : 'Nouvelle adresse' }}</h3>
+              <h3 class="text-base font-bold theme-text">{{ editing ? "Modifier l'adresse" : 'Nouvelle adresse' }}</h3>
               <button (click)="closeForm()" class="w-8 h-8 rounded-lg flex items-center justify-center theme-muted hover:text-gold hover:bg-gold/8 transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
