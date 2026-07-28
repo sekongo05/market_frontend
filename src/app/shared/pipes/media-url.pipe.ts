@@ -10,7 +10,13 @@ export class MediaUrlPipe implements PipeTransform {
     if (!url) return fallback;
     if (url.startsWith('http://') || url.startsWith('https://')) {
       if (w && CLOUDINARY_PATTERN.test(url)) {
-        return url.replace('/image/upload/', `/image/upload/w_${w},c_fill,q_auto,f_auto/`);
+        const uploadPath = '/image/upload/';
+        const idx = url.indexOf(uploadPath);
+        if (idx === -1) return url;
+        // Si des transformations sont déjà présentes (f_auto, q_auto, w_XXX…), ne pas les ré-appliquer
+        const afterUpload = url.substring(idx + uploadPath.length);
+        if (/^[a-z]_/.test(afterUpload)) return url;
+        return url.replace(uploadPath, `${uploadPath}w_${w},c_fill,q_auto,f_auto/`);
       }
       return url;
     }

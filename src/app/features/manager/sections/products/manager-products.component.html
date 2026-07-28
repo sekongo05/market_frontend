@@ -99,14 +99,14 @@
       <div class="block md:hidden">
         @for (product of products; track product.id) {
           <div class="p-4 border-b theme-border last:border-0 flex gap-3" [class.bg-red-500\/5]="confirmDeleteId === product.id">
-            <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+            <img [src]="(product.thumbnailUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
                  class="w-14 h-14 rounded-xl object-cover flex-shrink-0 ring-1 ring-white/10"
                  (error)="$any($event.target).src='https://placehold.co/80x80/1a1a1a/d4af37?text=CL'"/>
             <div class="flex-1 min-w-0">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                  <p class="font-semibold theme-text text-sm leading-snug line-clamp-1">{{ product.name }}</p>
-                  <span class="px-2 py-0.5 rounded-lg text-xs font-semibold bg-gold/10 text-gold mt-0.5 inline-block">{{ product.category.name }}</span>
+                   <p class="font-semibold theme-text text-sm leading-snug line-clamp-1">{{ product.name }}</p>
+                  <span class="px-2 py-0.5 rounded-lg text-xs font-semibold bg-gold/10 text-gold mt-0.5 inline-block">{{ product.categoryName }}</span>
                 </div>
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold flex-shrink-0" [class]="stockClass(product.stock)">{{ stockLabel(product.stock) }}</span>
               </div>
@@ -168,19 +168,18 @@
                 <!-- Produit -->
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
-                    <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+                    <img [src]="(product.thumbnailUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
                          class="w-10 h-10 rounded-xl object-cover flex-shrink-0 ring-1 ring-white/10"
                          (error)="$any($event.target).src='https://placehold.co/80x80/1a1a1a/d4af37?text=CL'"/>
                     <div class="min-w-0">
                       <p class="font-semibold theme-text truncate max-w-[180px]">{{ product.name }}</p>
-                      <p class="text-xs theme-muted truncate max-w-[180px]">{{ product.description | slice:0:55 }}…</p>
                     </div>
                   </div>
                 </td>
 
                 <!-- Catégorie -->
                 <td class="px-4 py-4 hidden md:table-cell">
-                  <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-gold/10 text-gold">{{ product.category.name }}</span>
+                  <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-gold/10 text-gold">{{ product.categoryName }}</span>
                 </td>
 
                 <!-- Prix -->

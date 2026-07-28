@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { ApiResponse, PageResponse } from '../models/common.models';
 import {
   ProductResponse,
+  ProductSummaryResponse,
   GetProductsParams,
 } from '../models/product.models';
 import { ApiService } from './api.service';
@@ -13,7 +14,7 @@ import { ApiService } from './api.service';
 export class ProductService {
   constructor(private apiService: ApiService) {}
 
-  getProducts(params?: GetProductsParams): Observable<ApiResponse<PageResponse<ProductResponse>>> {
+  getProducts(params?: GetProductsParams): Observable<ApiResponse<PageResponse<ProductSummaryResponse>>> {
     return this.apiService.get('/products', params);
   }
 
@@ -48,11 +49,11 @@ export class ProductService {
     return this.apiService.patch(`/products/${id}/toggle-featured`);
   }
 
-  getBestsellers(size = 8): Observable<ApiResponse<ProductResponse[]>> {
+  getBestsellers(size = 8): Observable<ApiResponse<ProductSummaryResponse[]>> {
     return this.apiService.get(`/products/bestsellers?size=${size}`);
   }
 
-  getFeaturedProducts(size = 6): Observable<ApiResponse<ProductResponse[]>> {
+  getFeaturedProducts(size = 6): Observable<ApiResponse<ProductSummaryResponse[]>> {
     return this.apiService.get(`/products/featured?size=${size}`);
   }
 

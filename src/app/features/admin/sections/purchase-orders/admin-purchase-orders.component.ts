@@ -20,7 +20,7 @@ import {
   PurchaseOrderStatus,
 } from '../../../../core/models/purchase-order.models';
 import { SupplierResponse } from '../../../../core/models/supplier.models';
-import { ProductResponse } from '../../../../core/models/product.models';
+import { ProductSummaryResponse } from '../../../../core/models/product.models';
 
 type DrawerMode = 'create' | 'detail' | 'receive' | null;
 
@@ -76,7 +76,7 @@ export class AdminPurchaseOrdersComponent implements OnInit, OnDestroy {
 
   // ── Formulaire création ───────────────────────────────────────────
   suppliers = signal<SupplierResponse[]>([]);
-  products  = signal<ProductResponse[]>([]);
+  products  = signal<ProductSummaryResponse[]>([]);
   productSearch = '';
 
   form: PurchaseOrderRequest = this.emptyForm();
@@ -185,17 +185,17 @@ export class AdminPurchaseOrdersComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  get filteredProducts(): ProductResponse[] {
+  get filteredProducts(): ProductSummaryResponse[] {
     const q = this.productSearch.toLowerCase();
     return q
       ? this.products().filter(p => p.name.toLowerCase().includes(q) || p.slug.toLowerCase().includes(q))
       : this.products().slice(0, 20);
   }
 
-  selectProduct(p: ProductResponse): void {
+  selectProduct(p: ProductSummaryResponse): void {
     this.newItem.productId   = p.id;
     this.newItem.productName = p.name;
-    this.newItem.unitPurchasePrice = p.costPrice ?? undefined;
+    this.newItem.unitPurchasePrice = undefined;
     this.productSearch = p.name;
     this.addingProduct = false;
     this.cdr.markForCheck();

@@ -9,10 +9,20 @@ const browserDistFolder = join(serverDistFolder, '../browser');
 
 const app = new AngularNodeAppEngine();
 
+const NO_CACHE_PATHS = ['/admin', '/manager', '/auth', '/checkout', '/profile', '/orders'];
+
+function setCacheControl(path: string, response: Response): void {
+  const shouldCache = !NO_CACHE_PATHS.some(p => path.startsWith(p));
+  if (shouldCache) {
+    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+  }
+}
+
 const server = createServer(async (req, res) => {
   try {
     const response = await app.handle(req, { staticFilesRoot: browserDistFolder });
     if (response) {
+      setCacheControl(req.url?.split('?')[0] ?? '', response);
       writeResponseToNodeResponse(response, res);
     } else {
       res.statusCode = 404;
@@ -35,6 +45,7 @@ if (isMainModule(import.meta.url)) {
 export const reqHandler = createNodeRequestHandler(async (req, res, next) => {
   const response = await app.handle(req, { staticFilesRoot: browserDistFolder });
   if (response) {
+    setCacheControl(req.url?.split('?')[0] ?? '', response);
     writeResponseToNodeResponse(response, res);
   } else {
     next();

@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FinanceService, FinanceDashboardResponse, StockValueResponse } from '../../../../core/services/finance.service';
 import { ProductService } from '../../../../core/services/product.service';
-import { ProductResponse } from '../../../../core/models/product.models';
+import { ProductSummaryResponse } from '../../../../core/models/product.models';
 import { CashFlowResponse } from '../../../../core/models/expense.models';
 import { PinGateComponent } from './pin-gate.component';
 import { PinSetupComponent } from './pin-setup.component';
@@ -36,8 +36,8 @@ export class AdminFinanceComponent implements OnInit, OnDestroy {
     { days: 0,   label: 'Tout'     },
   ];
 
-  // Marges produits
-  products = signal<ProductResponse[]>([]);
+  // Produits (vue synthétique — marges disponibles dans le rapport P&L)
+  products = signal<ProductSummaryResponse[]>([]);
   productsLoading = signal(false);
 
   // Stock
@@ -108,36 +108,6 @@ export class AdminFinanceComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  // ── Marges produits ───────────────────────────────────────────────
-
-  get productsWithMargin(): ProductResponse[] {
-    return this.products().filter(p => p.marginPercent != null);
-  }
-
-  get productsWithoutCost(): ProductResponse[] {
-    return this.products().filter(p => p.costPrice == null);
-  }
-
-  get avgMargin(): number {
-    const list = this.productsWithMargin;
-    if (!list.length) return 0;
-    return Math.round(list.reduce((acc, p) => acc + (p.marginPercent ?? 0), 0) / list.length * 10) / 10;
-  }
-
-  get topMarginProducts(): ProductResponse[] {
-    return [...this.productsWithMargin].sort((a, b) => (b.marginPercent ?? 0) - (a.marginPercent ?? 0)).slice(0, 5);
-  }
-
-  get bottomMarginProducts(): ProductResponse[] {
-    return [...this.productsWithMargin].sort((a, b) => (a.marginPercent ?? 0) - (b.marginPercent ?? 0)).slice(0, 5);
-  }
-
-  marginColor(m: number): string {
-    if (m >= 50) return 'text-emerald-400';
-    if (m >= 30) return 'text-yellow-400';
-    return 'text-red-400';
-  }
-
   // ── Rapport financier helpers ─────────────────────────────────────
 
   get maxRevenue(): number {
@@ -164,6 +134,12 @@ export class AdminFinanceComponent implements OnInit, OnDestroy {
 
   formatAmount(v: number): string {
     return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(v));
+  }
+
+  marginColor(m: number): string {
+    if (m >= 50) return 'text-emerald-400';
+    if (m >= 30) return 'text-yellow-400';
+    return 'text-red-400';
   }
 
   // ── Loaders ───────────────────────────────────────────────────────

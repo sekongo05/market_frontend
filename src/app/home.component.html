@@ -456,7 +456,7 @@
         class="card-appear group flex-shrink-0 w-[52vw] sm:w-auto cursor-pointer block snap-start"
         [style.animation-delay.ms]="idx * 75">
         <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-          <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
             class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
             (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -485,7 +485,7 @@
         </div>
         <p
           class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">
-          {{ product.category.name }}</p>
+          {{ product.categoryName }}</p>
         <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
         <div class="flex items-baseline gap-1.5">
           @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
@@ -577,7 +577,7 @@
         class="card-appear group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block snap-start"
         [style.animation-delay.ms]="idx * 80">
         <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-          <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
             class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
             (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -600,7 +600,7 @@
         </div>
         <p
           class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">
-          {{ product.category.name }}</p>
+          {{ product.categoryName }}</p>
         <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
         <div class="flex items-baseline gap-1.5">
           @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
@@ -624,7 +624,7 @@
         class="card-appear group cursor-pointer flex items-center gap-3 p-3 border transition-colors hover:border-gold/25"
         style="border-color:rgba(212,175,55,0.1);" [style.animation-delay.ms]="(idx + 4) * 80">
         <div class="flex-shrink-0 w-14 h-14 overflow-hidden relative">
-          <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+          <img [src]="(product.thumbnailUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             (error)="$any($event.target).src='https://placehold.co/56x56/0a0a0a/d4af37?text=SDM'" />
           <span
@@ -684,7 +684,7 @@
           <div
             class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-1.5 border transition-colors duration-300 rounded-xl"
             style="aspect-ratio:3/4;border-color:rgba(212,175,55,0.12);">
-            <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
               class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
               (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'" />
 
@@ -786,7 +786,7 @@
         class="card-appear group flex-shrink-0 w-[70vw] sm:w-auto cursor-pointer block snap-start"
         [style.animation-delay.ms]="idx * 80">
         <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-          <img [src]="product.imageUrl | mediaUrl" [alt]="product.name" loading="lazy"
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
             class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700"
             (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/f97316?text=SDM'" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -796,7 +796,7 @@
           }
         </div>
         <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-orange-500/60">{{
-          product.category.name }}</p>
+          product.categoryName }}</p>
         <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-1">{{ product.name }}</p>
         <div class="flex items-baseline gap-1.5">
           @if (product.salePrice) {

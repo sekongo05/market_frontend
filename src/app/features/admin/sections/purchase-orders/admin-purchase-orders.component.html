@@ -221,9 +221,6 @@
                       <button (click)="selectProduct(p)"
                               class="w-full text-left px-4 py-2.5 text-sm theme-text hover:bg-gold/8 flex items-center justify-between gap-2">
                         <span class="truncate">{{ p.name }}</span>
-                        @if (p.costPrice) {
-                          <span class="text-[10px] text-gold flex-shrink-0">CMUP {{ formatAmount(p.costPrice) }}</span>
-                        }
                       </button>
                     }
                   </div>

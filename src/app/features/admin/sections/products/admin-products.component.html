@@ -150,7 +150,7 @@
                   <div class="flex items-center gap-3">
                     <div class="relative w-14 h-14 rounded-xl bg-black/20 flex-shrink-0 overflow-hidden border theme-border">
                       @if (product.imageUrl) {
-                        <img [src]="product.imageUrl" [alt]="product.name" loading="lazy" class="w-full h-full object-cover"/>
+                        <img [src]="product.thumbnailUrl || product.imageUrl" [alt]="product.name" loading="lazy" class="w-full h-full object-cover"/>
                       } @else {
                         <div class="w-full h-full flex items-center justify-center">
                           <svg class="w-6 h-6 text-gold/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,15 +165,8 @@
                     </div>
                     <div class="min-w-0">
                       <p class="font-bold theme-text truncate text-sm group-hover:text-gold transition-colors">{{ product.name }}</p>
-                      @if (product.variants && product.variants.length > 0) {
-                        <div class="flex items-center gap-1 mt-1">
-                          <div class="flex -space-x-1">
-                            @for (v of product.variants.slice(0,3); track v.id) {
-                              <span class="w-2.5 h-2.5 rounded-full border border-zinc-800 flex-shrink-0" [style.background-color]="v.colorHex"></span>
-                            }
-                          </div>
-                          <span class="text-[10px] theme-muted ml-1">{{ product.variants.length }} variante(s)</span>
-                        </div>
+                      @if (product.variantCount > 0) {
+                        <span class="text-[10px] theme-muted ml-1">{{ product.variantCount }} variante(s)</span>
                       }
                     </div>
                   </div>
@@ -181,7 +174,7 @@
 
                 <!-- 2. CATÉGORIE -->
                 <td class="p-4 text-xs theme-muted">
-                  <span class="px-2 py-1 bg-black/10 rounded-md whitespace-nowrap">{{ product.category.name }}</span><br/>
+                  <span class="px-2 py-1 bg-black/10 rounded-md whitespace-nowrap">{{ product.categoryName }}</span><br/>
                   <span class="text-[10px] mt-1 inline-block opacity-60 uppercase">{{ product.gender }}</span>
                 </td>
 
@@ -232,14 +225,9 @@
                     @if (product.discountPercent && product.discountPercent > 0) {
                       <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-orange-500/20 text-orange-400">-{{ product.discountPercent }}%</span>
                     }
-                    @if (product.marginPercent !== null && product.marginPercent !== undefined) {
-                      <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full border"
-                            [class]="product.marginPercent >= 50 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
-                                     product.marginPercent >= 30 ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' :
-                                                                   'bg-red-500/10 border-red-500/30 text-red-400'">
-                        Marge {{ product.marginPercent | number:'1.0-0' }}%
-                      </span>
-                    }
+                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full border border-gold/30 text-gold">
+                      Marge —
+                    </span>
                   </div>
                 </td>
 

@@ -18,7 +18,7 @@ import { ReviewService } from '../../../core/services/review.service';
 import { WhatsappService } from '../../../core/services/whatsapp.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { ProductMediaItem, ProductResponse, ProductVariant, ProductAttributeResponse, ProductAttributeValueResponse } from '../../../core/models/product.models';
+import { ProductMediaItem, ProductResponse, ProductSummaryResponse, ProductVariant, ProductAttributeResponse, ProductAttributeValueResponse } from '../../../core/models/product.models';
 import { ReviewResponse, ProductRatingResponse } from '../../../core/models/review.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
@@ -48,7 +48,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   zoomed = false;
 
   // Related products (from same category)
-  relatedProducts: ProductResponse[] = [];
+  relatedProducts: ProductSummaryResponse[] = [];
 
   // Reviews
   reviews: ReviewResponse[] = [];
@@ -569,7 +569,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         if (res.success) {
           const all = (res.data as any)?.content ?? [];
           this.relatedProducts = all
-            .filter((p: ProductResponse) => p.id !== this.product!.id)
+            .filter((p: ProductSummaryResponse) => p.id !== this.product!.id)
             .slice(0, 4);
         }
         this.cdr.detectChanges();
@@ -578,7 +578,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
-  addRelatedToCart(product: ProductResponse): void {
+  addRelatedToCart(product: ProductSummaryResponse): void {
     this.cartService.addToCart({
       productId: product.id,
       productName: product.name,

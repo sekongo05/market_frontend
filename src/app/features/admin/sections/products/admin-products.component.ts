@@ -12,7 +12,7 @@ import { SupplierService } from '../../../../core/services/supplier.service';
 import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
-import { ProductResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender, SortOption, ProductAttributeResponse } from '../../../../core/models/product.models';
+import { ProductResponse, ProductSummaryResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender, SortOption, ProductAttributeResponse } from '../../../../core/models/product.models';
 import { CategoryResponse } from '../../../../core/models/category.models';
 import { PageResponse } from '../../../../core/models/common.models';
 import { SupplierResponse, ProductSupplierResponse } from '../../../../core/models/supplier.models';
@@ -26,7 +26,7 @@ import { stockClass } from '../../shared/admin-status.helpers';
   templateUrl: './admin-products.component.html',
 })
 export class AdminProductsComponent implements OnInit, OnDestroy {
-  products: ProductResponse[] = [];
+  products: ProductSummaryResponse[] = [];
   productsLoading = false;
   productsPage = 0;
   productsTotalPages = 0;
@@ -214,11 +214,11 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   applyProductFilter(): void { this.loadProducts(0); }
 
-  isNewProduct(p: ProductResponse): boolean {
+  isNewProduct(p: ProductSummaryResponse): boolean {
     return (Date.now() - new Date(p.createdAt).getTime()) / 86_400_000 < 7;
   }
 
-  isLowStock(p: ProductResponse): boolean {
+  isLowStock(p: ProductSummaryResponse): boolean {
     return p.stock > 0 && p.stock <= 3;
   }
   get isStep1Valid(): boolean {
@@ -267,7 +267,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.productService.getProducts(params).subscribe({
       next: (r) => {
         if (r.success) {
-          const pg = r.data as PageResponse<ProductResponse>;
+          const pg = r.data as PageResponse<ProductSummaryResponse>;
           this.products             = pg.content;
           this.productsTotalPages   = pg.totalPages;
           this.productsTotalElements = pg.totalElements;
@@ -297,23 +297,36 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
   }
 
-  openEditDrawer(product: ProductResponse): void {
-    this.editingProduct = product;
-    this._resetDrawer();
-    this.imagePreview = product.imageUrl || null;
-    this.productMedia = product.media ?? [];
-    this.productVariants = product.variants ?? [];
-    this.productAttributes = product.attributes ?? [];
-    this.initProductForm(product);
-    this.drawerOpen = true;
-    this.scrollLock.lock();
-    this.loadMedia(product.id);
-    this.loadVariants(product.id);
-    this.loadAttributes(product.id);
-    this.loadProductSuppliers(product.id);
-    this.loadAllSuppliers();
-    this.cdr.markForCheck();
-    setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
+  openEditDrawer(product: ProductSummaryResponse): void {
+    this.drawerLoading = true;
+    this.productService.getProductBySlug(product.slug).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (r) => {
+        if (r.success && r.data) {
+          this.editingProduct = r.data;
+          this._resetDrawer();
+          this.imagePreview = r.data.imageUrl || null;
+          this.productMedia = r.data.media ?? [];
+          this.productVariants = r.data.variants ?? [];
+          this.productAttributes = r.data.attributes ?? [];
+          this.initProductForm(r.data);
+          this.drawerOpen = true;
+          this.scrollLock.lock();
+          this.loadMedia(r.data.id);
+          this.loadVariants(r.data.id);
+          this.loadAttributes(r.data.id);
+          this.loadProductSuppliers(r.data.id);
+          this.loadAllSuppliers();
+        }
+        this.drawerLoading = false;
+        this.cdr.markForCheck();
+        setTimeout(() => document.getElementById('admin-drawer-panel')?.scrollTo(0, 0), 0);
+      },
+      error: () => {
+        this.drawerLoading = false;
+        this.drawerError = 'Impossible de charger le produit';
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   setDrawerTab(tab: 'info' | 'media' | 'variants'): void {
@@ -480,7 +493,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  startEditStock(product: ProductResponse): void {
+  startEditStock(product: ProductSummaryResponse): void {
     this.confirmDeleteId = null;
     this.editingStockId = product.id;
     this.editingStockValue = product.stock;
@@ -492,18 +505,16 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  confirmEditStock(product: ProductResponse): void {
+  confirmEditStock(product: ProductSummaryResponse): void {
     const newStock = Math.max(0, Math.round(+this.editingStockValue || 0));
     this.editingStockId = null;
     if (newStock === product.stock) { this.cdr.markForCheck(); return; }
     this.stockSavingId = product.id;
     const fd = new FormData();
     fd.append('name', product.name);
-    if (product.description) fd.append('description', product.description);
     fd.append('price', product.price.toString());
     fd.append('stock', newStock.toString());
     fd.append('gender', product.gender);
-    if (product.category?.id) fd.append('categoryId', product.category.id.toString());
     const apply = () => {
       const idx = this.products.findIndex(p => p.id === product.id);
       if (idx !== -1) { this.products = [...this.products]; this.products[idx] = { ...this.products[idx], stock: newStock }; }
@@ -519,7 +530,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   startDelete(id: number): void { this.editingStockId = null; this.confirmDeleteId = id; this.cdr.markForCheck(); }
   cancelDelete(): void { this.confirmDeleteId = null; this.cdr.markForCheck(); }
 
-  doDelete(product: ProductResponse): void {
+  doDelete(product: ProductSummaryResponse): void {
     this.confirmDeleteId = null;
     this.productService.deleteProduct(product.id).subscribe({
       next: () => { this.loadProducts(this.productsPage); this.toast.show(`"${product.name}" supprimé`); this.cdr.markForCheck(); },
@@ -527,13 +538,13 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  startEditDiscount(product: ProductResponse): void {
+  startEditDiscount(product: ProductSummaryResponse): void {
     this.discountEditingId = product.id;
     this.discountEditValue = product.discountPercent ?? 0;
     this.cdr.markForCheck();
   }
 
-  confirmEditDiscount(product: ProductResponse): void {
+  confirmEditDiscount(product: ProductSummaryResponse): void {
     const pct = Math.max(0, Math.min(100, Math.round(+this.discountEditValue || 0)));
     this.discountEditingId = null;
     if ((product.discountPercent ?? 0) === pct) return;
@@ -555,13 +566,13 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   cancelEditDiscount(): void { this.discountEditingId = null; this.cdr.markForCheck(); }
 
-  toggleProductActive(product: ProductResponse): void {
+  toggleProductActive(product: ProductSummaryResponse): void {
     this.toggleActivatingId = product.id;
     this.productService.toggleActive(product.id).subscribe({
       next: (r) => {
         if (r.success) {
           const idx = this.products.findIndex(p => p.id === product.id);
-          if (idx !== -1) { this.products = [...this.products]; this.products[idx] = r.data; }
+          if (idx !== -1) { this.products = [...this.products]; this.products[idx] = { ...this.products[idx], active: r.data.active }; }
           this.toast.show(`"${product.name}" ${r.data.active ? 'activé' : 'désactivé'}`);
         }
         this.toggleActivatingId = null;
@@ -571,13 +582,13 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleProductFeatured(product: ProductResponse): void {
+  toggleProductFeatured(product: ProductSummaryResponse): void {
     this.toggleFeaturedId = product.id;
     this.productService.toggleFeatured(product.id).subscribe({
       next: (r) => {
         if (r.success) {
           const idx = this.products.findIndex(p => p.id === product.id);
-          if (idx !== -1) { this.products = [...this.products]; this.products[idx] = r.data; }
+          if (idx !== -1) { this.products = [...this.products]; this.products[idx] = { ...this.products[idx], featured: r.data.featured }; }
           this.toast.show(`"${product.name}" ${r.data.featured ? 'en vedette ⭐' : 'retiré des vedettes'}`);
         }
         this.toggleFeaturedId = null;
@@ -587,24 +598,22 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  startEditPrice(product: ProductResponse): void {
+  startEditPrice(product: ProductSummaryResponse): void {
     this.priceEditingId = product.id;
     this.priceEditValue = product.price;
     this.cdr.markForCheck();
   }
 
-  confirmEditPrice(product: ProductResponse): void {
+  confirmEditPrice(product: ProductSummaryResponse): void {
     const newPrice = Math.max(1, Math.round(+this.priceEditValue || 1));
     this.priceEditingId = null;
     if (newPrice === product.price) { this.cdr.markForCheck(); return; }
     this.priceSavingId = product.id;
     const fd = new FormData();
     fd.append('name', product.name);
-    if (product.description) fd.append('description', product.description);
     fd.append('price', newPrice.toString());
     fd.append('stock', product.stock.toString());
     fd.append('gender', product.gender);
-    if (product.category?.id) fd.append('categoryId', product.category.id.toString());
     this.productService.updateProduct(product.id, fd).subscribe({
       next: (r) => {
         if (r.success) {

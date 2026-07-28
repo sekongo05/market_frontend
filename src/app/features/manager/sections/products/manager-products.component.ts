@@ -13,7 +13,7 @@ import { ProductVariantService, ProductVariantRequest } from '../../../../core/s
 import { WebSocketService } from '../../../../core/services/websocket.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
 import { ManagerToastService } from '../../shared/manager-toast.service';
-import { ProductResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender, ProductAttributeResponse } from '../../../../core/models/product.models';
+import { ProductResponse, ProductSummaryResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender, ProductAttributeResponse } from '../../../../core/models/product.models';
 import { CategoryResponse } from '../../../../core/models/category.models';
 import { PageResponse } from '../../../../core/models/common.models';
 
@@ -27,7 +27,7 @@ import { PageResponse } from '../../../../core/models/common.models';
 export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   // ── Data ──────────────────────────────────────────────────────────────────
-  products: ProductResponse[] = [];
+  products: ProductSummaryResponse[] = [];
   categories: CategoryResponse[] = [];
   loading = false;
   currentPage = 0;
@@ -212,7 +212,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.productService.getProducts(params).subscribe({
       next: (r) => {
         if (r.success) {
-          const pg = r.data as PageResponse<ProductResponse>;
+          const pg = r.data as PageResponse<ProductSummaryResponse>;
           this.products   = pg.content;
           this.totalPages = pg.totalPages;
         } else {
@@ -250,7 +250,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   // ── Inline stock ──────────────────────────────────────────────────────────
 
-  startEditStock(product: ProductResponse): void {
+  startEditStock(product: ProductSummaryResponse): void {
     this.confirmDeleteId = null;
     this.editingStockId = product.id;
     this.editingStockValue = product.stock;
@@ -262,18 +262,16 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  confirmEditStock(product: ProductResponse): void {
+  confirmEditStock(product: ProductSummaryResponse): void {
     const newStock = Math.max(0, Math.round(+this.editingStockValue || 0));
     this.editingStockId = null;
     if (newStock === product.stock) { this.cdr.markForCheck(); return; }
     this.stockSavingId = product.id;
     const fd = new FormData();
     fd.append('name', product.name);
-    if (product.description) fd.append('description', product.description);
     fd.append('price', product.price.toString());
     fd.append('stock', newStock.toString());
     fd.append('gender', product.gender);
-    if (product.category?.id) fd.append('categoryId', product.category.id.toString());
     const applyLocally = () => {
       const idx = this.products.findIndex(p => p.id === product.id);
       if (idx !== -1) { this.products = [...this.products]; this.products[idx] = { ...this.products[idx], stock: newStock }; this._computeStats(); }
@@ -288,7 +286,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   // ── Inline discount ───────────────────────────────────────────────────────
 
-  startEditDiscount(product: ProductResponse): void {
+  startEditDiscount(product: ProductSummaryResponse): void {
     this.editingStockId = null;
     this.confirmDeleteId = null;
     this.discountEditingId = product.id;
@@ -296,7 +294,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  confirmEditDiscount(product: ProductResponse): void {
+  confirmEditDiscount(product: ProductSummaryResponse): void {
     const pct = Math.max(0, Math.min(100, Math.round(+this.discountEditValue || 0)));
     this.discountEditingId = null;
     if ((product.discountPercent ?? 0) === pct) { this.cdr.markForCheck(); return; }
@@ -327,7 +325,7 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   startDelete(id: number): void { this.editingStockId = null; this.confirmDeleteId = id; this.cdr.markForCheck(); }
 
-  doDelete(product: ProductResponse): void {
+  doDelete(product: ProductSummaryResponse): void {
     this.confirmDeleteId = null;
     this.productService.deleteProduct(product.id).subscribe({
       next: () => { this.loadProducts(this.currentPage); this.toast.show(`"${product.name}" supprimé`); },
@@ -422,30 +420,43 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     setTimeout(() => document.getElementById('manager-drawer-body')?.scrollTo(0, 0), 0);
   }
 
-  openEditDrawer(product: ProductResponse): void {
-    this.editingProduct = product;
-    this.drawerError = null;
-    this.creationItems = []; this.pendingCreationFile = null; this.pendingCreationPreview = null; this.pendingCreationColorError = null;
-    this.selectedVideo = null; this.videoPreview = null;
-    this.imagePreview = product.imageUrl || null;
-    this.selectedImageFile = null; this.uploadError = null;
-    this.drawerTab = 'info';
-    this.productMedia = product.media ?? [];
-    this.productVariants = product.variants ?? [];
-    this.productAttributes = product.attributes ?? [];
-    this.attributesLoading = false; this.attributeSaving = false; this.attributeError = null;
-    this.addAttributeOpen = false; this.newAttributeName = ''; this.editingAttribute = null; this.newValueInputs = [];
-    this.variantError = null; this.editingVariant = null;
-    this.newVariant = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
-    this.variantFormAttributes = {}; this.variantAttributeValueIds = [];
-    this.initForm(product);
-    this.drawerOpen = true;
-    this.scrollLock.lock();
-    this.loadMedia(product.id);
-    this.loadVariants(product.id);
-    this.loadAttributes(product.id);
-    this.cdr.markForCheck();
-    setTimeout(() => document.getElementById('manager-drawer-body')?.scrollTo(0, 0), 0);
+  openEditDrawer(product: ProductSummaryResponse): void {
+    this.drawerLoading = true;
+    this.productService.getProductBySlug(product.slug).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (r) => {
+        if (r.success && r.data) {
+          this.editingProduct = r.data;
+          this.drawerError = null;
+          this.creationItems = []; this.pendingCreationFile = null; this.pendingCreationPreview = null; this.pendingCreationColorError = null;
+          this.selectedVideo = null; this.videoPreview = null;
+          this.imagePreview = r.data.imageUrl || null;
+          this.selectedImageFile = null; this.uploadError = null;
+          this.drawerTab = 'info';
+          this.productMedia = r.data.media ?? [];
+          this.productVariants = r.data.variants ?? [];
+          this.productAttributes = r.data.attributes ?? [];
+          this.attributesLoading = false; this.attributeSaving = false; this.attributeError = null;
+          this.addAttributeOpen = false; this.newAttributeName = ''; this.editingAttribute = null; this.newValueInputs = [];
+          this.variantError = null; this.editingVariant = null;
+          this.newVariant = { variantName: '', colorHex: '#000000', imageUrl: '', stock: 0 };
+          this.variantFormAttributes = {}; this.variantAttributeValueIds = [];
+          this.initForm(r.data);
+          this.drawerOpen = true;
+          this.scrollLock.lock();
+          this.loadMedia(r.data.id);
+          this.loadVariants(r.data.id);
+          this.loadAttributes(r.data.id);
+        }
+        this.drawerLoading = false;
+        this.cdr.markForCheck();
+        setTimeout(() => document.getElementById('manager-drawer-body')?.scrollTo(0, 0), 0);
+      },
+      error: () => {
+        this.drawerLoading = false;
+        this.drawerError = 'Impossible de charger le produit';
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   setDrawerTab(tab: 'info' | 'media' | 'variants'): void {
@@ -568,12 +579,13 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
       const idx = this.products.findIndex(p => p.id === this.editingProduct!.id);
       if (idx !== -1) {
         this.products = [...this.products];
-        this.products[idx] = { ...this.editingProduct, name: data.name, description: data.description, price: +data.price, stock: +data.stock, gender: data.gender, imageUrl: data.imageUrl, category };
+        this.products[idx] = { id: this.editingProduct.id, name: data.name, price: +data.price, salePrice: this.editingProduct.salePrice, discountPercent: this.editingProduct.discountPercent, compareAtPrice: this.editingProduct.compareAtPrice, stock: +data.stock, slug: this.editingProduct.slug, gender: data.gender, imageUrl: data.imageUrl, thumbnailUrl: undefined, listImageUrl: undefined, categoryName: category?.name ?? '', active: this.editingProduct.active, featured: this.editingProduct.featured, variantCount: 0, createdAt: this.editingProduct.createdAt };
       }
       this.toast.show('Produit mis à jour ✓');
     } else {
-      const newId = Math.max(...this.products.map(p => p.id), 0) + 1;
-      this.products = [{ id: newId, name: data.name, slug: data.name.toLowerCase().replace(/\s+/g, '-'), description: data.description, price: +data.price, stock: +data.stock, gender: data.gender, imageUrl: data.imageUrl, category, active: true, featured: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), attributes: [] }, ...this.products];
+      const now = new Date().toISOString();
+      const slug = data.name.toLowerCase().replace(/\s+/g, '-');
+      this.products = [{ id: Math.max(...this.products.map(p => p.id), 0) + 1, name: data.name, price: +data.price, salePrice: undefined, discountPercent: undefined, compareAtPrice: undefined, stock: +data.stock, slug, gender: data.gender, imageUrl: data.imageUrl, thumbnailUrl: undefined, listImageUrl: undefined, categoryName: category?.name ?? '', active: true, featured: false, variantCount: 0, createdAt: now }, ...this.products];
       this.toast.show('Produit ajouté ✓');
     }
     this._computeStats();

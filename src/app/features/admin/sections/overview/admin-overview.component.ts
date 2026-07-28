@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, forkJoin } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 import { DashboardService, DashboardStats, MonthlyRevenueItem, TopProductItem, DailyCaisseResponse, DailyActivityItem } from '../../../../core/services/dashboard.service';
 import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
@@ -42,6 +42,7 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
   readonly orderStatusClass = orderStatusClass;
 
   private readonly destroy$ = new Subject<void>();
+  private readonly reload$ = new Subject<void>();
 
   constructor(
     private dashboardService: DashboardService,
@@ -53,7 +54,10 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadStats();
     this.loadDailyCaisse();
-    this.wsService.orderEvent$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.wsService.orderEvent$.pipe(debounceTime(2000), takeUntil(this.destroy$)).subscribe(() => {
+      this.loadStats();
+    });
+    this.reload$.pipe(debounceTime(500), takeUntil(this.destroy$)).subscribe(() => {
       this.loadStats();
     });
   }
@@ -66,9 +70,17 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
   loadStats(): void {
     this.loading = true;
     this.error = null;
-    this.dashboardService.getStats().subscribe({
+    forkJoin({
+      stats: this.dashboardService.getStats(),
+      revenue: this.dashboardService.getMonthlyRevenue(this.selectedYear),
+      top: this.dashboardService.getTopProducts(6),
+      weekly: this.dashboardService.getWeeklyActivity(),
+    }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
-        if (r.success) this.stats = r.data;
+        if (r.stats.success) this.stats = r.stats.data;
+        if (r.revenue.success) this.monthlyRevenue = r.revenue.data;
+        if (r.top.success) this.topProducts = r.top.data;
+        if (r.weekly.success) this.weeklyActivity = r.weekly.data;
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -78,25 +90,13 @@ export class AdminOverviewComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
     });
-    this.dashboardService.getMonthlyRevenue(this.selectedYear).subscribe({
-      next: (r) => { if (r.success) this.monthlyRevenue = r.data; this.cdr.markForCheck(); },
-      error: (err) => { console.error('Failed to load monthly revenue', err); },
-    });
-    this.dashboardService.getTopProducts(6).subscribe({
-      next: (r) => { if (r.success) this.topProducts = r.data; this.cdr.markForCheck(); },
-      error: (err) => { console.error('Failed to load monthly revenue', err); },
-    });
-    this.dashboardService.getWeeklyActivity().subscribe({
-      next: (r) => { if (r.success) this.weeklyActivity = r.data; this.cdr.markForCheck(); },
-      error: (err) => { console.error('Failed to load monthly revenue', err); },
-    });
   }
 
   changeYear(delta: number): void {
     this.selectedYear += delta;
-    this.dashboardService.getMonthlyRevenue(this.selectedYear).subscribe({
+    this.dashboardService.getMonthlyRevenue(this.selectedYear).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => { if (r.success) this.monthlyRevenue = r.data; this.cdr.markForCheck(); },
-      error: (err) => { console.error('Failed to load monthly revenue', err); },
+      error: () => { this.cdr.markForCheck(); },
     });
   }
 

@@ -12,7 +12,7 @@ import { DashboardService, PublicStats } from './core/services/dashboard.service
 import { WebSocketService } from './core/services/websocket.service';
 import { SeoService } from './core/services/seo.service';
 import { MediaUrlPipe } from './shared/pipes/media-url.pipe';
-import { ProductResponse } from './core/models/product.models';
+import { ProductSummaryResponse } from './core/models/product.models';
 import { ReviewResponse } from './core/models/review.models';
 import { CategoryResponse } from './core/models/category.models';
 import { PageResponse } from './core/models/common.models';
@@ -38,10 +38,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   whatsAppUrl = `https://wa.me/${environment.whatsAppNumber}`;
 
   categories: CategoryResponse[] = [];
-  featuredProducts: ProductResponse[] = [];
-  bestsellers: ProductResponse[] = [];
-  newProducts: ProductResponse[] = [];
-  discountProducts: ProductResponse[] = [];
+  featuredProducts: ProductSummaryResponse[] = [];
+  bestsellers: ProductSummaryResponse[] = [];
+  newProducts: ProductSummaryResponse[] = [];
+  discountProducts: ProductSummaryResponse[] = [];
   featuredReviews: ReviewResponse[] = [];
 
   categoriesLoading   = true;
@@ -222,12 +222,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     if (event.key === 'Enter') this.search();
   }
 
-  isNew(product: ProductResponse): boolean {
+  isNew(product: ProductSummaryResponse): boolean {
     if (!product.createdAt) return false;
     return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= NEW_PRODUCT_DAYS;
   }
 
-  quickAdd(product: ProductResponse, event: Event): void {
+  quickAdd(product: ProductSummaryResponse, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
     const exists = this.cartService.cartValue.some(i => i.productId === product.id);
@@ -428,7 +428,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this.productService.getProducts({ page: 0, size: 24, sort: 'newest' }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => {
         if (r.success && r.data) {
-          const pg = r.data as PageResponse<ProductResponse>;
+          const pg = r.data as PageResponse<ProductSummaryResponse>;
           this.newProducts      = (pg.content ?? []).filter(p => this.isNew(p)).slice(0, 8);
           this.discountProducts = (pg.content ?? []).filter(p => p.discountPercent && p.discountPercent > 0).slice(0, 4);
         }

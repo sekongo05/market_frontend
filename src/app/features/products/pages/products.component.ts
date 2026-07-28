@@ -13,7 +13,7 @@ import { CartService } from '../../../core/services/cart.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { SeoService } from '../../../core/services/seo.service';
-import { ProductResponse, GetProductsParams, SortOption,ProductVariant } from '../../../core/models/product.models';
+import { ProductResponse, ProductSummaryResponse, GetProductsParams, SortOption,ProductVariant } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
@@ -30,7 +30,7 @@ import { OrderService } from '../../../core/services/order.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsComponent implements OnInit, OnDestroy {
-  products: ProductResponse[] = [];
+  products: ProductSummaryResponse[] = [];
   categories: CategoryResponse[] = [];
   loading = false;
   error: string | null = null;
@@ -206,30 +206,22 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private seo: SeoService,
   ) {}
 
-  openProductView(product: ProductResponse): void {
-    this.selectedProduct = product;
-    this.selectedProductQty = 1;
-    this.viewGalleryIndex = 0;
-    this.selectedViewVariant = null;
-    this._buildViewGallery(product);
-    this.scrollLock.lock();
-    this.cdr.detectChanges();
-    setTimeout(() => document.getElementById('product-view-panel')?.scrollTo(0, 0), 0);
-    // Charge les variantes via API si elles ne sont pas dans la réponse paginée
-    if (!product.variants?.length) {
-      this.variantService.getVariants(product.id)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (r) => {
-            if (r.success && r.data?.length && this.selectedProduct?.id === product.id) {
-              this.selectedProduct = { ...this.selectedProduct, variants: r.data };
-              this._buildViewGallery(this.selectedProduct);
-              this.cdr.detectChanges();
-            }
-          },
-          error: (err) => { console.error('Failed to load variants', err); },
-        });
-    }
+  openProductView(product: ProductSummaryResponse): void {
+    this.productService.getProductBySlug(product.slug).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (r) => {
+        if (r.success && r.data) {
+          this.selectedProduct = r.data;
+          this.selectedProductQty = 1;
+          this.viewGalleryIndex = 0;
+          this.selectedViewVariant = null;
+          this._buildViewGallery(r.data);
+          this.scrollLock.lock();
+          this.cdr.detectChanges();
+          setTimeout(() => document.getElementById('product-view-panel')?.scrollTo(0, 0), 0);
+        }
+      },
+      error: (err) => { console.error('Failed to load product', err); },
+    });
   }
 
   selectViewVariant(v: ProductVariant): void {
@@ -289,8 +281,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }, 1500);
   }
 
-  addToCart(product: ProductResponse): void {
-    if ((product.variants?.length ?? 0) > 0) {
+  addToCart(product: ProductSummaryResponse): void {
+    if ((product.variantCount ?? 0) > 0) {
       this.openProductView(product);
       return;
     }
@@ -361,16 +353,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
       .subscribe(update => {
         const p = this.products.find(p => p.id === update.productId);
         if (p) {
-          (p as any).stock = update.stock;
-          if (update.variantId != null && update.variantStock != null && p.variants) {
-            const v = p.variants.find(v => v.id === update.variantId);
-            if (v) (v as any).stock = update.variantStock;
-          }
+          p.stock = update.stock;
           if (this.selectedProduct?.id === update.productId) {
-            (this.selectedProduct as any).stock = update.stock;
+            this.selectedProduct.stock = update.stock;
             if (update.variantId != null && update.variantStock != null && this.selectedProduct.variants) {
               const v = this.selectedProduct.variants.find(v => v.id === update.variantId);
-              if (v) (v as any).stock = update.variantStock;
+              if (v) v.stock = update.variantStock;
             }
           }
           this.cdr.detectChanges();
@@ -438,20 +426,27 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   openEditModal(product: ProductResponse): void {
-    this.editingProduct = product;
-    this.modalError = null;
-    this.modalSuccess = null;
-    this.selectedImages = [];
-    this.imagePreviews = [];
-    this.selectedVideo = null;
-    this.videoPreview = null;
-    this.imagePreview = product.imageUrl || null;
-    this.selectedImageFile = null;
-    this.uploadError = null;
-    this.initForm(product);
-    this.showModal = true;
-    this.scrollLock.lock();
-    this.cdr.detectChanges();
+    this.productService.getProductBySlug(product.slug).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (r) => {
+        if (r.success && r.data) {
+          this.editingProduct = r.data;
+          this.modalError = null;
+          this.modalSuccess = null;
+          this.selectedImages = [];
+          this.imagePreviews = [];
+          this.selectedVideo = null;
+          this.videoPreview = null;
+          this.imagePreview = r.data.imageUrl || null;
+          this.selectedImageFile = null;
+          this.uploadError = null;
+          this.initForm(r.data);
+          this.showModal = true;
+          this.scrollLock.lock();
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => { console.error('Failed to load product', err); },
+    });
   }
 
   closeModal(): void {
@@ -661,7 +656,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response) => {
         if (response.success) {
-          const pageResponse = response.data as PageResponse<ProductResponse>;
+          const pageResponse = response.data as PageResponse<ProductSummaryResponse>;
           this.products = pageResponse.content;
           this.totalPages = pageResponse.totalPages;
           this.totalItems = pageResponse.totalElements;
@@ -754,11 +749,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.loadProducts(0);
   }
 
-  get productsByCategory(): { category: CategoryResponse; items: ProductResponse[] }[] {
-    const map = new Map<number, { category: CategoryResponse; items: ProductResponse[] }>();
+  get productsByCategory(): { category: { id: number; name: string }; items: ProductSummaryResponse[] }[] {
+    const map = new Map<string, { category: { id: number; name: string }; items: ProductSummaryResponse[] }>();
     for (const p of this.products) {
-      if (!map.has(p.category.id)) map.set(p.category.id, { category: p.category, items: [] });
-      map.get(p.category.id)!.items.push(p);
+      const key = p.categoryName || 'Autre';
+      if (!map.has(key)) map.set(key, { category: { id: 0, name: key }, items: [] });
+      map.get(key)!.items.push(p);
     }
     return Array.from(map.values());
   }

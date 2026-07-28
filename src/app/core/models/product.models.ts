@@ -42,6 +42,26 @@ export interface ProductVariant {
   updatedAt?: string;
 }
 
+export interface ProductSummaryResponse {
+  id: number;
+  name: string;
+  price: number;
+  salePrice?: number;
+  discountPercent?: number;
+  compareAtPrice?: number;
+  stock: number;
+  slug: string;
+  gender: Gender;
+  imageUrl: string;
+  thumbnailUrl?: string;
+  listImageUrl?: string;
+  categoryName: string;
+  active: boolean;
+  featured: boolean;
+  variantCount: number;
+  createdAt: string;
+}
+
 export interface ProductResponse {
   id: number;
   name: string;
