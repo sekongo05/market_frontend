@@ -99,11 +99,16 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   wizardStep: 1 | 2 = 1;
   hasVariantsToggle = false;
-  creationItems: { file: File; preview: string; variantName: string; colorHex: string; stock: number }[] = [];
+  creationItems: { file: File; preview: string; variantName: string; colorHex: string; stock: number; attributeValueTempIds?: string[] }[] = [];
   pendingCreationFile: File | null = null;
   pendingCreationPreview: string | null = null;
   pendingCreationColor = { variantName: '', colorHex: '#000000', stock: 0 };
   pendingCreationColorError: string | null = null;
+
+  // ── Attributs temporaires (création) ──────────────────────────────────
+  tempAttributes: { tempId: string; name: string; realId?: number; values: { tempId: string; value: string; colorHex?: string; realId?: number }[] }[] = [];
+  selectedCreationAttrValueIds: string[] = [];
+  editingTempAttr: { tempId: string; name: string; values: { tempId: string; value: string; colorHex?: string }[] } | null = null;
 
   selectedVideo: File | null = null;
   videoPreview: string | null = null;
@@ -360,6 +365,9 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.pendingCreationPreview = null;
     this.pendingCreationColorError = null;
     this.pendingCreationColor = { variantName: '', colorHex: '#000000', stock: 0 };
+    this.tempAttributes = [];
+    this.selectedCreationAttrValueIds = [];
+    this.editingTempAttr = null;
     this.selectedVideo = null;
     this.videoPreview = null;
     this.imagePreview = null;
@@ -432,6 +440,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
     const wasCreating = !this.editingProduct;
     const itemsSnapshot = [...this.creationItems];
+    const tempAttrSnapshot = [...this.tempAttributes];
+    const selectedAttrVals = [...this.selectedCreationAttrValueIds];
     req$.subscribe({
       next: (r) => {
         this.loadProducts(this.productsPage);
@@ -440,29 +450,63 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
           this.editingProduct = product;
           this.initProductForm(product);
           this.drawerTab = 'media';
-          if (itemsSnapshot.length === 0) {
-            this.drawerLoading = false;
-            this.productVariants = [];
-            this.productMedia = [];
-            this.toast.show('Produit créé ✓');
-            this.cdr.markForCheck();
-            return;
-          }
+
+          // 1. Sauvegarder les attributs temporaires
+          const saveAttrs = (cb: () => void, attrIndex = 0): void => {
+            if (attrIndex >= tempAttrSnapshot.length) { cb(); return; }
+            const a = tempAttrSnapshot[attrIndex];
+            this.productVariantService.addAttribute(product.id, {
+              name: a.name,
+              values: a.values.map(v => ({ value: v.value, colorHex: v.colorHex })),
+            }).subscribe({
+              next: (ar) => {
+                if (ar.success && ar.data) {
+                  // Mapper tempIds → vrais IDs
+                  tempAttrSnapshot[attrIndex].realId = ar.data.id;
+                  ar.data.values.forEach((av, i) => {
+                    if (a.values[i]) a.values[i].realId = av.id;
+                  });
+                }
+                saveAttrs(cb, attrIndex + 1);
+              },
+              error: () => saveAttrs(cb, attrIndex + 1),
+            });
+          };
+
+          // 2. Sauvegarder les variantes
           const processItem = (index: number) => {
             if (index >= itemsSnapshot.length) {
               this.drawerLoading = false;
               this.creationItems = [];
+              this.tempAttributes = [];
+              this.selectedCreationAttrValueIds = [];
               this.loadVariants(product.id);
               this.loadMedia(product.id);
-              this.toast.show(`Produit créé avec ${itemsSnapshot.length} couleur(s) ✓`);
+              this.loadAttributes(product.id);
+              const msg = itemsSnapshot.length > 0
+                ? `Produit créé avec ${itemsSnapshot.length} variante(s) ✓`
+                : 'Produit créé ✓';
+              this.toast.show(msg);
               this.cdr.markForCheck();
               return;
             }
             const item = itemsSnapshot[index];
+            const variantReq: any = {
+              variantName: item.variantName,
+              colorHex: item.colorHex || undefined,
+              imageUrl: '',
+              stock: item.stock,
+            };
+            if (item.attributeValueTempIds?.length) {
+              const realIds = item.attributeValueTempIds
+                .map(tid => tempAttrSnapshot.flatMap(a => a.values).find(v => v.tempId === tid)?.realId)
+                .filter((id): id is number => id != null);
+              if (realIds.length) variantReq.attributeValueIds = realIds;
+            }
             const createVariant = (imageUrl: string) => {
-              this.productVariantService.addVariant(product.id, {
-                variantName: item.variantName, colorHex: item.colorHex, imageUrl, stock: item.stock,
-              }).subscribe({ next: () => processItem(index + 1), error: () => processItem(index + 1) });
+              variantReq.imageUrl = imageUrl;
+              this.productVariantService.addVariant(product.id, variantReq)
+                .subscribe({ next: () => processItem(index + 1), error: () => processItem(index + 1) });
             };
             if (index === 0 && product.imageUrl) {
               createVariant(product.imageUrl);
@@ -473,7 +517,20 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
               });
             }
           };
-          processItem(0);
+
+          if (itemsSnapshot.length === 0 && tempAttrSnapshot.length === 0) {
+            this.drawerLoading = false;
+            this.productVariants = [];
+            this.productMedia = [];
+            this.toast.show('Produit créé ✓');
+            this.cdr.markForCheck();
+            return;
+          }
+          if (tempAttrSnapshot.length > 0) {
+            saveAttrs(() => processItem(0));
+          } else {
+            processItem(0);
+          }
         } else {
           this.drawerLoading = false;
           if (r.data) {
@@ -764,6 +821,49 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  openAddTempAttribute(): void {
+    this.editingTempAttr = null;
+    this.newAttributeName = '';
+    this.newValueInputs = [{ value: '', colorHex: '#000000' }];
+    this.attributeError = null;
+    this.addAttributeOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  openEditTempAttribute(attr: { tempId: string; name: string; values: { tempId: string; value: string; colorHex?: string }[] }): void {
+    this.editingTempAttr = attr;
+    this.newAttributeName = attr.name;
+    this.newValueInputs = attr.values.length > 0
+      ? attr.values.map(v => ({ value: v.value, colorHex: v.colorHex || '#000000' }))
+      : [{ value: '', colorHex: '#000000' }];
+    this.attributeError = null;
+    this.addAttributeOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  deleteTempAttribute(tempId: string): void {
+    if (!confirm('Supprimer cet attribut et toutes ses valeurs ?')) return;
+    this.tempAttributes = this.tempAttributes.filter(a => a.tempId !== tempId);
+    this.selectedCreationAttrValueIds = this.selectedCreationAttrValueIds.filter(id =>
+      !this.tempAttributes.some(a => a.values.some(v => v.tempId === id))
+    );
+    this.cdr.markForCheck();
+  }
+
+  toggleCreationAttrValue(valueTempId: string): void {
+    const idx = this.selectedCreationAttrValueIds.indexOf(valueTempId);
+    if (idx >= 0) {
+      this.selectedCreationAttrValueIds = this.selectedCreationAttrValueIds.filter(id => id !== valueTempId);
+    } else {
+      this.selectedCreationAttrValueIds = [...this.selectedCreationAttrValueIds, valueTempId];
+    }
+    this.pendingCreationColor.variantName = this.tempAttributes
+      .flatMap(a => a.values.filter(v => this.selectedCreationAttrValueIds.includes(v.tempId)))
+      .map(v => v.value)
+      .join(' / ');
+    this.cdr.markForCheck();
+  }
+
   openEditAttribute(attr: ProductAttributeResponse): void {
     this.editingAttribute = attr;
     this.newAttributeName = attr.name;
@@ -778,6 +878,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   cancelAttributeForm(): void {
     this.addAttributeOpen = false;
     this.editingAttribute = null;
+    this.editingTempAttr = null;
     this.newAttributeName = '';
     this.newValueInputs = [];
     this.attributeError = null;
@@ -795,13 +896,34 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
 
   saveAttribute(): void {
-    if (!this.editingProduct || !this.newAttributeName.trim()) return;
-    this.attributeSaving = true;
-    this.attributeError = null;
-    const productId = this.editingProduct.id;
+    if (!this.newAttributeName.trim()) return;
     const values = this.newValueInputs
       .filter(v => v.value.trim())
       .map(v => ({ value: v.value.trim(), colorHex: v.colorHex !== '#000000' ? v.colorHex : undefined }));
+
+    if (!this.editingProduct) {
+      // Mode création : stocker en local
+      if (this.editingTempAttr) {
+        this.tempAttributes = this.tempAttributes.map(a =>
+          a.tempId === this.editingTempAttr!.tempId
+            ? { ...a, name: this.newAttributeName.trim(), values: values.map(v => ({ ...v, tempId: crypto.randomUUID() })) }
+            : a
+        );
+      } else {
+        this.tempAttributes = [...this.tempAttributes, {
+          tempId: crypto.randomUUID(),
+          name: this.newAttributeName.trim(),
+          values: values.map(v => ({ ...v, tempId: crypto.randomUUID() })),
+        }];
+      }
+      this.cancelAttributeForm();
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.attributeSaving = true;
+    this.attributeError = null;
+    const productId = this.editingProduct.id;
     const req = { name: this.newAttributeName.trim(), values };
 
     if (this.editingAttribute) {
@@ -1090,13 +1212,17 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   confirmCreationItem(): void {
     if (!this.pendingCreationFile) return;
     if (!this.pendingCreationColor.variantName.trim()) { this.pendingCreationColorError = 'Le nom de la variante est requis'; return; }
-    if (!/^#[0-9A-Fa-f]{6}$/.test(this.pendingCreationColor.colorHex)) { this.pendingCreationColorError = 'Code couleur invalide (ex: #FF5733)'; return; }
+    if (this.tempAttributes.length === 0) {
+      if (!/^#[0-9A-Fa-f]{6}$/.test(this.pendingCreationColor.colorHex)) { this.pendingCreationColorError = 'Code couleur invalide (ex: #FF5733)'; return; }
+    }
+    const attrValueTempIds = this.selectedCreationAttrValueIds.length > 0 ? [...this.selectedCreationAttrValueIds] : undefined;
     this.creationItems = [...this.creationItems, {
       file: this.pendingCreationFile,
       preview: this.pendingCreationPreview!,
       variantName: this.pendingCreationColor.variantName.trim(),
       colorHex: this.pendingCreationColor.colorHex,
       stock: this.pendingCreationColor.stock || 0,
+      attributeValueTempIds: attrValueTempIds,
     }];
     const totalStock = this.creationItems.reduce((sum, i) => sum + i.stock, 0);
     this.productForm.patchValue({ stock: totalStock });
