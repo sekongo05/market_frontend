@@ -72,7 +72,7 @@ export class RegisterComponent implements OnInit {
       nom: ['', Validators.required],
       prenom: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['+225', [Validators.required, Validators.pattern(/^(\+225)?[0-9]{10}$/)]],
+      phone: ['+225 ', [Validators.required, Validators.pattern(/^(\+225\s?)?([0-9]{2}\s?){4}[0-9]{2}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
     });
@@ -80,6 +80,26 @@ export class RegisterComponent implements OnInit {
 
   get f() {
     return this.registerForm.controls;
+  }
+
+  formatPhone(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let val = input.value;
+    
+    let hasPrefix = val.startsWith('+225');
+    if (hasPrefix) {
+      val = val.substring(4);
+    }
+    
+    let numbers = val.replace(/\D/g, '');
+    if (numbers.length > 10) {
+      numbers = numbers.substring(0, 10);
+    }
+    
+    let formatted = numbers.match(/.{1,2}/g)?.join(' ') || '';
+    let finalValue = hasPrefix ? '+225' + (formatted ? ' ' + formatted : ' ') : formatted;
+    
+    this.registerForm.get('phone')?.setValue(finalValue, { emitEvent: false });
   }
 
   onSubmit(): void {
@@ -100,6 +120,9 @@ export class RegisterComponent implements OnInit {
 
     this.loading = true;
     const { confirmPassword, ...data } = this.registerForm.value;
+    if (data.phone) {
+      data.phone = data.phone.replace(/\s/g, '');
+    }
     this.authService.register(data).subscribe({
       next: (response) => {
         this.loading = false;
