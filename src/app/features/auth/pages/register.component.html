@@ -303,7 +303,8 @@
               @if ((submitted || f['password'].touched) && f['password'].errors) {
                 <p class="mt-1 text-xs text-red-400">
                   @if (f['password'].errors['required']) { Mot de passe requis }
-                  @else if (f['password'].errors['minlength']) { Minimum 6 caractères }
+                  @else if (f['password'].errors['minlength']) { Minimum 8 caractères }
+                  @else if (f['password'].errors['pattern']) { Doit contenir au moins 1 majuscule et 1 chiffre }
                 </p>
               }
             </div>
@@ -362,7 +363,7 @@
             </button>
           }
           @if (step === totalSteps) {
-            <button type="submit" [disabled]="loading"
+            <button type="submit" [disabled]="loading || registerForm.invalid || f['password'].value !== f['confirmPassword'].value"
               class="flex-1 flex items-center justify-center gap-2 py-3.5 font-black text-sm rounded-xl
                      bg-gold text-black
                      hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5
