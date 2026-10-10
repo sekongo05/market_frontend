@@ -1,7 +1,7 @@
 @if (navigating) {
 <div class="route-loading-bar" role="progressbar" aria-label="Chargement"></div>
 }
-<app-navbar></app-navbar>
+<app-navbar ngSkipHydration></app-navbar>
 <app-toast></app-toast>
 
 <main class="min-h-screen theme-bg" [class.backoffice-main]="isBackoffice">

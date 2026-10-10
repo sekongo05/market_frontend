@@ -151,8 +151,7 @@ export class AuthService {
       if (refreshToken) {
         this.refreshToken(refreshToken).subscribe({
           error: (err) => {
-            // Uniquement si erreur client (4xx). Ne pas déconnecter si erreur réseau (0)
-            if (err && err.status >= 400 && err.status < 500) {
+            if (err && err.status !== 0) {
               this.logout();
             }
           }
@@ -208,7 +207,7 @@ export class AuthService {
       if (refreshToken) {
         this.refreshToken(refreshToken).subscribe({
           error: (err) => {
-            if (err && err.status >= 400 && err.status < 500) {
+            if (err && err.status !== 0) {
               this.logout();
             }
           }
@@ -218,6 +217,14 @@ export class AuthService {
       }
     } else {
       this._scheduleProactiveRefresh();
+      // Valider la validité de la session auprès du backend
+      this.apiService.get('/users/me').subscribe({
+        error: (err) => {
+          if (err && (err.status === 401 || err.status === 403 || err.status === 404)) {
+            this.logout();
+          }
+        }
+      });
     }
   }
 

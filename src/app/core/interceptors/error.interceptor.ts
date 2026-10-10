@@ -142,7 +142,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           this.isRefreshing = false;
           // Only log out if it's a client error (e.g. 401, 403, 400).
           // Do NOT log out on network error (0) or server error (50x).
-          if (err.status >= 400 && err.status < 500) {
+          if (err.status !== 0) {
             this._logout();
           }
           return throwError(() => this._sanitizeError(err));
