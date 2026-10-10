@@ -45,14 +45,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private productsSub?: Subscription;
 
-  // Modal state
-  showModal = false;
-  editingProduct: ProductResponse | null = null;
-  modalLoading = false;
-  modalError: string | null = null;
-  modalSuccess: string | null = null;
   confirmDeleteProduct: ProductResponse | null = null;
-  productForm!: FormGroup;
   selectedViewVariant: ProductVariant | null = null;
   // Category filter
   selectedCategoryId: number | null = null;
@@ -179,15 +172,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Image upload state — création : multi-images ; édition : image unique
-  selectedImages: File[] = [];
-  imagePreviews: string[] = [];
-  selectedVideo: File | null = null;
-  videoPreview: string | null = null;
-  imagePreview: string | null = null;
-  selectedImageFile: File | null = null;
-  uploadError: string | null = null;
-  dragOver = false;
+
 
   constructor(
     private productService: ProductService,
@@ -304,7 +289,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       description: 'Découvrez notre catalogue complet : mode, montres, bijoux, beauté, électronique et lifestyle. Livraison rapide en Côte d\'Ivoire.',
       url: '/products',
     });
-    this.initForm();
     const slugParam     = this.route.snapshot.queryParamMap.get('categorie');
     const searchParam   = this.route.snapshot.queryParamMap.get('search');
     const featuredParam = this.route.snapshot.queryParamMap.get('featured');
@@ -385,9 +369,19 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get isAdmin(): boolean {
+    return this.authService.getCurrentUser()?.role === 'ADMIN';
+  }
+
   get isManager(): boolean {
     const user = this.authService.getCurrentUser();
     return user?.role === 'ADMIN' || user?.role === 'MANAGER';
+  }
+
+  editProduct(product: ProductResponse | ProductSummaryResponse): void {
+    this.scrollLock.unlock();
+    const target = this.isAdmin ? '/admin/products' : '/manager/products';
+    this.router.navigate([target], { queryParams: { edit: product.slug } });
   }
 
   isNew(product: ProductResponse): boolean {
@@ -396,218 +390,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     return diffMs / (1000 * 60 * 60 * 24) <= 7;
   }
 
-  // ─── Product form ───────────────────────────────────────────────────────────
 
-  private initForm(product?: ProductResponse): void {
-    this.productForm = this.fb.group({
-      name:        [product?.name        ?? '', Validators.required],
-      description: [product?.description ?? '', Validators.required],
-      price:       [product?.price       ?? null, [Validators.required, Validators.min(1)]],
-      stock:       [product?.stock       ?? null, [Validators.required, Validators.min(0)]],
-      categoryId:  [product?.category?.id ?? null, Validators.required],
-    });
-  }
-
-  openCreateModal(): void {
-    this.editingProduct = null;
-    this.modalError = null;
-    this.modalSuccess = null;
-    this.selectedImages = [];
-    this.imagePreviews = [];
-    this.selectedVideo = null;
-    this.videoPreview = null;
-    this.imagePreview = null;
-    this.selectedImageFile = null;
-    this.uploadError = null;
-    this.initForm();
-    this.showModal = true;
-    this.scrollLock.lock();
-    this.cdr.detectChanges();
-  }
-
-  openEditModal(product: ProductResponse): void {
-    this.productService.getProductBySlug(product.slug).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (r) => {
-        if (r.success && r.data) {
-          this.editingProduct = r.data;
-          this.modalError = null;
-          this.modalSuccess = null;
-          this.selectedImages = [];
-          this.imagePreviews = [];
-          this.selectedVideo = null;
-          this.videoPreview = null;
-          this.imagePreview = r.data.imageUrl || null;
-          this.selectedImageFile = null;
-          this.uploadError = null;
-          this.initForm(r.data);
-          this.showModal = true;
-          this.scrollLock.lock();
-          this.cdr.detectChanges();
-        }
-      },
-      error: (err) => { console.error('Failed to load product', err); },
-    });
-  }
-
-  closeModal(): void {
-    this.showModal = false;
-    this.scrollLock.unlock();
-    this.editingProduct = null;
-    this.modalError = null;
-    this.modalSuccess = null;
-    this.selectedImages = [];
-    this.imagePreviews = [];
-    this.selectedVideo = null;
-    this.videoPreview = null;
-    this.imagePreview = null;
-    this.selectedImageFile = null;
-    this.uploadError = null;
-    this.cdr.detectChanges();
-  }
-
-  // ─── Image upload ────────────────────────────────────────────────────────────
-
-  onFileDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver = false;
-    const files = event.dataTransfer?.files;
-    if (files) Array.from(files).forEach(f => this._uploadFile(f));
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver = true;
-    this.cdr.detectChanges();
-  }
-
-  onDragLeave(): void {
-    this.dragOver = false;
-    this.cdr.detectChanges();
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files) Array.from(input.files).forEach(f => this._uploadFile(f));
-    input.value = '';
-  }
-
-  onVideoSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) this._uploadFile(file);
-    input.value = '';
-  }
-
-  private _isImageFile(file: File): boolean {
-    if (file.type.startsWith('image/')) return true;
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-    return ['heic', 'heif'].includes(ext);
-  }
-
-  private _isVideoFile(file: File): boolean {
-    return file.type.startsWith('video/');
-  }
-
-  private _uploadFile(file: File): void {
-    if (this._isVideoFile(file)) {
-      if (file.size > 50 * 1024 * 1024) { this.uploadError = 'Vidéo trop lourde — max 50 Mo'; this.cdr.detectChanges(); return; }
-      this.selectedVideo = file;
-      this.uploadError = null;
-      const reader = new FileReader();
-      reader.onload = (e) => { this.videoPreview = e.target?.result as string; this.cdr.detectChanges(); };
-      reader.readAsDataURL(file);
-      return;
-    }
-    if (!this._isImageFile(file)) {
-      this.uploadError = 'Format non supporté — JPEG, PNG, WEBP, GIF, BMP, TIFF, SVG, AVIF, HEIC';
-      this.cdr.detectChanges();
-      return;
-    }
-    if (file.size > 20 * 1024 * 1024) {
-      this.uploadError = 'Image trop lourde — maximum 20 Mo';
-      this.cdr.detectChanges();
-      return;
-    }
-
-    if (this.editingProduct) {
-      this.selectedImageFile = file;
-      this.uploadError = null;
-      const reader = new FileReader();
-      reader.onload = (e) => { this.imagePreview = e.target?.result as string; this.cdr.detectChanges(); };
-      reader.readAsDataURL(file);
-    } else {
-      if (this.selectedImages.length >= 4) { this.uploadError = 'Maximum 4 images autorisées'; this.cdr.detectChanges(); return; }
-      this.uploadError = null;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.selectedImages = [...this.selectedImages, file];
-        this.imagePreviews = [...this.imagePreviews, e.target?.result as string];
-        this.cdr.detectChanges();
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  removeImage(index: number): void {
-    this.selectedImages = this.selectedImages.filter((_, i) => i !== index);
-    this.imagePreviews = this.imagePreviews.filter((_, i) => i !== index);
-    this.cdr.detectChanges();
-  }
-
-  removeVideo(): void { this.selectedVideo = null; this.videoPreview = null; this.cdr.detectChanges(); }
-
-  clearImage(): void {
-    this.imagePreview = null;
-    this.selectedImageFile = null;
-    this.uploadError = null;
-    this.cdr.detectChanges();
-  }
-
-  saveProduct(): void {
-    if (this.productForm.invalid) return;
-    this.modalLoading = true;
-    this.modalError = null;
-
-    const v = this.productForm.value;
-    const fd = new FormData();
-    fd.append('name', v.name);
-    if (v.description) fd.append('description', v.description);
-    fd.append('price', v.price.toString());
-    fd.append('stock', v.stock.toString());
-    if (v.categoryId) fd.append('categoryId', v.categoryId.toString());
-
-    let request$;
-    if (this.editingProduct) {
-      if (this.selectedImageFile) fd.append('mainImage', this.selectedImageFile);
-      if (this.selectedVideo) fd.append('video', this.selectedVideo);
-      request$ = this.productService.updateProduct(this.editingProduct.id, fd);
-    } else {
-      for (const img of this.selectedImages) fd.append('images', img);
-      if (this.selectedVideo) fd.append('video', this.selectedVideo);
-      request$ = this.productService.createProduct(fd);
-    }
-
-    request$.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.modalSuccess = this.editingProduct
-            ? 'Article mis à jour avec succès'
-            : 'Article ajouté avec succès';
-          this.loadProducts(this.currentPage);
-          setTimeout(() => this.closeModal(), 1200);
-        } else {
-          this.modalError = 'Une erreur est survenue';
-        }
-        this.modalLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.modalError = 'Erreur lors de la sauvegarde';
-        this.modalLoading = false;
-        this.cdr.detectChanges();
-      },
-    });
-  }
 
   startDelete(product: ProductResponse): void {
     this.confirmDeleteProduct = product;

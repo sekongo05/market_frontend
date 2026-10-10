@@ -62,7 +62,7 @@
        MAIN PRODUCT DETAIL
   ══════════════════════════════════════════════════════════════ -->
   @if (!loading && product) {
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-44 sm:pb-36 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-24 sm:pb-28 lg:py-16">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 xl:gap-20">
 
         <!-- ════ LEFT: Media Gallery ════ -->
@@ -460,7 +460,7 @@
                 ← Retour à la collection
               </button>
             } @else {
-              <div class="hidden lg:flex flex-col gap-3">
+              <div class="flex flex-col gap-3">
                 @let currentStock = selectedVariant ? selectedVariant.stock : product.stock;
                 @let isCurrentOutOfStock = currentStock === 0;
 
@@ -864,83 +864,5 @@
 
     </div>
 
-    <!-- ── Sticky CTA mobile (hidden on desktop) ── -->
-    @if (!isManager) {
-      <div class="lg:hidden fixed left-3 right-3 z-[44] theme-surface border theme-border rounded-2xl shadow-xl shadow-black/15 backdrop-blur-lg"
-           style="bottom: calc(var(--bottom-nav-h, 60px) + env(safe-area-inset-bottom, 0px) + 16px)">
-        <div class="flex items-center gap-2.5 px-3.5 py-2.5">
-          <!-- Thumbnail & Price preview on mobile -->
-          <div class="flex items-center gap-2 flex-1 min-w-0">
-            @if (selectedVariant?.imageUrl || product.imageUrl) {
-              <div class="w-10 h-10 rounded-xl overflow-hidden border border-gold/30 flex-shrink-0 bg-black/20 shadow-sm">
-                <img [src]="(selectedVariant?.imageUrl || product.imageUrl) | mediaUrl"
-                     [alt]="selectedVariant?.variantName || product.name"
-                     class="w-full h-full object-cover"/>
-              </div>
-            } @else if (selectedVariant?.colorHex) {
-              <div class="w-10 h-10 rounded-xl border border-white/20 flex-shrink-0 shadow-sm"
-                   [style.background-color]="selectedVariant?.colorHex"></div>
-            }
-            <div class="min-w-0 flex-1">
-              @if (selectedVariant) {
-                <p class="text-[11px] font-bold text-gold truncate leading-tight">{{ selectedVariant.variantName }}</p>
-              }
-              @if (hasDiscount) {
-                <p class="text-sm font-black text-orange-400 leading-none mt-0.5">{{ formattedPrice }}</p>
-                <p class="text-[10px] theme-muted line-through leading-none mt-0.5">{{ formattedOriginalPrice }} F</p>
-              } @else {
-                <p class="text-sm font-black gold-text leading-none mt-0.5">{{ formattedPrice }} F</p>
-              }
-            </div>
-          </div>
-
-          @let mobStock = selectedVariant ? selectedVariant.stock : product.stock;
-          @if (mobStock === 0 || allVariantsOutOfStock) {
-            <div class="px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-xs font-bold flex-shrink-0">
-              Épuisé
-            </div>
-          } @else {
-            <div class="flex items-center rounded-lg border theme-border overflow-hidden flex-shrink-0 bg-black/5">
-              <button type="button" (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1"
-                class="w-8 h-8 flex items-center justify-center theme-muted hover:bg-black/10 transition-colors disabled:opacity-30">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                </svg>
-              </button>
-              <span class="w-6 text-center font-black theme-text text-xs">{{ quantity }}</span>
-              <button type="button" (click)="setQuantity(quantity + 1)" [disabled]="quantity >= mobStock"
-                class="w-8 h-8 flex items-center justify-center theme-muted hover:bg-black/10 transition-colors disabled:opacity-30">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-              </button>
-            </div>
-
-            <button (click)="addToCart()"
-              [disabled]="(hasVariants && !selectedVariant) || mobStock === 0"
-              class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl font-bold text-xs flex-shrink-0 shadow-md
-                     transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              [class]="addedToCart
-                ? 'bg-green-500 text-white'
-                : (((hasVariants && !selectedVariant) || mobStock === 0) ? 'bg-gold/30 text-black/60' : 'bg-gold text-black active:scale-95')">
-              @if (addedToCart) {
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                </svg>
-                Ajouté !
-              } @else if (hasVariants && !selectedVariant) {
-                Choisir
-              } @else {
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                </svg>
-                Ajouter
-              }
-            </button>
-          }
-        </div>
-      </div>
-    }
   }
 </div>
