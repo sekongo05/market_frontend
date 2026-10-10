@@ -39,9 +39,68 @@ export class ErrorInterceptor implements HttpInterceptor {
           console.warn('Rate limited – 429 Too Many Requests');
         }
 
-        return throwError(() => error);
+        const sanitizedError = this._sanitizeError(error);
+        return throwError(() => sanitizedError);
       })
     );
+  }
+
+  private _sanitizeError(error: HttpErrorResponse): HttpErrorResponse {
+    const rawMessage = (typeof error.error?.message === 'string')
+      ? error.error.message.trim()
+      : (typeof error.error === 'string' ? error.error.trim() : '');
+
+    // Patterns techniques typiques des stacktraces / exceptions Java ou SQL
+    const technicalPatterns = [
+      /rollback/i,
+      /exception/i,
+      /nullpointer/i,
+      /sql/i,
+      /hibernate/i,
+      /jdbc/i,
+      /deadlock/i,
+      /constraint/i,
+      /org\.springframework/i,
+      /java\./i,
+      /internal server error/i,
+      /stacktrace/i,
+      /could not execute/i,
+      /cannot be cast/i,
+      /lazy.*initial/i,
+      /bad sql grammar/i,
+      /nested.*exception/i,
+      /transaction/i
+    ];
+
+    const isTechnical = technicalPatterns.some(pattern => pattern.test(rawMessage));
+
+    let userFriendlyMessage = rawMessage;
+
+    if (error.status === 0) {
+      userFriendlyMessage = "Impossible de joindre le serveur. Veuillez vérifier votre connexion internet.";
+    } else if (error.status >= 500 || isTechnical) {
+      userFriendlyMessage = "Une erreur technique est survenue sur le serveur. Veuillez réessayer dans un instant.";
+    } else if (error.status === 403) {
+      userFriendlyMessage = "Accès refusé. Vous n'avez pas les autorisations nécessaires.";
+    } else if (error.status === 404 && (!rawMessage || rawMessage.toLowerCase().includes('not found'))) {
+      userFriendlyMessage = "L'élément demandé est introuvable.";
+    } else if (error.status === 429) {
+      userFriendlyMessage = "Trop de requêtes effectuées. Veuillez patienter un instant.";
+    } else if (!userFriendlyMessage) {
+      userFriendlyMessage = "Une erreur est survenue lors de l'opération.";
+    }
+
+    const errorBody = (typeof error.error === 'object' && error.error !== null)
+      ? { ...error.error, message: userFriendlyMessage, rawTechnicalMessage: rawMessage }
+      : { message: userFriendlyMessage, rawTechnicalMessage: rawMessage };
+
+    return new HttpErrorResponse({
+      error: errorBody,
+      headers: error.headers,
+      status: error.status,
+      statusText: error.statusText,
+      url: error.url ?? undefined,
+    });
   }
 
   private _isRefreshRequest(request: HttpRequest<unknown>): boolean {
@@ -86,7 +145,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           if (err.status >= 400 && err.status < 500) {
             this._logout();
           }
-          return throwError(() => err);
+          return throwError(() => this._sanitizeError(err));
         })
       );
     } else {

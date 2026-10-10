@@ -6,6 +6,7 @@ export interface CategoryResponse {
   imageUrl: string;
   active: boolean;
   displayOrder?: number;
+  defaultAttributes?: string;
   productCount?: number;
   createdAt: string;
   updatedAt: string;
@@ -16,6 +17,17 @@ export interface CreateCategoryRequest {
   description?: string;
   imageUrl?: string;
   displayOrder?: number;
+  defaultAttributes?: string;
 }
 
 export interface UpdateCategoryRequest extends CreateCategoryRequest {}
+
+export interface CategoryAttributeValueDef {
+  name: string;
+  hex?: string;
+}
+
+export interface CategoryAttributeDef {
+  name: string;
+  values: CategoryAttributeValueDef[];
+}

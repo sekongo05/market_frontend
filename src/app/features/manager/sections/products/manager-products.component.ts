@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
@@ -16,6 +16,7 @@ import { ManagerToastService } from '../../shared/manager-toast.service';
 import { ProductResponse, ProductSummaryResponse, GetProductsParams, ProductMediaItem, ProductVariant, Gender, ProductAttributeResponse } from '../../../../core/models/product.models';
 import { CategoryResponse } from '../../../../core/models/category.models';
 import { PageResponse } from '../../../../core/models/common.models';
+import { compressImage } from '../../../../core/utils/image-compression.util';
 
 @Component({
   selector: 'app-manager-products',
@@ -132,12 +133,50 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   ];
 
   private readonly COLOR_MAP: Record<string, string> = {
-    'rouge': '#FF0000', 'bleu': '#0000FF', 'vert': '#008000',
-    'noir': '#000000', 'blanc': '#FFFFFF', 'jaune': '#FFD700',
-    'orange': '#FF8C00', 'violet': '#800080', 'rose': '#FF69B4',
-    'gris': '#808080', 'marron': '#8B4513', 'beige': '#F5F5DC',
-    'or': '#D4AF37', 'argent': '#C0C0C0', 'turquoise': '#40E0D0',
-    'bordeaux': '#800020', 'marine': '#001F5B', 'kaki': '#78866B',
+    // Couleurs basiques
+    'noir': '#000000', 'black': '#000000',
+    'blanc': '#FFFFFF', 'white': '#FFFFFF',
+    'rouge': '#FF0000', 'red': '#FF0000',
+    'bleu': '#0000FF', 'blue': '#0000FF',
+    'vert': '#008000', 'green': '#008000',
+    'jaune': '#FFD700', 'yellow': '#FFD700',
+    'orange': '#FF8C00',
+    'rose': '#FF69B4', 'pink': '#FF69B4',
+    'violet': '#800080', 'purple': '#800080',
+    'gris': '#808080', 'grey': '#808080', 'gray': '#808080',
+    'marron': '#8B4513', 'brun': '#5C4033', 'brown': '#8B4513',
+    'beige': '#F5F5DC',
+    // Bijouterie, métaux & horlogerie
+    'or': '#FFD700', 'gold': '#FFD700', 'dore': '#FFD700', 'doré': '#FFD700',
+    'or rose': '#B76E79', 'rose gold': '#B76E79',
+    'or jaune': '#FFD700',
+    'or blanc': '#F4F4F4',
+    'argent': '#C0C0C0', 'silver': '#C0C0C0', 'argente': '#C0C0C0', 'argenté': '#C0C0C0',
+    'acier': '#B0C4DE', 'acier inoxydable': '#B0C4DE',
+    'platine': '#E5E4E2',
+    'bronze': '#CD7F32',
+    'cuivre': '#B87333',
+    // Nuances de mode
+    'bleu marine': '#001F3F', 'marine': '#001F3F', 'navy': '#001F3F',
+    'bleu ciel': '#87CEEB',
+    'bleu nuit': '#191970',
+    'bleu roi': '#4169E1',
+    'bordeaux': '#800020', 'burgundy': '#800020',
+    'kaki': '#556B2F', 'khaki': '#556B2F',
+    'turquoise': '#40E0D0',
+    'vert olive': '#808000', 'olive': '#808000',
+    'vert emeraude': '#50C878', 'emeraude': '#50C878', 'vert émeraude': '#50C878', 'émeraude': '#50C878',
+    'anthracite': '#303030',
+    'taupe': '#483C32',
+    'cognac': '#9A463D',
+    'caramel': '#C68E17',
+    'moutarde': '#E1AD01',
+    'corail': '#FF7F50', 'coral': '#FF7F50',
+    'lilas': '#C8A2C8',
+    'lavande': '#E6E6FA',
+    'fuchsia': '#FF00FF',
+    'creme': '#FFFDD0', 'crème': '#FFFDD0', 'ivoire': '#FFFFF0', 'ivory': '#FFFFF0',
+    'menthe': '#98FF98',
   };
 
 
@@ -154,6 +193,8 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private scrollLock: ScrollLockService,
     private toast: ManagerToastService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   @HostListener('document:keydown.escape')
@@ -179,6 +220,31 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
       if (event.module === 'products')   this.loadProducts(0);
       if (event.module === 'categories') this.loadCategories();
       this.cdr.markForCheck();
+    });
+
+    this.wsService.stockUpdate$.pipe(takeUntil(this.destroy$)).subscribe(update => {
+      const idx = this.products.findIndex(p => p.id === update.productId);
+      if (idx !== -1) {
+        this.products = [...this.products];
+        this.products[idx] = { ...this.products[idx], stock: update.stock };
+        this._computeStats();
+        this.cdr.markForCheck();
+      }
+      if (this.editingProduct?.id === update.productId) {
+        this.editingProduct.stock = update.stock;
+        if (update.variantId != null && update.variantStock != null && this.productVariants) {
+          const v = this.productVariants.find(vr => vr.id === update.variantId);
+          if (v) v.stock = update.variantStock;
+        }
+        this.cdr.markForCheck();
+      }
+    });
+
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      const editSlug = params['edit'];
+      if (editSlug) {
+        this.openEditDrawer({ slug: editSlug } as ProductSummaryResponse);
+      }
     });
   }
 
@@ -494,6 +560,9 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.tempAttributes = [];
     this.selectedCreationAttrValueIds = [];
     this.editingTempAttr = null;
+    if (this.route.snapshot.queryParams['edit']) {
+      this.router.navigate([], { relativeTo: this.route, queryParams: { edit: null }, queryParamsHandling: 'merge', replaceUrl: true });
+    }
     this.cdr.markForCheck();
   }
 
@@ -654,20 +723,30 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   // ── Création : image + couleur ────────────────────────────────────────────
 
   onCreationColorNameChange(name: string): void {
-    const hex = this.COLOR_MAP[name.toLowerCase().trim()];
+    if (!name) return;
+    const lower = name.toLowerCase().trim();
+    const normalized = lower.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const hex = this.COLOR_MAP[lower] || this.COLOR_MAP[normalized];
     if (hex) this.pendingCreationColor.colorHex = hex;
   }
 
-  onCreationImageSelected(event: Event): void {
+  async onCreationImageSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
     if (!file || this.creationItems.length >= 4) return;
-    this.pendingCreationFile = file;
     this.pendingCreationColorError = null;
-    const reader = new FileReader();
-    reader.onload = (e) => { this.pendingCreationPreview = e.target?.result as string; this.cdr.markForCheck(); };
-    reader.readAsDataURL(file);
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.pendingCreationFile = compressed;
+      this.pendingCreationPreview = preview;
+    } catch {
+      this.pendingCreationFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.pendingCreationPreview = e.target?.result as string; this.cdr.markForCheck(); };
+      reader.readAsDataURL(file);
+    }
+    this.cdr.markForCheck();
   }
 
   cancelPendingCreation(): void {
@@ -700,15 +779,23 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
 
   // ── Image / vidéo ─────────────────────────────────────────────────────────
 
-  onFileSelected(event: Event): void {
+  async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
-    if (!file || !file.type.startsWith('image/')) return;
-    this.selectedImageFile = file; this.uploadError = null;
-    const reader = new FileReader();
-    reader.onload = (e) => { this.imagePreview = e.target?.result as string; this.cdr.markForCheck(); };
-    reader.readAsDataURL(file);
+    if (!file) return;
+    this.uploadError = null;
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.selectedImageFile = compressed;
+      this.imagePreview = preview;
+    } catch {
+      this.selectedImageFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.imagePreview = e.target?.result as string; this.cdr.markForCheck(); };
+      reader.readAsDataURL(file);
+    }
+    this.cdr.markForCheck();
   }
 
   onVideoSelected(event: Event): void {
@@ -738,16 +825,23 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onMediaSelected(event: Event): void {
+  async onMediaSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
     if (!file || !this.editingProduct) return;
-    this.pendingMediaFile = file;
     this.mediaColorError = null;
-    const reader = new FileReader();
-    reader.onload = (e) => { this.pendingMediaPreview = e.target?.result as string; this.cdr.markForCheck(); };
-    reader.readAsDataURL(file);
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.pendingMediaFile = compressed;
+      this.pendingMediaPreview = preview;
+    } catch {
+      this.pendingMediaFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.pendingMediaPreview = e.target?.result as string; this.cdr.markForCheck(); };
+      reader.readAsDataURL(file);
+    }
+    this.cdr.markForCheck();
   }
 
   cancelPendingMedia(): void { this.pendingMediaFile = null; this.pendingMediaPreview = null; this.mediaColorError = null; this.cdr.markForCheck(); }

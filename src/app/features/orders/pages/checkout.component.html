@@ -28,7 +28,7 @@
         <span>Carte</span>
       </div>
       <button (click)="cancelRedirect()"
-        class="text-sm px-6 py-2.5 rounded-xl border transition-all"
+        class="text-sm px-6 py-2.5 rounded-xl border transition-all hover:bg-black/5"
         style="color:#6b7280;border-color:rgba(0,0,0,0.12)">
         Annuler
       </button>
@@ -38,244 +38,401 @@
 
 <!-- ── CHECKOUT PAGE ── -->
 @if (!checkoutSuccess) {
-  <div class="min-h-screen" style="background:var(--color-bg,#faf9f6)">
+  <div class="min-h-screen pb-20" style="background:var(--color-bg,#faf9f6)">
 
-    <!-- Header -->
-    <div class="sticky top-0 z-40 border-b"
+    <!-- Top Navigation Bar -->
+    <div class="sticky top-0 z-40 border-b backdrop-blur-md"
          style="background:#0a0a0a;border-color:rgba(212,175,55,0.20)">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-        <!-- Back -->
-        <a routerLink="/products"
-           class="flex items-center gap-2 text-sm transition-colors hover:text-gold"
-           style="color:rgba(255,255,255,0.60)">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-          </svg>
-          <span class="hidden sm:inline">Continuer mes achats</span>
-        </a>
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
+        
+        <!-- Dynamic Back Button -->
+        @if (currentStep === 1) {
+          <a routerLink="/products"
+             class="flex items-center gap-1.5 text-xs sm:text-sm font-semibold transition-colors hover:text-gold"
+             style="color:rgba(255,255,255,0.70)">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            <span class="hidden sm:inline">Continuer mes achats</span>
+            <span class="sm:hidden">Boutique</span>
+          </a>
+        } @else {
+          <button type="button" (click)="prevStep()"
+             class="flex items-center gap-1.5 text-xs sm:text-sm font-semibold transition-colors hover:text-gold"
+             style="color:rgba(255,255,255,0.85)">
+            <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+            </svg>
+            <span class="hidden sm:inline">
+              {{ currentStep === 3 ? '← Modifier la livraison' : '← Revenir au panier' }}
+            </span>
+            <span class="sm:hidden text-gold font-bold">Retour</span>
+          </button>
+        }
 
-        <!-- Stepper -->
-        <div class="flex items-center gap-2 text-xs font-bold select-none">
-          <!-- Step 1 -->
-          <div class="flex items-center gap-1.5">
-            <div class="w-5 h-5 rounded-full bg-gold flex items-center justify-center text-black text-[10px] font-black">✓</div>
-            <span class="hidden sm:inline" style="color:rgba(255,255,255,0.55)">Panier</span>
-          </div>
-          <div class="w-6 h-px" style="background:rgba(212,175,55,0.35)"></div>
-          <!-- Step 2 -->
-          <div class="flex items-center gap-1.5">
-            <div class="w-5 h-5 rounded-full bg-gold flex items-center justify-center text-black text-[10px] font-black">2</div>
-            <span class="hidden sm:inline text-gold">Livraison</span>
-          </div>
-          <div class="w-6 h-px" style="background:rgba(255,255,255,0.15)"></div>
-          <!-- Step 3 -->
-          <div class="flex items-center gap-1.5">
-            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black border"
-                 style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.18);color:rgba(255,255,255,0.40)">3</div>
-            <span class="hidden sm:inline" style="color:rgba(255,255,255,0.35)">Confirmation</span>
-          </div>
-        </div>
+        <!-- Interactive 3-Step Stepper -->
+        <nav aria-label="Étapes de commande" class="flex items-center gap-1 sm:gap-3 text-xs font-bold select-none">
+          <!-- Step 1: Panier -->
+          <button type="button" (click)="goToStep(1)"
+            class="flex items-center gap-1.5 px-2 py-1 rounded-xl transition-all cursor-pointer hover:bg-white/10"
+            [class.text-gold]="currentStep === 1"
+            [class.opacity-90]="currentStep > 1"
+            [class.opacity-50]="currentStep < 1">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black transition-all"
+                 [ngClass]="currentStep > 1 ? 'bg-green-500 text-white' : (currentStep === 1 ? 'bg-gold text-black shadow-md ring-2 ring-gold/40' : 'bg-white/10 text-white/50')">
+              @if (currentStep > 1) {
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              } @else {
+                1
+              }
+            </div>
+            <span class="hidden sm:inline font-bold" [class.text-white]="currentStep > 1" [class.text-gold]="currentStep === 1">Panier</span>
+          </button>
+
+          <div class="w-3 sm:w-8 h-0.5 transition-colors"
+               [ngClass]="currentStep > 1 ? 'bg-gold' : 'bg-white/15'"></div>
+
+          <!-- Step 2: Livraison -->
+          <button type="button" (click)="goToStep(2)"
+            class="flex items-center gap-1.5 px-2 py-1 rounded-xl transition-all cursor-pointer hover:bg-white/10"
+            [class.text-gold]="currentStep === 2"
+            [class.opacity-90]="currentStep > 2"
+            [class.opacity-50]="currentStep < 2">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black transition-all"
+                 [ngClass]="currentStep > 2 ? 'bg-green-500 text-white' : (currentStep === 2 ? 'bg-gold text-black shadow-md ring-2 ring-gold/40' : 'bg-white/10 text-white/50 border border-white/20')">
+              @if (currentStep > 2) {
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              } @else {
+                2
+              }
+            </div>
+            <span class="hidden sm:inline font-bold" [class.text-white]="currentStep > 2" [class.text-gold]="currentStep === 2">Livraison</span>
+          </button>
+
+          <div class="w-3 sm:w-8 h-0.5 transition-colors"
+               [ngClass]="currentStep > 2 ? 'bg-gold' : 'bg-white/15'"></div>
+
+          <!-- Step 3: Paiement -->
+          <button type="button" (click)="goToStep(3)"
+            class="flex items-center gap-1.5 px-2 py-1 rounded-xl transition-all cursor-pointer hover:bg-white/10"
+            [class.text-gold]="currentStep === 3"
+            [class.opacity-50]="currentStep < 3">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black transition-all"
+                 [ngClass]="currentStep === 3 ? 'bg-gold text-black shadow-md ring-2 ring-gold/40' : 'bg-white/10 text-white/50 border border-white/20'">
+              3
+            </div>
+            <span class="hidden sm:inline font-bold" [class.text-gold]="currentStep === 3">Paiement</span>
+          </button>
+        </nav>
 
         <!-- Cart count badge -->
-        <div class="flex items-center gap-1.5 text-sm" style="color:rgba(255,255,255,0.50)">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-1.5 text-xs sm:text-sm" style="color:rgba(255,255,255,0.70)">
+          <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
           </svg>
-          <span class="text-gold font-bold">{{ cartCount }}</span>
+          <span class="text-gold font-black">{{ cartCount }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Body -->
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+    <!-- Main Container -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+      <!-- Step Error Alert -->
+      @if (stepError) {
+        <div class="mb-6 flex items-center justify-between gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 text-sm font-semibold">
+          <div class="flex items-center gap-2.5">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span>{{ stepError }}</span>
+          </div>
+          <button (click)="stepError = null" class="text-xs hover:underline">Fermer</button>
+        </div>
+      }
+
       @if (cartItems.length === 0) {
-        <!-- Empty cart -->
-        <div class="flex flex-col items-center justify-center gap-4 py-20 text-center">
-          <svg class="w-16 h-16" style="color:rgba(0,0,0,0.15)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-          </svg>
-          <p class="font-bold text-lg" style="color:#374151">Votre panier est vide</p>
-          <a routerLink="/products" class="text-sm text-gold hover:underline">Découvrir nos articles</a>
+        <!-- Panier vide -->
+        <div class="flex flex-col items-center justify-center gap-4 py-24 text-center">
+          <div class="w-20 h-20 rounded-full bg-black/5 flex items-center justify-center">
+            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+          </div>
+          <h2 class="font-black text-xl" style="color:#111111">Votre panier est vide</h2>
+          <p class="text-sm max-w-sm" style="color:#6b7280">
+            Vous n'avez pas encore d'articles sélectionnés. Découvrez nos collections pour débuter votre commande.
+          </p>
+          <a routerLink="/products"
+             class="mt-2 inline-flex items-center gap-2 px-6 py-3 bg-gold text-black font-bold rounded-2xl shadow-lg hover:shadow-yellow-600/25 transition-all">
+            Découvrir nos articles →
+          </a>
         </div>
       } @else {
-        <!-- 2-column layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 items-start">
 
-          <!-- ── LEFT: Récapitulatif ── -->
-          <div class="space-y-6">
-            <h2 class="text-lg font-black" style="color:#111111">Récapitulatif de la commande</h2>
-
-            <!-- Items list -->
-            <div class="rounded-2xl overflow-hidden border" style="border-color:rgba(0,0,0,0.09)">
-              @for (item of cartItems; track (item.productId + '-' + (item.variantId ?? 0))) {
-                <div class="flex items-center gap-4 px-4 py-4"
-                     style="background:#fff;border-bottom:1px solid rgba(0,0,0,0.05)">
-                  <!-- Image -->
-                  <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
-                    @if (item.imageUrl) {
-                      <img [src]="item.imageUrl | mediaUrl" [alt]="item.productName"
-                           class="w-full h-full object-cover"/>
-                    } @else {
-                      <div class="w-full h-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                      </div>
-                    }
-                  </div>
-                  <!-- Info -->
-                  <div class="flex-1 min-w-0">
-                    <p class="font-semibold text-sm truncate" style="color:#111111">{{ item.productName }}</p>
-                    @if (item.selectedColorHex || item.selectedColor) {
-                      <div class="flex items-center gap-2 mt-0.5">
-                        @if (item.selectedColorHex) {
-                          <span class="w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
-                                [style.background-color]="item.selectedColorHex"></span>
-                        }
-                        @if (item.selectedColor) {
-                          <span class="text-xs" style="color:#9ca3af">{{ item.selectedColor }}</span>
-                        }
-                      </div>
-                    }
-                    <p class="text-xs mt-1" style="color:#9ca3af">Qté : {{ item.quantity }}</p>
-                  </div>
-                  <!-- Price -->
-                  <div class="text-right flex-shrink-0">
-                    <p class="font-black text-sm gold-text">{{ item.price * item.quantity | number:'1.0-0':'fr-FR' }}</p>
-                    <p class="text-xs" style="color:#9ca3af">FCFA</p>
-                  </div>
+        <!-- ══════════════════════════════════════════════════════════════
+             ÉTAPE 1 : PANIER & ARTICLES
+        ══════════════════════════════════════════════════════════════ -->
+        @if (currentStep === 1) {
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+            
+            <!-- Left: Items management -->
+            <div class="space-y-5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-gold">Étape 1 sur 3</span>
+                  <h1 class="text-xl sm:text-2xl font-black" style="color:#111111">Vérification de votre panier</h1>
                 </div>
-              }
-            </div>
-
-            <!-- Totals -->
-            <div class="rounded-2xl px-5 py-4 space-y-3 border"
-                 style="background:#fff;border-color:rgba(0,0,0,0.09)">
-              <div class="flex items-center justify-between text-sm">
-                <span style="color:#6b7280">Sous-total ({{ cartCount }} article{{ cartCount > 1 ? 's' : '' }})</span>
-                <span class="font-semibold" style="color:#374151">{{ cartTotal | number:'1.0-0':'fr-FR' }}&thinsp;FCFA</span>
+                <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-gold/10 text-gold border border-gold/20">
+                  {{ cartCount }} article{{ cartCount > 1 ? 's' : '' }}
+                </span>
               </div>
-              <div class="flex items-center justify-between text-sm">
-                <span style="color:#6b7280">Livraison</span>
-                @if (shippingFee === 0) {
-                  <span style="color:#9ca3af;text-align:right;line-height:1.4">Abidjan 1 500 FCFA<br>Intérieur 2 000 FCFA</span>
-                } @else {
-                  <span class="font-semibold text-orange-500">{{ shippingFee | number:'1.0-0':'fr-FR' }}&thinsp;FCFA</span>
+
+              <!-- List of items -->
+              <div class="rounded-2xl overflow-hidden border divide-y divide-black/5" style="border-color:rgba(0,0,0,0.09)">
+                @for (item of cartItems; track (item.productId + '-' + (item.variantId ?? 0))) {
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5 bg-white transition-colors hover:bg-black/[0.01]">
+                    
+                    <!-- Thumbnail -->
+                    <div class="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100 border border-black/5 relative">
+                      @if (item.imageUrl) {
+                        <img [src]="item.imageUrl | mediaUrl" [alt]="item.productName"
+                             class="w-full h-full object-cover"/>
+                      } @else {
+                        <div class="w-full h-full flex items-center justify-center text-gray-400">
+                          📦
+                        </div>
+                      }
+                      @if (item.selectedColorHex) {
+                        <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow"
+                              [style.background-color]="item.selectedColorHex"></span>
+                      }
+                    </div>
+
+                    <!-- Details -->
+                    <div class="flex-1 min-w-0">
+                      <p class="font-bold text-base text-gray-900 truncate">{{ item.productName }}</p>
+                      @if (item.selectedColor) {
+                        <p class="text-xs font-semibold text-gold mt-0.5">Modèle : {{ item.selectedColor }}</p>
+                      }
+                      <p class="text-xs text-gray-500 mt-1">
+                        Prix unitaire : <strong class="text-gray-800">{{ item.price | number:'1.0-0':'fr-FR' }} FCFA</strong>
+                      </p>
+                    </div>
+
+                    <!-- Quantity Stepper & Price -->
+                    <div class="flex items-center justify-between sm:justify-end gap-5">
+                      <!-- Stepper -->
+                      <div class="flex items-center rounded-xl border border-black/10 overflow-hidden bg-gray-50">
+                        <button type="button" (click)="updateItemQuantity(item, -1)"
+                          class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gold hover:bg-black/5 transition-colors">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/>
+                          </svg>
+                        </button>
+                        <span class="w-8 text-center font-black text-sm text-gray-900">{{ item.quantity }}</span>
+                        <button type="button" (click)="updateItemQuantity(item, 1)"
+                          [disabled]="item.quantity >= item.maxStock"
+                          class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gold hover:bg-black/5 transition-colors disabled:opacity-30">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                          </svg>
+                        </button>
+                      </div>
+
+                      <!-- Subtotal -->
+                      <div class="text-right min-w-[90px]">
+                        <p class="font-black text-base gold-text">{{ item.price * item.quantity | number:'1.0-0':'fr-FR' }}</p>
+                        <p class="text-[11px] text-gray-400">FCFA</p>
+                      </div>
+
+                      <!-- Trash button -->
+                      <button type="button" (click)="removeItem(item)"
+                        title="Supprimer cet article"
+                        class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                      </button>
+                    </div>
+
+                  </div>
                 }
               </div>
-              @if (discountAmount > 0) {
-                <div class="flex items-center justify-between text-sm">
-                  <span style="color:#6b7280">Réduction ({{ promoCheckResult!.discountPercent }}%)</span>
-                  <span class="font-semibold text-green-500">−{{ discountAmount | number:'1.0-0':'fr-FR' }}&thinsp;FCFA</span>
-                </div>
-              }
-              <div class="h-px" style="background:linear-gradient(90deg,transparent,rgba(212,175,55,0.4),transparent)"></div>
-              <div class="flex items-center justify-between">
-                <span class="font-black text-base" style="color:#111111">Total</span>
-                <div class="flex items-baseline gap-1.5">
-                  @if (discountAmount > 0) {
-                    <span class="text-sm line-through" style="color:#9ca3af">{{ (cartTotal + shippingFee) | number:'1.0-0':'fr-FR' }}</span>
+
+              <!-- Promo Code Card -->
+              <div class="p-5 rounded-2xl bg-white border" style="border-color:rgba(0,0,0,0.09)">
+                <label class="block text-xs font-bold uppercase tracking-wider mb-2" style="color:#6b7280">Vous avez un code promo ?</label>
+                @if (promoCheckResult?.valid) {
+                  <div class="flex items-center justify-between px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
+                    <span>✓ <strong>{{ promoCheckResult!.code }}</strong> appliqué — {{ promoCheckResult!.discountPercent }}% de réduction</span>
+                    <button (click)="removePromo()" class="text-xs text-red-500 hover:underline font-semibold ml-3">Retirer</button>
+                  </div>
+                } @else {
+                  <div class="flex gap-2">
+                    <input type="text" [(ngModel)]="promoCodeInput"
+                      placeholder="CODE PROMO…"
+                      (keyup.enter)="checkPromo()"
+                      class="theme-input flex-1 px-4 py-2.5 rounded-xl text-sm uppercase tracking-widest transition-all"/>
+                    <button (click)="checkPromo()"
+                      [disabled]="promoChecking || !promoCodeInput.trim()"
+                      class="px-5 py-2.5 rounded-xl text-sm font-bold bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25 transition-colors disabled:opacity-40">
+                      {{ promoChecking ? 'Vérification…' : 'Appliquer' }}
+                    </button>
+                  </div>
+                  @if (promoError) {
+                    <p class="text-xs text-red-500 mt-1.5">{{ promoError }}</p>
                   }
-                  <span class="text-2xl font-black gold-text">{{ finalTotal | number:'1.0-0':'fr-FR' }}</span>
-                  <span class="text-sm" style="color:#6b7280">FCFA</span>
+                }
+              </div>
+
+            </div>
+
+            <!-- Right: Order summary & Next action -->
+            <div class="space-y-5 lg:sticky lg:top-24">
+              <div class="p-5 rounded-2xl bg-white border space-y-4" style="border-color:rgba(0,0,0,0.09)">
+                <h3 class="font-black text-base text-gray-900 pb-3 border-b border-gray-100">Récapitulatif de commande</h3>
+
+                <div class="space-y-2.5 text-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-gray-500">Sous-total ({{ cartCount }} articles)</span>
+                    <span class="font-bold text-gray-900">{{ cartTotal | number:'1.0-0':'fr-FR' }} FCFA</span>
+                  </div>
+
+                  @if (discountAmount > 0) {
+                    <div class="flex items-center justify-between text-green-600">
+                      <span>Réduction code promo</span>
+                      <span class="font-bold">−{{ discountAmount | number:'1.0-0':'fr-FR' }} FCFA</span>
+                    </div>
+                  }
+
+                  <div class="flex items-center justify-between text-gray-500">
+                    <span>Livraison</span>
+                    <span class="text-xs text-gray-400">Calculée à l'étape suivante</span>
+                  </div>
+                </div>
+
+                <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+                  <span class="font-black text-base text-gray-900">Total estimé</span>
+                  <div class="text-right">
+                    <span class="text-2xl font-black gold-text">{{ (cartTotal - discountAmount) | number:'1.0-0':'fr-FR' }}</span>
+                    <span class="text-xs text-gray-500 ml-1">FCFA</span>
+                  </div>
+                </div>
+
+                <!-- Next Button -->
+                <button type="button" (click)="goToStep(2)"
+                  class="w-full py-4 bg-gold text-black font-black rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all">
+                  <span>Passer à la livraison</span>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                  </svg>
+                </button>
+
+                <p class="text-[11px] text-center text-gray-400">
+                  Étape 1 sur 3 · Aucun paiement n'est débité à cette étape
+                </p>
+              </div>
+
+              <!-- Reassurance -->
+              <div class="p-4 rounded-2xl bg-black/[0.02] border border-black/5 space-y-2 text-xs text-gray-600">
+                <div class="flex items-center gap-2">
+                  <span class="text-green-500 font-bold">✓</span>
+                  <span>Paiements mobiles Wave, Orange Money, MTN & Carte</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-blue-500 font-bold">✓</span>
+                  <span>Livraison express à Abidjan & partout en Côte d'Ivoire</span>
                 </div>
               </div>
             </div>
 
-            <!-- Guarantees -->
-            <div class="flex flex-col sm:flex-row gap-3">
-              <div class="flex items-center gap-2 text-xs" style="color:#6b7280">
-                <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-                Commande sécurisée
-              </div>
-              <div class="flex items-center gap-2 text-xs" style="color:#6b7280">
-                <svg class="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                </svg>
-                Livraison 24–72h
-              </div>
-              <div class="flex items-center gap-2 text-xs" style="color:#6b7280">
-                <svg class="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/>
-                </svg>
-                Retour sous 3 jours
-              </div>
-            </div>
           </div>
+        }
 
-          <!-- ── RIGHT: Form ── -->
-          <div class="space-y-5">
-            <h2 class="text-lg font-black" style="color:#111111">Informations de livraison</h2>
+        <!-- ══════════════════════════════════════════════════════════════
+             ÉTAPE 2 : INFORMATIONS DE LIVRAISON
+        ══════════════════════════════════════════════════════════════ -->
+        @if (currentStep === 2) {
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+            
+            <!-- Left: Delivery Form -->
+            <div class="space-y-6">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-gold">Étape 2 sur 3</span>
+                <h1 class="text-xl sm:text-2xl font-black" style="color:#111111">Coordonnées & Lieu de livraison</h1>
+              </div>
 
-            <!-- Card -->
-            <div class="rounded-2xl border overflow-hidden" style="background:#fff;border-color:rgba(0,0,0,0.09)">
-              <div class="divide-y" style="--tw-divide-opacity:1">
-
+              <div class="rounded-2xl border overflow-hidden bg-white divide-y divide-black/5" style="border-color:rgba(0,0,0,0.09)">
+                
                 <!-- Phone -->
-                <div class="px-5 py-4">
-                  <label class="block text-xs font-bold mb-2" style="color:#6b7280">
-                    Téléphone <span class="text-red-500">*</span>
+                <div class="p-5">
+                  <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-600">
+                    Numéro de téléphone WhatsApp / Appel <span class="text-red-500">*</span>
                   </label>
                   <input type="tel" [ngModel]="deliveryPhone" (input)="onPhoneInput()"
                     placeholder="+225 07 00 00 00 00"
-                    class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
+                    class="theme-input w-full px-4 py-3 rounded-xl text-base font-medium transition-all"/>
+                  <p class="text-xs text-gray-400 mt-1.5">Le livreur vous appellera sur ce numéro avant la livraison.</p>
                 </div>
 
-                <!-- Zone -->
-                <div class="px-5 py-4">
-                  <label class="block text-xs font-bold mb-3" style="color:#6b7280">
+                <!-- Zone selection -->
+                <div class="p-5">
+                  <label class="block text-xs font-bold uppercase tracking-wider mb-3 text-gray-600">
                     Zone de livraison <span class="text-red-500">*</span>
                   </label>
-                  <div class="grid grid-cols-2 gap-3">
-                    <button (click)="deliveryZone = 'abidjan'; deliveryCity = ''"
-                      class="flex flex-col items-center gap-2 px-3 py-3.5 rounded-xl text-sm font-bold border transition-all"
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button type="button" (click)="deliveryZone = 'abidjan'; deliveryCity = ''"
+                      class="flex flex-col items-center gap-2 p-4 rounded-2xl text-sm font-bold border-2 transition-all cursor-pointer text-left"
                       [ngClass]="deliveryZone === 'abidjan'
-                        ? 'border-[#b8941e] bg-[#b8941e]/8 text-[#b8941e]'
-                        : 'border-gray-200 text-gray-500 hover:border-[#b8941e]/50'">
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                      </svg>
-                      <span>Abidjan</span>
-                      <span class="text-[11px] font-semibold opacity-70">1 500 FCFA</span>
+                        ? 'border-gold bg-gold/10 text-gold ring-2 ring-gold/20 shadow-md'
+                        : 'border-gray-200 text-gray-600 hover:border-gold/40'">
+                      <div class="flex items-center justify-between w-full">
+                        <span class="text-base font-black">Abidjan</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-black bg-gold/20 text-gold">1 500 FCFA</span>
+                      </div>
+                      <p class="text-xs font-normal opacity-80 w-full">Toutes communes (Cocody, Yopougon, Marcory…)</p>
                     </button>
-                    <button (click)="deliveryZone = 'interieur'; deliveryAddress = ''"
-                      class="flex flex-col items-center gap-2 px-3 py-3.5 rounded-xl text-sm font-bold border transition-all"
+
+                    <button type="button" (click)="deliveryZone = 'interieur'; deliveryAddress = ''"
+                      class="flex flex-col items-center gap-2 p-4 rounded-2xl text-sm font-bold border-2 transition-all cursor-pointer text-left"
                       [ngClass]="deliveryZone === 'interieur'
-                        ? 'border-[#b8941e] bg-[#b8941e]/8 text-[#b8941e]'
-                        : 'border-gray-200 text-gray-500 hover:border-[#b8941e]/50'">
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                      </svg>
-                      <span>Intérieur</span>
-                      <span class="text-[11px] font-semibold opacity-70">2 000 FCFA</span>
+                        ? 'border-gold bg-gold/10 text-gold ring-2 ring-gold/20 shadow-md'
+                        : 'border-gray-200 text-gray-600 hover:border-gold/40'">
+                      <div class="flex items-center justify-between w-full">
+                        <span class="text-base font-black">Intérieur du pays</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-black bg-orange-500/20 text-orange-500">2 000 FCFA</span>
+                      </div>
+                      <p class="text-xs font-normal opacity-80 w-full">Villes de province de Côte d'Ivoire</p>
                     </button>
                   </div>
                 </div>
 
-                <!-- Abidjan address -->
+                <!-- Abidjan Address -->
                 @if (deliveryZone === 'abidjan') {
-                  <div class="px-5 py-4">
-                    <label class="block text-xs font-bold mb-2" style="color:#6b7280">
-                      Lieu de livraison <span class="text-red-500">*</span>
+                  <div class="p-5 bg-gold/[0.02]">
+                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-600">
+                      Commune & Précision d'adresse à Abidjan <span class="text-red-500">*</span>
                     </label>
                     <input type="text" [(ngModel)]="deliveryAddress"
-                      placeholder="Ex: Cocody Angré, Yopougon Marché…"
+                      placeholder="Ex: Cocody Angré 8ème tranche, carrefour prière…"
                       class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
                   </div>
                 }
 
-                <!-- Interior city -->
+                <!-- Interior City -->
                 @if (deliveryZone === 'interieur') {
-                  <div class="px-5 py-4">
-                    <label class="block text-xs font-bold mb-2" style="color:#6b7280">
+                  <div class="p-5 bg-gold/[0.02]">
+                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-600">
                       Ville de destination <span class="text-red-500">*</span>
                     </label>
                     <select [(ngModel)]="deliveryCity"
                       class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all">
-                      <option value="" disabled>Choisir une ville…</option>
+                      <option value="" disabled>Choisir votre ville…</option>
                       @for (ville of villesInterieur; track ville) {
                         <option [value]="ville">{{ ville }}</option>
                       }
@@ -283,92 +440,280 @@
                   </div>
                 }
 
-                <!-- Promo code -->
-                <div class="px-5 py-4">
-                  <label class="block text-xs font-bold mb-2" style="color:#6b7280">Code promo</label>
-                  @if (promoCheckResult?.valid) {
-                    <div class="flex items-center justify-between px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
-                      <span>✓ <strong>{{ promoCheckResult!.code }}</strong> — {{ promoCheckResult!.discountPercent }}% de réduction</span>
-                      <button (click)="removePromo()" class="text-xs text-red-400 hover:text-red-600 transition-colors ml-3 font-semibold">Retirer</button>
+              </div>
+
+              <!-- Navigation Buttons between steps -->
+              <div class="flex items-center justify-between gap-4 pt-2">
+                <button type="button" (click)="goToStep(1)"
+                  class="flex items-center gap-2 px-6 py-3.5 rounded-2xl border border-gray-300 text-gray-700 font-bold text-sm hover:bg-gray-50 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                  </svg>
+                  <span>Revenir au panier</span>
+                </button>
+
+                <button type="button" (click)="goToStep(3)"
+                  [disabled]="!isDeliveryValid"
+                  class="flex items-center gap-2 px-7 py-3.5 bg-gold text-black font-black rounded-2xl text-sm shadow-lg hover:shadow-yellow-600/30 hover:-translate-y-0.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0">
+                  <span>Continuer vers le paiement</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Right: Order summary & Back link -->
+            <div class="space-y-5 lg:sticky lg:top-24">
+              <div class="p-5 rounded-2xl bg-white border space-y-4" style="border-color:rgba(0,0,0,0.09)">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                  <h3 class="font-black text-base text-gray-900">Votre commande</h3>
+                  <button type="button" (click)="goToStep(1)" class="text-xs text-gold font-bold hover:underline">
+                    Modifier les articles
+                  </button>
+                </div>
+
+                <!-- Compact list of items -->
+                <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  @for (item of cartItems; track (item.productId + '-' + (item.variantId ?? 0))) {
+                    <div class="flex items-center justify-between text-xs py-1">
+                      <div class="flex items-center gap-2 min-w-0">
+                        <span class="font-bold text-gray-700">{{ item.quantity }}x</span>
+                        <span class="truncate text-gray-800">{{ item.productName }}</span>
+                      </div>
+                      <span class="font-bold text-gray-900 ml-2 whitespace-nowrap">{{ item.price * item.quantity | number:'1.0-0':'fr-FR' }} F</span>
                     </div>
-                  } @else {
-                    <div class="flex gap-2">
-                      <input type="text" [(ngModel)]="promoCodeInput"
-                        placeholder="CODE PROMO…"
-                        (keyup.enter)="checkPromo()"
-                        class="theme-input flex-1 px-4 py-3 rounded-xl text-sm uppercase tracking-widest transition-all"/>
-                      <button (click)="checkPromo()"
-                        [disabled]="promoChecking || !promoCodeInput.trim()"
-                        class="px-4 py-3 rounded-xl text-sm font-bold bg-gold/10 text-gold border border-gold/25
-                               hover:bg-gold/18 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
-                        @if (promoChecking) {
-                          <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                          </svg>
-                        } @else {
-                          Appliquer
-                        }
-                      </button>
-                    </div>
-                    @if (promoError) {
-                      <p class="text-xs text-red-500 mt-1.5">{{ promoError }}</p>
-                    }
                   }
+                </div>
+
+                <!-- Price breakdown -->
+                <div class="space-y-2 pt-3 border-t border-gray-100 text-sm">
+                  <div class="flex items-center justify-between text-gray-500">
+                    <span>Sous-total</span>
+                    <span class="font-semibold text-gray-900">{{ cartTotal | number:'1.0-0':'fr-FR' }} FCFA</span>
+                  </div>
+
+                  <div class="flex items-center justify-between text-gray-500">
+                    <span>Frais de livraison</span>
+                    @if (shippingFee === 0) {
+                      <span class="text-xs text-gray-400">À sélectionner</span>
+                    } @else {
+                      <span class="font-bold text-orange-500">+{{ shippingFee | number:'1.0-0':'fr-FR' }} FCFA</span>
+                    }
+                  </div>
+
+                  @if (discountAmount > 0) {
+                    <div class="flex items-center justify-between text-green-600">
+                      <span>Réduction promo</span>
+                      <span class="font-bold">−{{ discountAmount | number:'1.0-0':'fr-FR' }} FCFA</span>
+                    </div>
+                  }
+                </div>
+
+                <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+                  <span class="font-black text-base text-gray-900">Total</span>
+                  <div class="text-right">
+                    <span class="text-2xl font-black gold-text">{{ finalTotal | number:'1.0-0':'fr-FR' }}</span>
+                    <span class="text-xs text-gray-500 ml-1">FCFA</span>
+                  </div>
+                </div>
+
+                <!-- Step CTA -->
+                <button type="button" (click)="goToStep(3)"
+                  [disabled]="!isDeliveryValid"
+                  class="w-full py-3.5 bg-gold text-black font-black rounded-2xl text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-yellow-600/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                  Vérifier et Payer →
+                </button>
+              </div>
+            </div>
+
+          </div>
+        }
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ÉTAPE 3 : CONFIRMATION & PAIEMENT
+        ══════════════════════════════════════════════════════════════ -->
+        @if (currentStep === 3) {
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+            
+            <!-- Left: Final review & Payment button -->
+            <div class="space-y-6">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-gold">Étape 3 sur 3</span>
+                <h1 class="text-xl sm:text-2xl font-black" style="color:#111111">Vérification et Paiement sécurisé</h1>
+              </div>
+
+              <!-- Card: Validated Delivery Details with "Modifier" button -->
+              <div class="p-5 rounded-2xl bg-white border space-y-3" style="border-color:rgba(0,0,0,0.09)">
+                <div class="flex items-center justify-between pb-2 border-b border-gray-100">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <h3 class="font-bold text-sm text-gray-900">Adresse de livraison validée</h3>
+                  </div>
+                  <!-- Back to Step 2 -->
+                  <button type="button" (click)="goToStep(2)"
+                    class="text-xs text-gold font-bold hover:underline flex items-center gap-1">
+                    <span>Modifier</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span class="text-xs text-gray-400 block">Contact livraison :</span>
+                    <span class="font-bold text-gray-800">{{ deliveryPhone }}</span>
+                  </div>
+                  <div>
+                    <span class="text-xs text-gray-400 block">Lieu / Ville :</span>
+                    <span class="font-bold text-gray-800">
+                      {{ deliveryZone === 'abidjan' ? 'Abidjan — ' + deliveryAddress : 'Intérieur — ' + deliveryCity }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Payment Methods & GeniusPay reassurance -->
+              <div class="p-5 rounded-2xl bg-white border space-y-4" style="border-color:rgba(0,0,0,0.09)">
+                <div class="flex items-center gap-2 pb-2 border-b border-gray-100">
+                  <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                  <h3 class="font-bold text-sm text-gray-900">Moyen de paiement</h3>
+                </div>
+
+                <div class="p-4 rounded-xl bg-gold/5 border border-gold/20 flex items-start gap-3">
+                  <div class="w-8 h-8 rounded-full bg-gold/20 text-gold flex items-center justify-center flex-shrink-0 font-black text-sm">
+                    🔒
+                  </div>
+                  <div class="text-xs leading-relaxed text-gray-600">
+                    <p class="font-bold text-gray-900 mb-1">Paiement 100% sécurisé via GeniusPay</p>
+                    <p>En cliquant sur le bouton ci-dessous, vous serez redirigé vers l'espace de paiement pour régler avec votre compte <strong>Wave</strong>, <strong>Orange Money</strong>, <strong>MTN MoMo</strong> ou votre <strong>Carte Bancaire</strong>.</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-center gap-6 py-2 text-xs font-semibold text-gray-500">
+                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>Wave</span>
+                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-orange-500"></span>Orange Money</span>
+                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-yellow-400"></span>MTN MoMo</span>
+                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-600"></span>Carte Visa / Mastercard</span>
+                </div>
+              </div>
+
+              <!-- Error Alert -->
+              @if (checkoutError) {
+                <div class="flex items-start gap-2.5 p-4 rounded-2xl bg-red-50 border border-red-200 text-sm text-red-600">
+                  <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <div>
+                    <p class="font-bold">Échec de la commande</p>
+                    <p class="text-xs mt-0.5">{{ checkoutError }}</p>
+                  </div>
+                </div>
+              }
+
+              <!-- Actions: Back to Step 2 OR Pay Now -->
+              <div class="flex flex-col sm:flex-row items-center gap-4 pt-2">
+                <button type="button" (click)="goToStep(2)"
+                  class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-4 rounded-2xl border border-gray-300 text-gray-700 font-bold text-sm hover:bg-gray-50 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                  </svg>
+                  <span>Modifier la livraison</span>
+                </button>
+
+                <button type="button" (click)="placeOrder()"
+                  [disabled]="!canConfirm"
+                  class="w-full sm:flex-1 py-4 bg-gold text-black font-black rounded-2xl text-base flex items-center justify-center gap-3 shadow-xl hover:shadow-yellow-600/35 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  @if (checkoutLoading) {
+                    <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    <span>Préparation du paiement…</span>
+                  } @else {
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    <span>Confirmer et Payer {{ finalTotal | number:'1.0-0':'fr-FR' }} FCFA</span>
+                  }
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Right: Order recap with Step 1 back link -->
+            <div class="space-y-5 lg:sticky lg:top-24">
+              <div class="p-5 rounded-2xl bg-white border space-y-4" style="border-color:rgba(0,0,0,0.09)">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                  <h3 class="font-black text-base text-gray-900">Articles commandés</h3>
+                  <button type="button" (click)="goToStep(1)" class="text-xs text-gold font-bold hover:underline">
+                    Modifier le panier
+                  </button>
+                </div>
+
+                <!-- Articles summary -->
+                <div class="space-y-3 max-h-56 overflow-y-auto pr-1">
+                  @for (item of cartItems; track (item.productId + '-' + (item.variantId ?? 0))) {
+                    <div class="flex items-center gap-3">
+                      <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 border border-black/5">
+                        @if (item.imageUrl) {
+                          <img [src]="item.imageUrl | mediaUrl" [alt]="item.productName" class="w-full h-full object-cover"/>
+                        }
+                      </div>
+                      <div class="flex-1 min-w-0 text-xs">
+                        <p class="font-bold text-gray-800 truncate">{{ item.productName }}</p>
+                        @if (item.selectedColor) {
+                          <p class="text-gold font-semibold">{{ item.selectedColor }}</p>
+                        }
+                        <p class="text-gray-400">Qté : {{ item.quantity }}</p>
+                      </div>
+                      <div class="text-right text-xs">
+                        <p class="font-black gold-text">{{ item.price * item.quantity | number:'1.0-0':'fr-FR' }} F</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <!-- Financial totals -->
+                <div class="space-y-2 pt-3 border-t border-gray-100 text-sm">
+                  <div class="flex items-center justify-between text-gray-500">
+                    <span>Sous-total</span>
+                    <span class="font-bold text-gray-800">{{ cartTotal | number:'1.0-0':'fr-FR' }} FCFA</span>
+                  </div>
+
+                  <div class="flex items-center justify-between text-gray-500">
+                    <span>Frais de livraison</span>
+                    <span class="font-bold text-orange-500">+{{ shippingFee | number:'1.0-0':'fr-FR' }} FCFA</span>
+                  </div>
+
+                  @if (discountAmount > 0) {
+                    <div class="flex items-center justify-between text-green-600">
+                      <span>Réduction code promo</span>
+                      <span class="font-bold">−{{ discountAmount | number:'1.0-0':'fr-FR' }} FCFA</span>
+                    </div>
+                  }
+                </div>
+
+                <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+                  <span class="font-black text-base text-gray-900">Total à payer</span>
+                  <div class="text-right">
+                    <span class="text-2xl font-black gold-text">{{ finalTotal | number:'1.0-0':'fr-FR' }}</span>
+                    <span class="text-xs text-gray-500 ml-1">FCFA</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Error -->
-            @if (checkoutError) {
-              <div class="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
-                <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                {{ checkoutError }}
-              </div>
-            }
-
-            <!-- Submit -->
-            <button (click)="placeOrder()"
-              [disabled]="!canConfirm"
-              class="w-full py-4 bg-gold text-black font-black rounded-2xl text-base
-                     flex items-center justify-center gap-3
-                     hover:shadow-2xl hover:shadow-yellow-600/30 hover:-translate-y-0.5
-                     active:scale-[.98] transition-all duration-200
-                     disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none">
-              @if (checkoutLoading) {
-                <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
-                Préparation du paiement…
-              } @else {
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-                Payer {{ finalTotal | number:'1.0-0':'fr-FR' }}&thinsp;FCFA
-              }
-            </button>
-
-            <!-- Payment methods -->
-            <div class="text-center space-y-1">
-              <p class="text-xs" style="color:#6b7280">
-                Paiement sécurisé par <strong style="color:#d4af37">GeniusPay</strong>
-              </p>
-              <div class="flex items-center justify-center gap-3 text-[11px]" style="color:#9ca3af">
-                <span>Wave</span>
-                <span class="w-px h-3" style="background:rgba(0,0,0,0.12)"></span>
-                <span>Orange Money</span>
-                <span class="w-px h-3" style="background:rgba(0,0,0,0.12)"></span>
-                <span>MTN</span>
-                <span class="w-px h-3" style="background:rgba(0,0,0,0.12)"></span>
-                <span>Carte</span>
-              </div>
-            </div>
           </div>
-        </div>
+        }
+
       }
     </div>
   </div>

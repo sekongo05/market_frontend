@@ -105,6 +105,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     return role === 'MANAGER' || role === 'ADMIN';
   }
 
+  get isAdmin(): boolean {
+    return this.authService.getCurrentUser()?.role === 'ADMIN';
+  }
+
   get isCustomer(): boolean {
     return this.authService.getCurrentUser()?.role === 'CUSTOMER';
   }
@@ -183,13 +187,17 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         }
         this.loading = false;
         this.cdr.detectChanges();
-        setTimeout(() => this._initScrollReveal(), 0);
+        if (isPlatformBrowser(this.platformId)) {
+          setTimeout(() => this._initScrollReveal(), 0);
+        }
       },
       error: () => {
         this.error = 'Produit introuvable';
         this.loading = false;
         this.cdr.detectChanges();
-        setTimeout(() => this._initScrollReveal(), 0);
+        if (isPlatformBrowser(this.platformId)) {
+          setTimeout(() => this._initScrollReveal(), 0);
+        }
       },
     });
   }
@@ -208,32 +216,36 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private _buildGallery(): void {
     if (!this.product) return;
 
-    // ── Priorité 1 : médias réels de l'API ─────────────────────────────────
-    if (this.product.media?.length) {
-      this.galleryItems = this.product.media.map(m => ({ url: m.url, type: m.mediaType }));
-      if (this.product.imageUrl) {
-        const alreadyInMedia = this.galleryItems.some(i => i.url === this.product!.imageUrl);
-        if (!alreadyInMedia) {
-          this.galleryItems.unshift({ url: this.product.imageUrl, type: 'IMAGE' });
-        }
-      }
-    } else {
-      // ── Priorité 2 : seulement l'image principale ──────────────────────────
-      this.galleryItems = this.product.imageUrl
-        ? [{ url: this.product.imageUrl, type: 'IMAGE' as const }]
-        : [];
+    const items: GalleryItem[] = [];
+
+    // 1. Image principale du produit
+    if (this.product.imageUrl) {
+      items.push({ url: this.product.imageUrl, type: 'IMAGE' });
     }
 
-    // ── Ajouter les images des variantes (si pas déjà présentes) ────────────
+    // 2. Images de toutes les variantes
     if (this.product.variants?.length) {
       for (const v of this.product.variants) {
-        if (v.imageUrl && !this.galleryItems.some(i => i.url === v.imageUrl)) {
-          this.galleryItems.push({ url: v.imageUrl, type: 'IMAGE' });
+        if (v.imageUrl && !items.some(i => i.url === v.imageUrl)) {
+          items.push({ url: v.imageUrl, type: 'IMAGE' });
         }
       }
     }
 
-    // ── Positionner la galerie sur l'image de la variante auto-sélectionnée ──
+    // 3. Médias additionnels du produit
+    if (this.product.media?.length) {
+      for (const m of this.product.media) {
+        if (m.url && !items.some(i => i.url === m.url)) {
+          items.push({ url: m.url, type: m.mediaType });
+        }
+      }
+    }
+
+    this.galleryItems = items.length > 0
+      ? items
+      : (this.product.imageUrl ? [{ url: this.product.imageUrl, type: 'IMAGE' }] : []);
+
+    // 4. Si une variante est sélectionnée, caler la galerie sur son image
     if (this.selectedVariant?.imageUrl) {
       const idx = this.galleryItems.findIndex(g => g.url === this.selectedVariant!.imageUrl);
       if (idx >= 0) this.activeIndex = idx;
@@ -293,14 +305,12 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       if (a.id === attr.id) found = true;
     }
     this.cascadeSelections = { ...this.cascadeSelections };
-    // Check if we have a unique match
+    // Check if we have a match
     const filtered = this.cascadeFilteredVariants;
-    if (filtered.length === 1) {
-      this.cascadeMatchedVariant = filtered[0];
+    if (filtered.length >= 1) {
       this.selectVariant(filtered[0]);
     } else {
       this.cascadeMatchedVariant = null;
-      if (filtered.length === 0) this.selectedVariant = null;
     }
     this.cdr.detectChanges();
   }
@@ -342,21 +352,16 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private _autoSelectVariant(): void {
     this.variantQty = new Map();
     this._initCascade();
-    if (this.isCascadeMode) {
-      const first = this.product?.variants?.find(v => v.stock > 0) ?? this.product?.variants?.[0];
-      if (first) {
-        this.selectedVariant = first;
-        this.cascadeMatchedVariant = first;
-        this._syncCascadeFromVariant(first);
-      }
-      return;
-    }
     if (!this.product?.variants?.length) {
       this.selectedVariant = null;
       return;
     }
-    this.selectedVariant =
-      this.product.variants.find(v => v.stock > 0) ?? this.product.variants[0];
+    const first = this.product.variants.find(v => v.stock > 0) ?? this.product.variants[0];
+    if (first) {
+      this.selectedVariant = first;
+      this.cascadeMatchedVariant = first;
+      this._syncCascadeFromVariant(first);
+    }
   }
 
   private _syncVariantFromImage(url: string): void {
@@ -438,18 +443,43 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get effectiveStock(): number {
     if (!this.product) return 0;
+    if (this.selectedVariant) {
+      return this.selectedVariant.stock;
+    }
     if (this.hasVariants) {
-      // Total stock remaining across all variants minus what's already in the qty map
-      return this.product.variants!.reduce((sum, v) => sum + Math.max(0, v.stock - this.getVariantQty(v.id)), 0);
+      return this.product.variants!.reduce((sum, v) => sum + v.stock, 0);
     }
     return this.product.stock;
   }
 
   selectVariant(variant: ProductVariant): void {
     this.selectedVariant = variant;
+    this.cascadeMatchedVariant = variant;
+    this._syncCascadeFromVariant(variant);
+
     if (variant.imageUrl) {
-      const idx = this.galleryItems.findIndex(g => g.url === variant.imageUrl);
-      if (idx >= 0) this.activeIndex = idx;
+      let idx = this.galleryItems.findIndex(g => g.url === variant.imageUrl);
+      if (idx === -1) {
+        this.galleryItems.unshift({ url: variant.imageUrl, type: 'IMAGE' });
+        idx = 0;
+      }
+      this.activeIndex = idx;
+      this.zoomed = false;
+
+      // Sur mobile, si l'image est hors champ au-dessus, on scroll doucement vers la galerie
+      if (isPlatformBrowser(this.platformId) && window.innerWidth < 1024) {
+        const galleryEl = document.getElementById('product-media-gallery');
+        if (galleryEl) {
+          const rect = galleryEl.getBoundingClientRect();
+          if (rect.bottom < 120) {
+            galleryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      }
+    }
+
+    if (variant.stock > 0) {
+      this.quantity = Math.max(1, Math.min(this.quantity, variant.stock));
     }
     this.cdr.detectChanges();
   }
@@ -477,8 +507,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get totalSelectedPrice(): number {
     if (!this.product) return 0;
-    const unitPrice = this.product.salePrice ?? this.product.price;
-    return unitPrice * this.totalSelectedQty;
+    const unitPrice = this.selectedVariant?.price ?? this.product.salePrice ?? this.product.price;
+    return unitPrice * this.quantity;
   }
 
   get formattedTotalPrice(): string {
@@ -489,19 +519,20 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   setQuantity(q: number): void {
     if (!this.product) return;
-    const maxStock = this.isCascadeMode && this.cascadeMatchedVariant
-      ? this.cascadeMatchedVariant.stock
-      : this.product.stock;
-    this.quantity = Math.max(1, Math.min(q, maxStock));
+    const maxStock = this.selectedVariant
+      ? this.selectedVariant.stock
+      : (this.isCascadeMode && this.cascadeMatchedVariant ? this.cascadeMatchedVariant.stock : this.product.stock);
+    this.quantity = Math.max(1, Math.min(q, Math.max(1, maxStock)));
     this.cdr.detectChanges();
   }
 
   addToCart(): void {
     if (!this.product) return;
 
-    if (this.isCascadeMode) {
-      if (!this.cascadeMatchedVariant || this.quantity === 0) return;
-      const variant = this.cascadeMatchedVariant;
+    if (this.hasVariants) {
+      const variant = this.selectedVariant || this.cascadeMatchedVariant;
+      if (!variant || variant.stock === 0 || this.quantity === 0) return;
+
       this.cartService.addToCart({
         productId: this.product.id,
         productName: this.product.name,
@@ -514,37 +545,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         selectedColorHex: variant.colorHex,
       });
       this.addedToCart = true;
-      this.quantity = 1;
       this.cdr.detectChanges();
       setTimeout(() => { this.addedToCart = false; this.cdr.detectChanges(); }, 2500);
-    } else if (this.hasVariants) {
-      if (this.totalSelectedQty === 0) return;
-      let added = false;
-      this.variantQty.forEach((qty, variantId) => {
-        const variant = this.product!.variants!.find(v => v.id === variantId);
-        if (!variant) return;
-        const unitPrice = variant.price ?? this.product!.salePrice ?? this.product!.price;
-        this.cartService.addToCart({
-          productId: this.product!.id,
-          productName: this.product!.name,
-          price: unitPrice,
-          quantity: qty,
-          imageUrl: variant.imageUrl || this.product!.imageUrl,
-          maxStock: variant.stock,
-          variantId: variant.id,
-          selectedColor: variant.variantName,
-          selectedColorHex: variant.colorHex,
-        });
-        added = true;
-      });
-      if (added) {
-        this.addedToCart = true;
-        this.variantQty = new Map();
-        this.cdr.detectChanges();
-        setTimeout(() => { this.addedToCart = false; this.cdr.detectChanges(); }, 2500);
-      }
     } else {
-      if (this.product.stock === 0) return;
+      if (this.product.stock === 0 || this.quantity === 0) return;
       this.cartService.addToCart({
         productId: this.product.id,
         productName: this.product.name,
@@ -593,7 +597,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get formattedPrice(): string {
     if (!this.product) return '';
-    const p = (this.product.salePrice ?? this.product.price);
+    const p = (this.selectedVariant?.price ?? this.product.salePrice ?? this.product.price);
     return new Intl.NumberFormat('fr-FR').format(p);
   }
 
@@ -683,6 +687,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private _initScrollReveal(): void {
+    if (!isPlatformBrowser(this.platformId) || typeof IntersectionObserver === 'undefined') return;
     this.observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(e => {

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
@@ -17,6 +18,7 @@ import { CategoryResponse } from '../../../../core/models/category.models';
 import { PageResponse } from '../../../../core/models/common.models';
 import { SupplierResponse, ProductSupplierResponse } from '../../../../core/models/supplier.models';
 import { stockClass } from '../../shared/admin-status.helpers';
+import { compressImage } from '../../../../core/utils/image-compression.util';
 
 @Component({
   selector: 'app-admin-products',
@@ -99,7 +101,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   wizardStep: 1 | 2 = 1;
   hasVariantsToggle = false;
-  creationItems: { file: File; preview: string; variantName: string; colorHex: string; stock: number; attributeValueTempIds?: string[] }[] = [];
+  creationItems: { file?: File; preview?: string; variantName: string; colorHex?: string; stock: number; attributeValueTempIds?: string[] }[] = [];
+  bulkStockValue: number = 10;
   pendingCreationFile: File | null = null;
   pendingCreationPreview: string | null = null;
   pendingCreationColor = { variantName: '', colorHex: '#000000', stock: 0 };
@@ -153,12 +156,50 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   readonly formatCurrency = (v: number | null | undefined) => `${Number(v ?? 0).toLocaleString('fr-FR')}`;
 
   private readonly COLOR_MAP: Record<string, string> = {
-    'rouge': '#FF0000', 'bleu': '#0000FF', 'vert': '#008000',
-    'noir': '#000000', 'blanc': '#FFFFFF', 'jaune': '#FFD700',
-    'orange': '#FF8C00', 'violet': '#800080', 'rose': '#FF69B4',
-    'gris': '#808080', 'marron': '#8B4513', 'beige': '#F5F5DC',
-    'or': '#D4AF37', 'argent': '#C0C0C0', 'turquoise': '#40E0D0',
-    'bordeaux': '#800020', 'marine': '#001F5B', 'kaki': '#78866B',
+    // Couleurs basiques
+    'noir': '#000000', 'black': '#000000',
+    'blanc': '#FFFFFF', 'white': '#FFFFFF',
+    'rouge': '#FF0000', 'red': '#FF0000',
+    'bleu': '#0000FF', 'blue': '#0000FF',
+    'vert': '#008000', 'green': '#008000',
+    'jaune': '#FFD700', 'yellow': '#FFD700',
+    'orange': '#FF8C00',
+    'rose': '#FF69B4', 'pink': '#FF69B4',
+    'violet': '#800080', 'purple': '#800080',
+    'gris': '#808080', 'grey': '#808080', 'gray': '#808080',
+    'marron': '#8B4513', 'brun': '#5C4033', 'brown': '#8B4513',
+    'beige': '#F5F5DC',
+    // Bijouterie, métaux & horlogerie
+    'or': '#FFD700', 'gold': '#FFD700', 'dore': '#FFD700', 'doré': '#FFD700',
+    'or rose': '#B76E79', 'rose gold': '#B76E79',
+    'or jaune': '#FFD700',
+    'or blanc': '#F4F4F4',
+    'argent': '#C0C0C0', 'silver': '#C0C0C0', 'argente': '#C0C0C0', 'argenté': '#C0C0C0',
+    'acier': '#B0C4DE', 'acier inoxydable': '#B0C4DE',
+    'platine': '#E5E4E2',
+    'bronze': '#CD7F32',
+    'cuivre': '#B87333',
+    // Nuances de mode
+    'bleu marine': '#001F3F', 'marine': '#001F3F', 'navy': '#001F3F',
+    'bleu ciel': '#87CEEB',
+    'bleu nuit': '#191970',
+    'bleu roi': '#4169E1',
+    'bordeaux': '#800020', 'burgundy': '#800020',
+    'kaki': '#556B2F', 'khaki': '#556B2F',
+    'turquoise': '#40E0D0',
+    'vert olive': '#808000', 'olive': '#808000',
+    'vert emeraude': '#50C878', 'emeraude': '#50C878', 'vert émeraude': '#50C878', 'émeraude': '#50C878',
+    'anthracite': '#303030',
+    'taupe': '#483C32',
+    'cognac': '#9A463D',
+    'caramel': '#C68E17',
+    'moutarde': '#E1AD01',
+    'corail': '#FF7F50', 'coral': '#FF7F50',
+    'lilas': '#C8A2C8',
+    'lavande': '#E6E6FA',
+    'fuchsia': '#FF00FF',
+    'creme': '#FFFDD0', 'crème': '#FFFDD0', 'ivoire': '#FFFFF0', 'ivory': '#FFFFF0',
+    'menthe': '#98FF98',
   };
 
   private readonly searchSubject = new Subject<string>();
@@ -175,6 +216,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     private scrollLock: ScrollLockService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -190,6 +233,30 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe(e => {
       if (e.module === 'products') this.loadProducts(this.productsPage);
       if (e.module === 'suppliers') { this.allSuppliers = []; this._lastSuppliersFetch = 0; }
+    });
+
+    this.wsService.stockUpdate$.pipe(takeUntil(this.destroy$)).subscribe(update => {
+      const idx = this.products.findIndex(p => p.id === update.productId);
+      if (idx !== -1) {
+        this.products = [...this.products];
+        this.products[idx] = { ...this.products[idx], stock: update.stock };
+        this.cdr.markForCheck();
+      }
+      if (this.editingProduct?.id === update.productId) {
+        this.editingProduct.stock = update.stock;
+        if (update.variantId != null && update.variantStock != null && this.productVariants) {
+          const v = this.productVariants.find(vr => vr.id === update.variantId);
+          if (v) v.stock = update.variantStock;
+        }
+        this.cdr.markForCheck();
+      }
+    });
+
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      const editSlug = params['edit'];
+      if (editSlug) {
+        this.openEditDrawer({ slug: editSlug } as ProductSummaryResponse);
+      }
     });
   }
 
@@ -231,7 +298,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     return !!(
       f.get('name')?.valid && f.get('description')?.valid &&
       f.get('categoryId')?.value && f.get('gender')?.value &&
-      f.get('price')?.valid && f.get('stock')?.valid &&
+      f.get('price')?.valid &&
       f.get('costPrice')?.valid
     );
   }
@@ -344,6 +411,9 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.editingProduct = null;
     this._resetDrawer();
     this.scrollLock.unlock();
+    if (this.route.snapshot.queryParams['edit']) {
+      this.router.navigate([], { relativeTo: this.route, queryParams: { edit: null }, queryParamsHandling: 'merge', replaceUrl: true });
+    }
     this.cdr.markForCheck();
   }
 
@@ -429,10 +499,10 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       req$ = this.productService.updateProduct(this.editingProduct.id, fd);
     } else {
       fd.append('costPrice', v.costPrice.toString());
-      if (this.hasVariantsToggle && this.creationItems.length > 0) {
-        fd.append('images', this.creationItems[0].file);
-      } else if (!this.hasVariantsToggle && this.selectedImageFile) {
+      if (this.selectedImageFile) {
         fd.append('images', this.selectedImageFile);
+      } else if (this.creationItems.length > 0 && this.creationItems[0].file) {
+        fd.append('images', this.creationItems[0].file);
       }
       if (this.selectedVideo) fd.append('video', this.selectedVideo);
       req$ = this.productService.createProduct(fd);
@@ -508,13 +578,13 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
               this.productVariantService.addVariant(product.id, variantReq)
                 .subscribe({ next: () => processItem(index + 1), error: () => processItem(index + 1) });
             };
-            if (index === 0 && product.imageUrl) {
-              createVariant(product.imageUrl);
-            } else {
+            if (item.file) {
               this.productMediaService.upload(product.id, item.file).subscribe({
-                next: (mr) => createVariant(mr.success ? mr.data.url : ''),
-                error: () => processItem(index + 1),
+                next: (mr) => createVariant(mr.success ? mr.data.url : (product.imageUrl || '')),
+                error: () => createVariant(product.imageUrl || ''),
               });
+            } else {
+              createVariant(product.imageUrl || '');
             }
           };
 
@@ -702,16 +772,23 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onMediaSelected(event: Event): void {
+  async onMediaSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
     if (!file || !this.editingProduct) return;
-    this.pendingMediaFile = file;
     this.mediaColorError = null;
-    const reader = new FileReader();
-    reader.onload = (e) => { this.pendingMediaPreview = e.target?.result as string; this.cdr.markForCheck(); };
-    reader.readAsDataURL(file);
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.pendingMediaFile = compressed;
+      this.pendingMediaPreview = preview;
+    } catch {
+      this.pendingMediaFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.pendingMediaPreview = e.target?.result as string; this.cdr.markForCheck(); };
+      reader.readAsDataURL(file);
+    }
+    this.cdr.markForCheck();
   }
 
   cancelPendingMedia(): void {
@@ -844,6 +921,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   deleteTempAttribute(tempId: string): void {
     if (!confirm('Supprimer cet attribut et toutes ses valeurs ?')) return;
     this.tempAttributes = this.tempAttributes.filter(a => a.tempId !== tempId);
+    this.generateCreationVariantsFromAttributes();
     this.selectedCreationAttrValueIds = this.selectedCreationAttrValueIds.filter(id =>
       !this.tempAttributes.some(a => a.values.some(v => v.tempId === id))
     );
@@ -885,6 +963,26 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  resolveColorHex(val: string): string | null {
+    if (!val) return null;
+    const trimmed = val.trim();
+    if (/^#[0-9A-Fa-f]{6}$/.test(trimmed)) return trimmed.toUpperCase();
+    const lower = trimmed.toLowerCase();
+    const normalized = lower.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    return this.COLOR_MAP[lower] || this.COLOR_MAP[normalized] || null;
+  }
+
+  onAttributeValueChange(index: number, val: string): void {
+    const item = this.newValueInputs[index];
+    if (!item) return;
+    item.value = val;
+    const detected = this.resolveColorHex(val);
+    if (detected) {
+      item.colorHex = detected;
+    }
+    this.cdr.markForCheck();
+  }
+
   addAttributeValueInput(): void {
     this.newValueInputs = [...this.newValueInputs, { value: '', colorHex: '#000000' }];
     this.cdr.markForCheck();
@@ -897,9 +995,17 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   saveAttribute(): void {
     if (!this.newAttributeName.trim()) return;
+    const isColorAttribute = /couleur|color|cadran|teinte|finition/i.test(this.newAttributeName);
     const values = this.newValueInputs
       .filter(v => v.value.trim())
-      .map(v => ({ value: v.value.trim(), colorHex: v.colorHex !== '#000000' ? v.colorHex : undefined }));
+      .map(v => {
+        const detected = this.resolveColorHex(v.value);
+        const hex = detected || (v.colorHex && v.colorHex !== '#000000' ? v.colorHex : (isColorAttribute && v.colorHex ? v.colorHex : undefined));
+        return {
+          value: v.value.trim(),
+          colorHex: hex,
+        };
+      });
 
     if (!this.editingProduct) {
       // Mode création : stocker en local
@@ -916,6 +1022,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
           values: values.map(v => ({ ...v, tempId: crypto.randomUUID() })),
         }];
       }
+      this.generateCreationVariantsFromAttributes();
       this.cancelAttributeForm();
       this.cdr.markForCheck();
       return;
@@ -1131,15 +1238,22 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  onVariantImageSelected(event: Event): void {
+  async onVariantImageSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
     if (!file) return;
-    this.newVariantFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => { this.newVariantPreview = e.target?.result as string; this.cdr.markForCheck(); };
-    reader.readAsDataURL(file);
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.newVariantFile = compressed;
+      this.newVariantPreview = preview;
+    } catch {
+      this.newVariantFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.newVariantPreview = e.target?.result as string; this.cdr.markForCheck(); };
+      reader.readAsDataURL(file);
+    }
+    this.cdr.markForCheck();
   }
 
   clearVariantImage(): void {
@@ -1157,18 +1271,23 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onFileSelected(event: Event): void {
+  async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
     if (!file) return;
-    if (file.type.startsWith('image/')) {
+    this.uploadError = null;
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.selectedImageFile = compressed;
+      this.imagePreview = preview;
+    } catch {
       this.selectedImageFile = file;
-      this.uploadError = null;
       const reader = new FileReader();
       reader.onload = (e) => { this.imagePreview = e.target?.result as string; this.cdr.markForCheck(); };
       reader.readAsDataURL(file);
     }
+    this.cdr.markForCheck();
   }
 
   onVideoSelected(event: Event): void {
@@ -1191,16 +1310,45 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     if (hex) this.pendingCreationColor.colorHex = hex;
   }
 
-  onCreationImageSelected(event: Event): void {
+  
+  async onVariantRowFileSelected(event: Event, index: number): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !this.creationItems[index]) return;
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.creationItems[index].file = compressed;
+      this.creationItems[index].preview = preview;
+    } catch {
+      this.creationItems[index].file = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.creationItems[index].preview = e.target?.result as string;
+        this.cdr.markForCheck();
+      };
+      reader.readAsDataURL(file);
+    }
+    this.cdr.markForCheck();
+  }
+
+  async onCreationImageSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
     if (!file || this.creationItems.length >= 4) return;
-    this.pendingCreationFile = file;
     this.pendingCreationColorError = null;
-    const reader = new FileReader();
-    reader.onload = (e) => { this.pendingCreationPreview = e.target?.result as string; this.cdr.markForCheck(); };
-    reader.readAsDataURL(file);
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.pendingCreationFile = compressed;
+      this.pendingCreationPreview = preview;
+    } catch {
+      this.pendingCreationFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.pendingCreationPreview = e.target?.result as string; this.cdr.markForCheck(); };
+      reader.readAsDataURL(file);
+    }
+    this.cdr.markForCheck();
   }
 
   cancelPendingCreation(): void {
@@ -1240,7 +1388,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   goToNextStep(): void {
     if (this.wizardStep === 1) {
-      ['name', 'description', 'categoryId', 'gender', 'price', 'stock'].forEach(f => this.productForm.get(f)?.markAsTouched());
+      ['name', 'description', 'categoryId', 'gender', 'price', 'costPrice'].forEach(f => this.productForm.get(f)?.markAsTouched());
       if (!this.isStep1Valid) { this.cdr.markForCheck(); return; }
     }
     if (this.wizardStep < 2) {
@@ -1258,6 +1406,109 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     }
   }
 
+  
+  
+  generateCreationVariantsFromAttributes(): void {
+    if (this.tempAttributes.length === 0) {
+      this.creationItems = [];
+      this.updateTotalStockFromVariants();
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const cartesian = (arrays: any[][]): any[][] => {
+      return arrays.reduce((acc, curr) => {
+        return acc.flatMap(a => curr.map(c => [...a, c]));
+      }, [[]]);
+    };
+
+    const attributeValueArrays = this.tempAttributes.map(attr =>
+      attr.values.map(val => ({
+        attrName: attr.name,
+        valueTempId: val.tempId,
+        value: val.value,
+        colorHex: val.colorHex,
+      }))
+    );
+
+    const combinations = cartesian(attributeValueArrays);
+
+    this.creationItems = combinations.map(comb => {
+      const variantName = comb.map(c => c.value).join(' / ');
+      const colorVal = comb.find(c => c.colorHex);
+      const detectedHex = colorVal?.colorHex || comb.map(c => this.resolveColorHex(c.value)).find(Boolean) || '';
+      const attrTempIds = comb.map(c => c.valueTempId);
+      return {
+        variantName,
+        colorHex: detectedHex,
+        stock: this.bulkStockValue != null ? this.bulkStockValue : 10,
+        attributeValueTempIds: attrTempIds,
+      };
+    });
+
+    this.updateTotalStockFromVariants();
+    this.cdr.markForCheck();
+  }
+
+  updateVariantRowColor(index: number, newHex: string): void {
+    if (this.creationItems[index]) {
+      this.creationItems[index].colorHex = newHex.toUpperCase();
+      this.cdr.markForCheck();
+    }
+  }
+
+  applyBulkStock(): void {
+    const s = Math.max(0, this.bulkStockValue || 0);
+    this.creationItems.forEach(item => item.stock = s);
+    this.updateTotalStockFromVariants();
+    this.cdr.markForCheck();
+  }
+
+  updateTotalStockFromVariants(): void {
+    const total = this.creationItems.reduce((acc, i) => acc + (i.stock || 0), 0);
+    this.productForm.patchValue({ stock: total });
+    this.cdr.markForCheck();
+  }
+
+  clearVariantRowImage(index: number): void {
+    if (this.creationItems[index]) {
+      this.creationItems[index].file = undefined;
+      this.creationItems[index].preview = undefined;
+      this.cdr.markForCheck();
+    }
+  }
+
+  loadCategoryDefaultAttributes(): void {
+    const catId = this.productForm?.get('categoryId')?.value;
+    if (!catId) return;
+    const cat = this.productCategories.find(c => c.id === +catId);
+    if (!cat?.defaultAttributes) return;
+
+    try {
+      const raw = JSON.parse(cat.defaultAttributes);
+      if (Array.isArray(raw) && raw.length > 0) {
+        this.tempAttributes = raw.map((a: any) => ({
+          tempId: crypto.randomUUID(),
+          name: a.name || '',
+          values: (a.values || []).map((v: any) => {
+            const valName = typeof v === 'string' ? v : (v.name || '');
+            const hex = typeof v === 'object' && v.hex ? v.hex : undefined;
+            return {
+              tempId: crypto.randomUUID(),
+              value: valName,
+              colorHex: hex,
+            };
+          }),
+        }));
+        this.hasVariantsToggle = true;
+        this.generateCreationVariantsFromAttributes();
+        this.toast.show(`Déclinaisons générées depuis "${cat.name}" ✓`);
+      }
+    } catch (e) {
+      // Ignorer
+    }
+  }
+
   onCategoryChange(): void {
     if (this.editingProduct) return;
     this.wizardStep = 1;
@@ -1266,6 +1517,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.pendingCreationFile = null;
     this.pendingCreationPreview = null;
     this.pendingCreationColorError = null;
+    this.loadCategoryDefaultAttributes();
     this.cdr.markForCheck();
   }
 
@@ -1275,7 +1527,11 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.pendingCreationFile = null;
     this.pendingCreationPreview = null;
     this.pendingCreationColorError = null;
-    if (!this.hasVariantsToggle) this.productForm.patchValue({ stock: null });
+    if (!this.hasVariantsToggle) {
+      this.productForm.patchValue({ stock: null });
+    } else if (this.tempAttributes.length === 0 && !this.editingProduct) {
+      this.loadCategoryDefaultAttributes();
+    }
     this.cdr.markForCheck();
   }
 

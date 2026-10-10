@@ -34,6 +34,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   promoChecking     = false;
   promoError: string | null = null;
 
+  currentStep: 1 | 2 | 3 = 1;
+  stepError: string | null = null;
   checkoutLoading = false;
   checkoutError: string | null = null;
   checkoutSuccess = false;
@@ -202,12 +204,87 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     });
   }
 
-  get canConfirm(): boolean {
-    if (this.checkoutLoading) return false;
+  get isDeliveryValid(): boolean {
     if (!this.deliveryPhone.trim() || !this.deliveryZone) return false;
+    const phoneDigits = this.deliveryPhone.trim().replace(/^\+225\s*/, '').replace(/\s/g, '');
+    if (!/^[0-9]{10}$/.test(phoneDigits)) return false;
     if (this.deliveryZone === 'abidjan' && !this.deliveryAddress.trim()) return false;
     if (this.deliveryZone === 'interieur' && !this.deliveryCity) return false;
     return true;
+  }
+
+  get canConfirm(): boolean {
+    return !this.checkoutLoading && this.isDeliveryValid && this.cartItems.length > 0;
+  }
+
+  goToStep(step: 1 | 2 | 3): void {
+    this.checkoutError = null;
+    this.stepError = null;
+
+    if (step === 1) {
+      this.currentStep = 1;
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (step === 2) {
+      if (this.cartItems.length === 0) {
+        this.stepError = 'Votre panier est vide';
+        return;
+      }
+      this.currentStep = 2;
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (step === 3) {
+      if (this.cartItems.length === 0) {
+        this.stepError = 'Votre panier est vide';
+        return;
+      }
+      if (!this.isDeliveryValid) {
+        if (!this.deliveryPhone.trim()) {
+          this.stepError = 'Veuillez saisir votre numéro de téléphone';
+        } else {
+          const phoneDigits = this.deliveryPhone.trim().replace(/^\+225\s*/, '').replace(/\s/g, '');
+          if (!/^[0-9]{10}$/.test(phoneDigits)) {
+            this.stepError = 'Numéro de téléphone invalide (10 chiffres requis)';
+          } else if (!this.deliveryZone) {
+            this.stepError = 'Veuillez sélectionner une zone de livraison';
+          } else if (this.deliveryZone === 'abidjan' && !this.deliveryAddress.trim()) {
+            this.stepError = 'Veuillez indiquer le lieu de livraison à Abidjan';
+          } else if (this.deliveryZone === 'interieur' && !this.deliveryCity) {
+            this.stepError = 'Veuillez sélectionner une ville';
+          }
+        }
+        return;
+      }
+      this.currentStep = 3;
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep === 3) {
+      this.goToStep(2);
+    } else if (this.currentStep === 2) {
+      this.goToStep(1);
+    } else {
+      this.router.navigate(['/products']);
+    }
+  }
+
+  updateItemQuantity(item: CartItem, delta: number): void {
+    const next = item.quantity + delta;
+    if (next <= 0) {
+      this.cartService.removeFromCart(item.productId, item.variantId);
+    } else {
+      this.cartService.updateQuantity(item.productId, Math.min(next, item.maxStock), item.variantId);
+    }
+  }
+
+  removeItem(item: CartItem): void {
+    this.cartService.removeFromCart(item.productId, item.variantId);
   }
 
   formatPrice(n: number): string {

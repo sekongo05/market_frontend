@@ -2,6 +2,8 @@ import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
+import { WebSocketService } from './websocket.service';
+
 export interface CartItem {
   productId: number;
   productName: string;
@@ -27,7 +29,35 @@ export class CartService {
   private _lastAdded = new Subject<CartItem>();
   readonly lastAdded$ = this._lastAdded.asObservable();
 
-  constructor() {}
+  constructor(private wsService: WebSocketService) {
+    this.wsService.stockUpdate$.subscribe(update => {
+      const cart = this.cartSubject.value;
+      let changed = false;
+      for (const item of cart) {
+        if (item.productId === update.productId) {
+          if (item.variantId != null && update.variantId != null) {
+            if (item.variantId === update.variantId && update.variantStock != null) {
+              item.maxStock = update.variantStock;
+              if (item.quantity > update.variantStock) {
+                item.quantity = Math.max(0, update.variantStock);
+                changed = true;
+              }
+            }
+          } else {
+            item.maxStock = update.stock;
+            if (item.quantity > update.stock) {
+              item.quantity = Math.max(0, update.stock);
+              changed = true;
+            }
+          }
+        }
+      }
+      if (changed) {
+        this.saveCart(cart);
+        this.cartSubject.next([...cart]);
+      }
+    });
+  }
 
   addToCart(item: CartItem): void {
     const cart = this.cartSubject.value;
