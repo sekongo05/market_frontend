@@ -62,7 +62,7 @@
        MAIN PRODUCT DETAIL
   ══════════════════════════════════════════════════════════════ -->
   @if (!loading && product) {
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-28 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-44 sm:pb-36 lg:py-16">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 xl:gap-20">
 
         <!-- ════ LEFT: Media Gallery ════ -->
@@ -866,8 +866,8 @@
 
     <!-- ── Sticky CTA mobile (hidden on desktop) ── -->
     @if (!isManager) {
-      <div class="lg:hidden fixed left-0 right-0 z-[46] theme-surface border-t theme-border"
-           style="bottom: calc(var(--bottom-nav-h, 60px) + env(safe-area-inset-bottom, 0px))">
+      <div class="lg:hidden fixed left-3 right-3 z-[44] theme-surface border theme-border rounded-2xl shadow-xl shadow-black/15 backdrop-blur-lg"
+           style="bottom: calc(var(--bottom-nav-h, 60px) + env(safe-area-inset-bottom, 0px) + 16px)">
         <div class="flex items-center gap-2.5 px-3.5 py-2.5">
           <!-- Thumbnail & Price preview on mobile -->
           <div class="flex items-center gap-2 flex-1 min-w-0">
