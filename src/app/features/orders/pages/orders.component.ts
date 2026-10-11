@@ -87,11 +87,14 @@ export class OrdersComponent implements OnInit, OnDestroy {
     if (this.returnFormOrderId !== null) { this.closeReturnForm(); }
   }
 
+  private pollingTimer: any = null;
+
   ngOnInit(): void {
     this.handlePaymentReturn();
     if (isPlatformBrowser(this.platformId) && this.authService.isAuthenticated()) {
       this.loadOrders();
       this.loadMyReturns();
+      this._startOrderSyncPolling();
     }
     this.wsService.orderStatusUpdate$
       .pipe(takeUntil(this.destroy$))
@@ -99,16 +102,50 @@ export class OrdersComponent implements OnInit, OnDestroy {
         const idx = this.orders.findIndex(o => o.id === update.orderId);
         if (idx !== -1) {
           this.orders = [...this.orders];
-          this.orders[idx] = { ...this.orders[idx], orderStatus: update.orderStatus as any };
+          const updated: OrderResponse = {
+            ...this.orders[idx],
+            orderStatus: update.orderStatus as any,
+          };
+          if (update.paymentStatus) {
+            updated.paymentStatus = update.paymentStatus as any;
+          }
+          this.orders[idx] = updated;
           this.cdr.detectChanges();
         }
+        // Toujours resynchroniser en tâche de fond pour avoir l'état complet
+        this.loadOrders(this.currentPage, true);
       });
     this.wsService.notification$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        this.loadOrders(this.currentPage);
+        this.loadOrders(this.currentPage, true);
         this.loadMyReturns();
       });
+  }
+
+  /**
+   * Polling intelligent de secours : si une commande est en attente (paiement ou traitement),
+   * on vérifie discrètement toutes les 8s pour garantir le temps réel même si le WebSocket
+   * a été coupé ou redémarré.
+   */
+  private _startOrderSyncPolling(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    this._stopOrderSyncPolling();
+    this.pollingTimer = setInterval(() => {
+      const hasPending = this.orders.some(o =>
+        o.orderStatus === 'PENDING' || o.paymentStatus === 'PENDING'
+      );
+      if (hasPending && typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        this.loadOrders(this.currentPage, true);
+      }
+    }, 8000);
+  }
+
+  private _stopOrderSyncPolling(): void {
+    if (this.pollingTimer) {
+      clearInterval(this.pollingTimer);
+      this.pollingTimer = null;
+    }
   }
 
   private handlePaymentReturn(): void {
@@ -144,9 +181,11 @@ export class OrdersComponent implements OnInit, OnDestroy {
     }, 300);
   }
 
-  loadOrders(page = 0): void {
-    this.loading = true;
-    this.error = null;
+  loadOrders(page = 0, silent = false): void {
+    if (!silent) {
+      this.loading = true;
+      this.error = null;
+    }
     this.orderService.getMyOrders(page, this.pageSize).subscribe((r) => {
       if (r.success) {
         const pg = r.data as PageResponse<OrderResponse>;
@@ -156,12 +195,14 @@ export class OrdersComponent implements OnInit, OnDestroy {
         const targetOrder = this.route.snapshot.queryParamMap.get('order');
         if (targetOrder) this._focusOrder(targetOrder);
       }
-      this.loading = false;
+      if (!silent) this.loading = false;
       this.cdr.detectChanges();
     }, (err: any) => {
-      this.error = err?.error?.message || 'Erreur lors du chargement des commandes';
-      this.loading = false;
-      this.cdr.detectChanges();
+      if (!silent) {
+        this.error = err?.error?.message || 'Erreur lors du chargement des commandes';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -402,6 +443,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
   nextPage(): void { if (this.currentPage < this.totalPages - 1) this.loadOrders(this.currentPage + 1); }
 
   ngOnDestroy(): void {
+    this._stopOrderSyncPolling();
     this.destroy$.next();
     this.destroy$.complete();
   }

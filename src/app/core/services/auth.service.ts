@@ -39,13 +39,21 @@ export class AuthService {
     this.loadUserFromToken();
     if (this.isBrowser) {
       document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible" && this.isAuthenticated()) {
-          this._checkAndRefreshIfNeeded();
+        if (document.visibilityState === "visible") {
+          if (this.isAuthenticated()) {
+            this._checkAndRefreshIfNeeded();
+            const user = this.currentUserSubject.value;
+            if (user) this._connectWs(user as any);
+          } else {
+            this.webSocketService.connect(null, false);
+          }
         }
       });
       window.addEventListener("focus", () => {
         if (this.isAuthenticated()) {
           this._checkAndRefreshIfNeeded();
+          const user = this.currentUserSubject.value;
+          if (user) this._connectWs(user as any);
         }
       });
       // Synchronisation multi-onglets : écoute des modifications de session depuis d'autres onglets

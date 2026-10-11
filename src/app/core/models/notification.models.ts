@@ -42,6 +42,7 @@ export interface WsOrderStatusUpdate {
   orderId: number;
   orderNumber: string;
   orderStatus: string;
+  paymentStatus?: string;
 }
 
 export interface WsStaffEvent {
