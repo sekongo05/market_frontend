@@ -118,6 +118,7 @@
             <input
               id="password" [type]="showPwd ? 'text' : 'password'" formControlName="password" autocomplete="current-password"
               placeholder="••••••••"
+              (copy)="$event.preventDefault()" (cut)="$event.preventDefault()"
               class="w-full pl-10 pr-12 py-3.5 rounded-xl text-sm theme-text theme-surface theme-border border
                      transition-all duration-200 focus:outline-none placeholder:theme-muted
                      focus:border-yellow-500/60 focus:ring-2 focus:ring-yellow-500/20"

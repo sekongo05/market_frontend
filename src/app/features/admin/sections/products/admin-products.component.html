@@ -869,7 +869,7 @@
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix de vente (FCFA) *</label>
-                <input formControlName="price" type="number" min="1" placeholder="45000"
+                <input formControlName="price" type="text" appPriceFormat placeholder="45 000"
                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
                   [class.border-red-500]="productForm.get('price')?.touched && productForm.get('price')?.invalid"/>
                 @if (productForm.get('price')?.touched && productForm.get('price')?.invalid) {
@@ -880,7 +880,7 @@
                 <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">
                   Prix de comparaison <span class="font-normal normal-case text-gold">(optionnel)</span>
                 </label>
-                <input formControlName="compareAtPrice" type="number" min="0" placeholder="65000"
+                <input formControlName="compareAtPrice" type="text" appPriceFormat placeholder="65 000"
                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"/>
                 <p class="text-[10px] theme-muted mt-1">Prix public ou boutique — affiché barré à côté du prix.</p>
               </div>
@@ -888,7 +888,7 @@
                 <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">
                   Prix d'achat *
                 </label>
-                <input formControlName="costPrice" type="number" min="1" placeholder="25000"
+                <input formControlName="costPrice" type="text" appPriceFormat placeholder="25 000"
                   class="theme-input w-full px-4 py-3 rounded-xl text-sm transition-all"
                   [class.border-red-500]="productForm.get('costPrice')?.invalid && productForm.get('costPrice')?.touched"/>
                 @if (productForm.get('costPrice')?.invalid && productForm.get('costPrice')?.touched) {
@@ -1200,7 +1200,7 @@
                 <div>
                   <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix de vente (FCFA) *</label>
                   <div class="relative">
-                    <input formControlName="price" type="number" min="1" placeholder="45 000"
+                    <input formControlName="price" type="text" appPriceFormat placeholder="45 000"
                       class="theme-input w-full pl-4 pr-16 py-3 rounded-xl text-sm transition-all"
                       [class.border-red-500]="productForm.get('price')?.touched && productForm.get('price')?.invalid"/>
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold theme-muted pointer-events-none">FCFA</span>
@@ -1212,7 +1212,7 @@
                 <div>
                   <label class="block text-xs font-bold theme-muted uppercase tracking-wider mb-1.5">Prix d'achat (FCFA) *</label>
                   <div class="relative">
-                    <input formControlName="costPrice" type="number" min="1" placeholder="25 000"
+                    <input formControlName="costPrice" type="text" appPriceFormat placeholder="25 000"
                       class="theme-input w-full pl-4 pr-16 py-3 rounded-xl text-sm transition-all"
                       [class.border-red-500]="productForm.get('costPrice')?.touched && productForm.get('costPrice')?.invalid"/>
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold theme-muted pointer-events-none">FCFA</span>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -32,7 +32,8 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private toastService: ToastService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -69,10 +70,12 @@ export class LoginComponent implements OnInit {
         } else {
           this.error = response.message || 'Identifiants incorrects';
         }
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.error = error?.error?.message || 'Erreur de connexion';
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }

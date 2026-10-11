@@ -283,6 +283,7 @@
                 </svg>
                 <input [type]="showPwd ? 'text' : 'password'" formControlName="password"
                   autocomplete="new-password" placeholder="••••••••"
+                  (copy)="$event.preventDefault()" (cut)="$event.preventDefault()"
                   class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
                   [class.!border-red-500]="(submitted || f['password'].touched) && f['password'].errors"/>
                 <button type="button" (click)="showPwd = !showPwd"
@@ -317,6 +318,7 @@
                 </svg>
                 <input [type]="showConfirmPwd ? 'text' : 'password'" formControlName="confirmPassword"
                   autocomplete="new-password" placeholder="••••••••"
+                  (copy)="$event.preventDefault()" (cut)="$event.preventDefault()"
                   class="theme-input w-full pl-10 pr-11 py-3 rounded-xl text-sm transition-all"
                   [class.!border-red-500]="(submitted || f['confirmPassword'].touched) && f['confirmPassword'].errors"/>
                 <button type="button" (click)="showConfirmPwd = !showConfirmPwd"

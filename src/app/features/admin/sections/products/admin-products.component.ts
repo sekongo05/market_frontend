@@ -19,12 +19,13 @@ import { PageResponse } from '../../../../core/models/common.models';
 import { SupplierResponse, ProductSupplierResponse } from '../../../../core/models/supplier.models';
 import { stockClass } from '../../shared/admin-status.helpers';
 import { compressImage } from '../../../../core/utils/image-compression.util';
+import { PriceFormatDirective } from '../../../../shared/directives/price-format.directive';
 
 @Component({
   selector: 'app-admin-products',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, PriceFormatDirective],
   templateUrl: './admin-products.component.html',
 })
 export class AdminProductsComponent implements OnInit, OnDestroy {

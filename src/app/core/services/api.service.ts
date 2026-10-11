@@ -116,7 +116,7 @@ export class ApiService {
     return {
       count: ApiService.RETRY_COUNT,
       delay: (error: any, retryCount: number) => {
-        if (error.status === 401 || error.status === 403 || error.status === 404 || error.status === 422) {
+        if (error.status === 400 || error.status === 401 || error.status === 403 || error.status === 404 || error.status === 409 || error.status === 422) {
           return throwError(() => error);
         }
         return timer(retryCount * ApiService.RETRY_DELAY_MS);

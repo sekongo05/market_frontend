@@ -17,12 +17,13 @@ import { ProductResponse, ProductSummaryResponse, GetProductsParams, ProductMedi
 import { CategoryResponse } from '../../../../core/models/category.models';
 import { PageResponse } from '../../../../core/models/common.models';
 import { compressImage } from '../../../../core/utils/image-compression.util';
+import { PriceFormatDirective } from '../../../../shared/directives/price-format.directive';
 
 @Component({
   selector: 'app-manager-products',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule, MediaUrlPipe],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule, MediaUrlPipe, PriceFormatDirective],
   templateUrl: './manager-products.component.html',
 })
 export class ManagerProductsComponent implements OnInit, OnDestroy {
