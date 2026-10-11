@@ -459,8 +459,8 @@
                       </p>
                       <div class="flex flex-col gap-2">
                         @for (item of order.items; track item.productId) {
-                          <a [routerLink]="['/products', item.productSlug]"
-                            class="flex items-center gap-3 p-2.5 rounded-xl transition-colors hover:bg-white/5">
+                          <button type="button" (click)="openReviewModal(order, item)"
+                            class="flex items-center gap-3 p-2.5 rounded-xl transition-colors hover:bg-white/5 text-left w-full">
                             @if (item.imageUrl) {
                               <img [src]="item.imageUrl" [alt]="item.productName"
                                 class="w-9 h-9 rounded-lg object-cover flex-shrink-0"
@@ -468,7 +468,7 @@
                             }
                             <span class="flex-1 text-xs font-semibold theme-text truncate">{{ item.productName }}</span>
                             <span class="text-xs font-bold flex-shrink-0" style="color:#d4af37">Donner mon avis →</span>
-                          </a>
+                          </button>
                         }
                       </div>
                     </div>

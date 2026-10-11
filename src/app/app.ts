@@ -2,12 +2,13 @@ import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { AuthPromptComponent } from './shared/components/auth-prompt.component';
+import { ReviewModalComponent } from './shared/components/review-modal.component';
 import { AuthService } from './core/services/auth.service';
 import { WebSocketService } from './core/services/websocket.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, AuthPromptComponent],
+  imports: [RouterOutlet, AuthPromptComponent, ReviewModalComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

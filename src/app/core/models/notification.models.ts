@@ -23,7 +23,7 @@ export interface WsNotification {
   type: string;
   subject: string;
   createdAt?: string;
-  products?: { slug: string; name: string }[];
+  products?: { id?: number; slug: string; name: string; imageUrl?: string | null }[];
 }
 
 export interface WsStockUpdate {

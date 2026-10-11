@@ -12,6 +12,7 @@ import { OrderResponse } from '../../../core/models/order.models';
 import { ReturnResponse } from '../../../core/models/return.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { AuthService } from '../../../core/services/auth.service';
+import { ReviewPromptService } from '../../../core/services/review-prompt.service';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 import { orderStatusLabel, orderStatusClass } from '../../admin/shared/admin-status.helpers';
 
@@ -78,7 +79,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private authService: AuthService
+    private authService: AuthService,
+    private reviewPromptService: ReviewPromptService
   ) {}
 
   @HostListener('document:keydown.escape')
@@ -101,9 +103,12 @@ export class OrdersComponent implements OnInit, OnDestroy {
       .subscribe(update => {
         const idx = this.orders.findIndex(o => o.id === update.orderId);
         if (idx !== -1) {
+          const currentOrder = this.orders[idx];
+          const isNewlyDelivered = update.orderStatus === 'DELIVERED' && currentOrder.orderStatus !== 'DELIVERED';
+
           this.orders = [...this.orders];
           const updated: OrderResponse = {
-            ...this.orders[idx],
+            ...currentOrder,
             orderStatus: update.orderStatus as any,
           };
           if (update.paymentStatus) {
@@ -111,6 +116,19 @@ export class OrdersComponent implements OnInit, OnDestroy {
           }
           this.orders[idx] = updated;
           this.cdr.detectChanges();
+
+          if (isNewlyDelivered && currentOrder.items?.length) {
+            this.reviewPromptService.openPrompt({
+              orderNumber: currentOrder.orderNumber,
+              subject: `Commande N° ${currentOrder.orderNumber} livrée`,
+              products: currentOrder.items.map(item => ({
+                id: item.productId,
+                slug: item.productSlug,
+                name: item.productName,
+                imageUrl: item.imageUrl
+              }))
+            });
+          }
         }
         // Toujours resynchroniser en tâche de fond pour avoir l'état complet
         this.loadOrders(this.currentPage, true);
@@ -280,6 +298,18 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   canReview(order: OrderResponse): boolean {
     return order.orderStatus === 'DELIVERED';
+  }
+
+  openReviewModal(order: OrderResponse, singleItem?: OrderResponse['items'][0]): void {
+    const products = singleItem
+      ? [{ id: singleItem.productId, slug: singleItem.productSlug, name: singleItem.productName, imageUrl: singleItem.imageUrl }]
+      : order.items.map(i => ({ id: i.productId, slug: i.productSlug, name: i.productName, imageUrl: i.imageUrl }));
+
+    this.reviewPromptService.openPrompt({
+      orderNumber: order.orderNumber,
+      subject: `Commande N° ${order.orderNumber} livrée`,
+      products
+    });
   }
 
   getExistingReturn(orderId: number): ReturnResponse | null {

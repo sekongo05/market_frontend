@@ -20,6 +20,7 @@ import { WebSocketService } from '../../core/services/websocket.service';
 import { OrderService } from '../../core/services/order.service';
 import { PublicPromoResponse } from '../../core/models/promo.models';
 import { PageResponse } from '../../core/models/common.models';
+import { ReviewPromptService } from '../../core/services/review-prompt.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SdmLogoComponent } from './logo.component';
@@ -78,6 +79,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private scrollLock: ScrollLockService,
     private webSocketService: WebSocketService,
     private orderService: OrderService,
+    private reviewPromptService: ReviewPromptService,
   ) {}
 
   getTemplate(type: NotificationType): NotifTemplate {
@@ -158,6 +160,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
         if (this.showNotifications) this.loadNotifications();
         if (notif.type === 'REVIEW_REQUEST' && notif.products?.length) {
           this._showReviewBanner(notif.subject, notif.products);
+          this.reviewPromptService.openPrompt({
+            subject: notif.subject,
+            products: notif.products
+          });
         }
         this.cdr.detectChanges();
       });
