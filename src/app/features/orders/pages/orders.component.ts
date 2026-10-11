@@ -13,6 +13,7 @@ import { ReturnResponse } from '../../../core/models/return.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { ReviewPromptService } from '../../../core/services/review-prompt.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 import { orderStatusLabel, orderStatusClass } from '../../admin/shared/admin-status.helpers';
 
@@ -80,7 +81,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
     private authService: AuthService,
-    private reviewPromptService: ReviewPromptService
+    private reviewPromptService: ReviewPromptService,
+    private toastService: ToastService
   ) {}
 
   @HostListener('document:keydown.escape')
@@ -135,9 +137,13 @@ export class OrdersComponent implements OnInit, OnDestroy {
       });
     this.wsService.notification$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
+      .subscribe(notif => {
         this.loadOrders(this.currentPage, true);
         this.loadMyReturns();
+        // Décision du staff sur un retour : retour visuel immédiat
+        if (notif.type === 'RETURN_DECIDED' || notif.type === 'RETURN_COMPLETED') {
+          this.toastService.info(notif.subject || 'Votre demande de retour a été mise à jour');
+        }
       });
   }
 
@@ -282,18 +288,27 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   // ── Retours ──────────────────────────────────────────────────────────────
 
+  /** Fenêtre de retour (jours) — identique à app.returns.window-days côté backend (3 par défaut). */
+  private readonly returnWindowDays = 3;
+
+  /**
+   * Le backend compare des jours entiers écoulés (Duration.toDays) : la demande est acceptée
+   * tant que floor(jours écoulés) <= fenêtre. On applique la même règle pour que le bouton
+   * « Retour » ne disparaisse pas alors que l'API accepterait encore la demande.
+   */
+  private wholeDaysSinceDelivery(order: OrderResponse): number {
+    const refDate = order.deliveredAt || order.updatedAt;
+    return Math.floor((Date.now() - new Date(refDate).getTime()) / 86_400_000);
+  }
+
   canReturn(order: OrderResponse): boolean {
     if (order.orderStatus !== 'DELIVERED') return false;
     if (this.returnsMap[order.id]) return false;
-    const refDate = order.deliveredAt || order.updatedAt;
-    const daysSince = (Date.now() - new Date(refDate).getTime()) / 86_400_000;
-    return daysSince <= 3;
+    return this.wholeDaysSinceDelivery(order) <= this.returnWindowDays;
   }
 
   daysLeftToReturn(order: OrderResponse): number {
-    const refDate = order.deliveredAt || order.updatedAt;
-    const daysSince = (Date.now() - new Date(refDate).getTime()) / 86_400_000;
-    return Math.max(0, Math.ceil(3 - daysSince));
+    return Math.max(0, this.returnWindowDays - this.wholeDaysSinceDelivery(order) + 1);
   }
 
   canReview(order: OrderResponse): boolean {
