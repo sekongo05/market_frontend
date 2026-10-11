@@ -195,7 +195,9 @@ export class AuthService {
       try {
         const user: AuthResponse = JSON.parse(userJson);
         this.currentUserSubject.next(user as CurrentUser);
-        this._connectWs(user);
+        if (!this.isTokenExpired()) {
+          this._connectWs(user);
+        }
       } catch (e) {
         console.error('Failed to parse stored user', e);
         this._storage('remove', 'current_user');
