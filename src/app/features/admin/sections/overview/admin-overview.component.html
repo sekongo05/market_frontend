@@ -1,32 +1,44 @@
 <div class="p-4 md:p-6 lg:p-8 animate-fade-in-up space-y-6 md:space-y-8 min-h-screen">
 
-  <!-- EN-TÊTE -->
+  <!-- EN-TÊTE AVEC PULSE TEMPS RÉEL ET SÉLECTEUR DE GRANULARITÉ -->
   <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
     <div>
-      <h1 class="text-3xl md:text-4xl font-black theme-text tracking-tight">Tableau de bord</h1>
-      <p class="text-sm theme-muted mt-2">Suivez les performances de votre boutique en temps réel.</p>
+      <div class="flex items-center gap-3">
+        <h1 class="text-3xl md:text-4xl font-black theme-text tracking-tight">Tableau de bord</h1>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          Direct
+        </span>
+      </div>
+      <p class="text-sm theme-muted mt-2">Pilotage intelligent et métriques décisionnelles de la boutique.</p>
     </div>
+
     <div class="flex items-center gap-3">
-      <button (click)="loadStats()" class="px-5 py-2.5 luxury-card border theme-border rounded-xl text-sm font-bold theme-text hover:text-gold hover:border-gold/30 transition-all active:scale-95 flex items-center gap-2 shadow-sm">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      <button
+        (click)="loadStats()"
+        [disabled]="loading()"
+        class="px-5 py-2.5 luxury-card border theme-border rounded-xl text-sm font-bold theme-text hover:text-gold hover:border-gold/30 transition-all active:scale-95 flex items-center gap-2 shadow-sm disabled:opacity-50">
+        <svg class="w-4 h-4" [class.animate-spin]="loading()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
         Actualiser
       </button>
     </div>
   </div>
 
-  @if (error) {
+  @if (error()) {
     <div class="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400">
       <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
-      {{ error }}
+      {{ error() }}
     </div>
   }
 
-  @if (loading) {
+  @if (loading() && !stats()) {
     <div class="space-y-6">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        @for (i of [1,2,3,4]; track i) {
+        @for (i of [1, 2, 3, 4]; track i) {
           <div class="luxury-card border theme-border rounded-3xl p-6">
             <div class="skeleton h-4 w-24 mb-3"></div>
             <div class="skeleton h-10 w-20"></div>
@@ -36,31 +48,12 @@
     </div>
   }
 
-  @if (!loading && stats) {
+  @if (stats(); as currentStats) {
 
-    <!-- ALERTES URGENTES -->
-    @if (stats.pendingOrders > 0) {
-      <a routerLink="/admin/orders" class="relative overflow-hidden flex items-center gap-5 px-6 py-5 bg-gradient-to-r from-amber-500/20 via-orange-500/10 to-transparent border border-amber-500/30 rounded-3xl hover:border-amber-500/50 transition-all active:scale-[0.99] group shadow-lg shadow-amber-500/5">
-        <div class="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-        <span class="relative flex-shrink-0 z-10">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60"></span>
-          <span class="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/30">
-            <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          </span>
-        </span>
-        <div class="flex-1 min-w-0 z-10">
-          <p class="text-base md:text-lg font-black text-amber-500">
-            {{ stats.pendingOrders }} commande{{ stats.pendingOrders > 1 ? 's' : '' }} en attente
-          </p>
-          <p class="text-sm text-amber-500/70 mt-0.5">Nécessite votre attention immédiate. Cliquez pour traiter.</p>
-        </div>
-        <div class="flex-shrink-0 z-10 hidden sm:block">
-          <span class="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-500 font-bold text-sm group-hover:bg-amber-500 group-hover:text-black transition-colors">Voir →</span>
-        </div>
-      </a>
-    }
+    <!-- ════ SMART ACTION CENTER (Priorités Décisionnelles) ════ -->
+    <app-dashboard-action-center [actions]="smartActions()" />
 
-    <!-- ════ LIGNE 1 : KPI MAJEURS ════ -->
+    <!-- ════ LIGNE 1 : KPI MAJEURS & VÉLOCITÉ ════ -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
       
       <!-- CA du mois -->
@@ -70,12 +63,12 @@
         </div>
         <div class="flex items-center justify-between mb-4 relative z-10">
           <p class="text-xs font-bold theme-muted uppercase tracking-widest">CA du mois</p>
-          <span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg" [ngClass]="revenueGrowthPositive ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'">
-            {{ revenueGrowthPct > 0 ? '+' : '' }}{{ revenueGrowthPct }}%
+          <span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg" [ngClass]="revenueGrowthPositive() ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'">
+            {{ revenueGrowthPct() > 0 ? '+' : '' }}{{ revenueGrowthPct() }}%
           </span>
         </div>
-        <p class="text-3xl font-black text-gold mb-1 truncate relative z-10">{{ formatAmount(stats.currentMonthRevenue) }}</p>
-        <p class="text-xs theme-muted relative z-10">Aujourd'hui : <span class="text-gold font-bold">+{{ formatAmount(stats.revenueToday) }} FCFA</span></p>
+        <p class="text-3xl font-black text-gold mb-1 truncate relative z-10">{{ formatAmount(currentStats.currentMonthRevenue) }}</p>
+        <p class="text-xs theme-muted relative z-10">Aujourd'hui : <span class="text-gold font-bold">+{{ formatAmount(currentStats.revenueToday) }} FCFA</span></p>
       </div>
 
       <!-- Commandes Totales -->
@@ -83,56 +76,54 @@
         <div class="flex items-center justify-between mb-4 relative z-10">
           <p class="text-xs font-bold theme-muted uppercase tracking-widest">Commandes Totales</p>
           <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
-             <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
           </div>
         </div>
-        <p class="text-3xl font-black theme-text mb-1 relative z-10">{{ stats.totalOrders }}</p>
-        <p class="text-xs theme-muted relative z-10"><span class="text-indigo-400 font-bold">+{{ stats.ordersToday }}</span> aujourd'hui</p>
+        <p class="text-3xl font-black theme-text mb-1 relative z-10">{{ currentStats.totalOrders }}</p>
+        <p class="text-xs theme-muted relative z-10"><span class="text-indigo-400 font-bold">+{{ currentStats.ordersToday }}</span> aujourd'hui</p>
       </div>
 
-      <!-- Taux de livraison -->
-      <div routerLink="/admin/delivery" class="luxury-card border theme-border rounded-3xl p-6 relative overflow-hidden group cursor-pointer hover:border-emerald-500/30 transition-colors">
+      <!-- Panier Moyen (Vélocité) -->
+      <div class="luxury-card border theme-border rounded-3xl p-6 relative overflow-hidden group">
         <div class="flex items-center justify-between mb-4 relative z-10">
-          <p class="text-xs font-bold theme-muted uppercase tracking-widest">Taux de livraison</p>
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
-             <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+          <p class="text-xs font-bold theme-muted uppercase tracking-widest">Panier Moyen</p>
+          <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
         </div>
-        <p class="text-3xl font-black theme-text mb-3 relative z-10">{{ completionRate }}<span class="text-lg theme-muted font-medium">%</span></p>
-        <div class="h-1.5 bg-black/10 rounded-full overflow-hidden relative z-10">
-          <div class="h-full rounded-full transition-all duration-700" [style.width.%]="completionRate" [ngClass]="completionRate >= 80 ? 'bg-emerald-400' : completionRate >= 50 ? 'bg-amber-400' : 'bg-red-400'"></div>
-        </div>
+        <p class="text-3xl font-black theme-text mb-1 relative z-10">{{ formatAmount(avgBasket()) }} <span class="text-xs theme-muted font-normal">FCFA</span></p>
+        <p class="text-xs theme-muted relative z-10">Taux de livraison : <span class="text-emerald-400 font-bold">{{ completionRate() }}%</span></p>
       </div>
 
-      <!-- Clients -->
+      <!-- Base clients -->
       <div routerLink="/admin/users" class="luxury-card border theme-border rounded-3xl p-6 relative overflow-hidden group cursor-pointer hover:border-teal-500/30 transition-colors">
         <div class="flex items-center justify-between mb-4 relative z-10">
           <p class="text-xs font-bold theme-muted uppercase tracking-widest">Base clients</p>
           <div class="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center group-hover:bg-teal-500/20 transition-colors">
-             <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           </div>
         </div>
-        <p class="text-3xl font-black theme-text mb-1 relative z-10">{{ stats.totalUsers }}</p>
-        <p class="text-xs theme-muted relative z-10"><span class="text-teal-400 font-bold">+{{ stats.newUsersThisMonth }}</span> inscrits ce mois</p>
+        <p class="text-3xl font-black theme-text mb-1 relative z-10">{{ currentStats.totalUsers }}</p>
+        <p class="text-xs theme-muted relative z-10"><span class="text-teal-400 font-bold">+{{ currentStats.newUsersThisMonth }}</span> inscrits ce mois</p>
       </div>
 
     </div>
 
-    <!-- ════ LIGNE 2 : GRAPHIQUES ET SIGNAUX ════ -->
+    <!-- ════ LIGNE 2 : REVENUS DYNAMIQUES & LIVE FEED TEMPS RÉEL ════ -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
       
-      <!-- Graphique Revenus -->
-      @if (monthlyRevenue.length > 0) {
+      <!-- Graphique Revenus avec Sélecteur d'Année -->
+      @if (monthlyRevenue().length > 0) {
         <div class="xl:col-span-2 luxury-card border theme-border rounded-3xl p-6 flex flex-col relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none opacity-50"></div>
           <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 relative z-10 gap-4">
             <div>
-              <h3 class="text-lg font-bold theme-text">Revenus mensuels {{ selectedYear }}</h3>
+              <h3 class="text-lg font-bold theme-text">Revenus mensuels {{ selectedYear() }}</h3>
               <p class="text-xs theme-muted mt-1">
                 Meilleur mois :
-                @if (bestMonthIndex >= 0) {
-                  <span class="text-gold font-semibold">{{ monthlyRevenue[bestMonthIndex].monthName }}</span>
-                  ({{ formatAmount(monthlyRevenue[bestMonthIndex].revenue) }} F)
+                @if (bestMonthIndex() >= 0) {
+                  <span class="text-gold font-semibold">{{ monthlyRevenue()[bestMonthIndex()].monthName }}</span>
+                  ({{ formatAmount(monthlyRevenue()[bestMonthIndex()].revenue) }} F)
                 } @else {
                   <span>aucune donnée</span>
                 }
@@ -142,16 +133,16 @@
               <button (click)="changeYear(-1)" class="w-8 h-8 rounded-xl hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
               </button>
-              <span class="text-sm font-bold theme-text w-12 text-center">{{ selectedYear }}</span>
+              <span class="text-sm font-bold theme-text w-12 text-center">{{ selectedYear() }}</span>
               <button (click)="changeYear(1)" class="w-8 h-8 rounded-xl hover:bg-gold/15 hover:text-gold flex items-center justify-center theme-muted transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </button>
             </div>
           </div>
           
-          <div class="relative flex-1 flex items-end z-10 min-h-[200px]">
-            @if (hoveredMonthIndex !== null) {
-              @let hm = monthlyRevenue[hoveredMonthIndex];
+          <div class="relative flex-1 flex items-end z-10 min-h-[220px]">
+            @if (hoveredMonthIndex() !== null) {
+              @let hm = monthlyRevenue()[hoveredMonthIndex()!];
               <div class="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none z-20">
                 <div class="bg-black border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold text-white shadow-2xl whitespace-nowrap">
                   <span class="opacity-70">{{ hm.monthName }} —</span> {{ formatAmount(hm.revenue) }} FCFA
@@ -162,15 +153,17 @@
               </div>
             }
             <div class="flex items-end gap-2 w-full h-full pb-6 border-b border-white/5">
-              @for (item of monthlyRevenue; track item.month; let idx = $index) {
+              @for (item of monthlyRevenue(); track item.month; let idx = $index) {
                 <div class="flex-1 flex flex-col items-center gap-3 cursor-pointer group h-full justify-end relative"
-                     (mouseenter)="hoveredMonthIndex = idx" (mouseleave)="hoveredMonthIndex = null" (click)="hoveredMonthIndex = hoveredMonthIndex === idx ? null : idx">
+                     (mouseenter)="hoveredMonthIndex.set(idx)"
+                     (mouseleave)="hoveredMonthIndex.set(null)"
+                     (click)="hoveredMonthIndex.set(hoveredMonthIndex() === idx ? null : idx)">
                   <div class="w-full max-w-[40px] rounded-t-xl transition-all duration-500 min-h-[4px]"
-                       [style.height.%]="(item.revenue / maxMonthlyRevenue) * 100"
+                       [style.height.%]="(item.revenue / maxMonthlyRevenue()) * 100"
                        [ngClass]="{
                          'bg-gradient-to-t from-gold/40 to-gold shadow-lg shadow-gold/20': item.month === currentCalendarMonth,
-                         'bg-amber-500/50 hover:bg-amber-500/70': idx === bestMonthIndex && item.month !== currentCalendarMonth,
-                         'bg-black/10 hover:bg-black/20': item.revenue > 0 && idx !== bestMonthIndex && item.month !== currentCalendarMonth,
+                         'bg-amber-500/50 hover:bg-amber-500/70': idx === bestMonthIndex() && item.month !== currentCalendarMonth,
+                         'bg-black/10 hover:bg-black/20': item.revenue > 0 && idx !== bestMonthIndex() && item.month !== currentCalendarMonth,
                          'bg-black/[.02]': item.revenue === 0
                        }">
                   </div>
@@ -184,62 +177,11 @@
         </div>
       }
 
-      <div class="flex flex-col gap-4 md:gap-6">
-        
-        <!-- Activité Hebdo -->
-        @if (weeklyActivity.length > 0) {
-          <div class="luxury-card border theme-border rounded-3xl p-6 relative overflow-hidden">
-            <div class="flex items-center justify-between mb-5">
-              <h3 class="text-sm font-bold theme-text uppercase tracking-widest">7 derniers jours</h3>
-              @if (hoveredDayIndex !== null) {
-                @let hd = weeklyActivity[hoveredDayIndex];
-                <div class="bg-indigo-500 border border-indigo-400 rounded-lg px-2 py-1 text-[10px] font-bold text-white whitespace-nowrap shadow-lg shadow-indigo-500/20">
-                  {{ hd.orderCount }} cmd
-                </div>
-              }
-            </div>
-            <div class="flex items-end gap-2 h-24">
-              @for (day of weeklyActivity; track day.date; let idx = $index) {
-                <div class="flex-1 flex flex-col items-center gap-1 cursor-pointer group h-full justify-end" (mouseenter)="hoveredDayIndex = idx" (mouseleave)="hoveredDayIndex = null">
-                  <div class="w-full max-w-[20px] rounded-t-md transition-all duration-300 min-h-[4px]"
-                       [style.height.%]="(day.orderCount / maxWeeklyOrders) * 100"
-                       [ngClass]="hoveredDayIndex === idx ? 'bg-indigo-400 shadow-lg shadow-indigo-500/30' : day.orderCount > 0 ? 'bg-indigo-500/20 group-hover:bg-indigo-500/40' : 'bg-black/[.04]'">
-                  </div>
-                  <span class="text-[9px] font-bold transition-colors uppercase" [ngClass]="hoveredDayIndex === idx ? 'text-indigo-400' : 'theme-muted'">
-                    {{ day.dayLabel[0] }}
-                  </span>
-                </div>
-              }
-            </div>
-          </div>
-        }
-
-        <!-- Signaux du jour -->
-        @if (insights.length > 0) {
-          <div class="luxury-card border theme-border rounded-3xl p-6 flex-1 flex flex-col">
-            <h3 class="text-sm font-bold theme-text uppercase tracking-widest mb-4 flex items-center gap-2">
-              <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-red-400"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>
-              Alertes & Insights
-            </h3>
-            <div class="flex flex-col gap-3 overflow-y-auto custom-scrollbar flex-1 pr-1 max-h-[220px]">
-              @for (insight of insights; track insight.message) {
-                @let c = insightColors(insight.type);
-                <div class="flex items-start gap-3 p-3.5 rounded-2xl border" [ngClass]="[c.border, c.bg]">
-                  <div class="mt-0.5 flex-shrink-0">
-                    <span class="inline-flex h-2.5 w-2.5 rounded-full" [ngClass]="c.dot"></span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-[11px] font-bold leading-tight mb-0.5 uppercase tracking-wide" [ngClass]="c.text">{{ insight.message }}</p>
-                    @if (insight.detail) {
-                      <p class="text-[10px] opacity-80" [ngClass]="c.text">{{ insight.detail }}</p>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        }
+      <!-- LIVE ACTIVITY FEED (Composant Réactif Temps Réel) -->
+      <div>
+        <app-dashboard-live-feed [events]="liveEvents()" />
       </div>
+
     </div>
 
     <!-- ════ LIGNE 3 : COMMANDES RÉCENTES ET TOP PRODUITS ════ -->
@@ -248,11 +190,16 @@
       <!-- Commandes Récentes -->
       <div class="xl:col-span-2 luxury-card border theme-border rounded-3xl p-6 flex flex-col">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-base font-bold theme-text">Commandes récentes</h3>
+          <div class="flex items-center gap-2">
+            <h3 class="text-base font-bold theme-text">Commandes récentes</h3>
+            <span class="text-xs px-2 py-0.5 rounded-md bg-black/[.04] border theme-border theme-muted font-bold">
+              {{ currentStats.recentOrders.length }}
+            </span>
+          </div>
           <a routerLink="/admin/orders" class="text-xs font-bold text-gold hover:underline px-3 py-1.5 bg-gold/10 rounded-xl">Voir tout →</a>
         </div>
         
-        @if (stats.recentOrders.length > 0) {
+        @if (currentStats.recentOrders.length > 0) {
           <div class="overflow-x-auto -mx-6 px-6">
             <table class="w-full text-left border-collapse">
               <thead>
@@ -264,7 +211,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y border-black/5">
-                @for (order of stats.recentOrders; track order.orderNumber) {
+                @for (order of currentStats.recentOrders; track order.orderNumber) {
                   <tr class="group hover:bg-black/[.02] transition-colors">
                     <td class="py-3">
                       <div class="flex items-center gap-3">
@@ -312,9 +259,9 @@
           <a routerLink="/admin/products" class="text-xs font-bold text-gold hover:underline">Catalogue →</a>
         </div>
         
-        @if (topProducts.length > 0) {
+        @if (topProducts().length > 0) {
           <div class="space-y-5 relative z-10">
-            @for (product of topProducts; track product.productId; let i = $index) {
+            @for (product of topProducts(); track product.productId; let i = $index) {
               <div class="group">
                 <div class="flex items-center gap-3 mb-2">
                   <div class="w-7 h-7 rounded-xl flex items-center justify-center text-[10px] font-black shrink-0 transition-colors shadow-sm"
@@ -328,7 +275,7 @@
                 </div>
                 <div class="h-1.5 bg-black/[.04] rounded-full overflow-hidden ml-10">
                   <div class="h-full rounded-full transition-all duration-700"
-                       [style.width.%]="(product.totalSold / maxTopProduct) * 100"
+                       [style.width.%]="(product.totalSold / maxTopProduct()) * 100"
                        [ngClass]="i === 0 ? 'bg-gradient-to-r from-gold/50 to-gold' : i === 1 ? 'bg-gold/40' : 'bg-black/20'">
                   </div>
                 </div>
@@ -348,7 +295,7 @@
 
     </div>
 
-    <!-- ════ LIGNE 4 : AUTRES INFOS (Répartition statuts et Caisse) ════ -->
+    <!-- ════ LIGNE 4 : CAISSE JOURNALIÈRE ET STATUTS ════ -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pb-8">
       
       <!-- Caisse Journalière -->
@@ -357,8 +304,8 @@
           <h3 class="text-base font-bold theme-text">Caisse journalière</h3>
           <div class="flex items-center gap-2 bg-black/[.03] p-1 rounded-xl border theme-border">
             <input [(ngModel)]="caisseDate" type="date" class="bg-transparent border-none focus:outline-none focus:ring-0 px-2 py-1 text-xs font-bold theme-text"/>
-            <button (click)="loadDailyCaisse()" [disabled]="dailyCaisseLoading" class="px-3 py-1.5 bg-gold text-black rounded-lg text-xs font-bold transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-gold/20">
-              @if (dailyCaisseLoading) {
+            <button (click)="loadDailyCaisse()" [disabled]="dailyCaisseLoading()" class="px-3 py-1.5 bg-gold text-black rounded-lg text-xs font-bold transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-gold/20">
+              @if (dailyCaisseLoading()) {
                 <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
               } @else {
                 Consulter
@@ -367,25 +314,25 @@
           </div>
         </div>
         
-        @if (dailyCaisse) {
+        @if (dailyCaisse(); as caisse) {
           <div class="grid grid-cols-2 gap-4">
             <div class="p-5 bg-gradient-to-br from-gold/10 to-transparent border border-gold/20 rounded-2xl flex flex-col items-center justify-center text-center group hover:border-gold/40 transition-colors shadow-sm">
               <p class="text-[10px] theme-muted uppercase tracking-wider mb-2 font-black">CA Encaissé</p>
-              <p class="text-2xl font-black text-gold">{{ formatAmount(dailyCaisse.totalRevenue) }}</p>
+              <p class="text-2xl font-black text-gold">{{ formatAmount(caisse.totalRevenue) }}</p>
               <p class="text-[10px] font-bold text-gold/60 mt-1">FCFA</p>
             </div>
             <div class="p-5 bg-black/[.02] border theme-border rounded-2xl flex flex-col justify-center gap-3 group hover:border-black/20 transition-colors shadow-sm">
               <div class="flex items-center justify-between">
                 <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Commandes</p>
-                <span class="text-sm font-black theme-text bg-black/[.04] px-2 py-0.5 rounded-lg border theme-border">{{ dailyCaisse.ordersCount }}</span>
+                <span class="text-sm font-black theme-text bg-black/[.04] px-2 py-0.5 rounded-lg border theme-border">{{ caisse.ordersCount }}</span>
               </div>
               <div class="flex items-center justify-between">
                 <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Livrées</p>
-                <span class="text-sm font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">{{ dailyCaisse.deliveredOrdersCount }}</span>
+                <span class="text-sm font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">{{ caisse.deliveredOrdersCount }}</span>
               </div>
               <div class="flex items-center justify-between">
                 <p class="text-[10px] font-bold theme-muted uppercase tracking-wider">Nouv. clients</p>
-                <span class="text-sm font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg border border-indigo-500/20">+{{ dailyCaisse.newCustomersCount }}</span>
+                <span class="text-sm font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg border border-indigo-500/20">+{{ caisse.newCustomersCount }}</span>
               </div>
             </div>
           </div>
@@ -402,10 +349,10 @@
       <!-- Répartition des statuts -->
       <div class="luxury-card border theme-border rounded-3xl p-6 flex flex-col">
         <h3 class="text-base font-bold theme-text mb-6">Répartition par statut</h3>
-        @if (stats.ordersByStatus && stats.ordersByStatus.length > 0) {
-          @let total = stats.totalOrders;
+        @if (currentStats.ordersByStatus && currentStats.ordersByStatus.length > 0) {
+          @let total = currentStats.totalOrders;
           <div class="space-y-4 flex-1 flex flex-col justify-center">
-            @for (item of stats.ordersByStatus; track item.status) {
+            @for (item of currentStats.ordersByStatus; track item.status) {
               @if (item.count > 0) {
                 <div>
                   <div class="flex items-center justify-between mb-2">
