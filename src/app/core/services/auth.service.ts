@@ -182,8 +182,8 @@ export class AuthService {
     const payload = this._getTokenPayload(token);
     if (payload && typeof payload["exp"] === "number") {
       const remainingMs = payload["exp"] * 1000 - Date.now();
-      // Si le token expire dans moins de 15 minutes ou est déjà expiré
-      if (remainingMs < 15 * 60 * 1000) {
+      // Si le token expire dans moins de 2 minutes ou est déjà expiré
+      if (remainingMs < 2 * 60 * 1000) {
         const rt = this.getRefreshToken();
         if (rt) {
           this.refreshToken(rt).subscribe({ error: () => {} });
@@ -204,8 +204,14 @@ export class AuthService {
     if (payload && typeof payload["exp"] === "number") {
       const expiresAtMs = payload["exp"] * 1000;
       const now = Date.now();
-      // Se réveiller 15 minutes avant expiration
-      delayMs = Math.max(5000, expiresAtMs - now - 15 * 60 * 1000);
+      const remainingMs = expiresAtMs - now;
+      // Se réveiller 2 minutes avant expiration, avec un seuil minimum de 60 secondes
+      if (remainingMs > 2 * 60 * 1000) {
+        delayMs = remainingMs - 2 * 60 * 1000;
+      } else {
+        // Le token est très proche de l'expiration ou expiré, laisser le premier appel HTTP ou l'intercepteur le rafraîchir
+        return;
+      }
     }
 
     this.refreshTimer = setTimeout(() => {
@@ -213,7 +219,7 @@ export class AuthService {
       if (refreshToken) {
         this.refreshToken(refreshToken).subscribe({
           error: (err) => {
-            if (err && err.status !== 0) {
+            if (err && (err.status === 400 || err.status === 401 || err.status === 403)) {
               this.logout();
             }
           }
@@ -271,7 +277,7 @@ export class AuthService {
       if (refreshToken) {
         this.refreshToken(refreshToken).subscribe({
           error: (err) => {
-            if (err && err.status !== 0) {
+            if (err && (err.status === 400 || err.status === 401 || err.status === 403)) {
               this.logout();
             }
           }
@@ -281,14 +287,6 @@ export class AuthService {
       }
     } else {
       this._scheduleProactiveRefresh();
-      // Valider la validité de la session auprès du backend
-      this.apiService.get('/users/me').subscribe({
-        error: (err) => {
-          if (err && (err.status === 401 || err.status === 403 || err.status === 404)) {
-            this.logout();
-          }
-        }
-      });
     }
   }
 

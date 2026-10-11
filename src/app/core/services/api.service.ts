@@ -20,7 +20,7 @@ interface TtlEntry {
 })
 export class ApiService {
   private readonly baseUrl = environment.apiUrl;
-  private static readonly DEFAULT_TIMEOUT = 15000;
+  private static readonly DEFAULT_TIMEOUT = 30000;
   private static readonly DEFAULT_TTL_MS = 30_000;
   private static readonly RETRY_COUNT = 2;
   private static readonly RETRY_DELAY_MS = 1000;
