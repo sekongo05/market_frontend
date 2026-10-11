@@ -38,3 +38,16 @@ export interface UpdateDeliveryRequest {
   carrierName?: string;
   carrierTrackingUrl?: string;
 }
+
+export interface DeliveryFeeConfig {
+  abidjanFee: number;
+  interieurFee: number;
+  freeShippingThreshold?: number | null;
+}
+
+export interface UpdateDeliveryFeeRequest {
+  abidjanFee: number;
+  interieurFee: number;
+  freeShippingThreshold?: number | null;
+}
+

@@ -22,6 +22,13 @@
           </button>
         }
       </div>
+      <button (click)="showFeeModal = true"
+        class="flex items-center gap-2 px-4 py-2.5 bg-gold text-black font-black text-sm rounded-xl hover:bg-amber-400 transition-colors shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Tarifs livraison
+      </button>
       <button (click)="loadDeliveryOrders()"
         class="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-sm rounded-xl hover:bg-gold/15 transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,6 +280,82 @@
         }
       </div>
     }
-  </div>
+  <!-- ── Modal Configuration des Tarifs de Livraison ─────────────────── -->
+  @if (showFeeModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+      <div class="theme-surface border theme-border rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl relative">
+
+        <div class="flex items-center justify-between pb-3 border-b theme-border">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gold/15 flex items-center justify-center text-gold">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-black theme-text text-base">Tarifs de Livraison</h3>
+              <p class="text-xs theme-muted">Configurez les frais appliqués au panier</p>
+            </div>
+          </div>
+          <button (click)="showFeeModal = false" class="p-1 rounded-lg text-gray-400 hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Abidjan Fee -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">
+              Frais Abidjan (FCFA) <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input type="number" [(ngModel)]="abidjanFee" min="0" step="100"
+                class="theme-input w-full px-4 py-2.5 rounded-xl text-sm font-bold"/>
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold theme-muted">FCFA</span>
+            </div>
+          </div>
+
+          <!-- Interieur Fee -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">
+              Frais Intérieur du pays (FCFA) <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input type="number" [(ngModel)]="interieurFee" min="0" step="100"
+                class="theme-input w-full px-4 py-2.5 rounded-xl text-sm font-bold"/>
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold theme-muted">FCFA</span>
+            </div>
+          </div>
+
+          <!-- Free Shipping Threshold -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider theme-muted mb-1.5">
+              Seuil livraison gratuite (Optionnel)
+            </label>
+            <div class="relative">
+              <input type="number" [(ngModel)]="freeShippingThreshold" min="0" step="1000" placeholder="Ex: 50000 (ou vide si désactivé)"
+                class="theme-input w-full px-4 py-2.5 rounded-xl text-sm font-bold"/>
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold theme-muted">FCFA</span>
+            </div>
+            <p class="text-[11px] theme-muted mt-1">Laisser vide pour ne pas offrir la livraison gratuite.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-3 border-t theme-border">
+          <button type="button" (click)="showFeeModal = false"
+            class="flex-1 py-2.5 rounded-xl border theme-border theme-muted hover:theme-text font-bold text-xs transition-colors">
+            Annuler
+          </button>
+          <button type="button" (click)="saveDeliveryFees()" [disabled]="feesSaving"
+            class="flex-1 py-2.5 rounded-xl bg-gold text-black font-black text-xs hover:bg-amber-400 disabled:opacity-50 transition-all shadow-md">
+            @if (feesSaving) { Enregistrement… } @else { Enregistrer }
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
 
 </div>

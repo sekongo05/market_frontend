@@ -393,7 +393,7 @@
                         : 'border-gray-200 text-gray-600 hover:border-gold/40'">
                       <div class="flex items-center justify-between w-full">
                         <span class="text-base font-black">Abidjan</span>
-                        <span class="px-2 py-0.5 rounded-full text-xs font-black bg-gold/20 text-gold">1 500 FCFA</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-black bg-gold/20 text-gold">{{ abidjanFee | number:'1.0-0':'fr-FR' }} FCFA</span>
                       </div>
                       <p class="text-xs font-normal opacity-80 w-full">Toutes communes (Cocody, Yopougon, Marcory…)</p>
                     </button>
@@ -405,7 +405,7 @@
                         : 'border-gray-200 text-gray-600 hover:border-gold/40'">
                       <div class="flex items-center justify-between w-full">
                         <span class="text-base font-black">Intérieur du pays</span>
-                        <span class="px-2 py-0.5 rounded-full text-xs font-black bg-orange-500/20 text-orange-500">2 000 FCFA</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-black bg-orange-500/20 text-orange-500">{{ interieurFee | number:'1.0-0':'fr-FR' }} FCFA</span>
                       </div>
                       <p class="text-xs font-normal opacity-80 w-full">Villes de province de Côte d'Ivoire</p>
                     </button>

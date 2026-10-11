@@ -5,6 +5,8 @@ import {
   DeliveryResponse,
   AddDeliveryEventRequest,
   UpdateDeliveryRequest,
+  DeliveryFeeConfig,
+  UpdateDeliveryFeeRequest,
 } from '../models/delivery.models';
 import { ApiService } from './api.service';
 
@@ -35,4 +37,13 @@ export class DeliveryService {
   ): Observable<ApiResponse<DeliveryResponse>> {
     return this.apiService.patch(`/delivery/${deliveryId}`, data);
   }
+
+  getDeliveryFees(): Observable<ApiResponse<DeliveryFeeConfig>> {
+    return this.apiService.get<DeliveryFeeConfig>('/delivery/fees');
+  }
+
+  updateDeliveryFees(data: UpdateDeliveryFeeRequest): Observable<ApiResponse<DeliveryFeeConfig>> {
+    return this.apiService.put<DeliveryFeeConfig>('/delivery/fees', data);
+  }
 }
+

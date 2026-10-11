@@ -10,6 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { OrderService } from '../../../core/services/order.service';
 import { PaymentService } from '../../../core/services/payment.service';
 import { PromoService } from '../../../core/services/promo.service';
+import { DeliveryService } from '../../../core/services/delivery.service';
 import { PromoCheckResponse } from '../../../core/models/promo.models';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 
@@ -55,14 +56,32 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     private orderService: OrderService,
     private paymentService: PaymentService,
     private promoService: PromoService,
+    private deliveryService: DeliveryService,
     private router: Router,
   ) {}
+
+  abidjanFee = 1500;
+  interieurFee = 2000;
+  freeShippingThreshold: number | null = null;
 
   ngOnInit(): void {
     this.cartService.cart$.pipe(takeUntil(this.destroy$)).subscribe(items => {
       this.cartItems = items;
       this.cartTotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
       if (this.promoCheckResult?.valid) this.checkPromo();
+    });
+
+    this.deliveryService.getDeliveryFees().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.abidjanFee = res.data.abidjanFee ?? 1500;
+          this.interieurFee = res.data.interieurFee ?? 2000;
+          this.freeShippingThreshold = res.data.freeShippingThreshold ?? null;
+        }
+      },
+      error: () => {
+        // Fallback transparent sur 1500 / 2000 si le backend n'a pas encore la route
+      }
     });
 
     const user = this.authService.getCurrentUser();
@@ -80,7 +99,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
   get shippingFee(): number {
-    return this.deliveryZone === 'interieur' ? 2000 : (this.deliveryZone === 'abidjan' ? 1500 : 0);
+    if (this.freeShippingThreshold && this.cartTotal >= this.freeShippingThreshold) {
+      return 0;
+    }
+    return this.deliveryZone === 'interieur' ? this.interieurFee : (this.deliveryZone === 'abidjan' ? this.abidjanFee : 0);
   }
 
   get discountAmount(): number {

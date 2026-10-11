@@ -38,6 +38,14 @@ export class AdminDeliveryComponent implements OnInit, OnDestroy {
   deliveryUpdateSaving = false;
   deliverySubTab: 'events' | 'update' = 'events';
 
+  /* ── Configuration Frais de Livraison ── */
+  abidjanFee = 1500;
+  interieurFee = 2000;
+  freeShippingThreshold: number | null = null;
+  feesLoading = false;
+  feesSaving = false;
+  showFeeModal = false;
+
   /* ── Filtres ── */
   searchQuery = '';
   filterOrderStatus: '' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' = '';
@@ -61,8 +69,54 @@ export class AdminDeliveryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadDeliveryOrders();
+    this.loadDeliveryFees();
     this.wsService.staffEvent$.pipe(takeUntil(this.destroy$)).subscribe(e => {
       if (e.module === 'deliveries') this.loadDeliveryOrders();
+    });
+  }
+
+  loadDeliveryFees(): void {
+    this.feesLoading = true;
+    this.deliveryService.getDeliveryFees().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (r) => {
+        if (r.success && r.data) {
+          this.abidjanFee = r.data.abidjanFee ?? 1500;
+          this.interieurFee = r.data.interieurFee ?? 2000;
+          this.freeShippingThreshold = r.data.freeShippingThreshold ?? null;
+        }
+        this.feesLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.feesLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  saveDeliveryFees(): void {
+    this.feesSaving = true;
+    this.deliveryService.updateDeliveryFees({
+      abidjanFee: this.abidjanFee,
+      interieurFee: this.interieurFee,
+      freeShippingThreshold: this.freeShippingThreshold ? Number(this.freeShippingThreshold) : null,
+    }).subscribe({
+      next: (r) => {
+        this.feesSaving = false;
+        this.showFeeModal = false;
+        if (r.success && r.data) {
+          this.abidjanFee = r.data.abidjanFee ?? 1500;
+          this.interieurFee = r.data.interieurFee ?? 2000;
+          this.freeShippingThreshold = r.data.freeShippingThreshold ?? null;
+        }
+        this.toast.show('Tarifs de livraison mis à jour avec succès');
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.feesSaving = false;
+        this.toast.show(err?.error?.message || 'Erreur lors de la mise à jour des tarifs', 'error');
+        this.cdr.markForCheck();
+      }
     });
   }
 
