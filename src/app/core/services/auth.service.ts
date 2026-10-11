@@ -37,6 +37,18 @@ export class AuthService {
     private webSocketService: WebSocketService
   ) {
     this.loadUserFromToken();
+    if (this.isBrowser) {
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && this.isAuthenticated()) {
+          this._checkAndRefreshIfNeeded();
+        }
+      });
+      window.addEventListener("focus", () => {
+        if (this.isAuthenticated()) {
+          this._checkAndRefreshIfNeeded();
+        }
+      });
+    }
   }
 
   register(data: RegisterRequest): Observable<ApiResponse<AuthResponse>> {
@@ -143,9 +155,38 @@ export class AuthService {
     }
   }
 
+  private _checkAndRefreshIfNeeded(): void {
+    const token = this.getToken();
+    if (!token) return;
+    const payload = this._getTokenPayload(token);
+    if (payload && typeof payload["exp"] === "number") {
+      const remainingMs = payload["exp"] * 1000 - Date.now();
+      // Si le token expire dans moins de 15 minutes ou est déjà expiré
+      if (remainingMs < 15 * 60 * 1000) {
+        const rt = this.getRefreshToken();
+        if (rt) {
+          this.refreshToken(rt).subscribe({ error: () => {} });
+        }
+      }
+    }
+  }
+
   private _scheduleProactiveRefresh(): void {
     this._clearProactiveRefresh();
     if (!this.isBrowser) return;
+
+    const token = this.getToken();
+    if (!token) return;
+
+    let delayMs = 7 * 60 * 60 * 1000; // 7h par défaut pour token 8h
+    const payload = this._getTokenPayload(token);
+    if (payload && typeof payload["exp"] === "number") {
+      const expiresAtMs = payload["exp"] * 1000;
+      const now = Date.now();
+      // Se réveiller 15 minutes avant expiration
+      delayMs = Math.max(5000, expiresAtMs - now - 15 * 60 * 1000);
+    }
+
     this.refreshTimer = setTimeout(() => {
       const refreshToken = this.getRefreshToken();
       if (refreshToken) {
@@ -157,7 +198,7 @@ export class AuthService {
           }
         });
       }
-    }, this.PROACTIVE_REFRESH_MS);
+    }, delayMs);
   }
 
   private _clearProactiveRefresh(): void {
