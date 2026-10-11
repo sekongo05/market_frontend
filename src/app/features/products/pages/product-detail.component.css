@@ -17,25 +17,25 @@
 /* ── Quantity stepper ───────────────────────────────────────────────── */
 .qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-/* ── Mobile: description après les options/CTA ───────────────────────── */
+/* ── Mobile: CTA et options juste après le prix, description en bas ───────── */
 .product-info-col { display: flex; flex-direction: column; gap: 1.5rem; }
-.sec-title { order: 0; }
-.sec-price { order: 1; }
+.sec-title    { order: 0; }
+.sec-price    { order: 1; }
 .sec-variants { order: 2; }
-.sec-desc  { order: 3; }
-.sec-cta   { order: 4; }
-.sec-wa    { order: 5; }
-.sec-share { order: 6; }
-.sec-trust { order: 7; }
+.sec-cta      { order: 3; }
+.sec-desc     { order: 4; }
+.sec-wa       { order: 5; }
+.sec-share    { order: 6; }
+.sec-trust    { order: 7; }
 @media (min-width: 640px) {
-  .sec-title { order: 0; }
-  .sec-price { order: 1; }
-  .sec-desc  { order: 2; }
+  .sec-title    { order: 0; }
+  .sec-price    { order: 1; }
+  .sec-desc     { order: 2; }
   .sec-variants { order: 3; }
-  .sec-cta   { order: 4; }
-  .sec-wa    { order: 5; }
-  .sec-share { order: 6; }
-  .sec-trust { order: 7; }
+  .sec-cta      { order: 4; }
+  .sec-wa       { order: 5; }
+  .sec-share    { order: 6; }
+  .sec-trust    { order: 7; }
 }
 
 /* ── No scrollbar utility ────────────────────────────────────────────── */
