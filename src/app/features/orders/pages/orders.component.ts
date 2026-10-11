@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -11,6 +11,7 @@ import { WebSocketService } from '../../../core/services/websocket.service';
 import { OrderResponse } from '../../../core/models/order.models';
 import { ReturnResponse } from '../../../core/models/return.models';
 import { PageResponse } from '../../../core/models/common.models';
+import { AuthService } from '../../../core/services/auth.service';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 import { orderStatusLabel, orderStatusClass } from '../../admin/shared/admin-status.helpers';
 
@@ -67,6 +68,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private authService: AuthService
   ) {}
 
   @HostListener('document:keydown.escape')
@@ -77,8 +80,10 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.handlePaymentReturn();
-    this.loadOrders();
-    this.loadMyReturns();
+    if (isPlatformBrowser(this.platformId) && this.authService.isAuthenticated()) {
+      this.loadOrders();
+      this.loadMyReturns();
+    }
     this.wsService.orderStatusUpdate$
       .pipe(takeUntil(this.destroy$))
       .subscribe(update => {
