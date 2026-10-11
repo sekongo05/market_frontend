@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -58,7 +58,8 @@ export class RegisterComponent implements OnInit {
     private authService: AuthService,
     private toastService: ToastService,
     private promoService: PromoService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -132,10 +133,12 @@ export class RegisterComponent implements OnInit {
         } else {
           this.error = response.message || 'Erreur lors de l\'inscription';
         }
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.error = error?.error?.message || 'Erreur lors de l\'inscription';
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
