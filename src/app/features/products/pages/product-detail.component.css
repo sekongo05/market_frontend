@@ -17,12 +17,12 @@
 /* ── Quantity stepper ───────────────────────────────────────────────── */
 .qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-/* ── Mobile: CTA et options juste après le prix, description en bas ───────── */
+/* ── Mobile: Quantité + Ajouter au panier (.sec-cta) juste après le prix (.sec-price) ───────── */
 .product-info-col { display: flex; flex-direction: column; gap: 1.5rem; }
 .sec-title    { order: 0; }
 .sec-price    { order: 1; }
-.sec-variants { order: 2; }
-.sec-cta      { order: 3; }
+.sec-cta      { order: 2; }
+.sec-variants { order: 3; }
 .sec-desc     { order: 4; }
 .sec-wa       { order: 5; }
 .sec-share    { order: 6; }
