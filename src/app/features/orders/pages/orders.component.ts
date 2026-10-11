@@ -199,7 +199,14 @@ export class OrdersComponent implements OnInit, OnDestroy {
     this.orderService.cancelOrder(order.id).subscribe((r) => {
       if (r.success) {
         const idx = this.orders.findIndex(o => o.id === order.id);
-        if (idx !== -1) { this.orders = [...this.orders]; this.orders[idx] = r.data; }
+        if (idx !== -1) {
+          const updated = r.data ? { ...r.data } : { ...this.orders[idx] };
+          updated.orderStatus = 'CANCELLED' as any;
+          this.orders = [...this.orders];
+          this.orders[idx] = updated;
+        }
+        // Rafraîchir les commandes pour synchroniser l'ensemble des données
+        this.loadOrders(this.currentPage);
       } else {
         this.cancelError = r.message || 'Impossible d\'annuler cette commande';
         this.cancelErrorOrderId = order.id;
