@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
   HttpErrorResponse,
-} from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, filter, switchMap, take } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+} from "@angular/common/http";
+import { Observable, throwError, BehaviorSubject } from "rxjs";
+import { catchError, filter, switchMap, take } from "rxjs/operators";
+import { Router } from "@angular/router";
+import { AuthService } from "../services/auth.service";
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
@@ -27,16 +27,16 @@ export class ErrorInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && !this._isRefreshRequest(request)) {
+        if (error.status === 401 && !this._isAuthEndpoint(request)) {
           return this._handle401(request, next);
         }
 
         if (error.status === 403) {
-          console.error('Forbidden - access denied');
+          console.error("Forbidden - access denied");
         }
 
         if (error.status === 429) {
-          console.warn('Rate limited – 429 Too Many Requests');
+          console.warn("Rate limited – 429 Too Many Requests");
         }
 
         const sanitizedError = this._sanitizeError(error);
@@ -46,11 +46,10 @@ export class ErrorInterceptor implements HttpInterceptor {
   }
 
   private _sanitizeError(error: HttpErrorResponse): HttpErrorResponse {
-    const rawMessage = (typeof error.error?.message === 'string')
+    const rawMessage = (typeof error.error?.message === "string")
       ? error.error.message.trim()
-      : (typeof error.error === 'string' ? error.error.trim() : '');
+      : (typeof error.error === "string" ? error.error.trim() : "");
 
-    // Patterns techniques typiques des stacktraces / exceptions Java ou SQL
     const technicalPatterns = [
       /rollback/i,
       /exception/i,
@@ -82,7 +81,7 @@ export class ErrorInterceptor implements HttpInterceptor {
       userFriendlyMessage = "Une erreur technique est survenue sur le serveur. Veuillez réessayer dans un instant.";
     } else if (error.status === 403) {
       userFriendlyMessage = "Accès refusé. Vous n'avez pas les autorisations nécessaires.";
-    } else if (error.status === 404 && (!rawMessage || rawMessage.toLowerCase().includes('not found'))) {
+    } else if (error.status === 404 && (!rawMessage || rawMessage.toLowerCase().includes("not found"))) {
       userFriendlyMessage = "L'élément demandé est introuvable.";
     } else if (error.status === 429) {
       userFriendlyMessage = "Trop de requêtes effectuées. Veuillez patienter un instant.";
@@ -90,7 +89,7 @@ export class ErrorInterceptor implements HttpInterceptor {
       userFriendlyMessage = "Une erreur est survenue lors de l'opération.";
     }
 
-    const errorBody = (typeof error.error === 'object' && error.error !== null)
+    const errorBody = (typeof error.error === "object" && error.error !== null)
       ? { ...error.error, message: userFriendlyMessage, rawTechnicalMessage: rawMessage }
       : { message: userFriendlyMessage, rawTechnicalMessage: rawMessage };
 
@@ -103,8 +102,12 @@ export class ErrorInterceptor implements HttpInterceptor {
     });
   }
 
-  private _isRefreshRequest(request: HttpRequest<unknown>): boolean {
-    return request.url.includes('/auth/refresh');
+  private _isAuthEndpoint(request: HttpRequest<unknown>): boolean {
+    return request.url.includes("/auth/login") ||
+           request.url.includes("/auth/register") ||
+           request.url.includes("/auth/refresh") ||
+           request.url.includes("/auth/forgot-password") ||
+           request.url.includes("/auth/reset-password");
   }
 
   private _handle401(
@@ -116,7 +119,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     if (!refreshToken) {
       this._logout();
       return throwError(
-        () => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' })
+        () => new HttpErrorResponse({ status: 401, statusText: "Unauthorized" })
       );
     }
 
@@ -124,36 +127,37 @@ export class ErrorInterceptor implements HttpInterceptor {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
+      // IMPORTANT : catchError est isolé sur le refreshToken lui-même !
+      // Si la requête rejouée produit une erreur métier (400, 404, 422),
+      // elle n'éjectera JAMAIS l'utilisateur.
       return this.authService.refreshToken(refreshToken).pipe(
+        catchError((refreshErr: HttpErrorResponse) => {
+          this.isRefreshing = false;
+          // Déconnecter UNIQUEMENT si le refresh token lui-même a échoué
+          if (refreshErr.status === 400 || refreshErr.status === 401 || refreshErr.status === 403) {
+            this._logout();
+          }
+          return throwError(() => this._sanitizeError(refreshErr));
+        }),
         switchMap((response) => {
           this.isRefreshing = false;
           if (response.success && response.data) {
-            this.refreshTokenSubject.next(response.data.token);
-            return next.handle(
-              this._addToken(request, response.data.token)
-            );
+            const newToken = response.data.token;
+            this.refreshTokenSubject.next(newToken);
+            return next.handle(this._addToken(request, newToken));
           }
           this._logout();
           return throwError(
-            () => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' })
+            () => new HttpErrorResponse({ status: 401, statusText: "Unauthorized" })
           );
-        }),
-        catchError((err: HttpErrorResponse) => {
-          this.isRefreshing = false;
-          // Only log out if it's a client error (e.g. 401, 403, 400).
-          // Do NOT log out on network error (0) or server error (50x).
-          if (err.status !== 0) {
-            this._logout();
-          }
-          return throwError(() => this._sanitizeError(err));
         })
       );
     } else {
       return this.refreshTokenSubject.pipe(
-        filter((token) => token !== null),
+        filter((token): token is string => token !== null),
         take(1),
         switchMap((token) =>
-          next.handle(this._addToken(request, token!))
+          next.handle(this._addToken(request, token))
         )
       );
     }
@@ -168,7 +172,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     });
   }
 
-  private readonly _protectedRoutes = ['/admin', '/manager', '/checkout', '/orders', '/profile'];
+  private readonly _protectedRoutes = ["/admin", "/manager", "/checkout", "/orders", "/profile"];
 
   private _logout(): void {
     const returnUrl = this.router.url;
@@ -176,8 +180,8 @@ export class ErrorInterceptor implements HttpInterceptor {
 
     const isProtected = this._protectedRoutes.some(route => returnUrl.startsWith(route));
     if (isProtected) {
-      this.router.navigate(['/auth/login'], {
-        queryParams: returnUrl !== '/' ? { returnUrl } : undefined,
+      this.router.navigate(["/auth/login"], {
+        queryParams: returnUrl !== "/" ? { returnUrl } : undefined,
       });
     }
   }

@@ -48,6 +48,27 @@ export class AuthService {
           this._checkAndRefreshIfNeeded();
         }
       });
+      // Synchronisation multi-onglets : écoute des modifications de session depuis d'autres onglets
+      window.addEventListener("storage", (event: StorageEvent) => {
+        if (event.key === this.tokenKey) {
+          if (!event.newValue) {
+            // Un autre onglet s'est déconnecté
+            this.currentUserSubject.next(null);
+            this.webSocketService.disconnect();
+          } else {
+            // Un autre onglet a obtenu un token frais
+            this._scheduleProactiveRefresh();
+          }
+        } else if (event.key === "current_user") {
+          if (event.newValue) {
+            try {
+              this.currentUserSubject.next(JSON.parse(event.newValue));
+            } catch {}
+          } else {
+            this.currentUserSubject.next(null);
+          }
+        }
+      });
     }
   }
 
