@@ -31,7 +31,16 @@ export class OrdersComponent implements OnInit, OnDestroy {
   totalPages = 0;
 
   // Payment feedback (return from GeniusPay)
-  paymentFeedback: { type: 'success' | 'error'; message: string } | null = null;
+  paymentFeedback: { type: 'success' | 'error'; message: string; targetOrder?: OrderResponse | null } | null = null;
+  failedPaymentOrderId: number | null = null;
+
+  get latestUnpaidOrder(): OrderResponse | null {
+    if (this.failedPaymentOrderId) {
+      const found = this.orders.find(o => o.id === this.failedPaymentOrderId);
+      if (found) return found;
+    }
+    return this.orders.find(o => (o.orderStatus === 'PENDING' && (o.paymentStatus === 'PENDING' || o.paymentStatus === 'FAILED'))) ?? null;
+  }
 
   // Inline expand / cancel
   expandedId: number | null = null;
@@ -109,7 +118,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
     if (payment === 'success') {
       this.paymentFeedback = { type: 'success', message: 'Paiement confirmé ! Merci pour votre commande.' };
     } else if (payment === 'failed') {
-      this.paymentFeedback = { type: 'error', message: 'Le paiement a échoué. Vous pouvez réessayer ci-dessous.' };
+      this.paymentFeedback = { type: 'error', message: 'Le paiement n\'a pas abouti. Vous pouvez le relancer immédiatement ci-dessous.' };
     }
 
     this.router.navigate([], {
