@@ -624,7 +624,7 @@
         class="card-appear group cursor-pointer flex items-center gap-3 p-3 border transition-colors hover:border-gold/25"
         style="border-color:rgba(212,175,55,0.1);" [style.animation-delay.ms]="(idx + 4) * 80">
         <div class="flex-shrink-0 w-14 h-14 overflow-hidden relative">
-          <img [src]="(product.thumbnailUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
+          <img [src]="(product.thumbnailUrl || product.imageUrl) | mediaUrl: 200" [alt]="product.name" loading="lazy"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             (error)="$any($event.target).src='https://placehold.co/56x56/0a0a0a/d4af37?text=SDM'" />
           <span

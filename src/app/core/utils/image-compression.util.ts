@@ -8,9 +8,9 @@
  */
 export async function compressImage(
   file: File,
-  maxWidth = 1600,
-  maxHeight = 1600,
-  quality = 0.85
+  maxWidth = 2048,
+  maxHeight = 2048,
+  quality = 0.90
 ): Promise<{ file: File; preview: string }> {
   // Préserver les GIFs animés sans compression
   if (file.type === 'image/gif') {
@@ -32,8 +32,8 @@ export async function compressImage(
         let width = img.width;
         let height = img.height;
 
-        // Si l'image est déjà petite (< 1600px et < 500 Ko), éviter de trop retraiter
-        if (width <= maxWidth && height <= maxHeight && file.size <= 500 * 1024) {
+        // Si l'image est déjà petite (< 2048px et < 800 Ko), éviter de trop retraiter
+        if (width <= maxWidth && height <= maxHeight && file.size <= 800 * 1024) {
           resolve({ file, preview: rawDataUrl });
           return;
         }
