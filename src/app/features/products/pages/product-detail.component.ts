@@ -225,15 +225,14 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   normalizeMediaKey(url: string): string {
     if (!url) return '';
-    // Pour Cloudinary : extraire le chemin après /upload/ en ignorant les transformations (w_XXX, etc.)
+    // Pour Cloudinary : extraire le chemin après /upload/ en ignorant les transformations (w_XXX, etc.) et le numéro de version (v1234...)
     const uploadIdx = url.indexOf('/upload/');
     if (uploadIdx !== -1) {
       const after = url.substring(uploadIdx + 8);
       const parts = after.split('/');
-      // Le chemin réel commence par le numéro de version (v1234...) ou le dossier racine ('sdmstore', 'products')
-      const contentIdx = parts.findIndex(p => /^v\d+$/.test(p) || p === 'sdmstore' || p === 'products' || !p.includes('_'));
-      if (contentIdx !== -1) {
-        return parts.slice(contentIdx).join('/').split('?')[0];
+      const contentParts = parts.filter(p => !p.includes(',') && !p.includes(':') && !/^v\d+$/.test(p) && !/^(w|h|c|q|f|dpr)_[a-zA-Z0-9]+$/.test(p));
+      if (contentParts.length > 0) {
+        return contentParts.join('/').split('?')[0];
       }
     }
     const clean = url.split('?')[0];
@@ -244,10 +243,24 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private _buildGallery(): void {
     if (!this.product) return;
 
+    // Détection d'un ancien doublon orphelin issu du double upload passé :
+    // Toutes les variantes ont leur propre photo, et un média orphelin supplémentaire existe
+    const variantsWithImages = this.product.variants?.filter(v => !!v.imageUrl) ?? [];
+    const allVariantsHaveImages = (this.product.variants?.length ?? 0) > 0 &&
+                                  variantsWithImages.length === this.product.variants!.length;
+    let orphanUrlToIgnore: string | null = null;
+    if (allVariantsHaveImages && (this.product.media?.length ?? 0) === variantsWithImages.length + 1) {
+      const orphan = this.product.media?.find(m => !variantsWithImages.some(v => this.isSameMedia(v.imageUrl, m.url)));
+      if (orphan) {
+        orphanUrlToIgnore = orphan.url;
+      }
+    }
+
     const items: GalleryItem[] = [];
 
     const addIfUnique = (url: string | null | undefined, type: 'IMAGE' | 'VIDEO' = 'IMAGE') => {
       if (!url) return;
+      if (orphanUrlToIgnore && this.isSameMedia(url, orphanUrlToIgnore)) return;
       if (!items.some(i => this.isSameMedia(i.url, url))) {
         items.push({ url, type });
       }

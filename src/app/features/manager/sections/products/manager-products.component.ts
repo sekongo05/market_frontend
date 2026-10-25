@@ -650,6 +650,13 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
             };
             // 2. Sauvegarder les variantes (avec cache d'upload)
             const uploadedUrlCache = new Map<File, string>();
+            if (product.imageUrl) {
+              if (this.hasVariantsToggle && itemsSnapshot.length > 0 && itemsSnapshot[0].file) {
+                uploadedUrlCache.set(itemsSnapshot[0].file, product.imageUrl);
+              } else if (this.selectedImageFile) {
+                uploadedUrlCache.set(this.selectedImageFile, product.imageUrl);
+              }
+            }
             const processItem = (index: number) => {
               if (index >= itemsSnapshot.length) {
                 this.drawerLoading = false;
@@ -838,6 +845,66 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   clearImage(): void { this.imagePreview = null; this.selectedImageFile = null; this.uploadError = null; this.cdr.markForCheck(); }
 
   // ── Galerie ───────────────────────────────────────────────────────────────
+
+  isSameMedia(urlA: string | null | undefined, urlB: string | null | undefined): boolean {
+    if (!urlA || !urlB) return false;
+    if (urlA === urlB) return true;
+    return this.normalizeMediaKey(urlA) === this.normalizeMediaKey(urlB);
+  }
+
+  normalizeMediaKey(url: string): string {
+    if (!url) return '';
+    const uploadIdx = url.indexOf('/upload/');
+    if (uploadIdx !== -1) {
+      const after = url.substring(uploadIdx + 8);
+      const parts = after.split('/');
+      const contentParts = parts.filter(p => !p.includes(',') && !p.includes(':') && !/^v\d+$/.test(p) && !/^(w|h|c|q|f|dpr)_[a-zA-Z0-9]+$/.test(p));
+      if (contentParts.length > 0) {
+        return contentParts.join('/').split('?')[0];
+      }
+    }
+    const clean = url.split('?')[0];
+    const lastSlash = clean.lastIndexOf('/');
+    return lastSlash !== -1 ? clean.substring(lastSlash + 1) : clean;
+  }
+
+  getVariantForMedia(mediaUrl: string): ProductVariant | undefined {
+    return this.productVariants.find(v => this.isSameMedia(v.imageUrl, mediaUrl));
+  }
+
+  cleaningOrphan = false;
+
+  get orphanDuplicateMedia(): ProductMediaItem | undefined {
+    if (!this.productMedia?.length || !this.productVariants?.length) return undefined;
+    const variantsWithImages = this.productVariants.filter(v => !!v.imageUrl);
+    if (variantsWithImages.length === 0 || variantsWithImages.length !== this.productVariants.length) {
+      return undefined;
+    }
+    const orphans = this.productMedia.filter(m => !variantsWithImages.some(v => this.isSameMedia(v.imageUrl, m.url)));
+    if (orphans.length === 1 && this.productMedia.length === variantsWithImages.length + 1) {
+      return orphans[0];
+    }
+    return undefined;
+  }
+
+  cleanOrphanMedia(mediaId: number): void {
+    if (!this.editingProduct || this.cleaningOrphan) return;
+    this.cleaningOrphan = true;
+    this.cdr.markForCheck();
+    this.productMediaService.delete(this.editingProduct.id, mediaId).subscribe({
+      next: () => {
+        this.productMedia = this.productMedia.filter(m => m.id !== mediaId);
+        this.cleaningOrphan = false;
+        this.toast.show('Doublon orphelin nettoyé avec succès ✓');
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.cleaningOrphan = false;
+        this.toast.show('Erreur lors du nettoyage', 'error');
+        this.cdr.markForCheck();
+      },
+    });
+  }
 
   loadMedia(productId: number): void {
     this.mediaLoading = true;
