@@ -186,6 +186,7 @@
             <div class="flex sm:grid sm:grid-cols-4 gap-2.5 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
               @for (item of galleryItems; track item.url; let i = $index) {
                 <button (click)="setActive(i)"
+                  [id]="'gallery-thumb-' + i"
                   class="thumb-btn flex-shrink-0 w-16 h-16 sm:w-auto sm:aspect-square relative rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105"
                   [style.border-color]="activeIndex === i ? '#d4af37' : 'transparent'">
 
@@ -254,170 +255,228 @@
           <!-- Variant selector -->
           <div class="sec-variants">
           @if (hasVariants) {
-            <div class="rounded-2xl luxury-card p-4 sm:p-5 border theme-border space-y-4">
-              <!-- Header -->
-              <div class="flex items-center justify-between flex-wrap gap-2">
-                <div class="flex items-center gap-2">
-                  <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">
-                    Variantes disponibles
-                  </h3>
-                  <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-gold/15 text-gold border border-gold/20">
-                    {{ product.variants?.length }}
-                  </span>
-                </div>
-                @if (selectedVariant) {
-                  <div class="flex items-center gap-1.5 text-xs font-semibold">
-                    <span class="theme-muted">Choix :</span>
-                    <span class="text-gold font-bold">{{ selectedVariant.variantName }}</span>
-                  </div>
-                }
-              </div>
+            <div class="rounded-2xl luxury-card p-4 sm:p-5 border theme-border space-y-5">
 
-              <!-- Visual cards grid for variants -->
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                @for (variant of product.variants; track variant.id) {
-                  @let isSelected = selectedVariant?.id === variant.id;
-                  @let isOutOfStock = variant.stock === 0;
+              <!-- Cas 1 : Mode Attributs Intelligents (Couleur, Pointure, Taille, etc.) -->
+              @if (isCascadeMode) {
+                @for (attr of cascadeAttributes; track attr.id) {
+                  @let isColor = isColorAttribute(attr);
+                  @let selectedVal = getSelectedAttrValue(attr);
+                  @let values = attr.values;
 
-                  <button
-                    type="button"
-                    (click)="selectVariant(variant)"
-                    class="group relative flex flex-col items-start p-2 rounded-2xl border text-left transition-all duration-200 overflow-hidden w-full"
-                    [class.border-gold]="isSelected"
-                    [class.bg-gold/10]="isSelected"
-                    [class.ring-2]="isSelected"
-                    [class.ring-gold/50]="isSelected"
-                    [class.shadow-md]="isSelected"
-                    [class.border-white/10]="!isSelected && !isOutOfStock"
-                    [class.border-red-500/20]="isOutOfStock && !isSelected"
-                    [class.bg-black/20]="!isSelected"
-                    [class.hover:border-gold/50]="!isSelected && !isOutOfStock"
-                    [class.opacity-50]="isOutOfStock">
-
-                    <!-- Thumbnail / Color preview -->
-                    <div class="w-full aspect-square rounded-xl overflow-hidden relative mb-2 bg-black/40 flex items-center justify-center border border-white/5">
-                      @if (variant.imageUrl) {
-                        <img
-                          [src]="variant.imageUrl | mediaUrl"
-                          [alt]="variant.variantName"
-                          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          (error)="$any($event.target).style.display='none'"/>
-                      } @else if (variant.colorHex) {
-                        <div class="w-full h-full flex items-center justify-center" [style.background-color]="variant.colorHex">
-                          <span class="w-6 h-6 rounded-full border-2 border-white/60 shadow"></span>
-                        </div>
-                      } @else {
-                        <div class="w-full h-full flex items-center justify-center text-xl">
-                          🏷️
-                        </div>
-                      }
-
-                      <!-- Color pip if image exists but colorHex also specified -->
-                      @if (variant.imageUrl && variant.colorHex) {
-                        <span class="absolute bottom-1.5 left-1.5 w-4 h-4 rounded-full border-2 border-white/80 shadow-md"
-                              [style.background-color]="variant.colorHex"></span>
-                      }
-
-                      <!-- Selected checkmark badge -->
-                      @if (isSelected) {
-                        <span class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-gold text-black flex items-center justify-center shadow-lg font-bold">
-                          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                          </svg>
+                  <div class="space-y-2.5">
+                    <!-- En-tête : Nom attribut & Valeur sélectionnée -->
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-bold theme-muted uppercase tracking-wider">{{ attr.name }} :</span>
+                        <span class="text-xs font-black text-gold">
+                          {{ selectedVal?.value || 'Sélectionner' }}
                         </span>
-                      }
-
-                      <!-- Stock banner over image -->
-                      @if (isOutOfStock) {
-                        <div class="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center">
-                          <span class="px-2 py-0.5 rounded bg-red-600/90 text-white text-[10px] font-black uppercase tracking-wider">
-                            Épuisé
-                          </span>
-                        </div>
-                      } @else if (variant.stock <= 3) {
-                        <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-orange-500/90 text-white text-[9px] font-bold">
-                          {{ variant.stock }} restants
-                        </span>
+                      </div>
+                      @if (isColor && selectedVal?.colorHex) {
+                        <span class="w-3.5 h-3.5 rounded-full border border-white/30 shadow-sm" [style.background-color]="selectedVal?.colorHex"></span>
                       }
                     </div>
 
-                    <!-- Variant Name and Price -->
-                    <div class="w-full min-w-0">
-                      <p class="text-xs font-bold truncate leading-tight transition-colors"
-                         [class.text-gold]="isSelected"
-                         [class.theme-text]="!isSelected">
-                        {{ variant.variantName }}
-                      </p>
+                    <!-- Sélecteur visuel pour Couleur (Swatches) -->
+                    @if (isColor) {
+                      <div class="flex flex-wrap items-center gap-2.5">
+                        @for (val of values; track val.id) {
+                          @let isSelected = cascadeSelections[attr.id] === val.id;
+                          @let isOutOfStock = isAttrValueOutOfStock(attr, val.id);
+                          @let isUnavailable = isAttrValueUnavailable(attr, val.id);
 
-                      <div class="flex items-center justify-between gap-1 mt-1">
-                        @if (variant.price && variant.price !== product.price) {
-                          <span class="text-[11px] font-extrabold gold-text">
-                            {{ variant.price | number:'1.0-0' }} F
-                          </span>
-                        } @else {
-                          <span class="text-[11px] theme-muted font-medium">
-                            {{ isOutOfStock ? 'Rupture' : 'En stock' }}
-                          </span>
+                          <button
+                            type="button"
+                            (click)="selectCascadeAttribute(attr, isSelected ? null : val.id)"
+                            [disabled]="isUnavailable"
+                            [title]="val.value + (isOutOfStock ? ' (Épuisé pour cette sélection)' : (isUnavailable ? ' (Non proposé)' : ''))"
+                            class="group relative flex items-center gap-2 p-1.5 pr-3 rounded-full border transition-all duration-200"
+                            [class.border-gold]="isSelected"
+                            [class.bg-gold/15]="isSelected"
+                            [class.ring-2]="isSelected"
+                            [class.ring-gold/60]="isSelected"
+                            [class.shadow-md]="isSelected"
+                            [class.border-white/15]="!isSelected && !isOutOfStock && !isUnavailable"
+                            [class.bg-white/[.03]]="!isSelected && !isOutOfStock && !isUnavailable"
+                            [class.hover:border-gold/50]="!isSelected && !isOutOfStock && !isUnavailable"
+                            [class.opacity-40]="isOutOfStock || isUnavailable"
+                            [class.border-dashed]="isOutOfStock || isUnavailable"
+                            [class.border-red-500/30]="isOutOfStock"
+                            [class.border-white/10]="isUnavailable"
+                            [class.cursor-not-allowed]="isUnavailable">
+
+                            <!-- Vignette photo ou pastille couleur -->
+                            @if (val.imageUrl) {
+                              <img [src]="val.imageUrl | mediaUrl" [alt]="val.value"
+                                class="w-7 h-7 rounded-full object-cover border border-white/20 shadow-sm flex-shrink-0"/>
+                            } @else if (val.colorHex) {
+                              <span class="w-7 h-7 rounded-full border border-black/30 shadow-inner flex-shrink-0"
+                                [style.background-color]="val.colorHex"></span>
+                            } @else {
+                              <span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-zinc-300 flex-shrink-0">
+                                {{ val.value.slice(0, 2).toUpperCase() }}
+                              </span>
+                            }
+
+                            <!-- Libellé couleur -->
+                            <span class="text-xs font-bold transition-colors"
+                              [class.text-gold]="isSelected"
+                              [class.theme-text]="!isSelected && !isOutOfStock && !isUnavailable"
+                              [class.text-zinc-500]="isOutOfStock || isUnavailable">
+                              {{ val.value }}
+                            </span>
+
+                            <!-- Indicateur épuisé -->
+                            @if (isOutOfStock) {
+                              <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-red-500/20 text-red-400 border border-red-500/30">
+                                Épuisé
+                              </span>
+                            }
+                          </button>
                         }
                       </div>
-                    </div>
-                  </button>
-                }
-              </div>
+                    }
 
-              <!-- Secondary cascade attributes (if any, like Size / Taille) -->
-              @if (isCascadeMode && cascadeAttributes.length > 0) {
-                <div class="pt-3 border-t border-white/5 space-y-3">
-                  @for (attr of cascadeAttributes; track attr.id; let i = $index) {
-                    @let values = cascadeAvailableValues(attr);
-                    @let isDisabled = i > 0 && !cascadeSelections[cascadeAttributes[i-1].id];
-                    <div>
-                      <div class="flex items-center justify-between mb-2">
-                        <label class="text-xs font-bold theme-muted uppercase tracking-wider">{{ attr.name }}</label>
-                        @if (cascadeSelections[attr.id]) {
-                          @let curVal = values.find(v => v.id === cascadeSelections[attr.id]);
-                          <span class="text-xs text-gold font-semibold">{{ curVal?.value }}</span>
-                        }
-                      </div>
+                    <!-- Sélecteur Pills pour Pointures / Tailles / Dimensions -->
+                    @else {
                       <div class="flex flex-wrap gap-2">
                         @for (val of values; track val.id) {
-                          @let isOutOfStock = cascadeValueOutOfStock(attr, val.id);
-                          @if (val.colorHex) {
-                            <button type="button" (click)="selectCascadeAttribute(attr, cascadeSelections[attr.id] === val.id ? null : val.id)"
-                              [disabled]="isDisabled"
-                              class="relative w-8 h-8 rounded-full ring-1 ring-inset ring-black/10 transition-all flex-shrink-0"
-                              [class.outline]="cascadeSelections[attr.id] === val.id"
-                              [class.outline-2]="cascadeSelections[attr.id] === val.id"
-                              [class.outline-offset-2]="cascadeSelections[attr.id] === val.id"
-                              [class.outline-gold]="cascadeSelections[attr.id] === val.id"
-                              [class.opacity-20]="isDisabled"
-                              [class.cursor-not-allowed]="isDisabled"
-                              [title]="val.value + (isOutOfStock ? ' — Épuisé' : '')"
-                              [style.background-color]="val.colorHex">
-                            </button>
-                          } @else {
-                            <button type="button" (click)="selectCascadeAttribute(attr, cascadeSelections[attr.id] === val.id ? null : val.id)"
-                              [disabled]="isDisabled"
-                              class="relative px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all"
-                              [class.border-gold]="cascadeSelections[attr.id] === val.id"
-                              [class.bg-gold/10]="cascadeSelections[attr.id] === val.id"
-                              [class.text-gold]="cascadeSelections[attr.id] === val.id"
-                              [class.border-white/15]="cascadeSelections[attr.id] !== val.id && !isDisabled"
-                              [class.theme-text]="cascadeSelections[attr.id] !== val.id"
-                              [class.opacity-30]="isDisabled"
-                              [class.cursor-not-allowed]="isDisabled">
-                              <span [class.opacity-40]="isOutOfStock && !isDisabled">{{ val.value }}</span>
-                              @if (isOutOfStock && !isDisabled) {
-                                <span class="ml-1 text-[9px] font-bold text-red-400">Épuisé</span>
-                              }
-                            </button>
-                          }
+                          @let isSelected = cascadeSelections[attr.id] === val.id;
+                          @let isOutOfStock = isAttrValueOutOfStock(attr, val.id);
+                          @let isUnavailable = isAttrValueUnavailable(attr, val.id);
+
+                          <button
+                            type="button"
+                            (click)="selectCascadeAttribute(attr, isSelected ? null : val.id)"
+                            [disabled]="isUnavailable"
+                            [title]="val.value + (isOutOfStock ? ' (Épuisé pour cette sélection)' : (isUnavailable ? ' (Non proposé)' : ''))"
+                            class="relative min-w-[50px] h-10 px-3.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all duration-200"
+                            [class.border-gold]="isSelected"
+                            [class.bg-gold]="isSelected"
+                            [class.text-black]="isSelected"
+                            [class.shadow-md]="isSelected"
+                            [class.shadow-yellow-600/20]="isSelected"
+                            [class.border-white/15]="!isSelected && !isOutOfStock && !isUnavailable"
+                            [class.bg-white/[.04]]="!isSelected && !isOutOfStock && !isUnavailable"
+                            [class.theme-text]="!isSelected && !isOutOfStock && !isUnavailable"
+                            [class.hover:border-gold/60]="!isSelected && !isOutOfStock && !isUnavailable"
+                            [class.hover:bg-gold/10]="!isSelected && !isOutOfStock && !isUnavailable"
+                            [class.opacity-40]="isOutOfStock || isUnavailable"
+                            [class.border-dashed]="isOutOfStock || isUnavailable"
+                            [class.border-white/10]="isUnavailable"
+                            [class.border-red-500/30]="isOutOfStock"
+                            [class.cursor-not-allowed]="isUnavailable"
+                            [class.line-through]="isOutOfStock">
+                            <span>{{ val.value }}</span>
+                            @if (isOutOfStock) {
+                              <span class="text-[9px] uppercase font-black text-red-400 no-underline">Épuisé</span>
+                            }
+                          </button>
                         }
                       </div>
+                    }
+                  </div>
+                }
+
+                <!-- Résumé déclinaison active & badge stock OU invite de sélection -->
+                @if (selectedVariant) {
+                  <div class="pt-3 border-t theme-border flex items-center justify-between flex-wrap gap-2 text-xs">
+                    <div class="flex items-center gap-2">
+                      <span class="theme-muted font-medium">Sélection :</span>
+                      <span class="font-bold text-gold">{{ selectedVariant.variantName }}</span>
+                      @if (selectedVariant.price && selectedVariant.price !== product.price) {
+                        <span class="px-2 py-0.5 rounded-md bg-gold/10 text-gold font-bold text-[11px]">
+                          {{ selectedVariant.price | number:'1.0-0' }} FCFA
+                        </span>
+                      }
                     </div>
-                  }
+
+                    <!-- Badge de stock pour la déclinaison -->
+                    @if (selectedVariant.stock === 0) {
+                      <span class="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-400 font-bold border border-red-500/25 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                        Rupture de stock
+                      </span>
+                    } @else if (selectedVariant.stock <= 3) {
+                      <span class="px-2.5 py-1 rounded-lg bg-orange-500/15 text-orange-400 font-bold border border-orange-500/25 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                        Plus que {{ selectedVariant.stock }} restants !
+                      </span>
+                    } @else {
+                      <span class="px-2.5 py-1 rounded-lg bg-green-500/15 text-green-400 font-bold border border-green-500/25 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        En stock ({{ selectedVariant.stock }} disponibles)
+                      </span>
+                    }
+                  </div>
+                } @else if (hasVariants) {
+                  <div class="pt-3 border-t theme-border flex items-center justify-between flex-wrap gap-2 text-xs">
+                    <div class="flex items-center gap-2 text-gold">
+                      <svg class="w-4 h-4 text-gold shrink-0 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <span class="font-bold">{{ missingAttributePrompt }}</span>
+                    </div>
+                    @if (effectiveStock > 0) {
+                      <span class="px-2 py-0.5 rounded text-[11px] font-semibold theme-muted bg-white/[.04]">
+                        {{ effectiveStock }} en stock au total
+                      </span>
+                    }
+                  </div>
+                }
+              }
+
+              <!-- Cas 2 : Variantes directes sans attributs configurés (produit simple) -->
+              @else {
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">
+                      Variantes disponibles
+                    </h3>
+                    <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-gold/15 text-gold border border-gold/20">
+                      {{ product.variants?.length }}
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                    @for (variant of product.variants; track variant.id) {
+                      @let isSelected = selectedVariant?.id === variant.id;
+                      @let isOutOfStock = variant.stock === 0;
+
+                      <button
+                        type="button"
+                        (click)="selectVariant(variant)"
+                        class="p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center gap-2.5"
+                        [class.border-gold]="isSelected"
+                        [class.bg-gold/15]="isSelected"
+                        [class.ring-2]="isSelected"
+                        [class.ring-gold/50]="isSelected"
+                        [class.border-white/10]="!isSelected && !isOutOfStock"
+                        [class.opacity-40]="isOutOfStock"
+                        [class.cursor-not-allowed]="isOutOfStock">
+
+                        @if (variant.imageUrl) {
+                          <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.variantName"
+                            class="w-8 h-8 rounded-lg object-cover border border-white/15 flex-shrink-0"/>
+                        } @else if (variant.colorHex) {
+                          <span class="w-8 h-8 rounded-lg border border-black/30 flex-shrink-0" [style.background-color]="variant.colorHex"></span>
+                        }
+
+                        <div class="min-w-0 flex-1">
+                          <p class="text-xs font-bold truncate" [class.text-gold]="isSelected" [class.theme-text]="!isSelected">
+                            {{ variant.variantName }}
+                          </p>
+                          <p class="text-[10px] theme-muted">
+                            {{ isOutOfStock ? 'Épuisé' : (variant.stock + ' en stock') }}
+                          </p>
+                        </div>
+                      </button>
+                    }
+                  </div>
                 </div>
               }
+
             </div>
           }
           </div>
@@ -461,7 +520,7 @@
               </button>
             } @else {
               <div class="flex flex-col gap-3">
-                @let currentStock = selectedVariant ? selectedVariant.stock : product.stock;
+                @let currentStock = selectedVariant ? selectedVariant.stock : (hasVariants ? effectiveStock : product.stock);
                 @let isCurrentOutOfStock = currentStock === 0;
 
                 <!-- Qty selector & Subtotal -->
@@ -517,7 +576,7 @@
                   } @else if (isCurrentOutOfStock) {
                     Variante épuisée
                   } @else if (hasVariants && !selectedVariant) {
-                    Sélectionnez une variante
+                    {{ missingAttributePrompt || 'Sélectionnez vos options' }}
                   } @else {
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

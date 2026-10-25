@@ -80,7 +80,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   addAttributeOpen = false;
   newAttributeName = '';
   editingAttribute: ProductAttributeResponse | null = null;
-  newValueInputs: { value: string; colorHex: string }[] = [];
+  newValueInputs: { value: string; colorHex: string; file?: File; preview?: string; imageUrl?: string }[] = [];
 
   get attributesAvailableValues(): Record<string, { value: string; count: number }[]> {
     const result: Record<string, { value: string; count: number }[]> = {};
@@ -110,7 +110,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   pendingCreationColorError: string | null = null;
 
   // ── Attributs temporaires (création) ──────────────────────────────────
-  tempAttributes: { tempId: string; name: string; realId?: number; values: { tempId: string; value: string; colorHex?: string; realId?: number }[] }[] = [];
+  tempAttributes: { tempId: string; name: string; realId?: number; values: { tempId: string; value: string; colorHex?: string; realId?: number; file?: File; preview?: string; imageUrl?: string }[] }[] = [];
   selectedCreationAttrValueIds: string[] = [];
   editingTempAttr: { tempId: string; name: string; values: { tempId: string; value: string; colorHex?: string }[] } | null = null;
 
@@ -477,7 +477,15 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
 
   saveProduct(): void {
-    if (this.productForm.invalid || this.drawerLoading) return;
+    if (this.drawerLoading) return;
+    if (this.productForm.invalid) {
+      if (this.editingProduct) {
+        this.drawerTab = 'info';
+        this.productForm.markAllAsTouched();
+        this.toast.show('Veuillez renseigner les champs obligatoires dans Informations');
+      }
+      return;
+    }
     this.drawerLoading = true;
     this.drawerError = null;
     const v = this.productForm.value;
@@ -544,7 +552,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
             });
           };
 
-          // 2. Sauvegarder les variantes
+          // 2. Sauvegarder les variantes (avec cache d'upload par fichier partagé)
+          const uploadedUrlCache = new Map<File, string>();
           const processItem = (index: number) => {
             if (index >= itemsSnapshot.length) {
               this.drawerLoading = false;
@@ -580,10 +589,18 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
                 .subscribe({ next: () => processItem(index + 1), error: () => processItem(index + 1) });
             };
             if (item.file) {
-              this.productMediaService.upload(product.id, item.file).subscribe({
-                next: (mr) => createVariant(mr.success ? mr.data.url : (product.imageUrl || '')),
-                error: () => createVariant(product.imageUrl || ''),
-              });
+              if (uploadedUrlCache.has(item.file)) {
+                createVariant(uploadedUrlCache.get(item.file)!);
+              } else {
+                this.productMediaService.upload(product.id, item.file).subscribe({
+                  next: (mr) => {
+                    const url = mr.success ? mr.data.url : (product.imageUrl || '');
+                    uploadedUrlCache.set(item.file!, url);
+                    createVariant(url);
+                  },
+                  error: () => createVariant(product.imageUrl || ''),
+                });
+              }
             } else {
               createVariant(product.imageUrl || '');
             }
@@ -622,6 +639,11 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
 
   startEditStock(product: ProductSummaryResponse): void {
+    if (product.variantCount > 0) {
+      this.openEditDrawer(product);
+      this.setDrawerTab('variants');
+      return;
+    }
     this.confirmDeleteId = null;
     this.editingStockId = product.id;
     this.editingStockValue = product.stock;
@@ -908,11 +930,11 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  openEditTempAttribute(attr: { tempId: string; name: string; values: { tempId: string; value: string; colorHex?: string }[] }): void {
+  openEditTempAttribute(attr: any): void {
     this.editingTempAttr = attr;
     this.newAttributeName = attr.name;
     this.newValueInputs = attr.values.length > 0
-      ? attr.values.map(v => ({ value: v.value, colorHex: v.colorHex || '#000000' }))
+      ? attr.values.map((v: any) => ({ value: v.value, colorHex: v.colorHex || '#000000', preview: v.preview || v.imageUrl, file: v.file, imageUrl: v.imageUrl }))
       : [{ value: '', colorHex: '#000000' }];
     this.attributeError = null;
     this.addAttributeOpen = true;
@@ -973,6 +995,36 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     return this.COLOR_MAP[lower] || this.COLOR_MAP[normalized] || null;
   }
 
+  async onAttributeValueFileSelected(event: Event, index: number): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !this.newValueInputs[index]) return;
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.newValueInputs[index].file = compressed;
+      this.newValueInputs[index].preview = preview;
+    } catch {
+      this.newValueInputs[index].file = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.newValueInputs[index].preview = e.target?.result as string;
+        this.cdr.markForCheck();
+      };
+      reader.readAsDataURL(file);
+    }
+    this.cdr.markForCheck();
+  }
+
+  clearAttributeValueFile(index: number): void {
+    if (this.newValueInputs[index]) {
+      this.newValueInputs[index].file = undefined;
+      this.newValueInputs[index].preview = undefined;
+      this.newValueInputs[index].imageUrl = undefined;
+      this.cdr.markForCheck();
+    }
+  }
+
   onAttributeValueChange(index: number, val: string): void {
     const item = this.newValueInputs[index];
     if (!item) return;
@@ -1009,18 +1061,33 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       });
 
     if (!this.editingProduct) {
-      // Mode création : stocker en local
+      // Mode création : stocker en local avec fichiers et prévisualisations
+      const tempValues = this.newValueInputs
+        .filter(v => v.value.trim())
+        .map(v => {
+          const detected = this.resolveColorHex(v.value);
+          const hex = detected || (v.colorHex && v.colorHex !== '#000000' ? v.colorHex : (isColorAttribute && v.colorHex ? v.colorHex : undefined));
+          return {
+            tempId: crypto.randomUUID(),
+            value: v.value.trim(),
+            colorHex: hex,
+            file: v.file,
+            preview: v.preview,
+            imageUrl: v.imageUrl,
+          };
+        });
+
       if (this.editingTempAttr) {
         this.tempAttributes = this.tempAttributes.map(a =>
           a.tempId === this.editingTempAttr!.tempId
-            ? { ...a, name: this.newAttributeName.trim(), values: values.map(v => ({ ...v, tempId: crypto.randomUUID() })) }
+            ? { ...a, name: this.newAttributeName.trim(), values: tempValues }
             : a
         );
       } else {
         this.tempAttributes = [...this.tempAttributes, {
           tempId: crypto.randomUUID(),
           name: this.newAttributeName.trim(),
-          values: values.map(v => ({ ...v, tempId: crypto.randomUUID() })),
+          values: tempValues,
         }];
       }
       this.generateCreationVariantsFromAttributes();
@@ -1429,6 +1496,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
         valueTempId: val.tempId,
         value: val.value,
         colorHex: val.colorHex,
+        file: val.file,
+        preview: val.preview,
       }))
     );
 
@@ -1436,12 +1505,18 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
     this.creationItems = combinations.map(comb => {
       const variantName = comb.map(c => c.value).join(' / ');
+      // Hériter de la couleur et de la photo de la couleur (ou attribut visuel)
+      const visualVal = comb.find(c => c.file || c.preview || c.colorHex);
       const colorVal = comb.find(c => c.colorHex);
       const detectedHex = colorVal?.colorHex || comb.map(c => this.resolveColorHex(c.value)).find(Boolean) || '';
+      const inheritedPreview = visualVal?.preview;
+      const inheritedFile = visualVal?.file;
       const attrTempIds = comb.map(c => c.valueTempId);
       return {
         variantName,
         colorHex: detectedHex,
+        preview: inheritedPreview,
+        file: inheritedFile,
         stock: this.bulkStockValue != null ? this.bulkStockValue : 10,
         attributeValueTempIds: attrTempIds,
       };

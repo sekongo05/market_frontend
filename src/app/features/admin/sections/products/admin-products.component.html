@@ -242,14 +242,25 @@
                       <button (click)="cancelEditStock()" class="w-6 h-6 bg-black/[.06] rounded-md flex items-center justify-center theme-muted hover:bg-white/15"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
                     </div>
                   } @else {
-                    <button (click)="startEditStock(product)" class="text-xs font-bold px-2.5 py-1 rounded-lg transition-colors inline-flex items-center gap-1.5" [ngClass]="stockClass(product.stock) + ' bg-black/10 hover:bg-white/10'">
-                      @if (stockSavingId === product.id) {
-                        <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                      } @else {
+                    @if (product.variantCount > 0) {
+                      <button (click)="openEditDrawer(product); setDrawerTab('variants')"
+                        title="Stock réparti sur {{ product.variantCount }} variantes (cliquer pour gérer)"
+                        class="text-xs font-bold px-2.5 py-1 rounded-lg transition-colors inline-flex items-center gap-1.5"
+                        [ngClass]="stockClass(product.stock) + ' bg-black/10 hover:bg-gold/15 hover:border-gold/30 border border-transparent'">
                         <span class="w-1.5 h-1.5 rounded-full" [ngClass]="product.stock === 0 ? 'bg-red-400' : isLowStock(product) ? 'bg-orange-400' : 'bg-green-400'"></span>
-                        {{ product.stock }} en stock
-                      }
-                    </button>
+                        <span>{{ product.stock }} en stock</span>
+                        <span class="text-[10px] theme-muted font-normal">({{ product.variantCount }} var.)</span>
+                      </button>
+                    } @else {
+                      <button (click)="startEditStock(product)" title="Cliquer pour modifier le stock direct" class="text-xs font-bold px-2.5 py-1 rounded-lg transition-colors inline-flex items-center gap-1.5" [ngClass]="stockClass(product.stock) + ' bg-black/10 hover:bg-white/10'">
+                        @if (stockSavingId === product.id) {
+                          <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        } @else {
+                          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="product.stock === 0 ? 'bg-red-400' : isLowStock(product) ? 'bg-orange-400' : 'bg-green-400'"></span>
+                          {{ product.stock }} en stock
+                        }
+                      </button>
+                    }
                   }
                 </td>
 
@@ -658,10 +669,8 @@
                         <div class="flex items-center gap-1.5">
                           <input [(ngModel)]="input.value" type="text" placeholder="ex: S, M, L, XL"
                             class="theme-input flex-1 px-2.5 py-1.5 rounded-lg text-xs"/>
-                          @if (idx === 0) {
-                            <input [(ngModel)]="input.colorHex" type="color"
-                              class="w-7 h-7 rounded border theme-border cursor-pointer p-0.5 flex-shrink-0"/>
-                          }
+                          <input [(ngModel)]="input.colorHex" type="color" title="Couleur (optionnelle)"
+                            class="w-7 h-7 rounded border theme-border cursor-pointer p-0.5 flex-shrink-0"/>
                           @if (newValueInputs.length > 1) {
                             <button type="button" (click)="removeAttributeValueInput(idx)"
                               class="p-1 text-red-400/50 hover:text-red-400 transition-colors">
@@ -1420,8 +1429,8 @@
 
                           <div>
                             <div class="flex items-center justify-between mb-1.5">
-                              <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider">Valeurs & Couleurs correspondantes</label>
-                              <span class="text-[10px] text-gold font-medium">Reconnaissance de couleur en direct</span>
+                              <label class="block text-[10px] font-bold theme-muted uppercase tracking-wider">Valeurs, Couleurs & Photos correspondantes</label>
+                              <span class="text-[10px] text-gold font-medium">Photo héritée par toutes les pointures de cette couleur</span>
                             </div>
 
                             <div class="space-y-2">
@@ -1439,6 +1448,21 @@
                                     <input type="color" [(ngModel)]="input.colorHex"
                                       class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"/>
                                   </label>
+
+                                  <!-- Photo de la couleur (optionnelle, appliquée à toutes les tailles de cette couleur) -->
+                                  @if (input.preview) {
+                                    <div class="relative w-8 h-8 rounded-xl overflow-hidden border border-gold/40 flex-shrink-0 group">
+                                      <img [src]="input.preview" class="w-full h-full object-cover"/>
+                                      <button type="button" (click)="clearAttributeValueFile(idx)"
+                                        class="absolute inset-0 bg-red-600/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold shadow" title="Supprimer la photo">✕</button>
+                                    </div>
+                                  } @else {
+                                    <label class="w-8 h-8 rounded-xl border border-dashed border-white/20 hover:border-gold/50 flex items-center justify-center cursor-pointer text-zinc-400 hover:text-gold flex-shrink-0 transition-all bg-black/20"
+                                      title="Photo pour cette couleur (ex: modèle noir)">
+                                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                      <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="onAttributeValueFileSelected($event, idx)"/>
+                                    </label>
+                                  }
 
                                   <!-- Champ de saisie du nom de la valeur -->
                                   <input [ngModel]="input.value" (ngModelChange)="onAttributeValueChange(idx, $event)" type="text"
@@ -1470,7 +1494,7 @@
                                 + Ajouter une autre valeur
                               </button>
                               <p class="text-[10px] theme-muted">
-                                💡 Tapez un nom de couleur pour voir sa teinte en direct
+                                💡 Ajoutez la photo de la couleur une seule fois : elle s'appliquera automatiquement à toutes ses pointures/tailles !
                               </p>
                             </div>
                           </div>
@@ -1602,13 +1626,13 @@
       <!-- Footer sticky -->
       <div class="px-6 py-4 border-t theme-border flex-shrink-0 flex gap-3">
 
-        @if (editingProduct && drawerTab === 'info') {
+        @if (editingProduct) {
           <button type="button" (click)="closeDrawer()"
             class="flex-1 py-3 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
-            Annuler
+            {{ drawerTab === 'info' ? 'Annuler' : 'Fermer' }}
           </button>
-          <button type="submit" form="adminProductForm" [disabled]="productForm.invalid || drawerLoading"
-            class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-yellow-600/20 transition-all">
+          <button type="button" (click)="saveProduct()" [disabled]="drawerLoading"
+            class="flex-1 py-3 bg-gold text-black rounded-xl text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-yellow-600/20 transition-all flex items-center justify-center gap-2">
             @if (drawerLoading) {
               <span class="flex items-center justify-center gap-2">
                 <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
@@ -1617,13 +1641,6 @@
             } @else {
               Mettre à jour
             }
-          </button>
-        }
-
-        @if (editingProduct && (drawerTab === 'media' || drawerTab === 'variants')) {
-          <button type="button" (click)="closeDrawer()"
-            class="flex-1 py-3 border theme-border theme-muted rounded-xl text-sm font-semibold luxury-card hover:theme-text transition-all">
-            Fermer
           </button>
         }
 

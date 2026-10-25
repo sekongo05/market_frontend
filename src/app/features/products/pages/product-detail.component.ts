@@ -213,31 +213,69 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // ── Gallery ──────────────────────────────────────────────────────────────
 
+  /**
+   * Compare deux URLs de médias pour déterminer si elles pointent vers le même fichier physique,
+   * même si l'une a des transformations Cloudinary (w_1200, w_1400...) et l'autre est brute.
+   */
+  isSameMedia(urlA: string | null | undefined, urlB: string | null | undefined): boolean {
+    if (!urlA || !urlB) return false;
+    if (urlA === urlB) return true;
+    return this.normalizeMediaKey(urlA) === this.normalizeMediaKey(urlB);
+  }
+
+  normalizeMediaKey(url: string): string {
+    if (!url) return '';
+    // Pour Cloudinary : extraire le chemin après /upload/ en ignorant les transformations (w_XXX, etc.)
+    const uploadIdx = url.indexOf('/upload/');
+    if (uploadIdx !== -1) {
+      const after = url.substring(uploadIdx + 8);
+      const parts = after.split('/');
+      // Le chemin réel commence par le numéro de version (v1234...) ou le dossier racine ('sdmstore', 'products')
+      const contentIdx = parts.findIndex(p => /^v\d+$/.test(p) || p === 'sdmstore' || p === 'products' || !p.includes('_'));
+      if (contentIdx !== -1) {
+        return parts.slice(contentIdx).join('/').split('?')[0];
+      }
+    }
+    const clean = url.split('?')[0];
+    const lastSlash = clean.lastIndexOf('/');
+    return lastSlash !== -1 ? clean.substring(lastSlash + 1) : clean;
+  }
+
   private _buildGallery(): void {
     if (!this.product) return;
 
     const items: GalleryItem[] = [];
 
-    // 1. Image principale du produit
-    if (this.product.imageUrl) {
-      items.push({ url: this.product.imageUrl, type: 'IMAGE' });
-    }
+    const addIfUnique = (url: string | null | undefined, type: 'IMAGE' | 'VIDEO' = 'IMAGE') => {
+      if (!url) return;
+      if (!items.some(i => this.isSameMedia(i.url, url))) {
+        items.push({ url, type });
+      }
+    };
 
-    // 2. Images de toutes les variantes
-    if (this.product.variants?.length) {
-      for (const v of this.product.variants) {
-        if (v.imageUrl && !items.some(i => i.url === v.imageUrl)) {
-          items.push({ url: v.imageUrl, type: 'IMAGE' });
+    // 1. Image principale du produit
+    addIfUnique(this.product.imageUrl, 'IMAGE');
+
+    // 2. Images des valeurs d'attributs (photos associées aux couleurs)
+    if (this.product.attributes?.length) {
+      for (const attr of this.product.attributes) {
+        for (const val of attr.values) {
+          addIfUnique(val.imageUrl, 'IMAGE');
         }
       }
     }
 
-    // 3. Médias additionnels du produit
+    // 3. Images de toutes les variantes
+    if (this.product.variants?.length) {
+      for (const v of this.product.variants) {
+        addIfUnique(v.imageUrl, 'IMAGE');
+      }
+    }
+
+    // 4. Médias additionnels du produit
     if (this.product.media?.length) {
       for (const m of this.product.media) {
-        if (m.url && !items.some(i => i.url === m.url)) {
-          items.push({ url: m.url, type: m.mediaType });
-        }
+        addIfUnique(m.url, m.mediaType || 'IMAGE');
       }
     }
 
@@ -245,9 +283,9 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       ? items
       : (this.product.imageUrl ? [{ url: this.product.imageUrl, type: 'IMAGE' }] : []);
 
-    // 4. Si une variante est sélectionnée, caler la galerie sur son image
+    // 5. Si une variante est sélectionnée, caler la galerie sur son image
     if (this.selectedVariant?.imageUrl) {
-      const idx = this.galleryItems.findIndex(g => g.url === this.selectedVariant!.imageUrl);
+      const idx = this.galleryItems.findIndex(g => this.isSameMedia(g.url, this.selectedVariant!.imageUrl));
       if (idx >= 0) this.activeIndex = idx;
     }
   }
@@ -256,12 +294,20 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.cascadeAttributes.length > 0;
   }
 
-  get cascadeFilteredVariants(): ProductVariant[] {
+  /**
+   * Retourne les variantes compatibles avec les sélections actuelles,
+   * en excluant optionnellement un attribut donné (pour calculer la disponibilité de ses propres valeurs).
+   */
+  getVariantsFilteredExcept(excludeAttrId?: number): ProductVariant[] {
     if (!this.product?.variants) return [];
     const sel = this.cascadeSelections;
     return this.product.variants.filter(v => {
-      for (const attrId of Object.keys(sel)) {
-        const selectedValueId = sel[+attrId];
+      for (const attrIdStr of Object.keys(sel)) {
+        const aId = +attrIdStr;
+        if (excludeAttrId != null && aId === excludeAttrId) {
+          continue;
+        }
+        const selectedValueId = sel[aId];
         if (selectedValueId != null) {
           const hasValue = v.attributeValues?.some(av => av.id === selectedValueId);
           if (!hasValue) return false;
@@ -271,53 +317,145 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
-  cascadeAvailableValues(attr: ProductAttributeResponse): ProductAttributeValueResponse[] {
-    const filteredVariants = this.cascadeFilteredVariants;
-    const attrValueIds = new Set(filteredVariants.flatMap(v =>
-      v.attributeValues?.filter(av =>
-        attr.values.some(pa => pa.id === av.id)
-      ).map(av => av.id) ?? []
-    ));
-    return attr.values.filter(v => attrValueIds.has(v.id));
+  get cascadeFilteredVariants(): ProductVariant[] {
+    return this.getVariantsFilteredExcept();
   }
 
-  cascadeValueOutOfStock(attr: ProductAttributeResponse, valueId: number): boolean {
+  /**
+   * Vérifie si une valeur d'attribut est en rupture de stock avec les sélections actuelles des autres attributs.
+   */
+  isAttrValueOutOfStock(attr: ProductAttributeResponse, valueId: number): boolean {
     if (!this.product?.variants) return false;
-    const filtered = this.product.variants.filter(v => {
-      for (const [attrIdStr, selValId] of Object.entries(this.cascadeSelections)) {
-        const aId = +attrIdStr;
-        if (selValId != null && aId !== attr.id) {
-          const hasValue = v.attributeValues?.some(av => av.id === selValId);
-          if (!hasValue) return false;
-        }
+    const compatibleVariants = this.getVariantsFilteredExcept(attr.id).filter(v =>
+      v.attributeValues?.some(av => av.id === valueId)
+    );
+    return compatibleVariants.length > 0 && compatibleVariants.every(v => v.stock === 0);
+  }
+
+  /**
+   * Vérifie si une valeur d'attribut n'est pas combinable avec les sélections actuelles des autres attributs.
+   */
+  isAttrValueUnavailable(attr: ProductAttributeResponse, valueId: number): boolean {
+    if (!this.product?.variants) return false;
+    const otherSelected = Object.entries(this.cascadeSelections).some(([aId, vId]) => +aId !== attr.id && vId != null);
+    if (!otherSelected) {
+      return !this.product.variants.some(v => v.attributeValues?.some(av => av.id === valueId));
+    }
+    const compatibleVariants = this.getVariantsFilteredExcept(attr.id).filter(v =>
+      v.attributeValues?.some(av => av.id === valueId)
+    );
+    return compatibleVariants.length === 0;
+  }
+
+  /**
+   * Stock disponible pour cette valeur en tenant compte des autres attributs sélectionnés.
+   */
+  getAttrValueStock(attr: ProductAttributeResponse, valueId: number): number {
+    if (!this.product?.variants) return 0;
+    const compatibleVariants = this.getVariantsFilteredExcept(attr.id).filter(v =>
+      v.attributeValues?.some(av => av.id === valueId)
+    );
+    return compatibleVariants.reduce((sum, v) => sum + v.stock, 0);
+  }
+
+  isColorAttribute(attr: ProductAttributeResponse): boolean {
+    const name = (attr.name || '').toLowerCase();
+    return name.includes('couleur') || name.includes('color') || name.includes('teinte')
+      || attr.values.some(v => !!v.colorHex || !!v.imageUrl);
+  }
+
+  getSelectedAttrValue(attr: ProductAttributeResponse): ProductAttributeValueResponse | undefined {
+    const valId = this.cascadeSelections[attr.id];
+    return valId != null ? attr.values.find(v => v.id === valId) : undefined;
+  }
+
+  get missingAttributePrompt(): string {
+    if (!this.hasVariants) return '';
+    for (const attr of this.cascadeAttributes) {
+      if (this.cascadeSelections[attr.id] == null) {
+        const name = (attr.name || '').toLowerCase();
+        if (name.includes('couleur') || name.includes('color')) return 'Choisissez une couleur';
+        if (name.includes('pointure')) return 'Choisissez une pointure';
+        if (name.includes('taille') || name.includes('size')) return 'Choisissez une taille';
+        return `Choisissez : ${attr.name}`;
       }
-      return v.attributeValues?.some(av => av.id === valueId);
-    });
-    return filtered.length > 0 && filtered.every(v => v.stock === 0);
+    }
+    return 'Sélectionnez vos options';
   }
 
   selectCascadeAttribute(attr: ProductAttributeResponse, valueId: number | null): void {
-    this.cascadeSelections[attr.id] = valueId;
-    // Clear subsequent selections
-    let found = false;
-    for (const a of this.cascadeAttributes) {
-      if (found) this.cascadeSelections[a.id] = null;
-      if (a.id === attr.id) found = true;
-    }
-    this.cascadeSelections = { ...this.cascadeSelections };
-    // Check if we have a match
-    const filtered = this.cascadeFilteredVariants;
-    if (filtered.length >= 1) {
-      this.selectVariant(filtered[0]);
+    // Si la valeur est déjà sélectionnée, recliquer dessus la dé-sélectionne (toggle)
+    if (this.cascadeSelections[attr.id] === valueId) {
+      this.cascadeSelections[attr.id] = null;
     } else {
+      this.cascadeSelections[attr.id] = valueId;
+    }
+
+    // Si une autre sélection active est incompatible avec cette nouvelle valeur, on la réinitialise
+    if (valueId != null) {
+      for (const otherAttr of this.cascadeAttributes) {
+        if (otherAttr.id === attr.id) continue;
+        const otherValId = this.cascadeSelections[otherAttr.id];
+        if (otherValId != null) {
+          const hasCompat = this.product?.variants?.some(v =>
+            v.attributeValues?.some(av => av.id === valueId) &&
+            v.attributeValues?.some(av => av.id === otherValId)
+          );
+          if (!hasCompat) {
+            this.cascadeSelections[otherAttr.id] = null;
+          }
+        }
+      }
+    }
+
+    this.cascadeSelections = { ...this.cascadeSelections };
+
+    // Synchroniser l'image de la galerie avec l'image de la couleur ou de la variante
+    const selectedVal = attr.values.find(v => v.id === valueId);
+    let targetImg = selectedVal?.imageUrl;
+    const remainingVariants = this.cascadeFilteredVariants;
+    if (!targetImg && remainingVariants.length > 0) {
+      targetImg = remainingVariants.find(v => v.imageUrl)?.imageUrl;
+    }
+    if (targetImg) {
+      let idx = this.galleryItems.findIndex(g => this.isSameMedia(g.url, targetImg));
+      if (idx === -1) {
+        this.galleryItems.unshift({ url: targetImg, type: 'IMAGE' });
+        idx = 0;
+      }
+      this.activeIndex = idx;
+      this.zoomed = false;
+      this._scrollToActiveThumbnail(idx);
+    }
+
+    // Résolution de la variante exacte
+    const allSelected = this.cascadeAttributes.length > 0 &&
+      this.cascadeAttributes.every(a => this.cascadeSelections[a.id] != null);
+
+    if (allSelected) {
+      const exact = this.product?.variants?.find(v =>
+        this.cascadeAttributes.every(a => {
+          const sVal = this.cascadeSelections[a.id];
+          return v.attributeValues?.some(av => av.id === sVal);
+        })
+      ) ?? null;
+      this.selectedVariant = exact;
+      this.cascadeMatchedVariant = exact;
+      if (exact && exact.stock > 0) {
+        this.quantity = Math.max(1, Math.min(this.quantity, exact.stock));
+      }
+    } else {
+      this.selectedVariant = null;
       this.cascadeMatchedVariant = null;
     }
+
     this.cdr.detectChanges();
   }
 
   clearCascade(): void {
     this.cascadeSelections = {};
     this.cascadeMatchedVariant = null;
+    this.selectedVariant = null;
     this.cdr.detectChanges();
   }
 
@@ -366,13 +504,32 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private _syncVariantFromImage(url: string): void {
     if (!url || !this.product?.variants?.length) return;
-    const match = this.product.variants.find(v => v.imageUrl === url);
-    if (match) {
-      this.selectedVariant = match;
+    const matchingVariants = this.product.variants.filter(v => this.isSameMedia(v.imageUrl, url));
+    if (matchingVariants.length === 0) return;
+
+    // Chercher en priorité la variante ayant cette image ET qui respecte les sélections actives (ex: pointure déjà choisie)
+    let bestMatch: ProductVariant | undefined;
+    if (this.isCascadeMode) {
+      bestMatch = matchingVariants.find(v => {
+        return this.cascadeAttributes.every(attr => {
+          const selValId = this.cascadeSelections[attr.id];
+          if (selValId == null) return true;
+          return v.attributeValues?.some(av => av.id === selValId);
+        });
+      });
+    }
+
+    // Sinon privilégier la première variante en stock
+    if (!bestMatch) {
+      bestMatch = matchingVariants.find(v => v.stock > 0) ?? matchingVariants[0];
+    }
+
+    if (bestMatch) {
+      this.selectedVariant = bestMatch;
       this.quantity = Math.min(this.quantity, Math.max(1, this.effectiveStock));
       if (this.isCascadeMode) {
-        this._syncCascadeFromVariant(match);
-        this.cascadeMatchedVariant = match;
+        this._syncCascadeFromVariant(bestMatch);
+        this.cascadeMatchedVariant = bestMatch;
       }
     }
   }
@@ -385,18 +542,26 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.activeIndex = index;
     this.zoomed = false;
     this._syncVariantFromImage(this.galleryItems[index]?.url);
+    this._scrollToActiveThumbnail(index);
     this.cdr.detectChanges();
   }
 
   private touchStartX = 0;
+  private touchStartY = 0;
 
   onTouchStart(e: TouchEvent): void {
-    this.touchStartX = e.changedTouches[0].screenX;
+    if (e.touches && e.touches.length > 0) {
+      this.touchStartX = e.touches[0].screenX;
+      this.touchStartY = e.touches[0].screenY;
+    }
   }
 
   onTouchEnd(e: TouchEvent): void {
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
     const dx = e.changedTouches[0].screenX - this.touchStartX;
-    if (Math.abs(dx) < 40) return;
+    const dy = e.changedTouches[0].screenY - this.touchStartY;
+    // Protéger contre le scroll vertical : déclencher uniquement si le swipe horizontal est prédominant
+    if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy) * 1.3) return;
     if (dx < 0) this.nextImage(); else this.prevImage();
   }
 
@@ -404,6 +569,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.activeIndex = (this.activeIndex - 1 + this.galleryItems.length) % this.galleryItems.length;
     this.zoomed = false;
     this._syncVariantFromImage(this.galleryItems[this.activeIndex]?.url);
+    this._scrollToActiveThumbnail(this.activeIndex);
     this.cdr.detectChanges();
   }
 
@@ -411,7 +577,18 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.activeIndex = (this.activeIndex + 1) % this.galleryItems.length;
     this.zoomed = false;
     this._syncVariantFromImage(this.galleryItems[this.activeIndex]?.url);
+    this._scrollToActiveThumbnail(this.activeIndex);
     this.cdr.detectChanges();
+  }
+
+  private _scrollToActiveThumbnail(index: number): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    setTimeout(() => {
+      const el = document.getElementById(`gallery-thumb-${index}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }, 50);
   }
 
   toggleZoom(): void {
@@ -446,6 +623,12 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.selectedVariant) {
       return this.selectedVariant.stock;
     }
+    if (this.isCascadeMode) {
+      const filtered = this.cascadeFilteredVariants;
+      if (filtered.length > 0) {
+        return filtered.reduce((sum, v) => sum + v.stock, 0);
+      }
+    }
     if (this.hasVariants) {
       return this.product.variants!.reduce((sum, v) => sum + v.stock, 0);
     }
@@ -458,13 +641,14 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this._syncCascadeFromVariant(variant);
 
     if (variant.imageUrl) {
-      let idx = this.galleryItems.findIndex(g => g.url === variant.imageUrl);
+      let idx = this.galleryItems.findIndex(g => this.isSameMedia(g.url, variant.imageUrl));
       if (idx === -1) {
         this.galleryItems.unshift({ url: variant.imageUrl, type: 'IMAGE' });
         idx = 0;
       }
       this.activeIndex = idx;
       this.zoomed = false;
+      this._scrollToActiveThumbnail(idx);
 
       // Sur mobile, si l'image est hors champ au-dessus, on scroll doucement vers la galerie
       if (isPlatformBrowser(this.platformId) && window.innerWidth < 1024) {
@@ -612,8 +796,11 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get stockLabel(): string {
     if (!this.product) return '';
+    if (this.selectedVariant) {
+      return this.selectedVariant.stock === 0 ? 'Épuisé' : 'En stock';
+    }
     if (this.hasVariants) {
-      const total = this.product.variants!.reduce((s, v) => s + v.stock, 0);
+      const total = this.effectiveStock;
       if (total === 0) return 'Épuisé';
       return 'En stock';
     }
@@ -624,8 +811,13 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get stockColor(): string {
     if (!this.product) return '#9ca3af';
+    if (this.selectedVariant) {
+      if (this.selectedVariant.stock === 0) return '#f87171';
+      if (this.selectedVariant.stock <= 3) return '#fb923c';
+      return '#4ade80';
+    }
     if (this.hasVariants) {
-      const total = this.product.variants!.reduce((s, v) => s + v.stock, 0);
+      const total = this.effectiveStock;
       if (total === 0) return '#f87171';
       if (total <= 3) return '#fb923c';
       return '#4ade80';
