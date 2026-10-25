@@ -93,10 +93,10 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   addAttributeOpen = false;
   newAttributeName = '';
   editingAttribute: ProductAttributeResponse | null = null;
-  newValueInputs: { value: string; colorHex: string }[] = [];
+  newValueInputs: { value: string; colorHex: string; file?: File; preview?: string; imageUrl?: string }[] = [];
 
   // ── Attributs temporaires (création) ──────────────────────────────────
-  tempAttributes: { tempId: string; name: string; realId?: number; values: { tempId: string; value: string; colorHex?: string; realId?: number }[] }[] = [];
+  tempAttributes: { tempId: string; name: string; realId?: number; values: { tempId: string; value: string; colorHex?: string; realId?: number; file?: File; preview?: string; imageUrl?: string }[] }[] = [];
   selectedCreationAttrValueIds: string[] = [];
   editingTempAttr: { tempId: string; name: string; values: { tempId: string; value: string; colorHex?: string }[] } | null = null;
 
@@ -323,6 +323,11 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   // ── Inline stock ──────────────────────────────────────────────────────────
 
   startEditStock(product: ProductSummaryResponse): void {
+    if (product.variantCount > 0) {
+      this.openEditDrawer(product);
+      this.setDrawerTab('variants');
+      return;
+    }
     this.confirmDeleteId = null;
     this.editingStockId = product.id;
     this.editingStockValue = product.stock;
@@ -568,7 +573,15 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
   }
 
   saveProduct(): void {
-    if (this.productForm.invalid) return;
+    if (this.drawerLoading) return;
+    if (this.productForm.invalid) {
+      if (this.editingProduct) {
+        this.drawerTab = 'info';
+        this.productForm.markAllAsTouched();
+        this.toast.show('Veuillez renseigner les champs obligatoires dans Informations');
+      }
+      return;
+    }
     this.drawerLoading = true;
     this.drawerError = null;
 
@@ -635,7 +648,8 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
                 error: () => saveAttrs(cb, attrIndex + 1),
               });
             };
-            // 2. Sauvegarder les variantes
+            // 2. Sauvegarder les variantes (avec cache d'upload)
+            const uploadedUrlCache = new Map<File, string>();
             const processItem = (index: number) => {
               if (index >= itemsSnapshot.length) {
                 this.drawerLoading = false;
@@ -670,13 +684,23 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
                 this.productVariantService.addVariant(product.id, variantReq)
                   .subscribe({ next: () => processItem(index + 1), error: () => processItem(index + 1) });
               };
-              if (index === 0 && product.imageUrl) {
+              if (index === 0 && product.imageUrl && !item.file) {
                 createVariant(product.imageUrl);
+              } else if (item.file) {
+                if (uploadedUrlCache.has(item.file)) {
+                  createVariant(uploadedUrlCache.get(item.file)!);
+                } else {
+                  this.productMediaService.upload(product.id, item.file).subscribe({
+                    next: (mr) => {
+                      const url = mr.success ? mr.data.url : (product.imageUrl || '');
+                      uploadedUrlCache.set(item.file, url);
+                      createVariant(url);
+                    },
+                    error: () => createVariant(product.imageUrl || ''),
+                  });
+                }
               } else {
-                this.productMediaService.upload(product.id, item.file).subscribe({
-                  next: (mr) => createVariant(mr.success ? mr.data.url : ''),
-                  error: () => processItem(index + 1),
-                });
+                createVariant(product.imageUrl || '');
               }
             };
             if (tempAttrSnapshot.length > 0) {
@@ -948,11 +972,11 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  openEditTempAttribute(attr: { tempId: string; name: string; values: { tempId: string; value: string; colorHex?: string }[] }): void {
+  openEditTempAttribute(attr: any): void {
     this.editingTempAttr = attr;
     this.newAttributeName = attr.name;
     this.newValueInputs = attr.values.length > 0
-      ? attr.values.map(v => ({ value: v.value, colorHex: v.colorHex || '#000000' }))
+      ? attr.values.map((v: any) => ({ value: v.value, colorHex: v.colorHex || '#000000', preview: v.preview || v.imageUrl, file: v.file, imageUrl: v.imageUrl }))
       : [{ value: '', colorHex: '#000000' }];
     this.attributeError = null;
     this.addAttributeOpen = true;
@@ -1012,6 +1036,36 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  async onAttributeValueFileSelected(event: Event, index: number): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !this.newValueInputs[index]) return;
+    try {
+      const { file: compressed, preview } = await compressImage(file);
+      this.newValueInputs[index].file = compressed;
+      this.newValueInputs[index].preview = preview;
+    } catch {
+      this.newValueInputs[index].file = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.newValueInputs[index].preview = e.target?.result as string;
+        this.cdr.markForCheck();
+      };
+      reader.readAsDataURL(file);
+    }
+    this.cdr.markForCheck();
+  }
+
+  clearAttributeValueFile(index: number): void {
+    if (this.newValueInputs[index]) {
+      this.newValueInputs[index].file = undefined;
+      this.newValueInputs[index].preview = undefined;
+      this.newValueInputs[index].imageUrl = undefined;
+      this.cdr.markForCheck();
+    }
+  }
+
   addAttributeValueInput(): void {
     this.newValueInputs = [...this.newValueInputs, { value: '', colorHex: '#000000' }];
     this.cdr.markForCheck();
@@ -1029,17 +1083,28 @@ export class ManagerProductsComponent implements OnInit, OnDestroy {
       .map(v => ({ value: v.value.trim(), colorHex: v.colorHex !== '#000000' ? v.colorHex : undefined }));
 
     if (!this.editingProduct) {
+      const tempValues = this.newValueInputs
+        .filter(v => v.value.trim())
+        .map(v => ({
+          tempId: crypto.randomUUID(),
+          value: v.value.trim(),
+          colorHex: v.colorHex !== '#000000' ? v.colorHex : undefined,
+          file: v.file,
+          preview: v.preview,
+          imageUrl: v.imageUrl,
+        }));
+
       if (this.editingTempAttr) {
         this.tempAttributes = this.tempAttributes.map(a =>
           a.tempId === this.editingTempAttr!.tempId
-            ? { ...a, name: this.newAttributeName.trim(), values: values.map(v => ({ ...v, tempId: crypto.randomUUID() })) }
+            ? { ...a, name: this.newAttributeName.trim(), values: tempValues }
             : a
         );
       } else {
         this.tempAttributes = [...this.tempAttributes, {
           tempId: crypto.randomUUID(),
           name: this.newAttributeName.trim(),
-          values: values.map(v => ({ ...v, tempId: crypto.randomUUID() })),
+          values: tempValues,
         }];
       }
       this.cancelAttributeForm();
