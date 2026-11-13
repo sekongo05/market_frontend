@@ -278,8 +278,9 @@
                       <div class="flex items-center justify-between px-4 py-2.5">
                         <div class="flex items-center gap-2 min-w-0">
                           @if (group.imageUrl) {
-                            <img [src]="group.imageUrl" [alt]="group.productName"
-                                 class="w-8 h-8 rounded-lg object-cover flex-shrink-0 border border-white/10"/>
+                            <img [src]="group.imageUrl | mediaUrl: 100" [alt]="group.productName"
+                                 class="w-8 h-8 rounded-lg object-cover flex-shrink-0 border border-white/10"
+                                 (error)="$any($event.target).src='/product-placeholder.svg'"/>
                           }
                           <span class="font-bold theme-text truncate text-sm">{{ group.productName }}</span>
                         </div>
@@ -462,9 +463,10 @@
                           <button type="button" (click)="openReviewModal(order, item)"
                             class="flex items-center gap-3 p-2.5 rounded-xl transition-colors hover:bg-white/5 text-left w-full">
                             @if (item.imageUrl) {
-                              <img [src]="item.imageUrl" [alt]="item.productName"
+                              <img [src]="item.imageUrl | mediaUrl: 100" [alt]="item.productName"
                                 class="w-9 h-9 rounded-lg object-cover flex-shrink-0"
-                                style="border:1px solid rgba(212,175,55,0.2)"/>
+                                style="border:1px solid rgba(212,175,55,0.2)"
+                                (error)="$any($event.target).src='/product-placeholder.svg'"/>
                             }
                             <span class="flex-1 text-xs font-semibold theme-text truncate">{{ item.productName }}</span>
                             <span class="text-xs font-bold flex-shrink-0" style="color:#d4af37">Donner mon avis →</span>

@@ -35,7 +35,8 @@
           <!-- Image ou placeholder -->
           @if (cat.imageUrl) {
             <div class="h-32 overflow-hidden">
-              <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy" class="w-full h-full object-cover"/>
+              <img [src]="cat.imageUrl | mediaUrl: 600" [alt]="cat.name" loading="lazy" class="w-full h-full object-cover"
+                   (error)="$any($event.target).src='/product-placeholder.svg'"/>
             </div>
           } @else {
             <div class="h-32 bg-gradient-to-br from-[#b8860b]/10 to-[#d4af37]/5 flex items-center justify-center">

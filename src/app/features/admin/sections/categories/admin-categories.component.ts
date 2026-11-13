@@ -11,12 +11,13 @@ import { ScrollLockService } from '../../../../core/services/scroll-lock.service
 import { TooltipDirective } from '../../../../shared/directives/tooltip.directive';
 import { UploadService } from '../../../../core/services/upload.service';
 import { compressImage } from '../../../../core/utils/image-compression.util';
+import { MediaUrlPipe } from '../../../../shared/pipes/media-url.pipe';
 
 @Component({
   selector: 'app-admin-categories',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, TooltipDirective],
+  imports: [CommonModule, FormsModule, TooltipDirective, MediaUrlPipe],
   templateUrl: './admin-categories.component.html',
 })
 export class AdminCategoriesComponent implements OnInit, OnDestroy {

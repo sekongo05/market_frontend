@@ -15,12 +15,13 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ReviewPromptService } from '../../../core/services/review-prompt.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
+import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
 import { orderStatusLabel, orderStatusClass } from '../../admin/shared/admin-status.helpers';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TooltipDirective],
+  imports: [CommonModule, FormsModule, RouterLink, TooltipDirective, MediaUrlPipe],
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css'],
 })

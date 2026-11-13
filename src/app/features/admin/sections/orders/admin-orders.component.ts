@@ -12,6 +12,7 @@ import { WebSocketService } from '../../../../core/services/websocket.service';
 import { AdminToastService } from '../../shared/admin-toast.service';
 import { ScrollLockService } from '../../../../core/services/scroll-lock.service';
 import { orderStatusLabel, orderStatusClass, formatAmount } from '../../shared/admin-status.helpers';
+import { MediaUrlPipe } from '../../../../shared/pipes/media-url.pipe';
 
 export interface OrderBadge { label: string; classes: string; }
 
@@ -27,7 +28,7 @@ export interface TimelineStep {
   selector: 'app-admin-orders',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MediaUrlPipe],
   templateUrl: './admin-orders.component.html',
 })
 export class AdminOrdersComponent implements OnInit, OnDestroy {

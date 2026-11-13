@@ -1,25 +1,49 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
-const MEDIA_BASE = environment.apiUrl.replace(/\/api$/, '');
+const MEDIA_BASE = (environment.apiUrl || '').replace(/\/api$/, '');
 const CLOUDINARY_PATTERN = /res\.cloudinary\.com/;
+// Segments Cloudinary de transformation reconnus (ex: w_800, c_limit, q_auto, f_auto, etc.)
+const CLOUDINARY_TRANSFORM_SEGMENT = /^(?:[a-z]{1,4}_[a-zA-Z0-9.:_-]+,?)+$/;
 
 @Pipe({ name: 'mediaUrl', standalone: true })
 export class MediaUrlPipe implements PipeTransform {
   transform(url: string | null | undefined, w?: number | string, fallback = ''): string {
     if (!url) return fallback;
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      if (w && CLOUDINARY_PATTERN.test(url)) {
-        const uploadPath = '/image/upload/';
-        const idx = url.indexOf(uploadPath);
-        if (idx === -1) return url;
-        // Si des transformations sont déjà présentes (f_auto, q_auto, w_XXX…), ne pas les ré-appliquer
-        const afterUpload = url.substring(idx + uploadPath.length);
-        if (/^[a-z]_/.test(afterUpload)) return url;
-        return url.replace(uploadPath, `${uploadPath}w_${w},c_fill,q_auto,f_auto/`);
-      }
+
+    // Laisser intacts les aperçus locaux (Blob, Base64 Data URL)
+    if (url.startsWith('data:') || url.startsWith('blob:')) {
       return url;
     }
-    return MEDIA_BASE + url;
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      if (!CLOUDINARY_PATTERN.test(url)) {
+        return url;
+      }
+
+      const uploadToken = '/image/upload/';
+      const idx = url.indexOf(uploadToken);
+      if (idx === -1) return url;
+
+      const base = url.substring(0, idx + uploadToken.length);
+      const after = url.substring(idx + uploadToken.length);
+      const parts = after.split('/');
+
+      // Conserver le reste du chemin en nettoyant uniquement un premier segment de transformation Cloudinary existant
+      let rest = after;
+      if (parts.length > 1 && CLOUDINARY_TRANSFORM_SEGMENT.test(parts[0])) {
+        rest = parts.slice(1).join('/');
+      }
+
+      // Par défaut 800px si aucun w n'est spécifié, avec c_limit (ne rogne jamais le produit !)
+      const targetW = w ?? 800;
+      return `${base}w_${targetW},c_limit,q_auto:good,f_auto/${rest}`;
+    }
+
+    // Gestion propre des URLs relatives
+    const cleanBase = MEDIA_BASE.endsWith('/') ? MEDIA_BASE.slice(0, -1) : MEDIA_BASE;
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    return `${cleanBase}${cleanUrl}`;
   }
 }
+

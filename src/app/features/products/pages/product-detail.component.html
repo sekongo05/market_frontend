@@ -142,13 +142,20 @@
 
             <!-- Image -->
             @if (activeItem.type === 'IMAGE') {
-              <div class="w-full h-full overflow-hidden">
-                <img [src]="activeItem.url | mediaUrl"
+              <div class="w-full h-full overflow-hidden relative bg-[#09080d] flex items-center justify-center">
+                <!-- Arrière-plan flou d'ambiance pour harmoniser le carré sans couper le produit -->
+                <img [src]="activeItem.url | mediaUrl: 300"
+                     alt=""
+                     aria-hidden="true"
+                     class="absolute inset-0 w-full h-full object-cover blur-2xl scale-125 opacity-30 pointer-events-none select-none" />
+
+                <!-- Image nette centrale intégrale -->
+                <img [src]="activeItem.url | mediaUrl: 1400"
                      [alt]="product.name"
-                     class="gallery-img w-full h-full object-cover transition-all duration-500"
+                     class="gallery-img relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-2 transition-all duration-500"
                      [class.zoomed]="zoomed"
                      (click)="toggleZoom()"
-                     (error)="$any($event.target).src='https://placehold.co/800x800/1a1a1a/d4af37?text=No+image'"/>
+                     (error)="$any($event.target).src='/product-placeholder.svg'"/>
               </div>
             }
 
@@ -192,10 +199,10 @@
 
                   <!-- Image thumbnail -->
                   @if (item.type === 'IMAGE') {
-                    <img [src]="item.url | mediaUrl" [alt]="'Photo ' + (i+1)"
+                    <img [src]="item.url | mediaUrl: 300" [alt]="'Photo ' + (i+1)"
                          loading="lazy"
                          class="w-full h-full object-cover"
-                         (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
+                         (error)="$any($event.target).src='/product-placeholder.svg'"/>
                   }
 
                   <!-- Video thumbnail : icône play sur fond sombre -->
@@ -669,11 +676,14 @@
                 [style.box-shadow]="activeIndex === i ? '0 0 0 2px #d4af37' : ''">
 
                 @if (item.type === 'IMAGE') {
-                  <img [src]="item.url | mediaUrl" [alt]="product.name + ' - photo ' + (i+1)"
-                       loading="lazy"
-                       class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                       (error)="$any($event.target).src='https://placehold.co/400x400/1a1a1a/d4af37?text=?'"/>
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                  <div class="w-full h-full relative overflow-hidden bg-[#09080d] flex items-center justify-center">
+                    <img [src]="item.url | mediaUrl: 300" alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none" />
+                    <img [src]="item.url | mediaUrl: 800" [alt]="product.name + ' - photo ' + (i+1)"
+                         loading="lazy"
+                         class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain group-hover:scale-105 transition-transform duration-500 p-1"
+                         (error)="$any($event.target).src='/product-placeholder.svg'"/>
+                  </div>
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 pointer-events-none">
                     <span class="text-white text-xs font-semibold">Photo {{ i + 1 }}</span>
                   </div>
                 }

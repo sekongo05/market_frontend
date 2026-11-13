@@ -302,8 +302,9 @@
               @for (item of returnDecisionItem.orderItems; track item.productId) {
                 <div class="flex items-center gap-3 p-2 bg-black/[.04] rounded-xl">
                   @if (item.imageUrl) {
-                    <img [src]="item.imageUrl" [alt]="item.productName"
-                      class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-white/10">
+                    <img [src]="item.imageUrl | mediaUrl: 100" [alt]="item.productName"
+                      class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-white/10"
+                      (error)="$any($event.target).src='/product-placeholder.svg'">
                   } @else {
                     <div class="w-10 h-10 rounded-lg bg-black/10 flex-shrink-0 flex items-center justify-center">
                       <svg class="w-5 h-5 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">

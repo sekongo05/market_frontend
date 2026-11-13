@@ -4,7 +4,7 @@
   cursor: zoom-in;
 }
 .gallery-img.zoomed {
-  transform: scale(1.35);
+  transform: scale(1.6);
   cursor: zoom-out;
 }
 

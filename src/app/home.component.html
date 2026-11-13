@@ -358,8 +358,9 @@
         [class]="categories.length > 1 ? 'lg:flex-[58]' : 'w-full'"
         style="height:clamp(260px,58vw,680px);transition-delay:200ms;">
         @if (categories[0].imageUrl) {
-        <img [src]="categories[0].imageUrl" [alt]="categories[0].name" loading="lazy"
-          class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-1000 ease-out" />
+        <img [src]="categories[0].imageUrl | mediaUrl: 1200" [alt]="categories[0].name" loading="lazy"
+          class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-1000 ease-out"
+          (error)="$any($event.target).src='/product-placeholder.svg'" />
         } @else {
         <div class="absolute inset-0" style="background:linear-gradient(135deg,#1a1000,#0a0800);"></div>
         }
@@ -388,8 +389,9 @@
         <a [href]="'/products?categorie=' + cat.slug" (click)="goToCategory(cat.slug); $event.preventDefault()"
           class="glint-card bracket-card cursor-hover-zone group relative overflow-hidden cursor-pointer block flex-1 h-[42vw] lg:h-0 lg:flex-1">
           @if (cat.imageUrl) {
-          <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy"
-            class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-1000 ease-out" />
+          <img [src]="cat.imageUrl | mediaUrl: 800" [alt]="cat.name" loading="lazy"
+            class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-1000 ease-out"
+            (error)="$any($event.target).src='/product-placeholder.svg'" />
           } @else {
           <div class="absolute inset-0" style="background:linear-gradient(135deg,#12100a,#080600);"></div>
           }
@@ -455,11 +457,13 @@
       <a [routerLink]="['/products', product.slug]"
         class="card-appear group flex-shrink-0 w-[52vw] sm:w-auto cursor-pointer block snap-start"
         [style.animation-delay.ms]="idx * 75">
-        <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
-            class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
-            (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3 bg-[#09080d]/80 flex items-center justify-center rounded-xl" style="aspect-ratio:3/4;">
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 300" alt="" aria-hidden="true"
+            class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 800" [alt]="product.name" loading="lazy"
+            class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-500 ease-out"
+            (error)="$any($event.target).src='/product-placeholder.svg'" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
           <!-- Badge vedette -->
           <div class="absolute top-2.5 left-2.5 flex items-center gap-1 px-2 py-1"
             style="background:rgba(212,175,55,0.9);">
@@ -576,11 +580,13 @@
       <a [routerLink]="['/products', product.slug]"
         class="card-appear group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block snap-start"
         [style.animation-delay.ms]="idx * 80">
-        <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
-            class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
-            (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3 bg-[#09080d]/80 flex items-center justify-center rounded-xl" style="aspect-ratio:3/4;">
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 300" alt="" aria-hidden="true"
+            class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 800" [alt]="product.name" loading="lazy"
+            class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-500 ease-out"
+            (error)="$any($event.target).src='/product-placeholder.svg'" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
           <!-- Rang -->
           <div
             class="absolute top-2.5 left-2.5 w-7 h-7 flex items-center justify-center text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
@@ -623,10 +629,10 @@
       <a [routerLink]="['/products', product.slug]"
         class="card-appear group cursor-pointer flex items-center gap-3 p-3 border transition-colors hover:border-gold/25"
         style="border-color:rgba(212,175,55,0.1);" [style.animation-delay.ms]="(idx + 4) * 80">
-        <div class="flex-shrink-0 w-14 h-14 overflow-hidden relative">
-          <img [src]="(product.thumbnailUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            (error)="$any($event.target).src='https://placehold.co/56x56/0a0a0a/d4af37?text=SDM'" />
+        <div class="flex-shrink-0 w-14 h-14 overflow-hidden relative rounded-lg bg-[#09080d] flex items-center justify-center border border-white/10">
+          <img [src]="(product.thumbnailUrl || product.imageUrl) | mediaUrl: 200" [alt]="product.name" loading="lazy"
+            class="max-w-full max-h-full w-auto h-auto object-contain p-0.5 group-hover:scale-105 transition-transform duration-500"
+            (error)="$any($event.target).src='/product-placeholder.svg'" />
           <span
             class="absolute top-0 left-0 w-4 h-4 flex items-center justify-center text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
             style="background:rgba(0,0,0,0.7);">#{{ idx + 5 }}</span>
@@ -682,11 +688,13 @@
         <!-- Lien principal vers la fiche produit -->
         <a [routerLink]="['/products', product.slug]" class="block cursor-pointer">
           <div
-            class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-1.5 border transition-colors duration-300 rounded-xl"
+            class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-1.5 border transition-colors duration-300 rounded-xl bg-[#09080d]/80 flex items-center justify-center"
             style="aspect-ratio:3/4;border-color:rgba(212,175,55,0.12);">
-            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
-              class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
-              (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/d4af37?text=SDM'" />
+            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 300" alt="" aria-hidden="true"
+              class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
+            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 800" [alt]="product.name" loading="lazy"
+              class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-500 ease-out"
+              (error)="$any($event.target).src='/product-placeholder.svg'" />
 
             <!-- Badge promo (orange) -->
             @if (product.discountPercent && product.discountPercent > 0) {
@@ -785,10 +793,12 @@
       <a [routerLink]="['/products', product.slug]"
         class="card-appear group flex-shrink-0 w-[70vw] sm:w-auto cursor-pointer block snap-start"
         [style.animation-delay.ms]="idx * 80">
-        <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3" style="aspect-ratio:3/4;">
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl" [alt]="product.name" loading="lazy"
-            class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700"
-            (error)="$any($event.target).src='https://placehold.co/400x533/0a0a0a/f97316?text=SDM'" />
+        <div class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3 bg-[#09080d]/80 flex items-center justify-center rounded-xl" style="aspect-ratio:3/4;">
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 300" alt="" aria-hidden="true"
+            class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 800" [alt]="product.name" loading="lazy"
+            class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-700"
+            (error)="$any($event.target).src='/product-placeholder.svg'" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
           @if (product.discountPercent) {
           <div class="absolute top-3 left-3 px-3 py-1.5 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"

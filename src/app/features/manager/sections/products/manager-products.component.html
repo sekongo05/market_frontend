@@ -498,8 +498,8 @@
                 <div class="grid grid-cols-2 gap-3">
                   @for (media of productMedia; track media.id; let i = $index) {
                     <div class="relative group rounded-xl overflow-hidden aspect-square luxury-card">
-                      <img [src]="media.url" [alt]="'Photo ' + (i + 1)" class="w-full h-full object-cover"
-                           (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
+                      <img [src]="media.url | mediaUrl: 400" [alt]="'Photo ' + (i + 1)" class="w-full h-full object-cover"
+                           (error)="$any($event.target).src='/product-placeholder.svg'"/>
                       @for (v of productVariants; track v.id) {
                         @if (v.imageUrl && v.imageUrl === media.url) {
                           <div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
@@ -739,7 +739,7 @@
                 @for (variant of productVariants; track variant.id) {
                   <div class="flex items-center gap-3 p-3 rounded-xl transition-colors" [class]="editingVariant?.id === variant.id ? 'border border-gold/40 bg-gold/5' : 'bg-black/[.04]'">
                     <div class="w-9 h-9 rounded-full flex-shrink-0 border-2 border-white/10 shadow-md" [style.background-color]="variant.colorHex || '#888'"></div>
-                    @if (variant.imageUrl) { <img [src]="variant.imageUrl" [alt]="variant.variantName" class="w-9 h-9 rounded-lg object-cover flex-shrink-0 border theme-border"/> }
+                    @if (variant.imageUrl) { <img [src]="variant.imageUrl | mediaUrl: 100" [alt]="variant.variantName" class="w-9 h-9 rounded-lg object-cover flex-shrink-0 border theme-border" (error)="$any($event.target).src='/product-placeholder.svg'"/> }
                     <div class="flex-1 min-w-0">
                       <p class="text-sm font-bold theme-text truncate">{{ variant.variantName }}</p>
                       <p class="text-xs theme-muted">{{ variant.stock }} en stock</p>
