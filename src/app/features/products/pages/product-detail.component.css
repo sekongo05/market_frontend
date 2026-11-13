@@ -1,45 +1,54 @@
-/* ── Main image zoom ──────────────────────────────────────────────────── */
+/* ── Gallery surface éditoriale ──────────────────────────────────────── */
+.gallery-surface {
+  border-radius: 0.75rem;
+  background: rgba(128, 128, 128, 0.055);
+}
+
 .gallery-img {
-  transition: transform 0.5s cubic-bezier(.22,1,.36,1);
+  transition: transform 0.5s cubic-bezier(.22, 1, .36, 1);
   cursor: zoom-in;
 }
+
 .gallery-img.zoomed {
-  transform: scale(1.6);
+  transform: scale(1.65);
   cursor: zoom-out;
 }
 
 /* ── Thumbnail active ring ───────────────────────────────────────────── */
+.thumb-btn {
+  background: rgba(128, 128, 128, 0.055);
+}
+
 .thumb-btn.active {
-  ring: 2px solid #d4af37;
   box-shadow: 0 0 0 2px #d4af37;
 }
 
 /* ── Quantity stepper ───────────────────────────────────────────────── */
-.qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.qty-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
 
-/* ── Mobile: Quantité + Ajouter au panier (.sec-cta) juste après le prix (.sec-price) ───────── */
-.product-info-col { display: flex; flex-direction: column; gap: 1.5rem; }
-.sec-title    { order: 0; }
-.sec-price    { order: 1; }
-.sec-cta      { order: 2; }
-.sec-variants { order: 3; }
-.sec-desc     { order: 4; }
-.sec-wa       { order: 5; }
-.sec-share    { order: 6; }
-.sec-trust    { order: 7; }
-@media (min-width: 640px) {
-  .sec-title    { order: 0; }
-  .sec-price    { order: 1; }
-  .sec-desc     { order: 2; }
-  .sec-variants { order: 3; }
-  .sec-cta      { order: 4; }
-  .sec-wa       { order: 5; }
-  .sec-share    { order: 6; }
-  .sec-trust    { order: 7; }
+/* ── Hiérarchie de conversion (Mobile & Desktop) ─────────────────────── */
+.product-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Mobile sticky CTA bar ───────────────────────────────────────────── */
+.mobile-sticky-bar {
+  background: color-mix(in srgb, var(--color-bg, #ffffff) 92%, transparent);
+  border-top: 1px solid rgba(128, 128, 128, 0.14);
+  backdrop-filter: blur(12px);
 }
 
 /* ── No scrollbar utility ────────────────────────────────────────────── */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 
-
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

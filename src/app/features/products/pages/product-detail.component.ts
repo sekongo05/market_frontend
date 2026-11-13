@@ -1,16 +1,19 @@
 import {
   Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
-  AfterViewInit, HostListener, Inject, PLATFORM_ID
+  AfterViewInit, HostListener, Inject, PLATFORM_ID, inject
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
+import { ProductCardComponent } from '../../../shared/components/product-card/product-card.component';
 import { Subject } from 'rxjs';
 import { takeUntil, switchMap } from 'rxjs/operators';
 
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../../core/services/product.service';
 import { CartService } from '../../../core/services/cart.service';
+import { WishlistService } from '../../../core/services/wishlist.service';
+import { ScrollLockService } from '../../../core/services/scroll-lock.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
@@ -32,7 +35,7 @@ export interface GalleryItem {
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, TooltipDirective, MediaUrlPipe],
+  imports: [CommonModule, RouterLink, FormsModule, TooltipDirective, MediaUrlPipe, ProductCardComponent],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,10 +45,17 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   loading = true;
   error: string | null = null;
 
-  // Gallery
+  // Gallery & Lightbox
   galleryItems: GalleryItem[] = [];
   activeIndex = 0;
   zoomed = false;
+  lightboxOpen = false;
+  openAccordion: 'desc' | 'shipping' | null = 'desc';
+
+  private readonly wishlistService = inject(WishlistService);
+  private readonly scrollLock = inject(ScrollLockService);
+  favoriteIds = new Set<number>();
+  cartProductIds = new Set<number>();
 
   // Related products (from same category)
   relatedProducts: ProductSummaryResponse[] = [];
@@ -142,6 +152,16 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnInit(): void {
+    this.wishlistService.favoriteIds$.pipe(takeUntil(this.destroy$)).subscribe(ids => {
+      this.favoriteIds = ids;
+      this.cdr.detectChanges();
+    });
+
+    this.cartService.cart$.pipe(takeUntil(this.destroy$)).subscribe(cart => {
+      this.cartProductIds = new Set(cart.map(i => i.productId));
+      this.cdr.detectChanges();
+    });
+
     this.wsService.stockUpdate$
       .pipe(takeUntil(this.destroy$))
       .subscribe(update => {
@@ -616,7 +636,14 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   onRight(): void { if (this.product) this.nextImage(); }
 
   @HostListener('document:keydown.escape')
-  onEsc(): void { this.zoomed = false; this.cdr.detectChanges(); }
+  onEsc(): void {
+    if (this.lightboxOpen) {
+      this.closeLightbox();
+      return;
+    }
+    this.zoomed = false;
+    this.cdr.detectChanges();
+  }
 
   // ── Cart ─────────────────────────────────────────────────────────────────
 
@@ -1004,4 +1031,80 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   starsRange = [1, 2, 3, 4, 5];
+
+  get isProductFavorite(): boolean {
+    return this.product ? this.favoriteIds.has(this.product.id) : false;
+  }
+
+  get ratingBreakdown(): { stars: number; count: number; percent: number }[] {
+    const total = this.reviews.length;
+    return [5, 4, 3, 2, 1].map(stars => {
+      const count = this.reviews.filter(r => Math.round(r.rating) === stars).length;
+      return { stars, count, percent: total > 0 ? Math.round((count / total) * 100) : 0 };
+    });
+  }
+
+  toggleFavorite(): void {
+    if (!this.product) return;
+    const added = this.wishlistService.toggle(this.product.id);
+    this.toast.info(added ? 'Ajouté aux favoris' : 'Retiré des favoris');
+  }
+
+  openLightbox(): void {
+    if (this.activeItem.type !== 'IMAGE') return;
+    this.lightboxOpen = true;
+    this.scrollLock.lock();
+    this.cdr.detectChanges();
+  }
+
+  closeLightbox(): void {
+    this.lightboxOpen = false;
+    this.scrollLock.unlock();
+    this.cdr.detectChanges();
+  }
+
+  toggleAccordion(section: 'desc' | 'shipping'): void {
+    this.openAccordion = this.openAccordion === section ? null : section;
+    this.cdr.detectChanges();
+  }
+
+  scrollToReviews(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  scrollToVariantsOrAdd(): void {
+    if (this.hasVariants && !this.selectedVariant) {
+      if (isPlatformBrowser(this.platformId)) {
+        document.getElementById('product-variants')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    this.addToCart();
+  }
+
+  onRelatedQuickAdd(product: ProductSummaryResponse): void {
+    if ((product.variantCount ?? 0) > 0) {
+      this.router.navigate(['/products', product.slug]);
+      return;
+    }
+    if (this.cartProductIds.has(product.id)) {
+      this.toast.info('Déjà dans votre panier');
+      return;
+    }
+    this.cartService.addToCart({
+      productId: product.id,
+      productName: product.name,
+      price: product.salePrice ?? product.price,
+      quantity: 1,
+      imageUrl: product.imageUrl,
+      maxStock: product.stock,
+    });
+    this.toast.success('Ajouté au panier');
+  }
+
+  onRelatedToggleFavorite(product: ProductSummaryResponse): void {
+    const added = this.wishlistService.toggle(product.id);
+    this.toast.info(added ? 'Ajouté aux favoris' : 'Retiré des favoris');
+  }
 }
