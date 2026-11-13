@@ -1,0 +1,158 @@
+<a [routerLink]="['/products', product.slug]"
+   class="product-card group flex flex-col select-none animate-fade-in-up"
+   [style.animation-delay]="((index % 8) * 0.05) + 's'">
+
+  <!-- Surface image éditoriale sans bordure -->
+  <div class="product-card__media relative aspect-[3/4] flex items-center justify-center mb-2.5 overflow-hidden">
+    <img [src]="displayImage | mediaUrl: 1000"
+         [attr.srcset]="(displayImage | mediaUrl: 500) + ' 500w, ' + (displayImage | mediaUrl: 1000) + ' 1000w'"
+         [attr.sizes]="sizes"
+         [alt]="product.name"
+         [attr.loading]="priorityImage ? 'eager' : 'lazy'"
+         [attr.fetchpriority]="priorityImage ? 'high' : null"
+         decoding="async"
+         class="product-card__img max-w-full max-h-full w-auto h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+         [class.opacity-55]="isOutOfStock"
+         (error)="$any($event.target).src='/product-placeholder.svg'" />
+
+    <!-- Badges haut-gauche -->
+    <div class="absolute top-2.5 left-2.5 flex flex-col items-start gap-1 pointer-events-none z-10">
+      @if (isOutOfStock) {
+        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-neutral-900/80 text-white">
+          Épuisé
+        </span>
+      } @else if (hasDiscount) {
+        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wide bg-orange-500 text-white">
+          −{{ product.discountPercent }}%
+        </span>
+      } @else if (isNewProduct) {
+        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider text-black"
+              style="background:rgba(212,175,55,0.92);">
+          Nouveau
+        </span>
+      }
+
+      @if (isManager && isLowStock) {
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-500 text-white text-[10px] font-black uppercase rounded">
+          <span class="w-1 h-1 rounded-full bg-white animate-pulse flex-shrink-0"></span>
+          Stock bas ({{ product.stock }})
+        </span>
+      }
+    </div>
+
+    <!-- Actions haut-droite : Manager OU Favoris client -->
+    @if (isManager) {
+      <div class="absolute top-2.5 right-2.5 flex gap-1.5 z-20">
+        <button type="button"
+                (click)="onEdit($event)"
+                appTooltip="Modifier ce produit"
+                tooltipPosition="bottom"
+                class="w-8 h-8 bg-black/75 text-yellow-400 rounded-lg flex items-center justify-center hover:bg-black/90 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+        </button>
+        <button type="button"
+                (click)="onDelete($event)"
+                appTooltip="Supprimer ce produit"
+                tooltipPosition="bottom"
+                class="w-8 h-8 bg-black/75 text-red-400 rounded-lg flex items-center justify-center hover:bg-black/90 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+      </div>
+    } @else {
+      <button type="button"
+              (click)="onToggleFavorite($event)"
+              [attr.aria-label]="isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+              class="product-card__fav absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200"
+              [class.product-card__fav--active]="isFavorite">
+        <svg class="w-4 h-4"
+             [attr.fill]="isFavorite ? 'currentColor' : 'none'"
+             stroke="currentColor"
+             viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+      </button>
+
+      <!-- Barre d'actions rapides Desktop (hover) -->
+      @if (!isOutOfStock) {
+        <div class="product-card__actions hidden sm:flex items-center gap-1.5 absolute bottom-2.5 left-2.5 right-2.5 z-20">
+          @if (showQuickView) {
+            <button type="button"
+                    (click)="onQuickView($event)"
+                    class="product-card__action-btn flex-1 py-2 px-2.5 text-[11px] font-bold tracking-wide uppercase rounded-md backdrop-blur-md transition-colors">
+              Aperçu
+            </button>
+          }
+          <button type="button"
+                  (click)="onQuickAdd($event)"
+                  class="product-card__add-btn flex-1 py-2 px-2.5 text-[11px] font-bold tracking-wide uppercase rounded-md transition-colors"
+                  [class.product-card__add-btn--done]="inCart">
+            @if (inCart) {
+              Dans le panier
+            } @else if (product.variantCount > 0) {
+              Choisir
+            } @else {
+              + Panier
+            }
+          </button>
+        </div>
+
+        <!-- Bouton discret mobile (+) -->
+        <button type="button"
+                (click)="onQuickAdd($event)"
+                [attr.aria-label]="product.variantCount > 0 ? 'Choisir une option' : 'Ajouter au panier'"
+                class="sm:hidden product-card__mobile-add absolute bottom-2 right-2 z-20 w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-transform active:scale-95"
+                [class.product-card__mobile-add--done]="inCart">
+          @if (inCart) {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+          } @else {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v16m8-8H4"/>
+            </svg>
+          }
+        </button>
+      }
+    }
+  </div>
+
+  <!-- Informations produit alignées sous l'image -->
+  <div class="flex items-center justify-between gap-2 mb-0.5 min-h-[1rem]">
+    <span class="text-[11px] uppercase tracking-wider theme-muted truncate">
+      {{ product.categoryName || 'Collection' }}
+    </span>
+    @if (product.variantCount > 0) {
+      <span class="text-[10px] font-medium theme-muted flex-shrink-0">
+        +{{ product.variantCount }} opt.
+      </span>
+    }
+  </div>
+
+  <h3 class="font-medium theme-text text-[13px] sm:text-sm leading-snug line-clamp-2 min-h-[2.4rem] mb-1 group-hover:text-gold transition-colors">
+    {{ product.name }}
+  </h3>
+
+  <div class="flex items-baseline gap-1.5 flex-wrap mt-auto">
+    @if (hasDiscount) {
+      <span class="font-bold text-[13px] sm:text-sm text-orange-600">
+        {{ product.salePrice | number:'1.0-0':'fr-FR' }}
+      </span>
+      <span class="text-[11px] theme-muted line-through">
+        {{ product.price | number:'1.0-0':'fr-FR' }}
+      </span>
+    } @else {
+      <span class="font-bold text-[13px] sm:text-sm theme-text">
+        {{ product.price | number:'1.0-0':'fr-FR' }}
+      </span>
+    }
+    <span class="text-[11px] font-semibold text-gold/80">FCFA</span>
+  </div>
+</a>
+

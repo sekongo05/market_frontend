@@ -255,50 +255,56 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   CATALOG CARD & FRAME — écrin luxe haute couture
+   CATALOG TOOLBAR — barre sticky Genre / Favoris / Densité
 ═══════════════════════════════════════════════════════════════════ */
-.catalog-card {
-  border-radius: 1rem;
-  border: 1px solid rgba(212, 175, 55, 0.16);
-  background: var(--color-surface, #ffffff);
-  overflow: hidden;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.35s ease,
-              box-shadow 0.35s ease;
-  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.08);
-}
-.catalog-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(212, 175, 55, 0.5);
-  box-shadow: 0 20px 38px -12px rgba(0, 0, 0, 0.28),
-              0 0 22px -6px rgba(212, 175, 55, 0.22);
+.catalog-toolbar {
+  background: color-mix(in srgb, var(--color-bg, #ffffff) 88%, transparent);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.12);
 }
 
-.catalog-frame {
-  position: relative;
-  overflow: hidden;
-  background: radial-gradient(circle at 50% 42%, rgba(212, 175, 55, 0.08) 0%, #09080d 78%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+.gender-pill {
+  padding: 0.35rem 0.75rem;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  color: var(--color-muted, #6b7280);
+  background: transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-@keyframes catalog-shimmer {
-  from { left: -65%; }
-  to   { left: 165%; }
+.gender-pill:hover {
+  color: var(--color-text, #111827);
+  background: rgba(128, 128, 128, 0.08);
 }
-.catalog-frame::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -65%;
-  width: 45%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.10), transparent);
-  transform: skewX(-20deg);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 4;
+
+.gender-pill--active {
+  background: #18181b;
+  color: #ffffff;
 }
-.catalog-card:hover .catalog-frame::after {
-  opacity: 1;
-  animation: catalog-shimmer 0.75s ease forwards;
+
+:host-context(.dark) .gender-pill--active,
+:host-context([data-theme="dark"]) .gender-pill--active {
+  background: #d4af37;
+  color: #000000;
+}
+
+.density-btn {
+  padding: 0.3rem 0.45rem;
+  border-radius: 0.25rem;
+  color: var(--color-muted, #6b7280);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.density-btn:hover {
+  color: var(--color-text, #111827);
+}
+
+.density-btn--active {
+  background: rgba(212, 175, 55, 0.16);
+  color: #b8860b;
 }

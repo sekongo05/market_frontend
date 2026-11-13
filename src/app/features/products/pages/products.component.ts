@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule, NgTemplateOutlet } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener, ViewChild, ElementRef, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
@@ -10,21 +10,23 @@ import { ProductVariantService } from '../../../core/services/product-variant.se
 import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
+import { WishlistService } from '../../../core/services/wishlist.service';
 import { AuthPromptService } from '../../../core/services/auth-prompt.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { SeoService } from '../../../core/services/seo.service';
-import { ProductResponse, ProductSummaryResponse, GetProductsParams, SortOption,ProductVariant } from '../../../core/models/product.models';
+import { Gender, ProductResponse, ProductSummaryResponse, GetProductsParams, SortOption, ProductVariant } from '../../../core/models/product.models';
 import { CategoryResponse } from '../../../core/models/category.models';
 import { PageResponse } from '../../../core/models/common.models';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 import { MediaUrlPipe } from '../../../shared/pipes/media-url.pipe';
+import { ProductCardComponent } from '../../../shared/components/product-card/product-card.component';
 import { ScrollLockService } from '../../../core/services/scroll-lock.service';
 import { OrderService } from '../../../core/services/order.service';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, NgTemplateOutlet, FormsModule, ReactiveFormsModule, RouterLink, TooltipDirective, MediaUrlPipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, TooltipDirective, MediaUrlPipe, ProductCardComponent],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,12 +47,18 @@ export class ProductsComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private productsSub?: Subscription;
 
-  confirmDeleteProduct: ProductResponse | null = null;
+  confirmDeleteProduct: ProductResponse | ProductSummaryResponse | null = null;
   selectedViewVariant: ProductVariant | null = null;
-  // Category filter
+  // Category & gender filter
   selectedCategoryId: number | null = null;
+  selectedGender: Gender | null = null;
   private pendingCategorySlug: string | null = null;
   featuredOnly = false;
+  onlyFavorites = false;
+  gridDensity: 3 | 4 = 4;
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly wishlistService = inject(WishlistService);
+  favoriteIds = new Set<number>();
 
   // Sort & price filter
   sortOption: SortOption = 'newest';
@@ -290,6 +298,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       url: '/products',
     });
     const slugParam     = this.route.snapshot.queryParamMap.get('categorie');
+    const genderParam   = this.route.snapshot.queryParamMap.get('genre')?.toUpperCase();
     const searchParam   = this.route.snapshot.queryParamMap.get('search');
     const featuredParam = this.route.snapshot.queryParamMap.get('featured');
     const sortParam     = this.route.snapshot.queryParamMap.get('sort');
@@ -297,6 +306,16 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const maxPriceParam = this.route.snapshot.queryParamMap.get('maxPrice');
     const inStockParam  = this.route.snapshot.queryParamMap.get('inStock');
     const pageParam     = this.route.snapshot.queryParamMap.get('page');
+
+    if (genderParam === 'HOMME' || genderParam === 'FEMME' || genderParam === 'UNISEX') {
+      this.selectedGender = genderParam;
+    }
+    if (this.isBrowser) {
+      const savedDensity = localStorage.getItem('sdm_grid_density');
+      if (savedDensity === '3' || savedDensity === '4') {
+        this.gridDensity = Number(savedDensity) as 3 | 4;
+      }
+    }
 
     if (featuredParam === 'true') this.featuredOnly = true;
     if (sortParam && ['newest','price_asc','price_desc','name_asc'].includes(sortParam)) this.sortOption = sortParam as SortOption;
@@ -327,6 +346,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     this.cartService.cart$.pipe(takeUntil(this.destroy$)).subscribe(cart => {
       this.cartProductIds = new Set(cart.map(i => i.productId));
+      this.cdr.detectChanges();
+    });
+
+    this.wishlistService.favoriteIds$.pipe(takeUntil(this.destroy$)).subscribe(ids => {
+      this.favoriteIds = ids;
       this.cdr.detectChanges();
     });
 
@@ -392,7 +416,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
 
 
-  startDelete(product: ProductResponse): void {
+  startDelete(product: ProductResponse | ProductSummaryResponse): void {
     this.confirmDeleteProduct = product;
   }
 
@@ -426,6 +450,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const params: GetProductsParams = { page, size: this.pageSize };
     if (this.searchQuery) params.search = this.searchQuery;
     if (this.selectedCategoryId) params.categoryId = this.selectedCategoryId;
+    if (this.selectedGender) params.gender = this.selectedGender;
     if (this.sortOption !== 'newest') params.sort = this.sortOption;
     const min = parseFloat(this.minPriceInput);
     const max = parseFloat(this.maxPriceInput);
@@ -471,6 +496,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       queryParams['categorie'] = null;
     }
     queryParams['sort'] = this.sortOption !== 'newest' ? this.sortOption : null;
+    queryParams['genre'] = this.selectedGender ? this.selectedGender.toLowerCase() : null;
     queryParams['minPrice'] = this.minPriceSlider > 0 ? String(this.minPriceSlider) : null;
     queryParams['maxPrice'] = this.maxPriceSlider < this.PRICE_MAX ? String(this.maxPriceSlider) : null;
     queryParams['inStock'] = this.inStockOnly ? 'true' : null;
@@ -559,6 +585,38 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.loadProducts(0);
   }
 
+  selectGender(gender: Gender | null): void {
+    this.selectedGender = this.selectedGender === gender ? null : gender;
+    this.loadProducts(0);
+  }
+
+  setGridDensity(density: 3 | 4): void {
+    this.gridDensity = density;
+    if (this.isBrowser) {
+      try {
+        localStorage.setItem('sdm_grid_density', String(density));
+      } catch {
+        // Ignore storage errors
+      }
+    }
+    this.cdr.detectChanges();
+  }
+
+  toggleFavorite(product: ProductSummaryResponse): void {
+    const added = this.wishlistService.toggle(product.id);
+    this.showToast(added ? 'Ajouté aux favoris' : 'Retiré des favoris');
+  }
+
+  toggleFavoritesFilter(): void {
+    this.onlyFavorites = !this.onlyFavorites;
+    this.cdr.detectChanges();
+  }
+
+  get displayedProducts(): ProductSummaryResponse[] {
+    if (!this.onlyFavorites) return this.products;
+    return this.products.filter(p => this.favoriteIds.has(p.id));
+  }
+
   clearFilters(): void {
     this.sortOption = 'newest';
     this.minPriceInput = '';
@@ -567,6 +625,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.maxPriceSlider = this.PRICE_MAX;
     this.inStockOnly = false;
     this.featuredOnly = false;
+    this.onlyFavorites = false;
+    this.selectedGender = null;
     this.searchQuery = '';
     this.selectedCategoryId = null;
     this.loadProducts(0);
@@ -574,7 +634,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   get hasActiveFilters(): boolean {
-    return this.sortOption !== 'newest' || this.minPriceSlider > 0 || this.maxPriceSlider < this.PRICE_MAX || this.inStockOnly || !!this.searchQuery || this.selectedCategoryId != null;
+    return this.sortOption !== 'newest' || this.minPriceSlider > 0 || this.maxPriceSlider < this.PRICE_MAX || this.inStockOnly || this.onlyFavorites || this.selectedGender != null || !!this.searchQuery || this.selectedCategoryId != null;
   }
 
   previousPage(): void {

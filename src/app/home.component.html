@@ -454,60 +454,18 @@
     <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
                   sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
       @for (product of featuredProducts; track product.id; let idx = $index) {
-      <a [routerLink]="['/products', product.slug]"
-        class="card-appear group flex-shrink-0 w-[52vw] sm:w-auto cursor-pointer block snap-start"
-        [style.animation-delay.ms]="idx * 75">
-        <div
-          class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3 bg-[#09080d]/80 flex items-center justify-center rounded-xl"
-          style="aspect-ratio:3/4;">
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 80" alt="" aria-hidden="true"
-            loading="lazy" decoding="async"
-            class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 1000"
-            [attr.srcset]="((product.listImageUrl || product.imageUrl) | mediaUrl: 500) + ' 500w, ' + ((product.listImageUrl || product.imageUrl) | mediaUrl: 1000) + ' 1000w'"
-            sizes="(max-width: 640px) 60vw, 25vw"
-            [alt]="product.name" loading="lazy" decoding="async"
-            class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-500 ease-out"
-            (error)="$any($event.target).src='/product-placeholder.svg'" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
-          <!-- Badge vedette -->
-          <div class="absolute top-2.5 left-2.5 flex items-center gap-1 px-2 py-1"
-            style="background:rgba(212,175,55,0.9);">
-            <svg class="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-            <span
-              class="text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-black uppercase tracking-wider">Vedette</span>
-          </div>
-          @if (product.discountPercent && product.discountPercent > 0) {
-          <span
-            class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 tracking-wider uppercase">
-            −{{ product.discountPercent }}%
-          </span>
-          }
-          @if (product.stock === 0) {
-          <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <span
-              class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
-          </div>
-          }
-        </div>
-        <p
-          class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">
-          {{ product.categoryName }}</p>
-        <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
-        <div class="flex items-baseline gap-1.5">
-          @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-          <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR'
-            }}</span>
-          <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-          } @else {
-          <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-          }
-          <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
-        </div>
-      </a>
+      <div class="card-appear flex-shrink-0 w-[52vw] sm:w-auto snap-start"
+           [style.animation-delay.ms]="idx * 75">
+        <app-product-card
+          [product]="product"
+          [index]="idx"
+          [showQuickView]="false"
+          [inCart]="cartProductIds.has(product.id)"
+          [isFavorite]="favoriteIds.has(product.id)"
+          sizes="(max-width: 640px) 52vw, (max-width: 1024px) 33vw, 17vw"
+          (quickAdd)="onQuickAddProduct($event)"
+          (toggleFavorite)="onToggleFavoriteProduct($event)" />
+      </div>
       }
     </div>
   </section>
@@ -583,54 +541,18 @@
     <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
                   sm:grid sm:grid-cols-4 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
       @for (product of bestsellers.slice(0,4); track product.id; let idx = $index) {
-      <a [routerLink]="['/products', product.slug]"
-        class="card-appear group flex-shrink-0 w-[60vw] sm:w-auto cursor-pointer block snap-start"
-        [style.animation-delay.ms]="idx * 80">
-        <div
-          class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3 bg-[#09080d]/80 flex items-center justify-center rounded-xl"
-          style="aspect-ratio:3/4;">
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 80" alt="" aria-hidden="true"
-            loading="lazy" decoding="async"
-            class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 1000"
-            [attr.srcset]="((product.listImageUrl || product.imageUrl) | mediaUrl: 500) + ' 500w, ' + ((product.listImageUrl || product.imageUrl) | mediaUrl: 1000) + ' 1000w'"
-            sizes="(max-width: 640px) 60vw, 25vw"
-            [alt]="product.name" loading="lazy" decoding="async"
-            class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-500 ease-out"
-            (error)="$any($event.target).src='/product-placeholder.svg'" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
-          <!-- Rang -->
-          <div
-            class="absolute top-2.5 left-2.5 w-7 h-7 flex items-center justify-center text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
-            style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.15);">#{{ idx + 1 }}</div>
-          @if (product.discountPercent && product.discountPercent > 0) {
-          <span
-            class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 uppercase">
-            −{{ product.discountPercent }}%
-          </span>
-          }
-          @if (product.stock === 0) {
-          <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <span
-              class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
-          </div>
-          }
-        </div>
-        <p
-          class="text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-gold">
-          {{ product.categoryName }}</p>
-        <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-2">{{ product.name }}</p>
-        <div class="flex items-baseline gap-1.5">
-          @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-          <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR'
-            }}</span>
-          <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-          } @else {
-          <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-          }
-          <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
-        </div>
-      </a>
+      <div class="card-appear flex-shrink-0 w-[60vw] sm:w-auto snap-start"
+           [style.animation-delay.ms]="idx * 80">
+        <app-product-card
+          [product]="product"
+          [index]="idx"
+          [showQuickView]="false"
+          [inCart]="cartProductIds.has(product.id)"
+          [isFavorite]="favoriteIds.has(product.id)"
+          sizes="(max-width: 640px) 60vw, 25vw"
+          (quickAdd)="onQuickAddProduct($event)"
+          (toggleFavorite)="onToggleFavoriteProduct($event)" />
+      </div>
       }
     </div>
 
@@ -699,56 +621,16 @@
     @if (!newProductsLoading && hasNewProducts) {
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 px-5 sm:px-8 lg:px-12">
       @for (product of newProducts; track product.id; let idx = $index) {
-      <div class="card-appear group relative" [style.animation-delay.ms]="idx * 75">
-        <!-- Lien principal vers la fiche produit -->
-        <a [routerLink]="['/products', product.slug]" class="block cursor-pointer">
-          <div
-            class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-1.5 border transition-colors duration-300 rounded-xl bg-[#09080d]/80 flex items-center justify-center"
-            style="aspect-ratio:3/4;border-color:rgba(212,175,55,0.12);">
-            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 80" alt="" aria-hidden="true"
-              loading="lazy" decoding="async"
-              class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
-            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 1000"
-              [attr.srcset]="((product.listImageUrl || product.imageUrl) | mediaUrl: 500) + ' 500w, ' + ((product.listImageUrl || product.imageUrl) | mediaUrl: 1000) + ' 1000w'"
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              [alt]="product.name" loading="lazy" decoding="async"
-              class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-500 ease-out"
-              (error)="$any($event.target).src='/product-placeholder.svg'" />
-
-            <!-- Badge promo (orange) -->
-            @if (product.discountPercent && product.discountPercent > 0) {
-            <span
-              class="absolute top-2 right-2 bg-orange-500 text-white text-[clamp(0.75rem,1.5vw,0.875rem)] font-black px-2 py-0.5 uppercase z-10">
-              −{{ product.discountPercent }}%
-            </span>
-            }
-
-            <!-- Stock épuisé -->
-            @if (product.stock === 0) {
-            <div class="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
-              <span
-                class="text-white/70 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-widest">Épuisé</span>
-            </div>
-            }
-          </div>
-        </a>
-
-        <!-- Infos sous l'image -->
-        <a [routerLink]="['/products', product.slug]" class="block">
-          <p
-            class="font-semibold theme-text text-sm leading-snug mb-0.5 line-clamp-2 hover:text-gold transition-colors">
-            {{ product.name }}</p>
-        </a>
-        <div class="flex items-baseline gap-1.5">
-          @if (product.discountPercent && product.discountPercent > 0 && product.salePrice) {
-          <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR'
-            }}</span>
-          <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-          } @else {
-          <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-          }
-          <span class="text-[13px] text-gold/60">FCFA</span>
-        </div>
+      <div class="card-appear" [style.animation-delay.ms]="idx * 75">
+        <app-product-card
+          [product]="product"
+          [index]="idx"
+          [showQuickView]="false"
+          [inCart]="cartProductIds.has(product.id)"
+          [isFavorite]="favoriteIds.has(product.id)"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          (quickAdd)="onQuickAddProduct($event)"
+          (toggleFavorite)="onToggleFavoriteProduct($event)" />
       </div>
       }
     </div>
@@ -809,41 +691,18 @@
     <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
                   sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
       @for (product of discountProducts; track product.id; let idx = $index) {
-      <a [routerLink]="['/products', product.slug]"
-        class="card-appear group flex-shrink-0 w-[70vw] sm:w-auto cursor-pointer block snap-start"
-        [style.animation-delay.ms]="idx * 80">
-        <div
-          class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3 bg-[#09080d]/80 flex items-center justify-center rounded-xl"
-          style="aspect-ratio:3/4;">
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 80" alt="" aria-hidden="true"
-            loading="lazy" decoding="async"
-            class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 1000"
-            [attr.srcset]="((product.listImageUrl || product.imageUrl) | mediaUrl: 500) + ' 500w, ' + ((product.listImageUrl || product.imageUrl) | mediaUrl: 1000) + ' 1000w'"
-            sizes="(max-width: 640px) 70vw, 25vw"
-            [alt]="product.name" loading="lazy" decoding="async"
-            class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-700"
-            (error)="$any($event.target).src='/product-placeholder.svg'" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-          @if (product.discountPercent) {
-          <div class="absolute top-3 left-3 px-3 py-1.5 text-[clamp(0.75rem,1.5vw,0.875rem)] font-black text-white"
-            style="background:#f97316;">−{{ product.discountPercent }}%</div>
-          }
-        </div>
-        <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.3em] font-bold mb-1 text-orange-500/60">{{
-          product.categoryName }}</p>
-        <p class="font-bold theme-text text-xs sm:text-sm leading-tight mb-2 line-clamp-1">{{ product.name }}</p>
-        <div class="flex items-baseline gap-1.5">
-          @if (product.salePrice) {
-          <span class="font-black text-base sm:text-lg text-orange-600">{{ product.salePrice | number:'1.0-0':'fr-FR'
-            }}</span>
-          <span class="text-xs theme-muted line-through">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-          } @else {
-          <span class="font-black text-base sm:text-lg theme-text">{{ product.price | number:'1.0-0':'fr-FR' }}</span>
-          }
-          <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] theme-muted">FCFA</span>
-        </div>
-      </a>
+      <div class="card-appear flex-shrink-0 w-[70vw] sm:w-auto snap-start"
+           [style.animation-delay.ms]="idx * 80">
+        <app-product-card
+          [product]="product"
+          [index]="idx"
+          [showQuickView]="false"
+          [inCart]="cartProductIds.has(product.id)"
+          [isFavorite]="favoriteIds.has(product.id)"
+          sizes="(max-width: 640px) 70vw, 25vw"
+          (quickAdd)="onQuickAddProduct($event)"
+          (toggleFavorite)="onToggleFavoriteProduct($event)" />
+      </div>
       }
     </div>
   </section>

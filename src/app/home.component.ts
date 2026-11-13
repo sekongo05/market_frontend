@@ -7,11 +7,13 @@ import { ProductService } from './core/services/product.service';
 import { ReviewService } from './core/services/review.service';
 import { CategoryService } from './core/services/category.service';
 import { CartService } from './core/services/cart.service';
+import { WishlistService } from './core/services/wishlist.service';
 import { ToastService } from './core/services/toast.service';
 import { DashboardService, PublicStats } from './core/services/dashboard.service';
 import { WebSocketService } from './core/services/websocket.service';
 import { SeoService } from './core/services/seo.service';
 import { MediaUrlPipe } from './shared/pipes/media-url.pipe';
+import { ProductCardComponent } from './shared/components/product-card/product-card.component';
 import { ProductSummaryResponse } from './core/models/product.models';
 import { ReviewResponse } from './core/models/review.models';
 import { CategoryResponse } from './core/models/category.models';
@@ -27,7 +29,7 @@ const NEW_PRODUCT_DAYS = 21;
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MediaUrlPipe],
+  imports: [CommonModule, RouterLink, FormsModule, MediaUrlPipe, ProductCardComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,6 +62,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   searchQuery = '';
   firstOrderPromo: PublicPromoResponse | null = null;
   readonly skeletonArray = new Array(6);
+  cartProductIds = new Set<number>();
+  favoriteIds = new Set<number>();
 
   // ── Hero slideshow ──────────────────────────────────────────────
   readonly heroSlides = [
@@ -123,10 +127,20 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private seo: SeoService,
     private cartService: CartService,
+    private wishlistService: WishlistService,
     private toastService: ToastService,
   ) {
     this._platformBrowser = isPlatformBrowser(this.platformId);
     this.currentUser$ = this.authService.currentUser$;
+
+    this.cartService.cart$.pipe(takeUntil(this.destroy$)).subscribe(cart => {
+      this.cartProductIds = new Set(cart.map(i => i.productId));
+      this.cdr.markForCheck();
+    });
+    this.wishlistService.favoriteIds$.pipe(takeUntil(this.destroy$)).subscribe(ids => {
+      this.favoriteIds = ids;
+      this.cdr.markForCheck();
+    });
 
     afterNextRender(() => {
       this._loadPublicStats();
@@ -549,5 +563,30 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     };
     const id = requestAnimationFrame(tick);
     this._frameIds.push(id);
+  }
+
+  onQuickAddProduct(product: ProductSummaryResponse): void {
+    if ((product.variantCount ?? 0) > 0) {
+      this.router.navigate(['/products', product.slug]);
+      return;
+    }
+    if (this.cartProductIds.has(product.id)) {
+      this.toastService.info('Déjà dans votre panier');
+      return;
+    }
+    this.cartService.addToCart({
+      productId: product.id,
+      productName: product.name,
+      price: product.salePrice ?? product.price,
+      quantity: 1,
+      imageUrl: product.imageUrl,
+      maxStock: product.stock,
+    });
+    this.toastService.success('Ajouté au panier');
+  }
+
+  onToggleFavoriteProduct(product: ProductSummaryResponse): void {
+    const added = this.wishlistService.toggle(product.id);
+    this.toastService.info(added ? 'Ajouté aux favoris' : 'Retiré des favoris');
   }
 }
