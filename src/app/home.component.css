@@ -600,23 +600,17 @@
 .cta-halo { animation: halo-pulse 6s ease-in-out infinite; }
 
 /* ═══════════════════════════════════════════════════════════════════
-   SÉPARATEURS DE SECTION — transitions gradient entre fonds clairs/sombres
+   ACCESSIBILITÉ — respect prefers-reduced-motion
 ═══════════════════════════════════════════════════════════════════ */
-.sdm-sep {
-  display: block;
-  height: 40px;
-  pointer-events: none;
-  flex-shrink: 0;
-}
-
-/* Fond clair → ventes flash brun-noir (#0e0500) */
-.sdm-sep--to-dark-warm {
-  background: linear-gradient(to bottom, #f8f5f0, #0e0500);
-}
-
-/* Section éditoriale (#060606) → fond clair */
-.sdm-sep--from-editorial {
-  background: linear-gradient(to bottom, #060606 0%, rgba(6,6,6,0.85) 30%, rgba(212,175,55,0.04) 55%, #f8f5f0 100%);
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide,
+  .hero-parallax,
+  .card-appear,
+  .gold-line-pulse,
+  .cta-halo {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* ─── Décorations CTA ─── */
