@@ -150,7 +150,8 @@
                   <div class="flex items-center gap-3">
                     <div class="relative w-14 h-14 rounded-xl bg-black/20 flex-shrink-0 overflow-hidden border theme-border">
                       @if (product.imageUrl) {
-                        <img [src]="product.thumbnailUrl || product.imageUrl" [alt]="product.name" loading="lazy" class="w-full h-full object-cover"/>
+                        <img [src]="(product.thumbnailUrl || product.imageUrl) | mediaUrl: 200" [alt]="product.name" loading="lazy" class="w-full h-full object-cover"
+                             (error)="$any($event.target).src='/product-placeholder.svg'"/>
                       } @else {
                         <div class="w-full h-full flex items-center justify-center">
                           <svg class="w-6 h-6 text-gold/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -577,8 +578,8 @@
               <div class="grid grid-cols-2 gap-3">
                 @for (media of productMedia; track media.id; let i = $index) {
                   <div class="relative group rounded-xl overflow-hidden aspect-square luxury-card">
-                    <img [src]="media.url" [alt]="media.altText || ('Photo ' + (i + 1))" class="w-full h-full object-cover"
-                         (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
+                    <img [src]="media.url | mediaUrl: 400" [alt]="media.altText || ('Photo ' + (i + 1))" class="w-full h-full object-cover"
+                         (error)="$any($event.target).src='/product-placeholder.svg'"/>
                     <!-- Variante associée ou badge Libre -->
                     @if (getVariantForMedia(media.url); as matchedVariant) {
                       <div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
@@ -835,7 +836,8 @@
                   <div class="w-8 h-8 rounded-full flex-shrink-0 border-2 border-white/10 shadow"
                        [style.background-color]="variant.colorHex"></div>
                   @if (variant.imageUrl) {
-                     <img [src]="variant.imageUrl" [alt]="variant.variantName" class="w-8 h-8 rounded-lg object-cover flex-shrink-0"/>
+                     <img [src]="variant.imageUrl | mediaUrl: 100" [alt]="variant.variantName" class="w-8 h-8 rounded-lg object-cover flex-shrink-0"
+                          (error)="$any($event.target).src='/product-placeholder.svg'"/>
                   }
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2">

@@ -200,8 +200,9 @@
                     <!-- Thumbnail -->
                     <div class="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100 border border-black/5 relative">
                       @if (item.imageUrl) {
-                        <img [src]="item.imageUrl | mediaUrl" [alt]="item.productName"
-                             class="w-full h-full object-cover"/>
+                        <img [src]="item.imageUrl | mediaUrl: 200" [alt]="item.productName"
+                             class="w-full h-full object-cover"
+                             (error)="$any($event.target).src='/product-placeholder.svg'"/>
                       } @else {
                         <div class="w-full h-full flex items-center justify-center text-gray-400">
                           📦
@@ -664,7 +665,8 @@
                     <div class="flex items-center gap-3">
                       <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 border border-black/5">
                         @if (item.imageUrl) {
-                          <img [src]="item.imageUrl | mediaUrl" [alt]="item.productName" class="w-full h-full object-cover"/>
+                          <img [src]="item.imageUrl | mediaUrl: 100" [alt]="item.productName" class="w-full h-full object-cover"
+                               (error)="$any($event.target).src='/product-placeholder.svg'"/>
                         }
                       </div>
                       <div class="flex-1 min-w-0 text-xs">

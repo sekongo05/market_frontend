@@ -10,12 +10,13 @@ import { CashFlowResponse } from '../../../../core/models/expense.models';
 import { PinGateComponent } from './pin-gate.component';
 import { PinSetupComponent } from './pin-setup.component';
 import { PinResetComponent } from './pin-reset.component';
+import { MediaUrlPipe } from '../../../../shared/pipes/media-url.pipe';
 
 @Component({
   selector: 'app-admin-finance',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, PinGateComponent, PinSetupComponent, PinResetComponent],
+  imports: [CommonModule, RouterLink, PinGateComponent, PinSetupComponent, PinResetComponent, MediaUrlPipe],
   templateUrl: './admin-finance.component.html',
 })
 export class AdminFinanceComponent implements OnInit, OnDestroy {

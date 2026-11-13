@@ -6,14 +6,14 @@
       <div class="flex items-center gap-2 text-sm theme-muted">
         <a routerLink="/" class="hover:text-gold transition-colors">Accueil</a>
         <svg class="w-3.5 h-3.5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
         <button (click)="goBack()" class="hover:text-gold transition-colors">Collection</button>
         @if (product) {
-          <svg class="w-3.5 h-3.5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-          </svg>
-          <span class="theme-text font-medium truncate max-w-[120px] sm:max-w-[200px]">{{ product.name }}</span>
+        <svg class="w-3.5 h-3.5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <span class="theme-text font-medium truncate max-w-[120px] sm:max-w-[200px]">{{ product.name }}</span>
         }
       </div>
     </div>
@@ -21,907 +21,898 @@
 
   <!-- ── Loading ──────────────────────────────────────────────────── -->
   @if (loading) {
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-        <!-- Image skeleton -->
-        <div class="space-y-4">
-          <div class="skeleton aspect-square rounded-3xl"></div>
-          <div class="grid grid-cols-4 gap-3">
-            @for (n of [1,2,3,4]; track n) {
-              <div class="skeleton aspect-square rounded-2xl"></div>
-            }
-          </div>
-        </div>
-        <!-- Info skeleton -->
-        <div class="space-y-5 pt-4">
-          <div class="skeleton h-4 w-28 rounded"></div>
-          <div class="skeleton h-9 w-3/4 rounded"></div>
-          <div class="skeleton h-4 w-full rounded"></div>
-          <div class="skeleton h-4 w-5/6 rounded"></div>
-          <div class="skeleton h-4 w-4/6 rounded"></div>
-          <div class="skeleton h-14 w-40 rounded-2xl mt-4"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+      <!-- Image skeleton -->
+      <div class="space-y-4">
+        <div class="skeleton aspect-square rounded-3xl"></div>
+        <div class="grid grid-cols-4 gap-3">
+          @for (n of [1,2,3,4]; track n) {
+          <div class="skeleton aspect-square rounded-2xl"></div>
+          }
         </div>
       </div>
+      <!-- Info skeleton -->
+      <div class="space-y-5 pt-4">
+        <div class="skeleton h-4 w-28 rounded"></div>
+        <div class="skeleton h-9 w-3/4 rounded"></div>
+        <div class="skeleton h-4 w-full rounded"></div>
+        <div class="skeleton h-4 w-5/6 rounded"></div>
+        <div class="skeleton h-4 w-4/6 rounded"></div>
+        <div class="skeleton h-14 w-40 rounded-2xl mt-4"></div>
+      </div>
     </div>
+  </div>
   }
 
   <!-- ── Error ────────────────────────────────────────────────────── -->
   @if (!loading && error) {
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-      <div class="text-6xl mb-4">🔍</div>
-      <h2 class="text-2xl font-black theme-text mb-3">{{ error }}</h2>
-      <p class="theme-muted mb-8">Le produit que vous cherchez n'existe pas ou a été retiré.</p>
-      <a routerLink="/products"
-         class="inline-flex items-center gap-2 bg-gold text-black px-6 py-3 rounded-2xl font-bold hover:shadow-lg hover:shadow-yellow-600/25 transition-all">
-        ← Retour à la collection
-      </a>
-    </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+    <div class="text-6xl mb-4">🔍</div>
+    <h2 class="text-2xl font-black theme-text mb-3">{{ error }}</h2>
+    <p class="theme-muted mb-8">Le produit que vous cherchez n'existe pas ou a été retiré.</p>
+    <a routerLink="/products"
+      class="inline-flex items-center gap-2 bg-gold text-black px-6 py-3 rounded-2xl font-bold hover:shadow-lg hover:shadow-yellow-600/25 transition-all">
+      ← Retour à la collection
+    </a>
+  </div>
   }
 
   <!-- ══════════════════════════════════════════════════════════════
        MAIN PRODUCT DETAIL
   ══════════════════════════════════════════════════════════════ -->
   @if (!loading && product) {
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-24 sm:pb-28 lg:py-16">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 xl:gap-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-24 sm:pb-28 lg:py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 xl:gap-20">
 
-        <!-- ════ LEFT: Media Gallery ════ -->
-        <div class="scroll-reveal from-left">
+      <!-- ════ LEFT: Media Gallery ════ -->
+      <div class="scroll-reveal from-left">
 
-          <!-- Main viewer -->
-          <div id="product-media-gallery" class="relative overflow-hidden rounded-3xl luxury-card mb-4 aspect-square"
-               (touchstart)="onTouchStart($event)"
-               (touchend)="onTouchEnd($event)">
+        <!-- Main viewer -->
+        <div id="product-media-gallery" class="relative overflow-hidden rounded-3xl luxury-card mb-4 aspect-square"
+          (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
 
-            <!-- Navigation arrows -->
-            <button (click)="prevImage()" appTooltip="Image précédente" tooltipPosition="right"
-              class="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full
+          <!-- Navigation arrows -->
+          <button (click)="prevImage()" appTooltip="Image précédente" tooltipPosition="right" class="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full
                      bg-black/50 backdrop-blur-sm border border-white/15 text-white
                      flex items-center justify-center hover:bg-black/70 transition-all duration-200"
-              [class.opacity-100]="galleryItems.length > 1"
-              [class.opacity-0]="galleryItems.length <= 1">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-              </svg>
-            </button>
-            <button (click)="nextImage()" appTooltip="Image suivante" tooltipPosition="left"
-              class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full
+            [class.opacity-100]="galleryItems.length > 1" [class.opacity-0]="galleryItems.length <= 1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button (click)="nextImage()" appTooltip="Image suivante" tooltipPosition="left" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full
                      bg-black/50 backdrop-blur-sm border border-white/15 text-white
                      flex items-center justify-center hover:bg-black/70 transition-all duration-200"
-              [class.opacity-100]="galleryItems.length > 1"
-              [class.opacity-0]="galleryItems.length <= 1">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
-            </button>
+            [class.opacity-100]="galleryItems.length > 1" [class.opacity-0]="galleryItems.length <= 1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
 
-            <!-- Zoom (images only) -->
-            @if (activeItem.type === 'IMAGE') {
-              <button (click)="toggleZoom()" [appTooltip]="zoomed ? 'Dézoomer' : 'Zoomer'"  tooltipPosition="left"
-                class="absolute top-4 right-4 z-10 min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl
+          <!-- Zoom (images only) -->
+          @if (activeItem.type === 'IMAGE') {
+          <button (click)="toggleZoom()" [appTooltip]="zoomed ? 'Dézoomer' : 'Zoomer'" tooltipPosition="left" class="absolute top-4 right-4 z-10 min-w-[44px] min-h-[44px] w-9 h-9 rounded-xl
                        bg-black/50 backdrop-blur-sm border border-white/15 text-white
                        flex items-center justify-center hover:bg-black/70 transition-all duration-200">
-                @if (!zoomed) {
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
-                  </svg>
-                } @else {
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/>
-                  </svg>
-                }
-              </button>
+            @if (!zoomed) {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+            </svg>
+            } @else {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+            </svg>
             }
-
-            <!-- Stock badge -->
-            <div class="absolute top-4 left-4 z-10">
-              @if (effectiveStock === 0 && (!hasVariants || selectedVariant)) {
-                <span class="px-3 py-1 bg-red-900/80 text-red-300 text-xs font-bold rounded-full">Épuisé</span>
-              } @else if (effectiveStock <= 3 && effectiveStock > 0 && (!hasVariants || selectedVariant)) {
-                <span class="px-3 py-1 bg-orange-900/80 text-orange-300 text-xs font-bold rounded-full animate-pulse">
-                  Dernières pièces
-                </span>
-              } @else if (!hasVariants || selectedVariant) {
-                <span class="px-3 py-1 bg-gold text-black text-xs font-bold rounded-full">En stock</span>
-              }
-              @if (selectedVariant) {
-                <span class="ml-2 px-2.5 py-1 text-xs font-bold rounded-full border border-white/20 text-white"
-                      [style.background-color]="(selectedVariant.colorHex || '#888') + '99'">
-                  {{ selectedVariant.variantName }}
-                </span>
-              }
-            </div>
-
-            <!-- Counter -->
-            <div class="absolute bottom-4 right-4 z-10 px-2.5 py-1 bg-black/60 backdrop-blur-sm
-                        rounded-lg text-white text-xs font-semibold">
-              {{ activeIndex + 1 }} / {{ galleryItems.length }}
-            </div>
-
-            <!-- Image -->
-            @if (activeItem.type === 'IMAGE') {
-              <div class="w-full h-full overflow-hidden">
-                <img [src]="activeItem.url | mediaUrl: 1400"
-                     [alt]="product.name"
-                     class="gallery-img w-full h-full object-cover transition-all duration-500"
-                     [class.zoomed]="zoomed"
-                     (click)="toggleZoom()"
-                     (error)="$any($event.target).src='https://placehold.co/800x800/1a1a1a/d4af37?text=No+image'"/>
-              </div>
-            }
-
-            <!-- Video -->
-            @if (activeItem.type === 'VIDEO') {
-              <div class="w-full h-full flex items-center justify-center bg-black">
-                <video [src]="activeItem.url | mediaUrl"
-                       controls
-                       playsinline
-                       preload="metadata"
-                       class="w-full h-full object-contain max-h-full"
-                       style="max-height: 100%;">
-                  Votre navigateur ne supporte pas la lecture vidéo.
-                </video>
-              </div>
-            }
-          </div>
-
-          <!-- Dots (mobile uniquement, galerie multi-image) -->
-          @if (galleryItems.length > 1) {
-            <div class="flex justify-center gap-1.5 mb-3 sm:hidden">
-              @for (item of galleryItems; track item.url; let i = $index) {
-                <button (click)="setActive(i)"
-                  class="flex items-center justify-center p-2 -m-2 transition-all duration-200"
-                  [attr.aria-label]="'Image ' + (i + 1)">
-                  <span class="rounded-full block"
-                        [class]="activeIndex === i ? 'w-5 h-2 bg-gold' : 'w-2 h-2 bg-black/20'"></span>
-                </button>
-              }
-            </div>
+          </button>
           }
 
-          <!-- Thumbnails (mobile scrollable strip & desktop grid) -->
-          @if (galleryItems.length > 1) {
-            <div class="flex sm:grid sm:grid-cols-4 gap-2.5 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
-              @for (item of galleryItems; track item.url; let i = $index) {
-                <button (click)="setActive(i)"
-                  [id]="'gallery-thumb-' + i"
-                  class="thumb-btn flex-shrink-0 w-16 h-16 sm:w-auto sm:aspect-square relative rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105"
-                  [style.border-color]="activeIndex === i ? '#d4af37' : 'transparent'">
-
-                  <!-- Image thumbnail -->
-                  @if (item.type === 'IMAGE') {
-                    <img [src]="item.url | mediaUrl: 300" [alt]="'Photo ' + (i+1)"
-                         loading="lazy"
-                         class="w-full h-full object-cover"
-                         (error)="$any($event.target).src='https://placehold.co/200x200/1a1a1a/d4af37?text=?'"/>
-                  }
-
-                  <!-- Video thumbnail : icône play sur fond sombre -->
-                  @if (item.type === 'VIDEO') {
-                    <div class="w-full h-full flex items-center justify-center bg-zinc-900">
-                      <div class="flex flex-col items-center gap-1">
-                        <svg class="w-8 h-8 text-gold" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z"/>
-                        </svg>
-                        <span class="text-[9px] text-zinc-400 font-semibold uppercase tracking-wider">Vidéo</span>
-                      </div>
-                    </div>
-                  }
-
-                  <!-- Active ring -->
-                  @if (activeIndex === i) {
-                    <div class="absolute inset-0 ring-2 ring-gold rounded-2xl pointer-events-none"></div>
-                  }
-                </button>
+          <!-- Stock badge -->
+          <div class="absolute top-4 left-4 z-10">
+            @if (effectiveStock === 0 && (!hasVariants || selectedVariant)) {
+            <span class="px-3 py-1 bg-red-900/80 text-red-300 text-xs font-bold rounded-full">Épuisé</span>
+            } @else if (effectiveStock <= 3 && effectiveStock> 0 && (!hasVariants || selectedVariant)) {
+              <span class="px-3 py-1 bg-orange-900/80 text-orange-300 text-xs font-bold rounded-full animate-pulse">
+                Dernières pièces
+              </span>
+              } @else if (!hasVariants || selectedVariant) {
+              <span class="px-3 py-1 bg-gold text-black text-xs font-bold rounded-full">En stock</span>
               }
-            </div>
+              @if (selectedVariant) {
+              <span class="ml-2 px-2.5 py-1 text-xs font-bold rounded-full border border-white/20 text-white"
+                [style.background-color]="(selectedVariant.colorHex || '#888') + '99'">
+                {{ selectedVariant.variantName }}
+              </span>
+              }
+          </div>
+
+          <!-- Counter -->
+          <div class="absolute bottom-4 right-4 z-10 px-2.5 py-1 bg-black/60 backdrop-blur-sm
+                        rounded-lg text-white text-xs font-semibold">
+            {{ activeIndex + 1 }} / {{ galleryItems.length }}
+          </div>
+
+          <!-- Image -->
+          @if (activeItem.type === 'IMAGE') {
+
+          <div class="w-full h-full overflow-hidden relative bg-[#09080d] flex items-center justify-center">
+            <!-- Arrière-plan flou d'ambiance pour harmoniser le carré sans couper le produit -->
+            <img [src]="activeItem.url | mediaUrl: 300" alt="" aria-hidden="true"
+              class="absolute inset-0 w-full h-full object-cover blur-2xl scale-125 opacity-30 pointer-events-none select-none" />
+
+            <!-- Image nette centrale intégrale -->
+
+            <img [src]="activeItem.url | mediaUrl: 1400" [alt]="product.name"
+              class="gallery-img relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-2 transition-all duration-500"
+              [class.zoomed]="zoomed" (click)="toggleZoom()"
+              (error)="$any($event.target).src='/product-placeholder.svg'" />
+          </div>
+          }
+
+          <!-- Video -->
+          @if (activeItem.type === 'VIDEO') {
+          <div class="w-full h-full flex items-center justify-center bg-black">
+            <video [src]="activeItem.url | mediaUrl" controls playsinline preload="metadata"
+              class="w-full h-full object-contain max-h-full" style="max-height: 100%;">
+              Votre navigateur ne supporte pas la lecture vidéo.
+            </video>
+          </div>
           }
         </div>
 
-        <!-- ════ RIGHT: Product Info ════ -->
-        <div class="product-info-col scroll-reveal from-right">
-
-          <!-- Title -->
-          <div class="sec-title">
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black theme-text leading-tight mb-3">{{ product.name }}</h1>
-            <!-- Gold divider -->
-            <div class="h-0.5 w-16 bg-gold rounded-full"></div>
-          </div>
-          <div class="sec-price">
-            <p class="text-xs theme-muted uppercase tracking-wider">Prix</p>
-            @if (hasDiscount) {
-              <div class="flex items-baseline gap-2 flex-wrap mt-1">
-                <p class="text-3xl sm:text-4xl font-black leading-none" style="color: #f97316">{{ formattedPrice }}</p>
-                <span class="text-xl theme-muted line-through leading-none">{{ formattedOriginalPrice }}</span>
-                <span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-sm font-black">-{{ product!.discountPercent }}%</span>
-                <span class="text-sm theme-muted">FCFA</span>
-              </div>
-            } @else {
-              <div class="flex items-baseline gap-2 mt-1">
-                <p class="text-3xl sm:text-4xl font-black gold-text leading-none">{{ formattedPrice }}</p>
-                <span class="text-sm theme-muted">FCFA</span>
-              </div>
-            }
-          </div>
-
-          <!-- Description -->
-          <div class="sec-desc">
-            <h3 class="text-xs font-bold theme-muted uppercase tracking-widest mb-3">Description</h3>
-            <p class="theme-text leading-relaxed text-[15px]">{{ product.description }}</p>
-          </div>
-
-          <!-- Variant selector -->
-          <div class="sec-variants">
-          @if (hasVariants) {
-            <div class="rounded-2xl luxury-card p-4 sm:p-5 border theme-border space-y-5">
-
-              <!-- Cas 1 : Mode Attributs Intelligents (Couleur, Pointure, Taille, etc.) -->
-              @if (isCascadeMode) {
-                @for (attr of cascadeAttributes; track attr.id) {
-                  @let isColor = isColorAttribute(attr);
-                  @let selectedVal = getSelectedAttrValue(attr);
-                  @let values = attr.values;
-
-                  <div class="space-y-2.5">
-                    <!-- En-tête : Nom attribut & Valeur sélectionnée -->
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-1.5">
-                        <span class="text-xs font-bold theme-muted uppercase tracking-wider">{{ attr.name }} :</span>
-                        <span class="text-xs font-black text-gold">
-                          {{ selectedVal?.value || 'Sélectionner' }}
-                        </span>
-                      </div>
-                      @if (isColor && selectedVal?.colorHex) {
-                        <span class="w-3.5 h-3.5 rounded-full border border-white/30 shadow-sm" [style.background-color]="selectedVal?.colorHex"></span>
-                      }
-                    </div>
-
-                    <!-- Sélecteur visuel pour Couleur (Swatches) -->
-                    @if (isColor) {
-                      <div class="flex flex-wrap items-center gap-2.5">
-                        @for (val of values; track val.id) {
-                          @let isSelected = cascadeSelections[attr.id] === val.id;
-                          @let isOutOfStock = isAttrValueOutOfStock(attr, val.id);
-                          @let isUnavailable = isAttrValueUnavailable(attr, val.id);
-
-                          <button
-                            type="button"
-                            (click)="selectCascadeAttribute(attr, isSelected ? null : val.id)"
-                            [disabled]="isUnavailable"
-                            [title]="val.value + (isOutOfStock ? ' (Épuisé pour cette sélection)' : (isUnavailable ? ' (Non proposé)' : ''))"
-                            class="group relative flex items-center gap-2 p-1.5 pr-3 rounded-full border transition-all duration-200"
-                            [class.border-gold]="isSelected"
-                            [class.bg-gold/15]="isSelected"
-                            [class.ring-2]="isSelected"
-                            [class.ring-gold/60]="isSelected"
-                            [class.shadow-md]="isSelected"
-                            [class.border-white/15]="!isSelected && !isOutOfStock && !isUnavailable"
-                            [class.bg-white/[.03]]="!isSelected && !isOutOfStock && !isUnavailable"
-                            [class.hover:border-gold/50]="!isSelected && !isOutOfStock && !isUnavailable"
-                            [class.opacity-40]="isOutOfStock || isUnavailable"
-                            [class.border-dashed]="isOutOfStock || isUnavailable"
-                            [class.border-red-500/30]="isOutOfStock"
-                            [class.border-white/10]="isUnavailable"
-                            [class.cursor-not-allowed]="isUnavailable">
-
-                            <!-- Vignette photo ou pastille couleur -->
-                            @if (val.imageUrl) {
-                              <img [src]="val.imageUrl | mediaUrl" [alt]="val.value"
-                                class="w-7 h-7 rounded-full object-cover border border-white/20 shadow-sm flex-shrink-0"/>
-                            } @else if (val.colorHex) {
-                              <span class="w-7 h-7 rounded-full border border-black/30 shadow-inner flex-shrink-0"
-                                [style.background-color]="val.colorHex"></span>
-                            } @else {
-                              <span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-zinc-300 flex-shrink-0">
-                                {{ val.value.slice(0, 2).toUpperCase() }}
-                              </span>
-                            }
-
-                            <!-- Libellé couleur -->
-                            <span class="text-xs font-bold transition-colors"
-                              [class.text-gold]="isSelected"
-                              [class.theme-text]="!isSelected && !isOutOfStock && !isUnavailable"
-                              [class.text-zinc-500]="isOutOfStock || isUnavailable">
-                              {{ val.value }}
-                            </span>
-
-                            <!-- Indicateur épuisé -->
-                            @if (isOutOfStock) {
-                              <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-red-500/20 text-red-400 border border-red-500/30">
-                                Épuisé
-                              </span>
-                            }
-                          </button>
-                        }
-                      </div>
-                    }
-
-                    <!-- Sélecteur Pills pour Pointures / Tailles / Dimensions -->
-                    @else {
-                      <div class="flex flex-wrap gap-2">
-                        @for (val of values; track val.id) {
-                          @let isSelected = cascadeSelections[attr.id] === val.id;
-                          @let isOutOfStock = isAttrValueOutOfStock(attr, val.id);
-                          @let isUnavailable = isAttrValueUnavailable(attr, val.id);
-
-                          <button
-                            type="button"
-                            (click)="selectCascadeAttribute(attr, isSelected ? null : val.id)"
-                            [disabled]="isUnavailable"
-                            [title]="val.value + (isOutOfStock ? ' (Épuisé pour cette sélection)' : (isUnavailable ? ' (Non proposé)' : ''))"
-                            class="relative min-w-[50px] h-10 px-3.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all duration-200"
-                            [class.border-gold]="isSelected"
-                            [class.bg-gold]="isSelected"
-                            [class.text-black]="isSelected"
-                            [class.shadow-md]="isSelected"
-                            [class.shadow-yellow-600/20]="isSelected"
-                            [class.border-white/15]="!isSelected && !isOutOfStock && !isUnavailable"
-                            [class.bg-white/[.04]]="!isSelected && !isOutOfStock && !isUnavailable"
-                            [class.theme-text]="!isSelected && !isOutOfStock && !isUnavailable"
-                            [class.hover:border-gold/60]="!isSelected && !isOutOfStock && !isUnavailable"
-                            [class.hover:bg-gold/10]="!isSelected && !isOutOfStock && !isUnavailable"
-                            [class.opacity-40]="isOutOfStock || isUnavailable"
-                            [class.border-dashed]="isOutOfStock || isUnavailable"
-                            [class.border-white/10]="isUnavailable"
-                            [class.border-red-500/30]="isOutOfStock"
-                            [class.cursor-not-allowed]="isUnavailable"
-                            [class.line-through]="isOutOfStock">
-                            <span>{{ val.value }}</span>
-                            @if (isOutOfStock) {
-                              <span class="text-[9px] uppercase font-black text-red-400 no-underline">Épuisé</span>
-                            }
-                          </button>
-                        }
-                      </div>
-                    }
-                  </div>
-                }
-
-                <!-- Résumé déclinaison active & badge stock OU invite de sélection -->
-                @if (selectedVariant) {
-                  <div class="pt-3 border-t theme-border flex items-center justify-between flex-wrap gap-2 text-xs">
-                    <div class="flex items-center gap-2">
-                      <span class="theme-muted font-medium">Sélection :</span>
-                      <span class="font-bold text-gold">{{ selectedVariant.variantName }}</span>
-                      @if (selectedVariant.price && selectedVariant.price !== product.price) {
-                        <span class="px-2 py-0.5 rounded-md bg-gold/10 text-gold font-bold text-[11px]">
-                          {{ selectedVariant.price | number:'1.0-0' }} FCFA
-                        </span>
-                      }
-                    </div>
-
-                    <!-- Badge de stock pour la déclinaison -->
-                    @if (selectedVariant.stock === 0) {
-                      <span class="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-400 font-bold border border-red-500/25 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                        Rupture de stock
-                      </span>
-                    } @else if (selectedVariant.stock <= 3) {
-                      <span class="px-2.5 py-1 rounded-lg bg-orange-500/15 text-orange-400 font-bold border border-orange-500/25 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
-                        Plus que {{ selectedVariant.stock }} restants !
-                      </span>
-                    } @else {
-                      <span class="px-2.5 py-1 rounded-lg bg-green-500/15 text-green-400 font-bold border border-green-500/25 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                        En stock ({{ selectedVariant.stock }} disponibles)
-                      </span>
-                    }
-                  </div>
-                } @else if (hasVariants) {
-                  <div class="pt-3 border-t theme-border flex items-center justify-between flex-wrap gap-2 text-xs">
-                    <div class="flex items-center gap-2 text-gold">
-                      <svg class="w-4 h-4 text-gold shrink-0 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                      </svg>
-                      <span class="font-bold">{{ missingAttributePrompt }}</span>
-                    </div>
-                    @if (effectiveStock > 0) {
-                      <span class="px-2 py-0.5 rounded text-[11px] font-semibold theme-muted bg-white/[.04]">
-                        {{ effectiveStock }} en stock au total
-                      </span>
-                    }
-                  </div>
-                }
-              }
-
-              <!-- Cas 2 : Variantes directes sans attributs configurés (produit simple) -->
-              @else {
-                <div class="space-y-3">
-                  <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">
-                      Variantes disponibles
-                    </h3>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-gold/15 text-gold border border-gold/20">
-                      {{ product.variants?.length }}
-                    </span>
-                  </div>
-
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                    @for (variant of product.variants; track variant.id) {
-                      @let isSelected = selectedVariant?.id === variant.id;
-                      @let isOutOfStock = variant.stock === 0;
-
-                      <button
-                        type="button"
-                        (click)="selectVariant(variant)"
-                        class="p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center gap-2.5"
-                        [class.border-gold]="isSelected"
-                        [class.bg-gold/15]="isSelected"
-                        [class.ring-2]="isSelected"
-                        [class.ring-gold/50]="isSelected"
-                        [class.border-white/10]="!isSelected && !isOutOfStock"
-                        [class.opacity-40]="isOutOfStock"
-                        [class.cursor-not-allowed]="isOutOfStock">
-
-                        @if (variant.imageUrl) {
-                          <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.variantName"
-                            class="w-8 h-8 rounded-lg object-cover border border-white/15 flex-shrink-0"/>
-                        } @else if (variant.colorHex) {
-                          <span class="w-8 h-8 rounded-lg border border-black/30 flex-shrink-0" [style.background-color]="variant.colorHex"></span>
-                        }
-
-                        <div class="min-w-0 flex-1">
-                          <p class="text-xs font-bold truncate" [class.text-gold]="isSelected" [class.theme-text]="!isSelected">
-                            {{ variant.variantName }}
-                          </p>
-                          <p class="text-[10px] theme-muted">
-                            {{ isOutOfStock ? 'Épuisé' : (variant.stock + ' en stock') }}
-                          </p>
-                        </div>
-                      </button>
-                    }
-                  </div>
-                </div>
-              }
-
-            </div>
+        <!-- Dots (mobile uniquement, galerie multi-image) -->
+        @if (galleryItems.length > 1) {
+        <div class="flex justify-center gap-1.5 mb-3 sm:hidden">
+          @for (item of galleryItems; track item.url; let i = $index) {
+          <button (click)="setActive(i)" class="flex items-center justify-center p-2 -m-2 transition-all duration-200"
+            [attr.aria-label]="'Image ' + (i + 1)">
+            <span class="rounded-full block"
+              [class]="activeIndex === i ? 'w-5 h-2 bg-gold' : 'w-2 h-2 bg-black/20'"></span>
+          </button>
           }
-          </div>
+        </div>
+        }
 
-          <!-- CTA zone — adapté au rôle -->
-          <div class="sec-cta">
+        <!-- Thumbnails (mobile scrollable strip & desktop grid) -->
+        @if (galleryItems.length > 1) {
+        <div class="flex sm:grid sm:grid-cols-4 gap-2.5 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
+          @for (item of galleryItems; track item.url; let i = $index) {
+          <button (click)="setActive(i)" [id]="'gallery-thumb-' + i"
+            class="thumb-btn flex-shrink-0 w-16 h-16 sm:w-auto sm:aspect-square relative rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105"
+            [style.border-color]="activeIndex === i ? '#d4af37' : 'transparent'">
+
+            <!-- Image thumbnail -->
+            @if (item.type === 'IMAGE') {
+            <img [src]="item.url | mediaUrl: 300" [alt]="'Photo ' + (i+1)" loading="lazy"
+              class="w-full h-full object-cover" (error)="$any($event.target).src='/product-placeholder.svg'" />
+            }
+
+            <!-- Video thumbnail : icône play sur fond sombre -->
+            @if (item.type === 'VIDEO') {
+            <div class="w-full h-full flex items-center justify-center bg-zinc-900">
+              <div class="flex flex-col items-center gap-1">
+                <svg class="w-8 h-8 text-gold" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span class="text-[9px] text-zinc-400 font-semibold uppercase tracking-wider">Vidéo</span>
+              </div>
+            </div>
+            }
+
+            <!-- Active ring -->
+            @if (activeIndex === i) {
+            <div class="absolute inset-0 ring-2 ring-gold rounded-2xl pointer-events-none"></div>
+            }
+          </button>
+          }
+        </div>
+        }
+      </div>
+
+      <!-- ════ RIGHT: Product Info ════ -->
+      <div class="product-info-col scroll-reveal from-right">
+
+        <!-- Title -->
+        <div class="sec-title">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black theme-text leading-tight mb-3">{{ product.name }}</h1>
+          <!-- Gold divider -->
+          <div class="h-0.5 w-16 bg-gold rounded-full"></div>
+        </div>
+        <div class="sec-price">
+          <p class="text-xs theme-muted uppercase tracking-wider">Prix</p>
+          @if (hasDiscount) {
+          <div class="flex items-baseline gap-2 flex-wrap mt-1">
+            <p class="text-3xl sm:text-4xl font-black leading-none" style="color: #f97316">{{ formattedPrice }}</p>
+            <span class="text-xl theme-muted line-through leading-none">{{ formattedOriginalPrice }}</span>
+            <span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-sm font-black">-{{
+              product!.discountPercent }}%</span>
+            <span class="text-sm theme-muted">FCFA</span>
+          </div>
+          } @else {
+          <div class="flex items-baseline gap-2 mt-1">
+            <p class="text-3xl sm:text-4xl font-black gold-text leading-none">{{ formattedPrice }}</p>
+            <span class="text-sm theme-muted">FCFA</span>
+          </div>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="sec-desc">
+          <h3 class="text-xs font-bold theme-muted uppercase tracking-widest mb-3">Description</h3>
+          <p class="theme-text leading-relaxed text-[15px]">{{ product.description }}</p>
+        </div>
+
+        <!-- Variant selector -->
+        <div class="sec-variants">
+          @if (hasVariants) {
+          <div class="rounded-2xl luxury-card p-4 sm:p-5 border theme-border space-y-5">
+
+            <!-- Cas 1 : Mode Attributs Intelligents (Couleur, Pointure, Taille, etc.) -->
+            @if (isCascadeMode) {
+            @for (attr of cascadeAttributes; track attr.id) {
+            @let isColor = isColorAttribute(attr);
+            @let selectedVal = getSelectedAttrValue(attr);
+            @let values = attr.values;
+
+            <div class="space-y-2.5">
+              <!-- En-tête : Nom attribut & Valeur sélectionnée -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-bold theme-muted uppercase tracking-wider">{{ attr.name }} :</span>
+                  <span class="text-xs font-black text-gold">
+                    {{ selectedVal?.value || 'Sélectionner' }}
+                  </span>
+                </div>
+                @if (isColor && selectedVal?.colorHex) {
+                <span class="w-3.5 h-3.5 rounded-full border border-white/30 shadow-sm"
+                  [style.background-color]="selectedVal?.colorHex"></span>
+                }
+              </div>
+
+              <!-- Sélecteur visuel pour Couleur (Swatches) -->
+              @if (isColor) {
+              <div class="flex flex-wrap items-center gap-2.5">
+                @for (val of values; track val.id) {
+                @let isSelected = cascadeSelections[attr.id] === val.id;
+                @let isOutOfStock = isAttrValueOutOfStock(attr, val.id);
+                @let isUnavailable = isAttrValueUnavailable(attr, val.id);
+
+                <button type="button" (click)="selectCascadeAttribute(attr, isSelected ? null : val.id)"
+                  [disabled]="isUnavailable"
+                  [title]="val.value + (isOutOfStock ? ' (Épuisé pour cette sélection)' : (isUnavailable ? ' (Non proposé)' : ''))"
+                  class="group relative flex items-center gap-2 p-1.5 pr-3 rounded-full border transition-all duration-200"
+                  [class.border-gold]="isSelected" [class.bg-gold/15]="isSelected" [class.ring-2]="isSelected"
+                  [class.ring-gold/60]="isSelected" [class.shadow-md]="isSelected"
+                  [class.border-white/15]="!isSelected && !isOutOfStock && !isUnavailable"
+                  [class.bg-white/[.03]]="!isSelected && !isOutOfStock && !isUnavailable"
+                  [class.hover:border-gold/50]="!isSelected && !isOutOfStock && !isUnavailable"
+                  [class.opacity-40]="isOutOfStock || isUnavailable"
+                  [class.border-dashed]="isOutOfStock || isUnavailable" [class.border-red-500/30]="isOutOfStock"
+                  [class.border-white/10]="isUnavailable" [class.cursor-not-allowed]="isUnavailable">
+
+                  <!-- Vignette photo ou pastille couleur -->
+                  @if (val.imageUrl) {
+                  <img [src]="val.imageUrl | mediaUrl" [alt]="val.value"
+                    class="w-7 h-7 rounded-full object-cover border border-white/20 shadow-sm flex-shrink-0" />
+                  } @else if (val.colorHex) {
+                  <span class="w-7 h-7 rounded-full border border-black/30 shadow-inner flex-shrink-0"
+                    [style.background-color]="val.colorHex"></span>
+                  } @else {
+                  <span
+                    class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-zinc-300 flex-shrink-0">
+                    {{ val.value.slice(0, 2).toUpperCase() }}
+                  </span>
+                  }
+
+                  <!-- Libellé couleur -->
+                  <span class="text-xs font-bold transition-colors" [class.text-gold]="isSelected"
+                    [class.theme-text]="!isSelected && !isOutOfStock && !isUnavailable"
+                    [class.text-zinc-500]="isOutOfStock || isUnavailable">
+                    {{ val.value }}
+                  </span>
+
+                  <!-- Indicateur épuisé -->
+                  @if (isOutOfStock) {
+                  <span
+                    class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-red-500/20 text-red-400 border border-red-500/30">
+                    Épuisé
+                  </span>
+                  }
+                </button>
+                }
+              </div>
+              }
+
+              <!-- Sélecteur Pills pour Pointures / Tailles / Dimensions -->
+              @else {
+              <div class="flex flex-wrap gap-2">
+                @for (val of values; track val.id) {
+                @let isSelected = cascadeSelections[attr.id] === val.id;
+                @let isOutOfStock = isAttrValueOutOfStock(attr, val.id);
+                @let isUnavailable = isAttrValueUnavailable(attr, val.id);
+
+                <button type="button" (click)="selectCascadeAttribute(attr, isSelected ? null : val.id)"
+                  [disabled]="isUnavailable"
+                  [title]="val.value + (isOutOfStock ? ' (Épuisé pour cette sélection)' : (isUnavailable ? ' (Non proposé)' : ''))"
+                  class="relative min-w-[50px] h-10 px-3.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all duration-200"
+                  [class.border-gold]="isSelected" [class.bg-gold]="isSelected" [class.text-black]="isSelected"
+                  [class.shadow-md]="isSelected" [class.shadow-yellow-600/20]="isSelected"
+                  [class.border-white/15]="!isSelected && !isOutOfStock && !isUnavailable"
+                  [class.bg-white/[.04]]="!isSelected && !isOutOfStock && !isUnavailable"
+                  [class.theme-text]="!isSelected && !isOutOfStock && !isUnavailable"
+                  [class.hover:border-gold/60]="!isSelected && !isOutOfStock && !isUnavailable"
+                  [class.hover:bg-gold/10]="!isSelected && !isOutOfStock && !isUnavailable"
+                  [class.opacity-40]="isOutOfStock || isUnavailable"
+                  [class.border-dashed]="isOutOfStock || isUnavailable" [class.border-white/10]="isUnavailable"
+                  [class.border-red-500/30]="isOutOfStock" [class.cursor-not-allowed]="isUnavailable"
+                  [class.line-through]="isOutOfStock">
+                  <span>{{ val.value }}</span>
+                  @if (isOutOfStock) {
+                  <span class="text-[9px] uppercase font-black text-red-400 no-underline">Épuisé</span>
+                  }
+                </button>
+                }
+              </div>
+              }
+            </div>
+            }
+
+            <!-- Résumé déclinaison active & badge stock OU invite de sélection -->
+            @if (selectedVariant) {
+            <div class="pt-3 border-t theme-border flex items-center justify-between flex-wrap gap-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="theme-muted font-medium">Sélection :</span>
+                <span class="font-bold text-gold">{{ selectedVariant.variantName }}</span>
+                @if (selectedVariant.price && selectedVariant.price !== product.price) {
+                <span class="px-2 py-0.5 rounded-md bg-gold/10 text-gold font-bold text-[11px]">
+                  {{ selectedVariant.price | number:'1.0-0' }} FCFA
+                </span>
+                }
+              </div>
+
+              <!-- Badge de stock pour la déclinaison -->
+              @if (selectedVariant.stock === 0) {
+              <span
+                class="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-400 font-bold border border-red-500/25 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                Rupture de stock
+              </span>
+              } @else if (selectedVariant.stock <= 3) { <span
+                class="px-2.5 py-1 rounded-lg bg-orange-500/15 text-orange-400 font-bold border border-orange-500/25 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                Plus que {{ selectedVariant.stock }} restants !
+                </span>
+                } @else {
+                <span
+                  class="px-2.5 py-1 rounded-lg bg-green-500/15 text-green-400 font-bold border border-green-500/25 flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                  En stock ({{ selectedVariant.stock }} disponibles)
+                </span>
+                }
+            </div>
+            } @else if (hasVariants) {
+            <div class="pt-3 border-t theme-border flex items-center justify-between flex-wrap gap-2 text-xs">
+              <div class="flex items-center gap-2 text-gold">
+                <svg class="w-4 h-4 text-gold shrink-0 animate-bounce" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="font-bold">{{ missingAttributePrompt }}</span>
+              </div>
+              @if (effectiveStock > 0) {
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold theme-muted bg-white/[.04]">
+                {{ effectiveStock }} en stock au total
+              </span>
+              }
+            </div>
+            }
+            }
+
+            <!-- Cas 2 : Variantes directes sans attributs configurés (produit simple) -->
+            @else {
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold theme-muted uppercase tracking-widest">
+                  Variantes disponibles
+                </h3>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-gold/15 text-gold border border-gold/20">
+                  {{ product.variants?.length }}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                @for (variant of product.variants; track variant.id) {
+                @let isSelected = selectedVariant?.id === variant.id;
+                @let isOutOfStock = variant.stock === 0;
+
+                <button type="button" (click)="selectVariant(variant)"
+                  class="p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center gap-2.5"
+                  [class.border-gold]="isSelected" [class.bg-gold/15]="isSelected" [class.ring-2]="isSelected"
+                  [class.ring-gold/50]="isSelected" [class.border-white/10]="!isSelected && !isOutOfStock"
+                  [class.opacity-40]="isOutOfStock" [class.cursor-not-allowed]="isOutOfStock">
+
+                  @if (variant.imageUrl) {
+                  <img [src]="variant.imageUrl | mediaUrl" [alt]="variant.variantName"
+                    class="w-8 h-8 rounded-lg object-cover border border-white/15 flex-shrink-0" />
+                  } @else if (variant.colorHex) {
+                  <span class="w-8 h-8 rounded-lg border border-black/30 flex-shrink-0"
+                    [style.background-color]="variant.colorHex"></span>
+                  }
+
+                  <div class="min-w-0 flex-1">
+                    <p class="text-xs font-bold truncate" [class.text-gold]="isSelected"
+                      [class.theme-text]="!isSelected">
+                      {{ variant.variantName }}
+                    </p>
+                    <p class="text-[10px] theme-muted">
+                      {{ isOutOfStock ? 'Épuisé' : (variant.stock + ' en stock') }}
+                    </p>
+                  </div>
+                </button>
+                }
+              </div>
+            </div>
+            }
+
+          </div>
+          }
+        </div>
+
+        <!-- CTA zone — adapté au rôle -->
+        <div class="sec-cta">
           @if (isManager) {
-            <!-- Admin ou Manager : bouton Modifier -->
-            <div class="flex flex-col gap-3">
-              <a [routerLink]="isAdmin ? ['/admin/products'] : ['/manager/products']"
-                 [queryParams]="product ? { edit: product.slug } : null"
-                class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
+          <!-- Admin ou Manager : bouton Modifier -->
+          <div class="flex flex-col gap-3">
+            <a [routerLink]="isAdmin ? ['/admin/products'] : ['/manager/products']"
+              [queryParams]="product ? { edit: product.slug } : null" class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
                        bg-yellow-500/10 border border-yellow-600/30 text-yellow-400
                        hover:bg-yellow-600/20 transition-all duration-200">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-                Modifier ce produit
-              </a>
-              <button (click)="goBack()"
-                class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Modifier ce produit
+            </a>
+            <button (click)="goBack()" class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
                        hover:theme-text luxury-card transition-all duration-200">
-                ← Retour à la collection
-              </button>
-            </div>
+              ← Retour à la collection
+            </button>
+          </div>
           } @else {
-            <!-- Customer -->
-            @if ((!hasVariants && product.stock === 0) || allVariantsOutOfStock) {
-              <div class="p-4 rounded-2xl bg-red-500/8 border border-red-500/20 text-red-400 text-sm font-semibold text-center">
-                @if (allVariantsOutOfStock) {
-                  Tous les coloris sont actuellement épuisés
-                } @else {
-                  Ce produit est actuellement épuisé
-                }
-              </div>
-              <button (click)="goBack()"
-                class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
-                       hover:theme-text luxury-card transition-all duration-200">
-                ← Retour à la collection
-              </button>
+          <!-- Customer -->
+          @if ((!hasVariants && product.stock === 0) || allVariantsOutOfStock) {
+          <div
+            class="p-4 rounded-2xl bg-red-500/8 border border-red-500/20 text-red-400 text-sm font-semibold text-center">
+            @if (allVariantsOutOfStock) {
+            Tous les coloris sont actuellement épuisés
             } @else {
-              <div class="flex flex-col gap-3">
-                @let currentStock = selectedVariant ? selectedVariant.stock : (hasVariants ? effectiveStock : product.stock);
-                @let isCurrentOutOfStock = currentStock === 0;
+            Ce produit est actuellement épuisé
+            }
+          </div>
+          <button (click)="goBack()" class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
+                       hover:theme-text luxury-card transition-all duration-200">
+            ← Retour à la collection
+          </button>
+          } @else {
+          <div class="flex flex-col gap-3">
+            @let currentStock = selectedVariant ? selectedVariant.stock : (hasVariants ? effectiveStock :
+            product.stock);
+            @let isCurrentOutOfStock = currentStock === 0;
 
-                <!-- Qty selector & Subtotal -->
-                <div class="flex items-center justify-between p-4 rounded-2xl luxury-card border theme-border">
-                  <div class="flex items-center gap-4">
-                    <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
-                    <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
-                      <button type="button" (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1 || isCurrentOutOfStock"
-                        class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
+            <!-- Qty selector & Subtotal -->
+            <div class="flex items-center justify-between p-4 rounded-2xl luxury-card border theme-border">
+              <div class="flex items-center gap-4">
+                <span class="text-xs font-bold theme-muted uppercase tracking-wider">Quantité</span>
+                <div class="flex items-center rounded-xl border theme-border overflow-hidden luxury-card">
+                  <button type="button" (click)="setQuantity(quantity - 1)"
+                    [disabled]="quantity <= 1 || isCurrentOutOfStock" class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
                                hover:text-gold hover:bg-black/5 transition-colors disabled:opacity-30">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                        </svg>
-                      </button>
-                      <span class="w-12 text-center font-black theme-text text-sm">{{ isCurrentOutOfStock ? 0 : quantity }}</span>
-                      <button type="button" (click)="setQuantity(quantity + 1)" [disabled]="quantity >= currentStock || isCurrentOutOfStock"
-                        class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                    </svg>
+                  </button>
+                  <span class="w-12 text-center font-black theme-text text-sm">{{ isCurrentOutOfStock ? 0 : quantity
+                    }}</span>
+                  <button type="button" (click)="setQuantity(quantity + 1)"
+                    [disabled]="quantity >= currentStock || isCurrentOutOfStock" class="qty-btn w-10 h-10 flex items-center justify-center theme-muted
                                hover:text-gold hover:bg-black/5 transition-colors disabled:opacity-30">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="text-right">
-                    <span class="text-xs theme-muted block">Total</span>
-                    <span class="text-base font-black gold-text">{{ formattedTotalPrice }} FCFA</span>
-                  </div>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
                 </div>
+              </div>
 
-                @if (selectedVariant && isCurrentOutOfStock) {
-                  <div class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold text-center">
-                    La variante « {{ selectedVariant.variantName }} » est actuellement en rupture de stock.
-                  </div>
-                }
+              <div class="text-right">
+                <span class="text-xs theme-muted block">Total</span>
+                <span class="text-base font-black gold-text">{{ formattedTotalPrice }} FCFA</span>
+              </div>
+            </div>
 
-                <!-- CTA -->
-                <button (click)="addToCart()"
-                  [disabled]="(hasVariants && !selectedVariant) || isCurrentOutOfStock"
-                  class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
-                         transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                  [class]="addedToCart
+            @if (selectedVariant && isCurrentOutOfStock) {
+            <div
+              class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold text-center">
+              La variante « {{ selectedVariant.variantName }} » est actuellement en rupture de stock.
+            </div>
+            }
+
+            <!-- CTA -->
+            <button (click)="addToCart()" [disabled]="(hasVariants && !selectedVariant) || isCurrentOutOfStock" class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm
+                         transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed" [class]="addedToCart
                     ? 'bg-green-500 text-white scale-[0.98]'
                     : (((hasVariants && !selectedVariant) || isCurrentOutOfStock)
                         ? 'bg-gold/30 text-black/60'
                         : 'bg-gold text-black hover:shadow-xl hover:shadow-yellow-600/25 hover:-translate-y-0.5')">
-                  @if (addedToCart) {
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    Ajouté au panier !
-                  } @else if (isCurrentOutOfStock) {
-                    Variante épuisée
-                  } @else if (hasVariants && !selectedVariant) {
-                    {{ missingAttributePrompt || 'Sélectionnez vos options' }}
-                  } @else {
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                    </svg>
-                    Ajouter au panier · {{ formattedTotalPrice }} FCFA
-                  }
-                </button>
+              @if (addedToCart) {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+              Ajouté au panier !
+              } @else if (isCurrentOutOfStock) {
+              Variante épuisée
+              } @else if (hasVariants && !selectedVariant) {
+              {{ missingAttributePrompt || 'Sélectionnez vos options' }}
+              } @else {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              Ajouter au panier · {{ formattedTotalPrice }} FCFA
+              }
+            </button>
 
-                <button (click)="goBack()"
-                  class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
+            <button (click)="goBack()" class="w-full py-3 rounded-2xl border theme-border theme-muted font-semibold text-sm
                          hover:theme-text luxury-card transition-all duration-200">
-                  ← Retour à la collection
-                </button>
-              </div>
-            }
-          }
+              ← Retour à la collection
+            </button>
           </div>
+          }
+          }
+        </div>
 
-          <!-- WhatsApp -->
-          <a [href]="whatsappUrl" target="_blank"
-             class="sec-wa flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm
+        <!-- WhatsApp -->
+        <a [href]="whatsappUrl" target="_blank" class="sec-wa flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm
                     border border-green-500/40 text-green-600 hover:bg-green-50
                     dark:hover:bg-green-900/20 transition-all duration-200 lg:mt-3">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-            </svg>
-            Discuter sur WhatsApp
-          </a>
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+          </svg>
+          Discuter sur WhatsApp
+        </a>
 
-          <!-- Share -->
-          <div class="sec-share">
-            <button (click)="shareProduct()"
-              class="w-full flex flex-col items-center justify-center gap-1 py-3.5 rounded-2xl font-semibold text-sm
+        <!-- Share -->
+        <div class="sec-share">
+          <button (click)="shareProduct()" class="w-full flex flex-col items-center justify-center gap-1 py-3.5 rounded-2xl font-semibold text-sm
                      border border-dashed border-gold/25 text-gold hover:bg-gold/[0.03] hover:border-gold/40
                      transition-all duration-200 group">
-              <span class="flex items-center gap-2">
-                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-                </svg>
-                Offrir ce produit à quelqu'un
-              </span>
-              <span class="text-[11px] theme-muted font-normal group-hover:text-gold/60 transition-colors">
-                WhatsApp, SMS, Messenger, copier le lien…
-              </span>
-            </button>
-          </div>
-
-          <!-- Trust badges -->
-          <div class="sec-trust grid grid-cols-3 gap-3 pt-2">
-            <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl luxury-card text-center">
-              <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
               </svg>
-              <p class="text-xs theme-muted font-semibold leading-tight">Qualité<br>vérifiée</p>
-            </div>
-            <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl luxury-card text-center">
-              <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-              </svg>
-              <p class="text-xs theme-muted font-semibold leading-tight">Livraison<br>premium 48h</p>
-            </div>
-            <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl luxury-card text-center">
-              <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-              </svg>
-              <p class="text-xs theme-muted font-semibold leading-tight">Retour<br>3 jours</p>
-            </div>
-          </div>
-
+              Offrir ce produit à quelqu'un
+            </span>
+            <span class="text-[11px] theme-muted font-normal group-hover:text-gold/60 transition-colors">
+              WhatsApp, SMS, Messenger, copier le lien…
+            </span>
+          </button>
         </div>
-      </div>
 
-      <!-- ════════════════════════════════════════════
+        <!-- Trust badges -->
+        <div class="sec-trust grid grid-cols-3 gap-3 pt-2">
+          <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl luxury-card text-center">
+            <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <p class="text-xs theme-muted font-semibold leading-tight">Qualité<br>vérifiée</p>
+          </div>
+          <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl luxury-card text-center">
+            <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <p class="text-xs theme-muted font-semibold leading-tight">Livraison<br>premium 48h</p>
+          </div>
+          <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl luxury-card text-center">
+            <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <p class="text-xs theme-muted font-semibold leading-tight">Retour<br>3 jours</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
            SECTION: Galerie complète
       ════════════════════════════════════════════ -->
-      @if (galleryItems.length > 1) {
-        <div class="mt-20 scroll-reveal">
-          <div class="mb-8">
-            <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-2">Galerie</p>
-            <h2 class="text-2xl font-black theme-text">Toutes les photos & vidéos</h2>
+    @if (galleryItems.length > 1) {
+    <div class="mt-20 scroll-reveal">
+      <div class="mb-8">
+        <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-2">Galerie</p>
+        <h2 class="text-2xl font-black theme-text">Toutes les photos & vidéos</h2>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        @for (item of galleryItems; track item.url; let i = $index) {
+        <button
+          (click)="setActive(i); $any($event.target).closest('.scroll-reveal')?.scrollIntoView({behavior:'smooth', block:'start'})"
+          class="group relative aspect-square overflow-hidden rounded-2xl luxury-card transition-all duration-300 hover:scale-[1.03]"
+          [style.box-shadow]="activeIndex === i ? '0 0 0 2px #d4af37' : ''">
+
+          @if (item.type === 'IMAGE') {
+
+          <div class="w-full h-full relative overflow-hidden bg-[#09080d] flex items-center justify-center">
+            <img [src]="item.url | mediaUrl: 300" alt="" aria-hidden="true"
+              class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none" />
+            <img [src]="item.url | mediaUrl: 800" [alt]="product.name + ' - photo ' + (i+1)" loading="lazy"
+              class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain group-hover:scale-105 transition-transform duration-500 p-1"
+              (error)="$any($event.target).src='/product-placeholder.svg'" />
           </div>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            @for (item of galleryItems; track item.url; let i = $index) {
-              <button (click)="setActive(i); $any($event.target).closest('.scroll-reveal')?.scrollIntoView({behavior:'smooth', block:'start'})"
-                class="group relative aspect-square overflow-hidden rounded-2xl luxury-card transition-all duration-300 hover:scale-[1.03]"
-                [style.box-shadow]="activeIndex === i ? '0 0 0 2px #d4af37' : ''">
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 pointer-events-none">
 
-                @if (item.type === 'IMAGE') {
-                  <img [src]="item.url | mediaUrl: 800" [alt]="product.name + ' - photo ' + (i+1)"
-                       loading="lazy"
-                       class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                       (error)="$any($event.target).src='https://placehold.co/400x400/1a1a1a/d4af37?text=?'"/>
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                    <span class="text-white text-xs font-semibold">Photo {{ i + 1 }}</span>
-                  </div>
-                }
-
-                @if (item.type === 'VIDEO') {
-                  <div class="w-full h-full flex flex-col items-center justify-center bg-zinc-900 gap-2">
-                    <svg class="w-10 h-10 text-gold" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
-                    <span class="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">Vidéo</span>
-                  </div>
-                }
-
-                @if (activeIndex === i) {
-                  <div class="absolute top-2 right-2 w-6 h-6 bg-gold rounded-full flex items-center justify-center">
-                    <svg class="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                    </svg>
-                  </div>
-                }
-              </button>
-            }
+            <span class="text-white text-xs font-semibold">Photo {{ i + 1 }}</span>
           </div>
-        </div>
-      }
+          }
 
-      <!-- ════════════════════════════════════════════
+          @if (item.type === 'VIDEO') {
+          <div class="w-full h-full flex flex-col items-center justify-center bg-zinc-900 gap-2">
+            <svg class="w-10 h-10 text-gold" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            <span class="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">Vidéo</span>
+          </div>
+          }
+
+          @if (activeIndex === i) {
+          <div class="absolute top-2 right-2 w-6 h-6 bg-gold rounded-full flex items-center justify-center">
+            <svg class="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          }
+        </button>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- ════════════════════════════════════════════
            SECTION: Avis clients
       ════════════════════════════════════════════ -->
-      <div id="reviews" class="mt-16 scroll-reveal">
+    <div id="reviews" class="mt-16 scroll-reveal">
 
-        <!-- Titre + note globale -->
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+      <!-- Titre + note globale -->
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+        <div>
+          <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-2">Ce que disent nos clients</p>
+          <h2 class="text-2xl font-black theme-text">Avis clients</h2>
+        </div>
+        @if (productRating && productRating.totalReviews > 0) {
+        <div class="flex items-center gap-3 luxury-card rounded-2xl px-4 py-3">
+          <span class="text-3xl font-black gold-text">{{ productRating.averageRating }}</span>
           <div>
-            <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-2">Ce que disent nos clients</p>
-            <h2 class="text-2xl font-black theme-text">Avis clients</h2>
-          </div>
-          @if (productRating && productRating.totalReviews > 0) {
-            <div class="flex items-center gap-3 luxury-card rounded-2xl px-4 py-3">
-              <span class="text-3xl font-black gold-text">{{ productRating.averageRating }}</span>
-              <div>
-                <div class="flex gap-0.5">
-                  @for (s of starsRange; track s) {
-                    <svg class="w-4 h-4" [class.text-yellow-400]="s <= productRating.averageRating" [class.text-zinc-600]="s > productRating.averageRating" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                  }
-                </div>
-                <p class="text-xs theme-muted mt-0.5">{{ productRating.totalReviews }} avis</p>
-              </div>
+            <div class="flex gap-0.5">
+              @for (s of starsRange; track s) {
+              <svg class="w-4 h-4" [class.text-yellow-400]="s <= productRating.averageRating"
+                [class.text-zinc-600]="s > productRating.averageRating" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              }
             </div>
+            <p class="text-xs theme-muted mt-0.5">{{ productRating.totalReviews }} avis</p>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Formulaire : laisser / modifier un avis -->
+      @if (isCustomer && canReview && !myReview && !editingReview) {
+      <div class="luxury-card rounded-2xl p-5 mb-8">
+        <p class="text-sm font-bold theme-text mb-4">Laisser un avis</p>
+
+        <!-- Étoiles cliquables -->
+        <div class="flex gap-1.5 mb-4">
+          @for (s of starsRange; track s) {
+          <button type="button" (click)="setReviewRating(s)" (mouseenter)="reviewHover = s"
+            (mouseleave)="reviewHover = 0" class="transition-transform hover:scale-110">
+            <svg class="w-8 h-8 transition-colors" [class.text-yellow-400]="s <= (reviewHover || reviewRating)"
+              [class.text-zinc-600]="s > (reviewHover || reviewRating)" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </button>
+          }
+          @if (reviewRating > 0) {
+          <span class="ml-2 text-xs text-gold self-center font-semibold">
+            {{ ['', 'Très mauvais', 'Mauvais', 'Correct', 'Bien', 'Excellent'][reviewRating] }}
+          </span>
           }
         </div>
 
-        <!-- Formulaire : laisser / modifier un avis -->
-        @if (isCustomer && canReview && !myReview && !editingReview) {
-          <div class="luxury-card rounded-2xl p-5 mb-8">
-            <p class="text-sm font-bold theme-text mb-4">Laisser un avis</p>
+        <!-- Commentaire -->
+        <textarea [(ngModel)]="reviewComment" rows="3" placeholder="Partagez votre expérience (optionnel)..."
+          class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm resize-none mb-3 transition-all"></textarea>
 
-            <!-- Étoiles cliquables -->
-            <div class="flex gap-1.5 mb-4">
-              @for (s of starsRange; track s) {
-                <button type="button" (click)="setReviewRating(s)"
-                  (mouseenter)="reviewHover = s" (mouseleave)="reviewHover = 0"
-                  class="transition-transform hover:scale-110">
-                  <svg class="w-8 h-8 transition-colors"
-                    [class.text-yellow-400]="s <= (reviewHover || reviewRating)"
-                    [class.text-zinc-600]="s > (reviewHover || reviewRating)"
-                    fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                </button>
-              }
-              @if (reviewRating > 0) {
-                <span class="ml-2 text-xs text-gold self-center font-semibold">
-                  {{ ['', 'Très mauvais', 'Mauvais', 'Correct', 'Bien', 'Excellent'][reviewRating] }}
-                </span>
-              }
-            </div>
+        @if (reviewError) {
+        <p class="text-xs text-red-400 mb-3">{{ reviewError }}</p>
+        }
 
-            <!-- Commentaire -->
-            <textarea [(ngModel)]="reviewComment" rows="3" placeholder="Partagez votre expérience (optionnel)..."
-              class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm resize-none mb-3 transition-all"></textarea>
+        <button (click)="submitReview()" [disabled]="reviewRating === 0 || reviewSubmitting"
+          class="px-5 py-2.5 bg-gold text-black text-sm font-bold rounded-xl hover:bg-yellow-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+          @if (reviewSubmitting) { Publication... } @else { Publier l'avis }
+        </button>
+      </div>
+      }
 
-            @if (reviewError) {
-              <p class="text-xs text-red-400 mb-3">{{ reviewError }}</p>
+      <!-- Modifier mon avis -->
+      @if (editingReview && myReview) {
+      <div class="luxury-card rounded-2xl p-5 mb-8 border border-gold/20">
+        <p class="text-sm font-bold theme-text mb-4">Modifier mon avis</p>
+        <div class="flex gap-1.5 mb-4">
+          @for (s of starsRange; track s) {
+          <button type="button" (click)="setReviewRating(s)" (mouseenter)="reviewHover = s"
+            (mouseleave)="reviewHover = 0" class="transition-transform hover:scale-110">
+            <svg class="w-8 h-8 transition-colors" [class.text-yellow-400]="s <= (reviewHover || reviewRating)"
+              [class.text-zinc-600]="s > (reviewHover || reviewRating)" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </button>
+          }
+        </div>
+        <textarea [(ngModel)]="reviewComment" rows="3" placeholder="Votre commentaire..."
+          class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm resize-none mb-3 transition-all"></textarea>
+        @if (reviewError) { <p class="text-xs text-red-400 mb-3">{{ reviewError }}</p> }
+        <div class="flex gap-2">
+          <button (click)="submitReview()" [disabled]="reviewRating === 0 || reviewSubmitting"
+            class="px-5 py-2.5 bg-gold text-black text-sm font-bold rounded-xl hover:bg-yellow-400 transition-colors disabled:opacity-40">
+            @if (reviewSubmitting) { Enregistrement... } @else { Enregistrer }
+          </button>
+          <button (click)="cancelEditReview()"
+            class="px-4 py-2.5 text-sm font-semibold theme-muted rounded-xl hover:bg-white/8 transition-colors">
+            Annuler
+          </button>
+        </div>
+      </div>
+      }
+
+      <!-- Mon avis existant (pas en mode édition) -->
+      @if (myReview && !editingReview) {
+      <div class="luxury-card rounded-2xl p-4 mb-6 border border-gold/20">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs font-bold text-gold uppercase tracking-wide">Mon avis
+            @if (myReview.purchased) {
+            <span class="inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 rounded text-[8px] font-bold align-middle"
+              style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.2);">
+              <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+              </svg>
+              Vérifié
+            </span>
             }
-
-            <button (click)="submitReview()" [disabled]="reviewRating === 0 || reviewSubmitting"
-              class="px-5 py-2.5 bg-gold text-black text-sm font-bold rounded-xl hover:bg-yellow-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-              @if (reviewSubmitting) { Publication... } @else { Publier l'avis }
-            </button>
+          </p>
+          <div class="flex gap-2">
+            <button (click)="startEditReview()"
+              class="text-xs theme-muted hover:text-gold transition-colors font-semibold">Modifier</button>
+            <button (click)="deleteMyReview()"
+              class="text-xs text-red-400/60 hover:text-red-400 transition-colors font-semibold">Supprimer</button>
           </div>
-        }
+        </div>
+        <div class="flex gap-0.5 mb-2">
+          @for (s of starsRange; track s) {
+          <svg class="w-4 h-4" [class.text-yellow-400]="s <= myReview.rating"
+            [class.text-zinc-600]="s > myReview.rating" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          }
+        </div>
+        @if (myReview.comment) { <p class="text-sm theme-text">{{ myReview.comment }}</p> }
+      </div>
+      }
 
-        <!-- Modifier mon avis -->
-        @if (editingReview && myReview) {
-          <div class="luxury-card rounded-2xl p-5 mb-8 border border-gold/20">
-            <p class="text-sm font-bold theme-text mb-4">Modifier mon avis</p>
-            <div class="flex gap-1.5 mb-4">
-              @for (s of starsRange; track s) {
-                <button type="button" (click)="setReviewRating(s)"
-                  (mouseenter)="reviewHover = s" (mouseleave)="reviewHover = 0"
-                  class="transition-transform hover:scale-110">
-                  <svg class="w-8 h-8 transition-colors"
-                    [class.text-yellow-400]="s <= (reviewHover || reviewRating)"
-                    [class.text-zinc-600]="s > (reviewHover || reviewRating)"
-                    fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                </button>
-              }
-            </div>
-            <textarea [(ngModel)]="reviewComment" rows="3" placeholder="Votre commentaire..."
-              class="theme-input w-full px-3.5 py-2.5 rounded-xl text-sm resize-none mb-3 transition-all"></textarea>
-            @if (reviewError) { <p class="text-xs text-red-400 mb-3">{{ reviewError }}</p> }
-            <div class="flex gap-2">
-              <button (click)="submitReview()" [disabled]="reviewRating === 0 || reviewSubmitting"
-                class="px-5 py-2.5 bg-gold text-black text-sm font-bold rounded-xl hover:bg-yellow-400 transition-colors disabled:opacity-40">
-                @if (reviewSubmitting) { Enregistrement... } @else { Enregistrer }
-              </button>
-              <button (click)="cancelEditReview()"
-                class="px-4 py-2.5 text-sm font-semibold theme-muted rounded-xl hover:bg-white/8 transition-colors">
-                Annuler
-              </button>
+      <!-- Messages selon le statut -->
+      @if (!isLoggedIn) {
+      <div class="luxury-card rounded-2xl p-5 mb-8 text-center">
+        <p class="text-sm theme-muted mb-3">Connectez-vous pour laisser un avis</p>
+        <a routerLink="/auth/login"
+          class="inline-block px-5 py-2 bg-gold text-black text-sm font-bold rounded-xl hover:bg-yellow-400 transition-colors">
+          Se connecter
+        </a>
+      </div>
+      } @else if (isCustomer && !canReview && !myReview) {
+      <div class="luxury-card rounded-2xl p-4 mb-8 flex items-center gap-3 border border-white/8">
+        <div class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+        </div>
+        <p class="text-sm theme-muted">Achetez et recevez ce produit pour pouvoir laisser un avis.</p>
+      </div>
+      }
+
+      <!-- Liste des avis -->
+      @if (reviewsLoading) {
+      <div class="space-y-3">
+        @for (i of [1,2,3]; track i) {
+        <div class="luxury-card rounded-2xl p-4 animate-pulse">
+          <div class="flex gap-3">
+            <div class="w-10 h-10 rounded-full bg-white/10 flex-shrink-0"></div>
+            <div class="flex-1 space-y-2">
+              <div class="h-3 bg-white/10 rounded w-1/4"></div>
+              <div class="h-3 bg-white/10 rounded w-3/4"></div>
             </div>
           </div>
+        </div>
         }
+      </div>
+      }
 
-        <!-- Mon avis existant (pas en mode édition) -->
-        @if (myReview && !editingReview) {
-          <div class="luxury-card rounded-2xl p-4 mb-6 border border-gold/20">
-            <div class="flex items-center justify-between mb-2">
-              <p class="text-xs font-bold text-gold uppercase tracking-wide">Mon avis
-                @if (myReview.purchased) {
-                  <span class="inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 rounded text-[8px] font-bold align-middle"
-                        style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.2);">
-                    <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+      @if (!reviewsLoading && reviews.length === 0 && productRating?.totalReviews === 0) {
+      <p class="text-sm theme-muted text-center py-8">Aucun avis pour ce produit. Soyez le premier !</p>
+      }
+
+      @if (!reviewsLoading) {
+      <div class="space-y-4">
+        @for (review of reviews; track review.id) {
+        <div class="luxury-card rounded-2xl p-4">
+          <div class="flex items-start gap-3">
+            <!-- Avatar initiales -->
+            <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0">
+              <span class="text-xs font-black text-gold">{{ reviewInitials(review.customerName) }}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <p class="text-sm font-bold theme-text truncate">{{ review.customerName }}
+                  @if (review.purchased) {
+                  <span
+                    class="inline-flex items-center gap-0.5 ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold align-middle"
+                    style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.2);"
+                    title="Achat vérifié">
+                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
                     Vérifié
                   </span>
-                }
-              </p>
-              <div class="flex gap-2">
-                <button (click)="startEditReview()" class="text-xs theme-muted hover:text-gold transition-colors font-semibold">Modifier</button>
-                <button (click)="deleteMyReview()" class="text-xs text-red-400/60 hover:text-red-400 transition-colors font-semibold">Supprimer</button>
+                  }
+                </p>
+                <p class="text-xs theme-muted flex-shrink-0">{{ review.createdAt | date:'dd/MM/yyyy' }}</p>
               </div>
-            </div>
-            <div class="flex gap-0.5 mb-2">
-              @for (s of starsRange; track s) {
-                <svg class="w-4 h-4" [class.text-yellow-400]="s <= myReview.rating" [class.text-zinc-600]="s > myReview.rating" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              <!-- Étoiles -->
+              <div class="flex gap-0.5 mb-2">
+                @for (s of starsRange; track s) {
+                <svg class="w-3.5 h-3.5" [class.text-yellow-400]="s <= review.rating"
+                  [class.text-zinc-600]="s > review.rating" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
+                }
+              </div>
+              @if (review.comment) {
+              <p class="text-sm theme-text leading-relaxed">{{ review.comment }}</p>
               }
             </div>
-            @if (myReview.comment) { <p class="text-sm theme-text">{{ myReview.comment }}</p> }
           </div>
+        </div>
         }
-
-        <!-- Messages selon le statut -->
-        @if (!isLoggedIn) {
-          <div class="luxury-card rounded-2xl p-5 mb-8 text-center">
-            <p class="text-sm theme-muted mb-3">Connectez-vous pour laisser un avis</p>
-            <a routerLink="/auth/login" class="inline-block px-5 py-2 bg-gold text-black text-sm font-bold rounded-xl hover:bg-yellow-400 transition-colors">
-              Se connecter
-            </a>
-          </div>
-        } @else if (isCustomer && !canReview && !myReview) {
-          <div class="luxury-card rounded-2xl p-4 mb-8 flex items-center gap-3 border border-white/8">
-            <div class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-              </svg>
-            </div>
-            <p class="text-sm theme-muted">Achetez et recevez ce produit pour pouvoir laisser un avis.</p>
-          </div>
-        }
-
-        <!-- Liste des avis -->
-        @if (reviewsLoading) {
-          <div class="space-y-3">
-            @for (i of [1,2,3]; track i) {
-              <div class="luxury-card rounded-2xl p-4 animate-pulse">
-                <div class="flex gap-3">
-                  <div class="w-10 h-10 rounded-full bg-white/10 flex-shrink-0"></div>
-                  <div class="flex-1 space-y-2">
-                    <div class="h-3 bg-white/10 rounded w-1/4"></div>
-                    <div class="h-3 bg-white/10 rounded w-3/4"></div>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        }
-
-        @if (!reviewsLoading && reviews.length === 0 && productRating?.totalReviews === 0) {
-          <p class="text-sm theme-muted text-center py-8">Aucun avis pour ce produit. Soyez le premier !</p>
-        }
-
-        @if (!reviewsLoading) {
-          <div class="space-y-4">
-            @for (review of reviews; track review.id) {
-              <div class="luxury-card rounded-2xl p-4">
-                <div class="flex items-start gap-3">
-                  <!-- Avatar initiales -->
-                  <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0">
-                    <span class="text-xs font-black text-gold">{{ reviewInitials(review.customerName) }}</span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between gap-2 mb-1">
-                      <p class="text-sm font-bold theme-text truncate">{{ review.customerName }}
-                        @if (review.purchased) {
-                          <span class="inline-flex items-center gap-0.5 ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold align-middle"
-                                style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.2);"
-                                title="Achat vérifié">
-                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            Vérifié
-                          </span>
-                        }
-                      </p>
-                      <p class="text-xs theme-muted flex-shrink-0">{{ review.createdAt | date:'dd/MM/yyyy' }}</p>
-                    </div>
-                    <!-- Étoiles -->
-                    <div class="flex gap-0.5 mb-2">
-                      @for (s of starsRange; track s) {
-                        <svg class="w-3.5 h-3.5" [class.text-yellow-400]="s <= review.rating" [class.text-zinc-600]="s > review.rating" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                      }
-                    </div>
-                    @if (review.comment) {
-                      <p class="text-sm theme-text leading-relaxed">{{ review.comment }}</p>
-                    }
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        }
-
       </div>
-
+      }
 
     </div>
+
+
+  </div>
 
   }
 </div>

@@ -11,6 +11,7 @@ import { ManagerToastService } from '../../shared/manager-toast.service';
 import { OrderResponse } from '../../../../core/models/order.models';
 import { PageResponse, OrderStatus } from '../../../../core/models/common.models';
 import { orderStatusLabel, orderStatusClass } from '../../../admin/shared/admin-status.helpers';
+import { MediaUrlPipe } from '../../../../shared/pipes/media-url.pipe';
 
 interface OrderVariantLine {
   color: string | null | undefined;
@@ -32,7 +33,7 @@ interface GroupedOrderItem {
   selector: 'app-manager-orders',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MediaUrlPipe],
   templateUrl: './manager-orders.component.html',
 })
 export class ManagerOrdersComponent implements OnInit, OnDestroy {

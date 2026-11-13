@@ -51,8 +51,9 @@
         <!-- Carte produit actif -->
         <div class="flex items-center gap-3.5 p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
           @if (selectedProduct.imageUrl) {
-            <img [src]="selectedProduct.imageUrl | mediaUrl" [alt]="selectedProduct.name"
-                 class="w-14 h-14 rounded-xl object-cover border border-gold/20 flex-shrink-0"/>
+            <img [src]="selectedProduct.imageUrl | mediaUrl: 200" [alt]="selectedProduct.name"
+                 class="w-14 h-14 rounded-xl object-cover border border-gold/20 flex-shrink-0"
+                 (error)="$any($event.target).src='/product-placeholder.svg'"/>
           } @else {
             <div class="w-14 h-14 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center text-xl flex-shrink-0">
               🛍️
