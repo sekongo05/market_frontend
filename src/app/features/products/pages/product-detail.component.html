@@ -66,12 +66,12 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 xl:gap-20">
 
       <!-- ════ LEFT: Media Gallery (Miniatures verticales desktop + surface épurée) ════ -->
-      <div class="scroll-reveal from-left">
+      <div class="animate-fade-in">
         <div class="flex flex-col lg:flex-row-reverse gap-3 lg:gap-4">
 
           <!-- Main viewer -->
           <div id="product-media-gallery"
-               class="gallery-surface relative overflow-hidden aspect-[4/5] sm:aspect-square flex-1"
+               class="gallery-surface relative overflow-hidden aspect-[4/5] sm:aspect-square max-h-[460px] lg:max-h-[520px] w-full flex-1"
                (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
 
             <!-- Navigation arrows -->
@@ -196,7 +196,7 @@
       </div>
 
       <!-- ════ RIGHT: Product Info (Sticky sur desktop, hiérarchie conversion) ════ -->
-      <div class="product-info-col scroll-reveal from-right lg:sticky lg:top-24 lg:self-start">
+      <div class="product-info-col animate-fade-in lg:sticky lg:top-24 lg:self-start">
 
         <!-- Catégorie + Note + Titre + Favoris -->
         <div class="sec-title">
@@ -287,7 +287,7 @@
                 <button type="button" (click)="selectCascadeAttribute(attr, isSelected ? null : val.id)"
                   [disabled]="isUnavailable"
                   [title]="val.value + (isOutOfStock ? ' (Épuisé pour cette sélection)' : (isUnavailable ? ' (Non proposé)' : ''))"
-                  class="group relative flex items-center gap-2 p-1.5 pr-3 rounded-full border transition-all duration-200"
+                  class="group relative flex items-center gap-2 p-1.5 pr-3 rounded-full border transition-none"
                   [class.border-gold]="isSelected" [class.bg-gold/15]="isSelected" [class.ring-2]="isSelected"
                   [class.ring-gold/60]="isSelected" [class.shadow-sm]="isSelected"
                   [class.theme-border]="!isSelected && !isOutOfStock && !isUnavailable"
@@ -340,7 +340,7 @@
                 <button type="button" (click)="selectCascadeAttribute(attr, isSelected ? null : val.id)"
                   [disabled]="isUnavailable"
                   [title]="val.value + (isOutOfStock ? ' (Épuisé pour cette sélection)' : (isUnavailable ? ' (Non proposé)' : ''))"
-                  class="relative min-w-[50px] h-10 px-3.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all duration-200"
+                  class="relative min-w-[50px] h-10 px-3.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-none"
                   [class.border-gold]="isSelected" [class.bg-gold]="isSelected" [class.text-black]="isSelected"
                   [class.shadow-sm]="isSelected"
                   [class.theme-border]="!isSelected && !isOutOfStock && !isUnavailable"
@@ -432,7 +432,7 @@
                 @let isOutOfStock = variant.stock === 0;
 
                 <button type="button" (click)="selectVariant(variant)"
-                  class="p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center gap-2.5"
+                  class="p-2.5 rounded-xl border text-left transition-none flex items-center gap-2.5"
                   [class.border-gold]="isSelected" [class.bg-gold/15]="isSelected" [class.ring-2]="isSelected"
                   [class.ring-gold/50]="isSelected" [class.theme-border]="!isSelected && !isOutOfStock"
                   [class.opacity-40]="isOutOfStock" [class.cursor-not-allowed]="isOutOfStock">
@@ -642,8 +642,8 @@
            SECTION: Vous aimerez aussi (Produits similaires)
       ════════════════════════════════════════════ -->
     @if (relatedProducts.length > 0) {
-      <div class="mt-16 pt-10 border-t theme-border scroll-reveal">
-        <div class="flex items-end justify-between mb-6">
+      <div class="mt-10 pt-8 border-t theme-border">
+        <div class="flex items-end justify-between mb-5">
           <div>
             <p class="text-gold text-xs font-bold uppercase tracking-[0.2em] mb-1">Dans la même collection</p>
             <h2 class="text-xl sm:text-2xl font-black theme-text">Vous aimerez aussi</h2>
@@ -670,7 +670,7 @@
     <!-- ════════════════════════════════════════════
            SECTION: Avis clients
       ════════════════════════════════════════════ -->
-    <div id="reviews" class="mt-16 scroll-reveal">
+    <div id="reviews" class="mt-10 pt-8 border-t theme-border">
 
       <!-- Titre + note globale -->
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">

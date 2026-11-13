@@ -86,6 +86,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   cascadeSelections: Record<number, number | null> = {}; // attributeValueId → selected valueId
   cascadeMatchedVariant: ProductVariant | null = null;
 
+  private _preloadedUrls = new Set<string>();
+  private readonly mediaUrlPipe = new MediaUrlPipe();
   private _currentProductId: number | null = null;
   private destroy$ = new Subject<void>();
   private observer?: IntersectionObserver;
@@ -320,6 +322,30 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.selectedVariant?.imageUrl) {
       const idx = this.galleryItems.findIndex(g => this.isSameMedia(g.url, this.selectedVariant!.imageUrl));
       if (idx >= 0) this.activeIndex = idx;
+    }
+
+    this._preloadGalleryImages();
+  }
+
+  private _preloadGalleryImages(): void {
+    if (!isPlatformBrowser(this.platformId) || this.galleryItems.length <= 1) return;
+    const run = () => {
+      for (let i = 0; i < this.galleryItems.length; i++) {
+        const item = this.galleryItems[i];
+        if (i === this.activeIndex || item.type !== 'IMAGE') continue;
+        const resolved = this.mediaUrlPipe.transform(item.url, 1400);
+        if (!resolved || this._preloadedUrls.has(resolved)) continue;
+        this._preloadedUrls.add(resolved);
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = resolved;
+      }
+    };
+    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number };
+    if (typeof w.requestIdleCallback === 'function') {
+      w.requestIdleCallback(run);
+    } else {
+      setTimeout(run, 150);
     }
   }
 
