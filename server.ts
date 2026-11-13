@@ -18,11 +18,19 @@ function setCacheControl(path: string, response: Response): void {
   }
 }
 
+function setSecurityHeaders(response: Response): void {
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+}
+
 const server = createServer(async (req, res) => {
   try {
     const response = await app.handle(req, { staticFilesRoot: browserDistFolder });
     if (response) {
       setCacheControl(req.url?.split('?')[0] ?? '', response);
+      setSecurityHeaders(response);
       writeResponseToNodeResponse(response, res);
     } else {
       res.statusCode = 404;
@@ -46,6 +54,7 @@ export const reqHandler = createNodeRequestHandler(async (req, res, next) => {
   const response = await app.handle(req, { staticFilesRoot: browserDistFolder });
   if (response) {
     setCacheControl(req.url?.split('?')[0] ?? '', response);
+    setSecurityHeaders(response);
     writeResponseToNodeResponse(response, res);
   } else {
     next();

@@ -207,9 +207,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       }),
     ).subscribe({
       next: paymentRes => {
-        if (paymentRes && paymentRes.success && paymentRes.data?.checkoutUrl) {
+        const checkoutUrl = paymentRes?.data?.checkoutUrl;
+        if (paymentRes && paymentRes.success && checkoutUrl && checkoutUrl.startsWith('https://')) {
           this.cartService.clearCart();
-          window.location.href = paymentRes.data.checkoutUrl;
+          window.location.href = checkoutUrl;
         } else {
           this.checkoutSuccess = false;
           this.checkoutLoading = false;

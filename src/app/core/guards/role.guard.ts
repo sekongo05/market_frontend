@@ -20,8 +20,10 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, _state: 
   }
 
   const user = authService.getCurrentUser();
+  const tokenRole = authService.getRoleFromToken() as UserRole | null;
+  const effectiveRole = tokenRole ?? user?.role;
 
-  if (user && requiredRoles.includes(user.role)) {
+  if (effectiveRole && requiredRoles.includes(effectiveRole)) {
     return true;
   }
 

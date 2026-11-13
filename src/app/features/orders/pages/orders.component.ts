@@ -427,8 +427,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
       errorUrl: `${baseUrl}/orders?payment=failed`,
     }).subscribe({
       next: (res) => {
-        if (res.success && res.data?.checkoutUrl) {
-          window.location.href = res.data.checkoutUrl;
+        const checkoutUrl = res.data?.checkoutUrl;
+        if (res.success && checkoutUrl && checkoutUrl.startsWith('https://')) {
+          window.location.href = checkoutUrl;
         } else {
           this.payingId = null;
           this.cdr.detectChanges();

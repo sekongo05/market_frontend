@@ -48,7 +48,7 @@ export class LoginComponent implements OnInit {
     });
 
     const param = this.route.snapshot.queryParamMap.get('returnUrl');
-    if (param && param.startsWith('/')) {
+    if (param && (param === '/' || /^\/[^\/\\]/.test(param))) {
       this.returnUrl = param;
     }
   }

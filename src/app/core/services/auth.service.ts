@@ -166,6 +166,17 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  /** Extrait le rôle depuis les claims du JWT (source plus fiable que current_user en localStorage) */
+  getRoleFromToken(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    const payload = this._getTokenPayload(token);
+    const role = payload?.['role'] ?? payload?.['roles'];
+    if (typeof role === 'string') return role.replace(/^ROLE_/, '');
+    if (Array.isArray(role) && typeof role[0] === 'string') return role[0].replace(/^ROLE_/, '');
+    return null;
+  }
+
   updateCurrentUser(data: Partial<CurrentUser>): void {
     const current = this.getCurrentUser();
     if (current) {
@@ -178,7 +189,8 @@ export class AuthService {
     try {
       const parts = token.split('.');
       if (parts.length !== 3) return null;
-      return JSON.parse(atob(parts[1]));
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(atob(base64));
     } catch {
       return null;
     }

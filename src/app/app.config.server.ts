@@ -8,6 +8,8 @@ export const config: ApplicationConfig = {
         // Pages privées : rendu client uniquement (pas d'indexation)
         { path: 'auth/**',      renderMode: RenderMode.Client },
         { path: 'profile',      renderMode: RenderMode.Client },
+        { path: 'checkout',     renderMode: RenderMode.Client },
+        { path: 'checkout/**',  renderMode: RenderMode.Client },
         { path: 'orders/**',    renderMode: RenderMode.Client },
         { path: 'admin/**',     renderMode: RenderMode.Client },
         { path: 'manager/**',   renderMode: RenderMode.Client },
