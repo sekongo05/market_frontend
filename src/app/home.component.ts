@@ -93,6 +93,25 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private _observer?: IntersectionObserver;
   private _statsAnimated = false;
   private destroy$ = new Subject<void>();
+
+  private _cursorEl: HTMLElement | null = null;
+  private _isTouchDevice = false;
+
+  private _onCursorMove = (e: MouseEvent): void => {
+    if (!this._cursorEl) return;
+    this._cursorEl.style.left = e.clientX + 'px';
+    this._cursorEl.style.top  = e.clientY + 'px';
+  };
+
+  private _onCursorOver = (e: MouseEvent): void => {
+    if (!this._cursorEl) return;
+    const inside = !!(e.target as HTMLElement).closest('.cursor-hover-zone');
+    this._cursorEl.classList.toggle('sdm-visible', inside);
+  };
+
+  private _onCursorDown = (): void => this._cursorEl?.classList.add('sdm-clicking');
+  private _onCursorUp   = (): void => this._cursorEl?.classList.remove('sdm-clicking');
+
   private _platformBrowser: boolean;
 
   constructor(
@@ -138,6 +157,14 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     if (this._platformBrowser) {
+      this._isTouchDevice = window.matchMedia('(hover: none)').matches;
+      if (!this._isTouchDevice) {
+        this._cursorEl = document.getElementById('sdm-cursor');
+        document.addEventListener('mousemove',  this._onCursorMove, { passive: true });
+        document.addEventListener('mouseover',  this._onCursorOver, { passive: true });
+        document.addEventListener('mousedown',  this._onCursorDown);
+        document.addEventListener('mouseup',    this._onCursorUp);
+      }
       this._preloadAdjacent();
       this._startAutoPlay();
       this._startProgress();
@@ -187,6 +214,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this._frameIds.forEach(id => cancelAnimationFrame(id));
     this._frameIds = [];
     if (this._transitionTimeout) clearTimeout(this._transitionTimeout);
+    if (this._platformBrowser && !this._isTouchDevice) {
+      document.removeEventListener('mousemove', this._onCursorMove);
+      document.removeEventListener('mouseover', this._onCursorOver);
+      document.removeEventListener('mousedown', this._onCursorDown);
+      document.removeEventListener('mouseup',   this._onCursorUp);
+    }
   }
 
   goToCategory(slug: string): void {
