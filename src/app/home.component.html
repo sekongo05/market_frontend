@@ -460,9 +460,13 @@
         <div
           class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3 bg-[#09080d]/80 flex items-center justify-center rounded-xl"
           style="aspect-ratio:3/4;">
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 300" alt="" aria-hidden="true"
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 80" alt="" aria-hidden="true"
+            loading="lazy" decoding="async"
             class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 800" [alt]="product.name" loading="lazy"
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 1000"
+            [attr.srcset]="((product.listImageUrl || product.imageUrl) | mediaUrl: 500) + ' 500w, ' + ((product.listImageUrl || product.imageUrl) | mediaUrl: 1000) + ' 1000w'"
+            sizes="(max-width: 640px) 60vw, 25vw"
+            [alt]="product.name" loading="lazy" decoding="async"
             class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-500 ease-out"
             (error)="$any($event.target).src='/product-placeholder.svg'" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
@@ -585,9 +589,13 @@
         <div
           class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3 bg-[#09080d]/80 flex items-center justify-center rounded-xl"
           style="aspect-ratio:3/4;">
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 300" alt="" aria-hidden="true"
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 80" alt="" aria-hidden="true"
+            loading="lazy" decoding="async"
             class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 800" [alt]="product.name" loading="lazy"
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 1000"
+            [attr.srcset]="((product.listImageUrl || product.imageUrl) | mediaUrl: 500) + ' 500w, ' + ((product.listImageUrl || product.imageUrl) | mediaUrl: 1000) + ' 1000w'"
+            sizes="(max-width: 640px) 60vw, 25vw"
+            [alt]="product.name" loading="lazy" decoding="async"
             class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-500 ease-out"
             (error)="$any($event.target).src='/product-placeholder.svg'" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
@@ -697,9 +705,13 @@
           <div
             class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-1.5 border transition-colors duration-300 rounded-xl bg-[#09080d]/80 flex items-center justify-center"
             style="aspect-ratio:3/4;border-color:rgba(212,175,55,0.12);">
-            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 300" alt="" aria-hidden="true"
+            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 80" alt="" aria-hidden="true"
+              loading="lazy" decoding="async"
               class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
-            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 800" [alt]="product.name" loading="lazy"
+            <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 1000"
+              [attr.srcset]="((product.listImageUrl || product.imageUrl) | mediaUrl: 500) + ' 500w, ' + ((product.listImageUrl || product.imageUrl) | mediaUrl: 1000) + ' 1000w'"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              [alt]="product.name" loading="lazy" decoding="async"
               class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-500 ease-out"
               (error)="$any($event.target).src='/product-placeholder.svg'" />
 
@@ -803,9 +815,13 @@
         <div
           class="product-card-wrap cursor-hover-zone relative overflow-hidden mb-3 bg-[#09080d]/80 flex items-center justify-center rounded-xl"
           style="aspect-ratio:3/4;">
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 300" alt="" aria-hidden="true"
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 80" alt="" aria-hidden="true"
+            loading="lazy" decoding="async"
             class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-25 pointer-events-none select-none transition-opacity duration-500 group-hover:opacity-40" />
-          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 800" [alt]="product.name" loading="lazy"
+          <img [src]="(product.listImageUrl || product.imageUrl) | mediaUrl: 1000"
+            [attr.srcset]="((product.listImageUrl || product.imageUrl) | mediaUrl: 500) + ' 500w, ' + ((product.listImageUrl || product.imageUrl) | mediaUrl: 1000) + ' 1000w'"
+            sizes="(max-width: 640px) 70vw, 25vw"
+            [alt]="product.name" loading="lazy" decoding="async"
             class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain p-1.5 group-hover:scale-[1.04] transition-transform duration-700"
             (error)="$any($event.target).src='/product-placeholder.svg'" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>

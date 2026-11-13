@@ -35,9 +35,14 @@ export class MediaUrlPipe implements PipeTransform {
         rest = parts.slice(1).join('/');
       }
 
-      // Par défaut 800px si aucun w n'est spécifié, avec c_limit (ne rogne jamais le produit !)
-      const targetW = w ?? 800;
-      return `${base}w_${targetW},c_limit,q_auto:good,f_auto/${rest}`;
+      // Par défaut 1000px si aucun w n'est spécifié, avec c_limit (ne rogne jamais le produit)
+      const targetW = Number(w ?? 1000) || 1000;
+      // Pour les fonds floutés (<= 120px), privilégier la légèreté extrême ; sinon qualité maximale + léger piqué
+      if (targetW <= 120) {
+        return `${base}w_${targetW},c_limit,q_auto:low,f_auto/${rest}`;
+      }
+      const sharpen = targetW <= 1200 ? ',e_sharpen:30' : '';
+      return `${base}w_${targetW},c_limit,q_auto:best,f_auto${sharpen}/${rest}`;
     }
 
     // Gestion propre des URLs relatives
