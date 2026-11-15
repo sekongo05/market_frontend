@@ -1,175 +1,137 @@
-import { Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, PLATFORM_ID, afterNextRender } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { AuthService } from './core/services/auth.service';
-import { ProductService } from './core/services/product.service';
-import { ReviewService } from './core/services/review.service';
-import { CategoryService } from './core/services/category.service';
-import { CartService } from './core/services/cart.service';
-import { WishlistService } from './core/services/wishlist.service';
-import { ToastService } from './core/services/toast.service';
-import { DashboardService, PublicStats } from './core/services/dashboard.service';
-import { WebSocketService } from './core/services/websocket.service';
-import { SeoService } from './core/services/seo.service';
-import { MediaUrlPipe } from './shared/pipes/media-url.pipe';
-import { ProductCardComponent } from './shared/components/product-card/product-card.component';
-import { ProductSummaryResponse } from './core/models/product.models';
-import { ReviewResponse } from './core/models/review.models';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
+import { map, retry } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 import { CategoryResponse } from './core/models/category.models';
 import { PageResponse } from './core/models/common.models';
-import { PromoService } from './core/services/promo.service';
+import { ProductSummaryResponse } from './core/models/product.models';
 import { PublicPromoResponse } from './core/models/promo.models';
-import { environment } from '../environments/environment';
-import { Subject } from 'rxjs';
-import { takeUntil, retry } from 'rxjs/operators';
+import { ReviewResponse } from './core/models/review.models';
+import { AuthService } from './core/services/auth.service';
+import { CartService } from './core/services/cart.service';
+import { CategoryService } from './core/services/category.service';
+import { DashboardService, PublicStats } from './core/services/dashboard.service';
+import { ProductService } from './core/services/product.service';
+import { PromoService } from './core/services/promo.service';
+import { ReviewService } from './core/services/review.service';
+import { SeoService } from './core/services/seo.service';
+import { ToastService } from './core/services/toast.service';
+import { WebSocketService } from './core/services/websocket.service';
+import { WishlistService } from './core/services/wishlist.service';
+import { HomeCampaignOfferComponent } from './features/home/components/home-campaign-offer/home-campaign-offer.component';
+import { HomeCollectionsComponent } from './features/home/components/home-collections/home-collections.component';
+import { HomeHeroComponent } from './features/home/components/home-hero/home-hero.component';
+import { HomeLookbookComponent } from './features/home/components/home-lookbook/home-lookbook.component';
+import { HomeMaisonComponent } from './features/home/components/home-maison/home-maison.component';
+import {
+  HomeShowcaseTabsComponent,
+  ShowcaseTabKey,
+} from './features/home/components/home-showcase-tabs/home-showcase-tabs.component';
+import { HomeTestimonialsComponent } from './features/home/components/home-testimonials/home-testimonials.component';
 
 const NEW_PRODUCT_DAYS = 21;
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MediaUrlPipe, ProductCardComponent],
+  imports: [
+    HomeHeroComponent,
+    HomeCollectionsComponent,
+    HomeShowcaseTabsComponent,
+    HomeCampaignOfferComponent,
+    HomeMaisonComponent,
+    HomeTestimonialsComponent,
+    HomeLookbookComponent,
+  ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent implements AfterViewInit, OnDestroy {
-  currentUser$;
+export class HomeComponent implements OnInit {
+  private readonly authService = inject(AuthService);
+  private readonly productService = inject(ProductService);
+  private readonly reviewService = inject(ReviewService);
+  private readonly categoryService = inject(CategoryService);
+  private readonly dashboardService = inject(DashboardService);
+  private readonly wsService = inject(WebSocketService);
+  private readonly promoService = inject(PromoService);
+  private readonly router = inject(Router);
+  private readonly seo = inject(SeoService);
+  private readonly cartService = inject(CartService);
+  private readonly wishlistService = inject(WishlistService);
+  private readonly toastService = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  whatsAppUrl = `https://wa.me/${environment.whatsAppNumber}`;
+  readonly whatsAppUrl = `https://wa.me/${environment.whatsAppNumber}`;
 
-  categories: CategoryResponse[] = [];
-  featuredProducts: ProductSummaryResponse[] = [];
-  bestsellers: ProductSummaryResponse[] = [];
-  newProducts: ProductSummaryResponse[] = [];
-  discountProducts: ProductSummaryResponse[] = [];
-  featuredReviews: ReviewResponse[] = [];
+  // ── État réactif immuable (OnPush-safe) ────────────────────────────
+  private readonly currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
+  readonly isLoggedIn = computed(() => Boolean(this.currentUser()));
 
-  categoriesLoading   = true;
-  featuredLoading     = true;
-  bestsellersLoading  = true;
-  newProductsLoading  = true;
-  reviewsLoading      = true;
+  private readonly cartItems = toSignal(this.cartService.cart$, {
+    initialValue: this.cartService.cartValue,
+  });
+  readonly cartProductIds = computed<ReadonlySet<number>>(
+    () => new Set(this.cartItems().map(item => item.productId)),
+  );
 
-  statProducts   = 0;
-  statCategories = 0;
-  statClients    = 0;
-  statReviews    = 0;
-  statAvgRating  = 0;
-  publicStats: PublicStats | null = null;
+  private readonly rawFavoriteIds = toSignal(
+    this.wishlistService.favoriteIds$.pipe(map(ids => new Set<number>(ids))),
+    { initialValue: new Set<number>() },
+  );
+  readonly favoriteIds = computed<ReadonlySet<number>>(() => this.rawFavoriteIds());
 
-  searchQuery = '';
-  firstOrderPromo: PublicPromoResponse | null = null;
-  readonly skeletonArray = new Array(6);
-  cartProductIds = new Set<number>();
-  favoriteIds = new Set<number>();
+  // ── Signaux de données & états sections ────────────────────────────
+  readonly categories = signal<CategoryResponse[]>([]);
+  readonly categoriesLoading = signal(true);
+  readonly categoriesError = signal(false);
 
-  // ── Hero slideshow ──────────────────────────────────────────────
-  readonly heroSlides = [
-    { imageUrl: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=80&fm=webp', label: 'Montres de prestige' },
-    { imageUrl: '/mt.webp', label: 'Maillots toutes nations' },
-    { imageUrl: '/campus.webp', label: 'Baskets & Sneakers' },
-    { imageUrl: '/sans_fil.webp', label: 'Écouteurs sans fil' },
-    { imageUrl: '/lalé.webp', label: 'Smartphones & Tech' },
-    { imageUrl: '/cas.webp', label: 'Casquettes & Accessoires' },
-    { imageUrl: '/macccc.webp', label: 'Ordinateurs & PC' },
-  ];
+  readonly featuredProducts = signal<ProductSummaryResponse[]>([]);
+  readonly featuredLoading = signal(true);
+  readonly featuredError = signal(false);
 
-  currentSlide = 0;
-  slidesLoaded = false;
-  progressValue = 0;
-  slideDirection: 'next' | 'prev' = 'next';
+  readonly bestsellers = signal<ProductSummaryResponse[]>([]);
+  readonly bestsellersLoading = signal(true);
+  readonly bestsellersError = signal(false);
 
-  private _slideTimer: ReturnType<typeof setInterval> | null = null;
-  private _progressTimer: ReturnType<typeof setInterval> | null = null;
-  readonly _slideInterval = 4000;
-  _isPaused = false;
-  _isTransitioning = false;
-  private _preloaded = new Set<string>();
-  private _frameIds: number[] = [];
-  private _transitionTimeout: ReturnType<typeof setTimeout> | null = null;
-  private _heroRafId: number | null = null;
+  readonly newProducts = signal<ProductSummaryResponse[]>([]);
+  readonly discountProducts = signal<ProductSummaryResponse[]>([]);
+  readonly newProductsLoading = signal(true);
+  readonly newProductsError = signal(false);
 
-  private _observer?: IntersectionObserver;
-  private _statsAnimated = false;
-  private destroy$ = new Subject<void>();
+  readonly featuredReviews = signal<ReviewResponse[]>([]);
+  readonly reviewsLoading = signal(true);
+  readonly reviewsError = signal(false);
 
-  private _cursorEl: HTMLElement | null = null;
-  private _isTouchDevice = false;
+  readonly publicStats = signal<PublicStats | null>(null);
+  readonly statsError = signal(false);
 
-  private _onCursorMove = (e: MouseEvent): void => {
-    if (!this._cursorEl) return;
-    this._cursorEl.style.left = e.clientX + 'px';
-    this._cursorEl.style.top  = e.clientY + 'px';
-  };
+  readonly firstOrderPromo = signal<PublicPromoResponse | null>(null);
 
-  private _onCursorOver = (e: MouseEvent): void => {
-    if (!this._cursorEl) return;
-    const inside = !!(e.target as HTMLElement).closest('.cursor-hover-zone');
-    this._cursorEl.classList.toggle('sdm-visible', inside);
-  };
-
-  private _onCursorDown = (): void => this._cursorEl?.classList.add('sdm-clicking');
-  private _onCursorUp   = (): void => this._cursorEl?.classList.remove('sdm-clicking');
-
-  private _platformBrowser: boolean;
-
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private authService: AuthService,
-    private productService: ProductService,
-    private reviewService: ReviewService,
-    private categoryService: CategoryService,
-    private dashboardService: DashboardService,
-    private wsService: WebSocketService,
-    private promoService: PromoService,
-    private router: Router,
-    private cdr: ChangeDetectorRef,
-    private seo: SeoService,
-    private cartService: CartService,
-    private wishlistService: WishlistService,
-    private toastService: ToastService,
-  ) {
-    this._platformBrowser = isPlatformBrowser(this.platformId);
-    this.currentUser$ = this.authService.currentUser$;
-
-    this.cartService.cart$.pipe(takeUntil(this.destroy$)).subscribe(cart => {
-      this.cartProductIds = new Set(cart.map(i => i.productId));
-      this.cdr.markForCheck();
-    });
-    this.wishlistService.favoriteIds$.pipe(takeUntil(this.destroy$)).subscribe(ids => {
-      this.favoriteIds = ids;
-      this.cdr.markForCheck();
-    });
-
+  constructor() {
     afterNextRender(() => {
-      this._loadPublicStats();
-      this._loadCategories();
-      this._loadFeatured();
-      this._loadBestsellers();
-      this._loadProducts();
-      this._loadReviews();
-      this._loadFirstOrderPromo();
-      this._initObserver();
-      this._subscribeStock();
+      this.loadCategories();
+      this.loadFeatured();
+      this.loadBestsellers();
+      this.loadProducts();
+      this.loadReviews();
+      this.loadPublicStats();
+      this.loadFirstOrderPromo();
+      this.subscribeStockUpdates();
     });
   }
 
-  ngAfterViewInit(): void {
-    if (this._platformBrowser) {
-      this._isTouchDevice = window.matchMedia('(hover: none)').matches;
-      if (!this._isTouchDevice) {
-        this._cursorEl = document.getElementById('sdm-cursor');
-        document.addEventListener('mousemove',  this._onCursorMove, { passive: true });
-        document.addEventListener('mouseover',  this._onCursorOver, { passive: true });
-        document.addEventListener('mousedown',  this._onCursorDown);
-        document.addEventListener('mouseup',    this._onCursorUp);
-      }
-      this._preloadAdjacent();
-      this._startAutoPlay();
-      this._startProgress();
-    }
+  ngOnInit(): void {
     this.seo.set({
       title: 'Mode, Montres & Lifestyle en Côte d\'Ivoire',
       description: 'SDM STORE : boutique en ligne de mode, montres, bijoux, beauté et lifestyle. Livraison 24–48h partout en Côte d\'Ivoire.',
@@ -206,383 +168,21 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    this._stopAutoPlay();
-    this._stopProgress();
-    this._observer?.disconnect();
-    this.destroy$.next();
-    this.destroy$.complete();
-    this._frameIds.forEach(id => cancelAnimationFrame(id));
-    this._frameIds = [];
-    if (this._transitionTimeout) clearTimeout(this._transitionTimeout);
-    if (this._heroRafId !== null && this._platformBrowser) {
-      cancelAnimationFrame(this._heroRafId);
-      this._heroRafId = null;
-    }
-    if (this._platformBrowser && !this._isTouchDevice) {
-      document.removeEventListener('mousemove', this._onCursorMove);
-      document.removeEventListener('mouseover', this._onCursorOver);
-      document.removeEventListener('mousedown', this._onCursorDown);
-      document.removeEventListener('mouseup',   this._onCursorUp);
+  onSearch(query: string): void {
+    const trimmed = query.trim();
+    if (trimmed) {
+      this.router.navigate(['/products'], { queryParams: { search: trimmed } });
     }
   }
 
-  goToCategory(slug: string): void {
+  onSelectCategory(slug: string): void {
     this.router.navigate(['/products'], { queryParams: { categorie: slug } });
   }
 
-  search(): void {
-    if (this.searchQuery.trim()) {
-      this.router.navigate(['/products'], { queryParams: { search: this.searchQuery.trim() } });
-    }
-  }
-
-  onSearchKey(event: KeyboardEvent): void {
-    if (event.key === 'Enter') this.search();
-  }
-
-  isNew(product: ProductSummaryResponse): boolean {
-    if (!product.createdAt) return false;
-    return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= NEW_PRODUCT_DAYS;
-  }
-
-  quickAdd(product: ProductSummaryResponse, event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-    const exists = this.cartService.cartValue.some(i => i.productId === product.id);
-    if (exists) {
-      this.toastService.info(`${product.name} déjà dans le panier`);
-      return;
-    }
-    this.cartService.addToCart({
-      productId: product.id,
-      productName: product.name,
-      price: product.salePrice ?? product.price,
-      quantity: 1,
-      imageUrl: product.imageUrl,
-      maxStock: product.stock,
-    });
-    this.toastService.success(`${product.name} ajouté au panier`);
-  }
-
-  onHeroMouseMove(event: MouseEvent): void {
-    if (!this._platformBrowser || this._isTouchDevice) return;
-    const section = event.currentTarget as HTMLElement;
-    const clientX = event.clientX;
-    const clientY = event.clientY;
-    if (this._heroRafId !== null) cancelAnimationFrame(this._heroRafId);
-    this._heroRafId = requestAnimationFrame(() => {
-      this._heroRafId = null;
-      const rect = section.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const cx = (clientX - rect.left) / rect.width - 0.5;
-      const cy = (clientY - rect.top) / rect.height - 0.5;
-      const parallax = section.querySelector('.hero-parallax') as HTMLElement | null;
-      if (parallax) parallax.style.transform = `translate(${(cx * -12).toFixed(2)}px, ${(cy * -8).toFixed(2)}px)`;
-      section.style.setProperty('--mx', ((clientX - rect.left) / rect.width * 100).toFixed(1) + '%');
-      section.style.setProperty('--my', ((clientY - rect.top) / rect.height * 100).toFixed(1) + '%');
-    });
-  }
-
-  onHeroMouseLeave(event: MouseEvent): void {
-    if (!this._platformBrowser || this._isTouchDevice) return;
-    if (this._heroRafId !== null) {
-      cancelAnimationFrame(this._heroRafId);
-      this._heroRafId = null;
-    }
-    const parallax = (event.currentTarget as HTMLElement).querySelector('.hero-parallax') as HTMLElement | null;
-    if (parallax) parallax.style.transform = '';
-  }
-
-  prevSlide(): void {
-    if (this._isTransitioning) return;
-    this.slideDirection = 'prev';
-    const prev = (this.currentSlide - 1 + this.heroSlides.length) % this.heroSlides.length;
-    this._goTo(prev);
-  }
-
-  nextSlide(): void {
-    if (this._isTransitioning) return;
-    this.slideDirection = 'next';
-    const next = (this.currentSlide + 1) % this.heroSlides.length;
-    this._goTo(next);
-  }
-
-  goToSlide(index: number): void {
-    if (this._isTransitioning || index === this.currentSlide) return;
-    this.slideDirection = index > this.currentSlide ? 'next' : 'prev';
-    this._goTo(index);
-  }
-
-  private _goTo(index: number): void {
-    this._isTransitioning = true;
-    this.currentSlide = index;
-    this.progressValue = 0;
-    this._preloadAdjacent();
-    this._stopAutoPlay();
-    this._stopProgress();
-    this._startAutoPlay();
-    this._startProgress();
-    this.cdr.detectChanges();
-    if (this._transitionTimeout) clearTimeout(this._transitionTimeout);
-    if (this._heroRafId !== null && this._platformBrowser) {
-      cancelAnimationFrame(this._heroRafId);
-      this._heroRafId = null;
-    }
-    this._transitionTimeout = setTimeout(() => { this._isTransitioning = false; }, 600);
-  }
-
-  onSlideError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.src = 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1200&q=80&fm=webp';
-  }
-
-  onHeroImgLoad(): void {
-    this.slidesLoaded = true;
-    this.cdr.detectChanges();
-  }
-
-  private _preloadAdjacent(): void {
-    if (!this._platformBrowser) return;
-    const next = (this.currentSlide + 1) % this.heroSlides.length;
-    const prev = (this.currentSlide - 1 + this.heroSlides.length) % this.heroSlides.length;
-    [next, prev].forEach(i => {
-      const url = this.heroSlides[i].imageUrl;
-      if (!this._preloaded.has(url)) {
-        const img = new Image();
-        img.src = url;
-        this._preloaded.add(url);
-      }
-    });
-  }
-
-  private _startAutoPlay(): void {
-    this._slideTimer = setInterval(() => {
-      if (!this._isPaused) {
-        this.nextSlide();
-      }
-    }, this._slideInterval);
-  }
-
-  private _stopAutoPlay(): void {
-    if (this._slideTimer) {
-      clearInterval(this._slideTimer);
-      this._slideTimer = null;
-    }
-  }
-
-  private _startProgress(): void {
-    this.progressValue = 0;
-    const step = 100 / (this._slideInterval / 30);
-    this._progressTimer = setInterval(() => {
-      if (!this._isPaused) {
-        this.progressValue = Math.min(this.progressValue + step, 100);
-        this.cdr.detectChanges();
-      }
-    }, 30);
-  }
-
-  private _stopProgress(): void {
-    if (this._progressTimer) {
-      clearInterval(this._progressTimer);
-      this._progressTimer = null;
-    }
-  }
-
-  get hasDeals(): boolean { return !this.newProductsLoading && this.discountProducts.length > 0; }
-  get hasFeatured(): boolean { return !this.featuredLoading && this.featuredProducts.length > 0; }
-  get hasBestsellers(): boolean { return !this.bestsellersLoading && this.bestsellers.length > 0; }
-  get hasNewProducts(): boolean { return !this.newProductsLoading && this.newProducts.length > 0; }
-  get hasGapSections(): boolean { return this.featuredLoading || this.hasFeatured || (!this.bestsellersLoading && this.bestsellers.length > 0); }
-
-
-
-  reviewInitials(name: string): string {
-    const parts = name.trim().split(' ');
-    if (parts.length >= 2) return parts[0] + ' ' + parts[1].charAt(0) + '.';
-    return parts[0];
-  }
-
-  starArray(): number[] { return [1, 2, 3, 4, 5]; }
-
-  avgRatingDisplay(): string {
-    if (!this.publicStats) return '…';
-    return this.publicStats.averageRating.toFixed(1);
-  }
-
-  private _loadCategories(): void {
-    this.categoryService.getCategories().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (r) => {
-        if (r.success) {
-          const raw = r.data;
-          this.categories = Array.isArray(raw) ? raw : [];
-        }
-        this.categoriesLoading = false;
-        this.cdr.detectChanges();
-        this._observeScrollReveals();
-      },
-      error: (err) => { console.error('Failed to load categories', err); this.categoriesLoading = false; this.cdr.detectChanges(); this._observeScrollReveals(); },
-    });
-  }
-
-  private _loadFeatured(): void {
-    this.productService.getFeaturedProducts(6).pipe(
-      retry({ count: 2, delay: 1000 }),
-      takeUntil(this.destroy$),
-    ).subscribe({
-      next: (r) => {
-        if (r.success) {
-          const raw = r.data;
-          this.featuredProducts = Array.isArray(raw) ? raw : [];
-        }
-        this.featuredLoading = false;
-        this.cdr.detectChanges();
-        this._observeScrollReveals();
-      },
-      error: (err) => { console.error('Failed to load featured', err); this.featuredLoading = false; this.cdr.detectChanges(); this._observeScrollReveals(); },
-    });
-  }
-
-  private _loadBestsellers(): void {
-    this.productService.getBestsellers(8).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (r) => {
-        if (r.success) {
-          const raw = r.data;
-          this.bestsellers = Array.isArray(raw) ? raw : [];
-        }
-        this.bestsellersLoading = false;
-        this.cdr.detectChanges();
-        this._observeScrollReveals();
-      },
-      error: (err) => { console.error('Failed to load bestsellers', err); this.bestsellersLoading = false; this.cdr.detectChanges(); this._observeScrollReveals(); },
-    });
-  }
-
-  private _loadProducts(): void {
-    this.productService.getProducts({ page: 0, size: 24, sort: 'newest' }).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (r) => {
-        if (r.success && r.data) {
-          const pg = r.data as PageResponse<ProductSummaryResponse>;
-          this.newProducts      = (pg.content ?? []).filter(p => this.isNew(p)).slice(0, 8);
-          this.discountProducts = (pg.content ?? []).filter(p => p.discountPercent && p.discountPercent > 0).slice(0, 4);
-        }
-        this.newProductsLoading = false;
-        this.cdr.detectChanges();
-        this._observeScrollReveals();
-      },
-      error: (err) => { console.error('Failed to load products', err); this.newProductsLoading = false; this.cdr.detectChanges(); this._observeScrollReveals(); },
-    });
-  }
-
-  private _loadPublicStats(): void {
-    this.dashboardService.getPublicStats().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (r) => {
-        if (r.success && r.data) {
-          this.publicStats   = r.data as PublicStats;
-          this.statAvgRating = this.publicStats.averageRating;
-          if (this._statsAnimated) {
-            this._statsAnimated = false;
-            this._count('statProducts',   this.publicStats.activeProducts,   2000);
-            this._count('statCategories', this.publicStats.activeCategories, 1400);
-            this._count('statClients',    this.publicStats.totalClients,     2400);
-            this._count('statReviews',    this.publicStats.totalReviews,     1800);
-          }
-          this.cdr.detectChanges();
-          this._observeScrollReveals();
-        }
-      },
-      error: (err) => { console.error('Stats load failed', err); },
-    });
-  }
-
-  private _loadFirstOrderPromo(): void {
-    this.promoService.getActivePromos().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (r) => {
-        if (r.success && Array.isArray(r.data)) {
-          this.firstOrderPromo = r.data.find(p => p.firstOrderOnly) ?? null;
-          this.cdr.detectChanges();
-        }
-      },
-      error: (err) => { console.error('Promo load failed', err); },
-    });
-  }
-
-  private _loadReviews(): void {
-    this.reviewService.getFeaturedReviews().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (r) => {
-        if (r.success) {
-          const raw = r.data;
-          this.featuredReviews = Array.isArray(raw) ? raw.slice(0, 6) : [];
-        }
-        this.reviewsLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => { console.error('Failed to load reviews', err); this.reviewsLoading = false; this.cdr.detectChanges(); },
-    });
-  }
-
-  private _subscribeStock(): void {
-    this.wsService.stockUpdate$.pipe(takeUntil(this.destroy$)).subscribe(update => {
-      let changed = false;
-      for (const list of [this.newProducts, this.discountProducts, this.featuredProducts, this.bestsellers]) {
-        const p = list.find(p => p.id === update.productId);
-        if (p) { (p as any).stock = update.stock; changed = true; }
-      }
-      if (changed) this.cdr.detectChanges();
-    });
-  }
-
-  private _initObserver(): void {
-    if (!this._platformBrowser) return;
-    this._observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('in-view');
-        if (entry.target.id === 'stats-row' && !this._statsAnimated && this.publicStats) {
-          this._statsAnimated = true;
-          this._count('statProducts',   this.publicStats.activeProducts,   2000);
-          this._count('statCategories', this.publicStats.activeCategories, 1400);
-          this._count('statClients',    this.publicStats.totalClients,     2400);
-          this._count('statReviews',    this.publicStats.totalReviews,     1800);
-        }
-        this._observer!.unobserve(entry.target);
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-    if (this._platformBrowser) {
-      this._observeScrollReveals();
-      const stats = document.getElementById('stats-row');
-      if (stats) this._observer.observe(stats);
-    }
-  }
-
-  private _observeScrollReveals(): void {
-    if (!this._observer) return;
-    document.querySelectorAll('.scroll-reveal').forEach(el => {
-      if (el.classList.contains('in-view')) return;
-      this._observer!.observe(el);
-    });
-  }
-
-  private _count(prop: 'statProducts'|'statCategories'|'statClients'|'statReviews', target: number, ms: number): void {
-    const t0 = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min((now - t0) / ms, 1);
-      const val = Math.round((1 - Math.pow(1 - p, 4)) * target);
-      switch (prop) {
-        case 'statProducts':   this.statProducts = val; break;
-        case 'statCategories': this.statCategories = val; break;
-        case 'statClients':    this.statClients = val; break;
-        case 'statReviews':    this.statReviews = val; break;
-      }
-      this.cdr.detectChanges();
-      if (p < 1) {
-        const id = requestAnimationFrame(tick);
-        this._frameIds.push(id);
-      }
-    };
-    const id = requestAnimationFrame(tick);
-    this._frameIds.push(id);
+  onRetryTab(tab: ShowcaseTabKey): void {
+    if (tab === 'featured') this.loadFeatured();
+    else if (tab === 'new') this.loadProducts();
+    else this.loadBestsellers();
   }
 
   onQuickAddProduct(product: ProductSummaryResponse): void {
@@ -590,7 +190,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       this.router.navigate(['/products', product.slug]);
       return;
     }
-    if (this.cartProductIds.has(product.id)) {
+    if (this.cartProductIds().has(product.id)) {
       this.toastService.info('Déjà dans votre panier');
       return;
     }
@@ -608,5 +208,149 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   onToggleFavoriteProduct(product: ProductSummaryResponse): void {
     const added = this.wishlistService.toggle(product.id);
     this.toastService.info(added ? 'Ajouté aux favoris' : 'Retiré des favoris');
+  }
+
+  loadCategories(): void {
+    this.categoriesLoading.set(true);
+    this.categoriesError.set(false);
+    this.categoryService.getCategories()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (r) => {
+          this.categories.set(r.success && Array.isArray(r.data) ? r.data : []);
+          this.categoriesLoading.set(false);
+        },
+        error: () => {
+          this.categoriesError.set(true);
+          this.categoriesLoading.set(false);
+        },
+      });
+  }
+
+  loadFeatured(): void {
+    this.featuredLoading.set(true);
+    this.featuredError.set(false);
+    this.productService.getFeaturedProducts(8)
+      .pipe(retry({ count: 2, delay: 1000 }), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (r) => {
+          this.featuredProducts.set(r.success && Array.isArray(r.data) ? r.data : []);
+          this.featuredLoading.set(false);
+        },
+        error: () => {
+          this.featuredError.set(true);
+          this.featuredLoading.set(false);
+        },
+      });
+  }
+
+  loadBestsellers(): void {
+    this.bestsellersLoading.set(true);
+    this.bestsellersError.set(false);
+    this.productService.getBestsellers(8)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (r) => {
+          this.bestsellers.set(r.success && Array.isArray(r.data) ? r.data : []);
+          this.bestsellersLoading.set(false);
+        },
+        error: () => {
+          this.bestsellersError.set(true);
+          this.bestsellersLoading.set(false);
+        },
+      });
+  }
+
+  loadProducts(): void {
+    this.newProductsLoading.set(true);
+    this.newProductsError.set(false);
+    this.productService.getProducts({ page: 0, size: 24, sort: 'newest' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (r) => {
+          if (r.success && r.data) {
+            const pg = r.data as PageResponse<ProductSummaryResponse>;
+            const content = pg.content ?? [];
+            this.newProducts.set(content.filter(p => this.isNew(p)).slice(0, 8));
+            this.discountProducts.set(
+              content.filter(p => Boolean(p.discountPercent && p.discountPercent > 0)).slice(0, 4),
+            );
+          }
+          this.newProductsLoading.set(false);
+        },
+        error: () => {
+          this.newProductsError.set(true);
+          this.newProductsLoading.set(false);
+        },
+      });
+  }
+
+  loadPublicStats(): void {
+    this.statsError.set(false);
+    this.dashboardService.getPublicStats()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (r) => {
+          if (r.success && r.data) {
+            this.publicStats.set(r.data as PublicStats);
+          }
+        },
+        error: () => {
+          this.statsError.set(true);
+        },
+      });
+  }
+
+  loadReviews(): void {
+    this.reviewsLoading.set(true);
+    this.reviewsError.set(false);
+    this.reviewService.getFeaturedReviews()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (r) => {
+          this.featuredReviews.set(r.success && Array.isArray(r.data) ? r.data.slice(0, 6) : []);
+          this.reviewsLoading.set(false);
+        },
+        error: () => {
+          this.reviewsError.set(true);
+          this.reviewsLoading.set(false);
+        },
+      });
+  }
+
+  private loadFirstOrderPromo(): void {
+    this.promoService.getActivePromos()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (r) => {
+          if (r.success && Array.isArray(r.data)) {
+            this.firstOrderPromo.set(r.data.find(p => p.firstOrderOnly) ?? null);
+          }
+        },
+        error: () => {
+          // Non bloquant : l'absence de promo d'accueil reste silencieuse
+        },
+      });
+  }
+
+  private subscribeStockUpdates(): void {
+    this.wsService.stockUpdate$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(update => {
+        const patchStock = (items: ProductSummaryResponse[]) =>
+          items.some(p => p.id === update.productId)
+            ? items.map(p => (p.id === update.productId ? { ...p, stock: update.stock } : p))
+            : items;
+
+        this.newProducts.update(patchStock);
+        this.discountProducts.update(patchStock);
+        this.featuredProducts.update(patchStock);
+        this.bestsellers.update(patchStock);
+      });
+  }
+
+  private isNew(product: ProductSummaryResponse): boolean {
+    if (!product.createdAt) return false;
+    return (Date.now() - new Date(product.createdAt).getTime()) / 86400000 <= NEW_PRODUCT_DAYS;
   }
 }

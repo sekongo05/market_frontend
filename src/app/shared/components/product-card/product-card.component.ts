@@ -23,6 +23,7 @@ export class ProductCardComponent {
   @Input() inCart = false;
   @Input() isFavorite = false;
   @Input() showQuickView = true;
+  @Input() tone: 'light' | 'dark' = 'light';
   @Input() sizes = '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw';
 
   @Output() quickView = new EventEmitter<ProductSummaryResponse>();

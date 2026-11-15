@@ -30,16 +30,36 @@ export class RegisterComponent implements OnInit {
   firstOrderPromo: PublicPromoResponse | null = null;
 
   step = 1;
-  readonly totalSteps = 3;
+  readonly totalSteps = 2;
 
   private readonly stepFields = [
-    ['nom', 'prenom'],
-    ['email', 'phone'],
+    ['nom', 'prenom', 'email', 'phone'],
     ['password', 'confirmPassword'],
   ];
 
   isStepDone(n: number): boolean {
     return n < this.step;
+  }
+
+  get passwordValue(): string {
+    return (this.registerForm?.get('password')?.value as string) || '';
+  }
+
+  get hasMinLength(): boolean {
+    return this.passwordValue.length >= 8;
+  }
+
+  get hasUpperCase(): boolean {
+    return /[A-Z]/.test(this.passwordValue);
+  }
+
+  get hasDigit(): boolean {
+    return /\d/.test(this.passwordValue);
+  }
+
+  get passwordsMismatch(): boolean {
+    const confirm = (this.registerForm?.get('confirmPassword')?.value as string) || '';
+    return confirm.length > 0 && confirm !== this.passwordValue;
   }
 
   nextStep(): void {
@@ -65,7 +85,10 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
     this.promoService.getActivePromos().subscribe({
       next: (r) => {
-        if (r.success) this.firstOrderPromo = r.data.find(p => p.firstOrderOnly) ?? null;
+        if (r.success) {
+          this.firstOrderPromo = r.data.find(p => p.firstOrderOnly) ?? null;
+          this.cdr.detectChanges();
+        }
       },
       error: (err) => { console.error('Failed to load promos', err); },
     });

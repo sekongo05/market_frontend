@@ -1,9 +1,9 @@
 <a [routerLink]="['/products', product.slug]"
-   class="product-card group flex flex-col select-none animate-fade-in-up"
-   [style.animation-delay]="((index % 8) * 0.05) + 's'">
+   class="product-card group flex flex-col select-none"
+   [class.product-card--dark]="tone === 'dark'">
 
-  <!-- Surface image éditoriale sans bordure -->
-  <div class="product-card__media relative aspect-[3/4] flex items-center justify-center mb-2.5 overflow-hidden">
+  <!-- Surface image éditoriale -->
+  <div class="product-card__media relative aspect-[3/4] flex items-center justify-center mb-3 overflow-hidden">
     <img [src]="displayImage | mediaUrl: 1000"
          [attr.srcset]="(displayImage | mediaUrl: 500) + ' 500w, ' + (displayImage | mediaUrl: 1000) + ' 1000w'"
          [attr.sizes]="sizes"
@@ -11,23 +11,22 @@
          [attr.loading]="priorityImage ? 'eager' : 'lazy'"
          [attr.fetchpriority]="priorityImage ? 'high' : null"
          decoding="async"
-         class="product-card__img max-w-full max-h-full w-auto h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+         class="product-card__img max-w-full max-h-full w-auto h-auto object-contain p-3 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
          [class.opacity-55]="isOutOfStock"
          (error)="$any($event.target).src='/product-placeholder.svg'" />
 
     <!-- Badges haut-gauche -->
     <div class="absolute top-2.5 left-2.5 flex flex-col items-start gap-1 pointer-events-none z-10">
       @if (isOutOfStock) {
-        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-neutral-900/80 text-white">
+        <span class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] bg-[#111111]/85 text-white">
           Épuisé
         </span>
       } @else if (hasDiscount) {
-        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wide bg-orange-500 text-white">
+        <span class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] bg-[#0a0a0a] text-[#d4af37] border border-[#d4af37]/35">
           −{{ product.discountPercent }}%
         </span>
       } @else if (isNewProduct) {
-        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider text-black"
-              style="background:rgba(212,175,55,0.92);">
+        <span class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] bg-white/95 text-[#111111] border border-[#111111]/12">
           Nouveau
         </span>
       }
@@ -85,13 +84,13 @@
           @if (showQuickView) {
             <button type="button"
                     (click)="onQuickView($event)"
-                    class="product-card__action-btn flex-1 py-2 px-2.5 text-[11px] font-bold tracking-wide uppercase rounded-md backdrop-blur-md transition-colors">
+                    class="product-card__action-btn flex-1 py-2.5 px-3 text-[10px] font-semibold tracking-[0.2em] uppercase transition-colors">
               Aperçu
             </button>
           }
           <button type="button"
                   (click)="onQuickAdd($event)"
-                  class="product-card__add-btn flex-1 py-2 px-2.5 text-[11px] font-bold tracking-wide uppercase rounded-md transition-colors"
+                  class="product-card__add-btn flex-1 py-2.5 px-3 text-[10px] font-semibold tracking-[0.2em] uppercase transition-colors"
                   [class.product-card__add-btn--done]="inCart">
             @if (inCart) {
               Dans le panier
@@ -124,35 +123,35 @@
   </div>
 
   <!-- Informations produit alignées sous l'image -->
-  <div class="flex items-center justify-between gap-2 mb-0.5 min-h-[1rem]">
-    <span class="text-[11px] uppercase tracking-wider theme-muted truncate">
+  <div class="flex items-center justify-between gap-2 mb-1 min-h-[1rem]">
+    <span class="product-card__cat text-[10px] uppercase tracking-[0.22em] truncate">
       {{ product.categoryName || 'Collection' }}
     </span>
     @if (product.variantCount > 0) {
-      <span class="text-[10px] font-medium theme-muted flex-shrink-0">
-        +{{ product.variantCount }} opt.
+      <span class="product-card__cat text-[10px] font-medium flex-shrink-0">
+        {{ product.variantCount }} options
       </span>
     }
   </div>
 
-  <h3 class="font-medium theme-text text-[13px] sm:text-sm leading-snug line-clamp-2 min-h-[2.4rem] mb-1 group-hover:text-gold transition-colors">
+  <h3 class="product-card__title font-medium text-[13px] sm:text-sm leading-snug line-clamp-2 min-h-[2.4rem] mb-1.5 transition-colors">
     {{ product.name }}
   </h3>
 
-  <div class="flex items-baseline gap-1.5 flex-wrap mt-auto">
+  <div class="flex items-baseline gap-2 flex-wrap mt-auto">
     @if (hasDiscount) {
-      <span class="font-bold text-[13px] sm:text-sm text-orange-600">
+      <span class="product-card__price text-[13px] sm:text-sm font-semibold tabular-nums">
         {{ product.salePrice | number:'1.0-0':'fr-FR' }}
       </span>
-      <span class="text-[11px] theme-muted line-through">
+      <span class="product-card__cat text-[11px] line-through tabular-nums">
         {{ product.price | number:'1.0-0':'fr-FR' }}
       </span>
     } @else {
-      <span class="font-bold text-[13px] sm:text-sm theme-text">
+      <span class="product-card__price text-[13px] sm:text-sm font-semibold tabular-nums">
         {{ product.price | number:'1.0-0':'fr-FR' }}
       </span>
     }
-    <span class="text-[11px] font-semibold text-gold/80">FCFA</span>
+    <span class="product-card__currency text-[10px] font-semibold tracking-[0.14em]">FCFA</span>
   </div>
 </a>
 

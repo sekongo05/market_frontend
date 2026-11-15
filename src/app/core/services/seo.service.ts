@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Renderer2, RendererFactory2, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { DOCUMENT } from '@angular/common';
 
@@ -25,6 +25,7 @@ export class SeoService {
   private meta = inject(Meta);
   private title = inject(Title);
   private doc = inject(DOCUMENT);
+  private renderer: Renderer2 = inject(RendererFactory2).createRenderer(null, null);
 
   set(config: SeoConfig): void {
     const fullTitle = `${config.title} — ${SITE_NAME}`;
@@ -72,26 +73,28 @@ export class SeoService {
   }
 
   private _setCanonical(url: string): void {
-    let link: HTMLLinkElement = this.doc.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    let link = this.doc.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!link) {
-      link = this.doc.createElement('link');
-      link.setAttribute('rel', 'canonical');
-      this.doc.head.appendChild(link);
+      link = this.renderer.createElement('link') as HTMLLinkElement;
+      this.renderer.setAttribute(link, 'rel', 'canonical');
+      this.renderer.appendChild(this.doc.head, link);
     }
-    link.setAttribute('href', url);
+    this.renderer.setAttribute(link, 'href', url);
   }
 
   private _setJsonLd(data: object): void {
     this._removeJsonLd();
-    const script = this.doc.createElement('script');
-    script.type = 'application/ld+json';
-    script.id = 'json-ld-structured';
-    script.textContent = JSON.stringify(data);
-    this.doc.head.appendChild(script);
+    const script = this.renderer.createElement('script') as HTMLScriptElement;
+    this.renderer.setAttribute(script, 'type', 'application/ld+json');
+    this.renderer.setAttribute(script, 'id', 'json-ld-structured');
+    this.renderer.setProperty(script, 'textContent', JSON.stringify(data));
+    this.renderer.appendChild(this.doc.head, script);
   }
 
   private _removeJsonLd(): void {
     const existing = this.doc.getElementById('json-ld-structured');
-    existing?.remove();
+    if (existing?.parentNode) {
+      this.renderer.removeChild(existing.parentNode, existing);
+    }
   }
 }

@@ -6,6 +6,11 @@
 @theme {
   --color-gold: #d4af37;
   --color-gold-dark: #b8860b;
+  --color-maison-ivory: #faf8f5;
+  --color-maison-stone: #f2efe9;
+  --color-maison-obsidian: #0a0a0a;
+  --color-maison-charcoal: #141414;
+  --font-display: 'Bodoni Moda', Georgia, serif;
 }
 
 /* ─── Theme transition ────────────────────────────────────────────────────── */
