@@ -89,6 +89,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private _preloaded = new Set<string>();
   private _frameIds: number[] = [];
   private _transitionTimeout: ReturnType<typeof setTimeout> | null = null;
+  private _heroRafId: number | null = null;
 
   private _observer?: IntersectionObserver;
   private _statsAnimated = false;
@@ -214,6 +215,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this._frameIds.forEach(id => cancelAnimationFrame(id));
     this._frameIds = [];
     if (this._transitionTimeout) clearTimeout(this._transitionTimeout);
+    if (this._heroRafId !== null && this._platformBrowser) {
+      cancelAnimationFrame(this._heroRafId);
+      this._heroRafId = null;
+    }
     if (this._platformBrowser && !this._isTouchDevice) {
       document.removeEventListener('mousemove', this._onCursorMove);
       document.removeEventListener('mouseover', this._onCursorOver);
@@ -261,19 +266,30 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   onHeroMouseMove(event: MouseEvent): void {
-    if (!this._platformBrowser || window.matchMedia('(hover: none)').matches) return;
+    if (!this._platformBrowser || this._isTouchDevice) return;
     const section = event.currentTarget as HTMLElement;
-    const rect    = section.getBoundingClientRect();
-    const cx = (event.clientX - rect.left) / rect.width  - 0.5;
-    const cy = (event.clientY - rect.top)  / rect.height - 0.5;
-    const parallax = section.querySelector('.hero-parallax') as HTMLElement | null;
-    if (parallax) parallax.style.transform = `translate(${(cx * -12).toFixed(2)}px, ${(cy * -8).toFixed(2)}px)`;
-    section.style.setProperty('--mx', ((event.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%');
-    section.style.setProperty('--my', ((event.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%');
+    const clientX = event.clientX;
+    const clientY = event.clientY;
+    if (this._heroRafId !== null) cancelAnimationFrame(this._heroRafId);
+    this._heroRafId = requestAnimationFrame(() => {
+      this._heroRafId = null;
+      const rect = section.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const cx = (clientX - rect.left) / rect.width - 0.5;
+      const cy = (clientY - rect.top) / rect.height - 0.5;
+      const parallax = section.querySelector('.hero-parallax') as HTMLElement | null;
+      if (parallax) parallax.style.transform = `translate(${(cx * -12).toFixed(2)}px, ${(cy * -8).toFixed(2)}px)`;
+      section.style.setProperty('--mx', ((clientX - rect.left) / rect.width * 100).toFixed(1) + '%');
+      section.style.setProperty('--my', ((clientY - rect.top) / rect.height * 100).toFixed(1) + '%');
+    });
   }
 
   onHeroMouseLeave(event: MouseEvent): void {
-    if (!this._platformBrowser || window.matchMedia('(hover: none)').matches) return;
+    if (!this._platformBrowser || this._isTouchDevice) return;
+    if (this._heroRafId !== null) {
+      cancelAnimationFrame(this._heroRafId);
+      this._heroRafId = null;
+    }
     const parallax = (event.currentTarget as HTMLElement).querySelector('.hero-parallax') as HTMLElement | null;
     if (parallax) parallax.style.transform = '';
   }
@@ -309,6 +325,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this._startProgress();
     this.cdr.detectChanges();
     if (this._transitionTimeout) clearTimeout(this._transitionTimeout);
+    if (this._heroRafId !== null && this._platformBrowser) {
+      cancelAnimationFrame(this._heroRafId);
+      this._heroRafId = null;
+    }
     this._transitionTimeout = setTimeout(() => { this._isTransitioning = false; }, 600);
   }
 

@@ -91,8 +91,6 @@
 .hero-slide {
   opacity: 0;
   object-position: center;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
   will-change: opacity;
   transition: opacity 2.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -252,19 +250,19 @@
 }
 
 .hero-content.visible .hero-content-eyebrow {
-  animation: fade-blur-in 6s ease-out 0.3s both;
+  animation: fade-blur-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 }
 
 .hero-content.visible .hero-content-desc {
-  animation: text-reveal 6s ease-out 0.8s both;
+  animation: text-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
 }
 
 .hero-content.visible .hero-content-ctas {
-  animation: slide-up-fade 6s ease-out 1.2s both;
+  animation: slide-up-fade 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.34s both;
 }
 
 .hero-content.visible .hero-content-ctas a:first-child {
-  animation: cta-pulse 3s ease-in-out 2s infinite;
+  animation: cta-pulse 3s ease-in-out 1.4s infinite;
 }
 
 /* ─── Elements permanents ─── */
@@ -275,14 +273,14 @@
 }
 
 .hero-permanent > * {
-  animation: slide-up-fade 0.8s ease 0.9s both;
+  animation: slide-up-fade 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both;
 }
 
 /* ─── Animations existantes conservées ─── */
-.hero-line-v   { animation: line-draw-y 1.6s ease-out 0.2s both,
-                            drift-line 6s ease-in-out 2.5s infinite; transform-origin: top; }
+.hero-line-v   { animation: line-draw-y 1.2s ease-out 0.15s both,
+                            drift-line 6s ease-in-out 2s infinite; transform-origin: top; }
 .hero-wrap     { display: block; overflow: hidden; }
-.hero-word     { display: inline-block; white-space: nowrap; animation: word-rise 1.4s ease-out both; }
+.hero-word     { display: inline-block; white-space: nowrap; animation: word-rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .hero-title    { min-height: clamp(5rem, 14vw, 9rem); }
 
 /* Réduction du délai sur mobile */
@@ -614,11 +612,46 @@
   background: linear-gradient(to bottom, #f8f5f0, #0e0500);
 }
 
-/* Section éditoriale (#060606) → fond clair */
+/* Section éditoriale (#030303) → fond clair */
 .sdm-sep--from-editorial {
-  background: linear-gradient(to bottom, #060606 0%, rgba(6,6,6,0.85) 30%, rgba(212,175,55,0.04) 55%, #f8f5f0 100%);
+  background: linear-gradient(to bottom, #030303 0%, rgba(3,3,3,0.85) 30%, rgba(212,175,55,0.04) 55%, #f8f5f0 100%);
 }
 
-/* ─── Décorations CTA ─── */
+/* ─── Accessibilité : réduction du mouvement (WCAG 2.3.3) ─── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide.active,
+  .hero-slide.active.no-ken,
+  .hero-content-line,
+  .hero-content.visible .hero-content-eyebrow,
+  .hero-content.visible .hero-content-desc,
+  .hero-content.visible .hero-content-ctas,
+  .hero-content.visible .hero-content-ctas a:first-child,
+  .hero-permanent > *,
+  .hero-line-v,
+  .hero-word,
+  .hero-sig,
+  .hero-badge,
+  .particle,
+  .hero-spotlight::after,
+  .gold-shimmer::after,
+  .marquee-track,
+  #sdm-cursor.sdm-visible .sdm-cursor-ring,
+  .card-appear,
+  #stats-row.in-view .stat-num,
+  .gold-line-pulse,
+  .cta-halo {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .scroll-reveal:not(.in-view) .r-up,
+  .scroll-reveal:not(.in-view) .r-left,
+  .scroll-reveal:not(.in-view) .r-right,
+  .scroll-reveal:not(.in-view) .r-scale,
+  .scroll-reveal:not(.in-view) .r-line {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
 
 

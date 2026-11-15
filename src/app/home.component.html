@@ -103,24 +103,24 @@
     <!-- ════ CONTENU ANIMÉ PAR SLIDE ════ -->
     <div class="relative flex flex-col justify-end lg:justify-center min-h-screen
                 px-7 sm:px-12 lg:px-16 xl:px-24
-                pb-20 pt-28 sm:pt-36 lg:pb-0 lg:pt-0 lg:max-w-[56%]" style="z-index:10">
+                pb-16 pt-24 sm:pt-32 lg:pb-10 lg:pt-20 lg:max-w-[56%]" style="z-index:10">
 
       <div class="hero-content visible">
-        <div class="hidden lg:block w-8 h-[1px] mb-14 hero-content-line" style="background:#d4af37;"></div>
+        <div class="hidden lg:block w-8 h-[1px] mb-10 hero-content-line" style="background:#d4af37;"></div>
 
-        <div class="flex items-center gap-2.5 mb-7 sm:mb-9 hero-content-eyebrow">
+        <div class="flex items-center gap-2.5 mb-5 sm:mb-7 hero-content-eyebrow">
           <div class="relative flex h-2 w-2 flex-shrink-0">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60"
               style="background:#d4af37;"></span>
             <span class="relative inline-flex rounded-full h-2 w-2" style="background:#d4af37;"></span>
           </div>
           <p class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.45em] font-bold"
-            style="color:rgba(212,175,55,0.72);">
+            style="color:rgba(212,175,55,0.82);">
             SDM Store
           </p>
         </div>
 
-        <h1 class="hero-title font-black leading-[0.85] tracking-tight text-white mb-9 sm:mb-11 flex flex-col gap-2">
+        <h1 class="hero-title font-black leading-[0.85] tracking-tight text-white mb-6 sm:mb-8 flex flex-col gap-2">
           <span class="hero-wrap">
             <span class="hero-word" style="font-size:clamp(2rem,5.5vw,4rem);">L'ÉLÉGANCE</span>
           </span>
@@ -129,24 +129,24 @@
           </span>
         </h1>
 
-        <p class="max-w-xs leading-relaxed mb-8 hero-content-desc"
-          style="color:rgba(255,255,255,0.65);font-size:0.875rem;">
+        <p class="max-w-xs leading-relaxed mb-6 hero-content-desc"
+          style="color:rgba(255,255,255,0.72);font-size:0.875rem;">
           L'authentique, livré chez vous.
         </p>
 
-        <div class="flex flex-col sm:flex-row gap-3 mb-8 hero-content-ctas">
-          <a routerLink="/products" class="inline-flex items-center gap-3 px-7 py-4 text-xs uppercase tracking-[0.2em] font-black text-black
+        <div class="flex flex-col sm:flex-row gap-3 mb-6 hero-content-ctas">
+          <a routerLink="/products" class="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-xl text-xs uppercase tracking-[0.2em] font-black text-black
                     hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
             style="background:#d4af37;box-shadow:0 8px 28px rgba(212,175,55,0.3)">
             Explorer la boutique
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </a>
           @if (!(currentUser$ | async)) {
-          <a routerLink="/auth/register" class="inline-flex items-center justify-center px-7 py-4 text-xs uppercase tracking-[0.2em] font-bold
-                      border hover:border-white/30 hover:text-white/80 transition-all duration-300"
-            style="color:rgba(255,255,255,0.48);border-color:rgba(255,255,255,0.14);">
+          <a routerLink="/auth/register" class="inline-flex items-center justify-center px-7 py-4 rounded-xl text-xs uppercase tracking-[0.2em] font-bold
+                      border hover:border-white/35 hover:text-white/90 transition-all duration-300"
+            style="color:rgba(255,255,255,0.68);border-color:rgba(255,255,255,0.18);">
             Créer un compte
           </a>
           }
@@ -156,20 +156,21 @@
       <!-- Search + Trust chips (toujours visibles) -->
       <div class="hero-permanent">
         <!-- Barre de recherche -->
-        <div class="mb-4 sm:mb-6 flex gap-2 max-w-md w-full">
-          <div class="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl"
-            style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);">
-            <svg class="w-4 h-4 flex-shrink-0" style="color:rgba(212,175,55,0.6);" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24">
+        <div class="mb-4 sm:mb-5 flex gap-2 max-w-md w-full">
+          <div class="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl backdrop-blur-md transition-all duration-300
+                      border border-white/15 bg-white/[0.07] focus-within:border-[#d4af37]/60 focus-within:bg-white/[0.11]">
+            <svg class="w-4 h-4 flex-shrink-0" style="color:rgba(212,175,55,0.75);" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input [(ngModel)]="searchQuery" (keydown)="onSearchKey($event)" type="text"
+              aria-label="Rechercher un article"
               placeholder="Rechercher un article…"
-              class="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none min-w-0" />
+              class="flex-1 bg-transparent text-sm text-white placeholder:text-white/40 outline-none min-w-0" />
           </div>
           <button (click)="search()" aria-label="Lancer la recherche"
-            class="px-4 py-3 text-black transition-all hover:-translate-y-0.5 flex items-center justify-center flex-shrink-0"
+            class="px-4 py-3 rounded-xl text-black transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center flex-shrink-0"
             style="background:#d4af37;">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -179,7 +180,7 @@
         </div>
 
         <!-- Trust chips -->
-        <div class="flex flex-wrap gap-2 mb-10">
+        <div class="flex flex-wrap gap-2 mb-6">
           <span
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)] font-bold uppercase tracking-wider"
             style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.28);color:rgba(212,175,55,0.88);">
@@ -214,7 +215,7 @@
         </div>
       </div>
 
-      <div class="hero-sig hidden lg:flex items-center gap-5 mt-auto pt-20" style="color:rgba(255,255,255,0.38);">
+      <div class="hero-sig hidden lg:flex items-center gap-5 mt-auto pt-10" style="color:rgba(255,255,255,0.48);">
         <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em]">Est. 2020</span>
         <div class="w-6 h-[1px]" style="background:rgba(255,255,255,0.2)"></div>
         <span class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em]">Abidjan · CI</span>
@@ -376,7 +377,7 @@
           <div class="flex items-center gap-4">
             <div class="h-[1px] w-8 transition-all duration-700 group-hover:w-20" style="background:#d4af37;"></div>
             <span
-              class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em] transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+              class="text-[clamp(0.75rem,1.5vw,0.875rem)] uppercase tracking-[0.4em] transition-opacity duration-500 opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
               style="color:#d4af37;">Explorer →</span>
           </div>
         </div>
@@ -412,8 +413,8 @@
     <div class="flex flex-wrap gap-2 px-5 sm:px-8 lg:px-12 mt-4">
       @for (cat of categories.slice(3); track cat.id) {
       <a [href]="'/products?categorie=' + cat.slug" (click)="goToCategory(cat.slug); $event.preventDefault()"
-        class="flex items-center gap-2 px-4 py-2.5 border text-sm font-bold transition-all hover:border-gold/50 hover:text-gold cursor-pointer r-up"
-        style="border-color:rgba(0,0,0,0.12);color:rgba(0,0,0,0.5);" [style.transition-delay.ms]="($index) * 60 + 200">
+        class="flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-bold transition-all hover:border-gold/50 hover:text-gold cursor-pointer r-up"
+        style="border-color:rgba(17,17,17,0.16);color:rgba(17,17,17,0.68);" [style.transition-delay.ms]="($index) * 60 + 200">
         <span class="uppercase">{{ cat.name }}</span>
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -447,11 +448,11 @@
           style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">SÉLECTION</h2>
       </div>
       <a routerLink="/products" [queryParams]="{featured: true}"
-        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
-        style="color:rgba(0,0,0,0.25);border-color:rgba(0,0,0,0.12);transition-delay:180ms">Voir tout</a>
+        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-[#b8860b]"
+        style="color:rgba(17,17,17,0.62);border-color:rgba(17,17,17,0.22);transition-delay:180ms">Voir tout</a>
     </div>
 
-    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
+    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth scroll-pl-5 sm:scroll-pl-0
                   sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
       @for (product of featuredProducts; track product.id; let idx = $index) {
       <div class="card-appear flex-shrink-0 w-[52vw] sm:w-auto snap-start"
@@ -490,10 +491,10 @@
                   sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
       @for (_ of skeletonArray; track $index) {
       <div class="flex-shrink-0 w-[52vw] sm:w-auto">
-        <div style="aspect-ratio:3/4;" class="rounded-lg bg-white/30 animate-pulse mb-3"></div>
-        <div class="h-2 w-16 rounded bg-white/30 animate-pulse mb-1.5"></div>
-        <div class="h-3 w-28 rounded bg-white/30 animate-pulse mb-2"></div>
-        <div class="h-3 w-20 rounded bg-white/30 animate-pulse"></div>
+        <div style="aspect-ratio:3/4;" class="skeleton rounded-lg mb-3"></div>
+        <div class="skeleton h-2 w-16 rounded mb-1.5"></div>
+        <div class="skeleton h-3 w-28 rounded mb-2"></div>
+        <div class="skeleton h-3 w-20 rounded"></div>
       </div>
       }
     </div>
@@ -520,8 +521,8 @@
       </div>
       @if (!bestsellersLoading && bestsellers.length > 0) {
       <a routerLink="/products"
-        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
-        style="color:rgba(0,0,0,0.35);border-color:rgba(0,0,0,0.14);transition-delay:180ms">Voir tout</a>
+        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-[#b8860b]"
+        style="color:rgba(17,17,17,0.62);border-color:rgba(17,17,17,0.22);transition-delay:180ms">Voir tout</a>
       }
     </div>
 
@@ -530,15 +531,15 @@
                   sm:grid sm:grid-cols-4 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
       @for (_ of skeletonArray; track $index) {
       <div class="flex-shrink-0 w-[60vw] sm:w-auto">
-        <div style="aspect-ratio:3/4;" class="rounded-lg bg-white/30 animate-pulse mb-3"></div>
-        <div class="h-2 w-16 rounded bg-white/30 animate-pulse mb-1.5"></div>
-        <div class="h-3 w-28 rounded bg-white/30 animate-pulse mb-2"></div>
-        <div class="h-3 w-20 rounded bg-white/30 animate-pulse"></div>
+        <div style="aspect-ratio:3/4;" class="skeleton rounded-lg mb-3"></div>
+        <div class="skeleton h-2 w-16 rounded mb-1.5"></div>
+        <div class="skeleton h-3 w-28 rounded mb-2"></div>
+        <div class="skeleton h-3 w-20 rounded"></div>
       </div>
       }
     </div>
     } @else if (bestsellers.length > 0) {
-    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
+    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth scroll-pl-5 sm:scroll-pl-0
                   sm:grid sm:grid-cols-4 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
       @for (product of bestsellers.slice(0,4); track product.id; let idx = $index) {
       <div class="card-appear flex-shrink-0 w-[60vw] sm:w-auto snap-start"
@@ -602,8 +603,8 @@
           style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:160ms">NOUVEAUTÉS</h2>
       </div>
       <a routerLink="/products"
-        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-gold"
-        style="color:rgba(0,0,0,0.35);border-color:rgba(0,0,0,0.14);transition-delay:200ms">Tout voir</a>
+        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-[#b8860b]"
+        style="color:rgba(17,17,17,0.62);border-color:rgba(17,17,17,0.22);transition-delay:200ms">Tout voir</a>
     </div>
 
     @if (newProductsLoading) {
@@ -678,17 +679,17 @@
             Temps limité
           </span>
         </div>
-        <h2 class="r-up font-black theme-text tracking-tight leading-none"
+        <h2 class="r-up font-black text-white tracking-tight leading-none"
           style="font-size:clamp(2.4rem,7vw,5.5rem);transition-delay:120ms">
           VENTES<br><span style="color:#f97316;">FLASH</span>
         </h2>
       </div>
       <a routerLink="/products"
-        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] sm:text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-orange-600"
-        style="color:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.1);transition-delay:180ms">Voir tout</a>
+        class="r-up text-[clamp(0.75rem,1.5vw,0.875rem)] font-black uppercase tracking-[0.35em] pb-0.5 border-b transition-colors hover:text-orange-500"
+        style="color:rgba(255,255,255,0.65);border-color:rgba(255,255,255,0.25);transition-delay:180ms">Voir tout</a>
     </div>
 
-    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth
+    <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-none scroll-fade-right snap-x snap-mandatory scroll-smooth scroll-pl-5 sm:scroll-pl-0
                   sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-8 lg:px-12">
       @for (product of discountProducts; track product.id; let idx = $index) {
       <div class="card-appear flex-shrink-0 w-[70vw] sm:w-auto snap-start"
@@ -729,7 +730,7 @@
         </div>
 
         <!-- Text Block (Overlapping) -->
-        <div class="r-left lg:col-span-6 lg:col-start-1 row-start-1 relative z-10 mt-[-100px] lg:mt-0 lg:-mr-16"
+        <div class="r-left lg:col-span-6 lg:col-start-1 row-start-1 relative z-10 -mt-12 sm:-mt-16 lg:mt-0 lg:-mr-16"
           style="transition-delay:100ms;">
           <div
             class="p-8 lg:p-14 backdrop-blur-2xl bg-[#080808]/80 border-t border-l border-[#d4af37]/20 shadow-2xl relative overflow-hidden">
@@ -828,14 +829,8 @@
         '24–48h Abidjan · 72h intérieur CI.' },
         { icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357
         2H15', title: 'Retour 3 jours', desc: 'Remboursement garanti sans friction.' },
-        { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003
-        9c0
-        5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Paiements
-        Sécurisés', desc: 'Vos paiements sont traités en toute sécurité en ligne via GeniusPay.' },
-        { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003
-        9c0
-        5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Qualité
-        vérifiée',
+        { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', title: 'Paiements Sécurisés', desc: 'Vos paiements sont traités en toute sécurité en ligne via GeniusPay.' },
+        { icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z', title: 'Qualité vérifiée',
         desc: 'Chaque article inspecté avant expédition.' }
         ]; track p.title; let i = $index) {
         <div
@@ -900,7 +895,8 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @for (review of featuredReviews; track review.id; let i = $index) {
-        <div class="r-up flex flex-col gap-4 p-6 border" style="border-color:rgba(0,0,0,0.09);background:#ffffff;"
+        <div class="r-up flex flex-col gap-4 p-6 rounded-2xl border shadow-[0_2px_20px_rgba(0,0,0,0.03)] hover:border-[#d4af37]/30 transition-colors"
+          style="border-color:rgba(0,0,0,0.09);background:#ffffff;"
           [style.transition-delay.ms]="i * 80 + 200">
           <div class="flex items-center gap-0.5">
             @for (star of starArray(); track star) {
