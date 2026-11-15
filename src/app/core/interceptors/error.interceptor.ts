@@ -84,7 +84,11 @@ export class ErrorInterceptor implements HttpInterceptor {
     } else if (error.status === 404 && (!rawMessage || rawMessage.toLowerCase().includes("not found"))) {
       userFriendlyMessage = "L'élément demandé est introuvable.";
     } else if (error.status === 429) {
-      userFriendlyMessage = "Trop de requêtes effectuées. Veuillez patienter un instant.";
+      const role = this.authService.getCurrentUser()?.role;
+      const isBackofficeUser = role === "ADMIN" || role === "MANAGER";
+      userFriendlyMessage = isBackofficeUser
+        ? "Trop de requêtes effectuées (429). Veuillez patienter un instant."
+        : "Le service est momentanément très sollicité. Merci de patienter quelques instants avant de réessayer.";
     } else if (!userFriendlyMessage) {
       userFriendlyMessage = "Une erreur est survenue lors de l'opération.";
     }
