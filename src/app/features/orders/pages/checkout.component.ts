@@ -36,6 +36,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   promoError: string | null = null;
 
   currentStep: 1 | 2 | 3 = 1;
+  paymentMethod: 'ONLINE' | 'CASH_ON_DELIVERY' = 'ONLINE';
   stepError: string | null = null;
   checkoutLoading = false;
   checkoutError: string | null = null;
@@ -147,6 +148,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.checkoutError = null;
   }
 
+  selectPaymentMethod(method: 'ONLINE' | 'CASH_ON_DELIVERY'): void {
+    if (method === 'CASH_ON_DELIVERY' && this.deliveryZone !== 'abidjan') return;
+    this.paymentMethod = method;
+  }
+
   placeOrder(): void {
     this.checkoutError = null;
 
@@ -174,6 +180,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       : `Intérieur du pays — ${this.deliveryCity}`;
     const fullAddress = `${adresse} | Tél: ${this.deliveryPhone.trim()}`;
 
+    if (this.paymentMethod === 'CASH_ON_DELIVERY' && this.deliveryZone !== 'abidjan') {
+      this.paymentMethod = 'ONLINE';
+    }
+
     const payload: any = {
       items: this.cartItems.map(i => ({
         productId: i.productId,
@@ -182,6 +192,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       })),
       deliveryAddress: fullAddress,
       deliveryZone: this.deliveryZone === 'interieur' ? 'INTERIOR' : 'ABIDJAN',
+      paymentMethod: this.paymentMethod,
     };
     if (this.promoCheckResult?.valid && this.promoCheckResult.code) {
       payload.promoCode = this.promoCheckResult.code;
@@ -194,6 +205,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         if (!res.success) {
           this.checkoutLoading = false;
           this.checkoutError = 'Erreur lors de la commande, veuillez réessayer';
+          return EMPTY;
+        }
+        if (this.paymentMethod === 'CASH_ON_DELIVERY') {
+          this.checkoutLoading = false;
+          this.cartService.clearCart();
+          this.router.navigate(['/orders'], {
+            queryParams: { payment: 'cod_success', order: res.data.orderNumber },
+          });
           return EMPTY;
         }
         this.checkoutSuccess = true;
@@ -281,6 +300,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           }
         }
         return;
+      }
+      if (this.deliveryZone !== 'abidjan') {
+        this.paymentMethod = 'ONLINE';
       }
       this.currentStep = 3;
       if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });

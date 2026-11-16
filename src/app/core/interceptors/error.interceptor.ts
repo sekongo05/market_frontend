@@ -6,16 +6,13 @@ import {
   HttpInterceptor,
   HttpErrorResponse,
 } from "@angular/common/http";
-import { Observable, throwError, BehaviorSubject } from "rxjs";
-import { catchError, filter, switchMap, take } from "rxjs/operators";
+import { Observable, throwError } from "rxjs";
+import { catchError, switchMap } from "rxjs/operators";
 import { Router } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-  private isRefreshing = false;
-  private refreshTokenSubject = new BehaviorSubject<string | null>(null);
-
   constructor(
     private authService: AuthService,
     private router: Router
@@ -127,44 +124,25 @@ export class ErrorInterceptor implements HttpInterceptor {
       );
     }
 
-    if (!this.isRefreshing) {
-      this.isRefreshing = true;
-      this.refreshTokenSubject.next(null);
-
-      // IMPORTANT : catchError est isolé sur le refreshToken lui-même !
-      // Si la requête rejouée produit une erreur métier (400, 404, 422),
-      // elle n'éjectera JAMAIS l'utilisateur.
-      return this.authService.refreshToken(refreshToken).pipe(
-        catchError((refreshErr: HttpErrorResponse) => {
-          this.isRefreshing = false;
-          // Déconnecter UNIQUEMENT si le refresh token lui-même a échoué
-          if (refreshErr.status === 400 || refreshErr.status === 401 || refreshErr.status === 403) {
-            this._logout();
-          }
-          return throwError(() => this._sanitizeError(refreshErr));
-        }),
-        switchMap((response) => {
-          this.isRefreshing = false;
-          if (response.success && response.data) {
-            const newToken = response.data.token;
-            this.refreshTokenSubject.next(newToken);
-            return next.handle(this._addToken(request, newToken));
-          }
+    // AuthService.refreshToken() mutualise l'appel via shareReplay(1) :
+    // toutes les requêtes en attente reçoivent soit le nouveau token, soit l'erreur.
+    return this.authService.refreshToken(refreshToken).pipe(
+      catchError((refreshErr: HttpErrorResponse) => {
+        if (refreshErr.status === 400 || refreshErr.status === 401 || refreshErr.status === 403) {
           this._logout();
-          return throwError(
-            () => new HttpErrorResponse({ status: 401, statusText: "Unauthorized" })
-          );
-        })
-      );
-    } else {
-      return this.refreshTokenSubject.pipe(
-        filter((token): token is string => token !== null),
-        take(1),
-        switchMap((token) =>
-          next.handle(this._addToken(request, token))
-        )
-      );
-    }
+        }
+        return throwError(() => this._sanitizeError(refreshErr));
+      }),
+      switchMap((response) => {
+        if (response.success && response.data) {
+          return next.handle(this._addToken(request, response.data.token));
+        }
+        this._logout();
+        return throwError(
+          () => new HttpErrorResponse({ status: 401, statusText: "Unauthorized" })
+        );
+      })
+    );
   }
 
   private _addToken(

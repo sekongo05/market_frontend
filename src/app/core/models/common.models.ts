@@ -39,6 +39,11 @@ export enum PaymentStatus {
   REFUNDED = 'REFUNDED',
 }
 
+export enum PaymentMethod {
+  ONLINE = 'ONLINE',
+  CASH_ON_DELIVERY = 'CASH_ON_DELIVERY',
+}
+
 export enum DeliveryStatus {
   PREPARING = 'PREPARING',
   OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',

@@ -49,6 +49,7 @@ export class ManagerOrdersComponent implements OnInit, OnDestroy {
 
   readonly orderStatuses = Object.values(OrderStatus);
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
+    PENDING:   OrderStatus.CONFIRMED,
     CONFIRMED: OrderStatus.SHIPPED,
     SHIPPED:   OrderStatus.DELIVERED,
     DELIVERED: null,

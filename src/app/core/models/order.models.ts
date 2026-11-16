@@ -1,4 +1,4 @@
-import { OrderStatus, PaymentStatus, DeliveryStatus, DeliveryZone } from './common.models';
+import { OrderStatus, PaymentStatus, PaymentMethod, DeliveryStatus, DeliveryZone } from './common.models';
 
 export interface OrderItem {
   productId: number;
@@ -11,6 +11,7 @@ export interface CreateOrderRequest {
   deliveryAddress: string;
   deliveryZone: DeliveryZone;
   promoCode?: string;
+  paymentMethod?: PaymentMethod | 'ONLINE' | 'CASH_ON_DELIVERY';
 }
 
 export interface OrderItemResponse {
@@ -32,6 +33,7 @@ export interface OrderResponse {
   totalAmount: number;
   orderStatus: OrderStatus;
   paymentStatus?: PaymentStatus;
+  paymentMethod?: PaymentMethod | 'ONLINE' | 'CASH_ON_DELIVERY';
   deliveryStatus: DeliveryStatus;
   deliveryZone: DeliveryZone | null;
   deliveryAddress: string;
@@ -44,6 +46,7 @@ export interface OrderResponse {
   createdAt: string;
   updatedAt: string;
   deliveredAt: string | null;
+  deliveryCode?: string | null;
 }
 
 export interface GetOrdersParams {

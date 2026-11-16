@@ -267,6 +267,13 @@
               <span class="font-mono text-indigo-400 font-semibold">{{ selectedOrder.trackingNumber }}</span>
             </div>
           }
+          @if (selectedOrder.deliveryCode) {
+            <div class="flex items-center gap-2 text-sm">
+              <span class="font-mono text-xs font-black text-gold px-2.5 py-1 rounded-lg bg-gold/10 border border-gold/25">
+                Code colis : {{ selectedOrder.deliveryCode }}
+              </span>
+            </div>
+          }
         </div>
       </div>
 

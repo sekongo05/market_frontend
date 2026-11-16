@@ -42,7 +42,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
       const found = this.orders.find(o => o.id === this.failedPaymentOrderId);
       if (found) return found;
     }
-    return this.orders.find(o => (o.orderStatus === 'PENDING' && (o.paymentStatus === 'PENDING' || o.paymentStatus === 'FAILED'))) ?? null;
+    return this.orders.find(o => o.orderStatus === 'PENDING' && o.paymentMethod !== 'CASH_ON_DELIVERY' && (o.paymentStatus === 'PENDING' || o.paymentStatus === 'FAILED')) ?? null;
   }
 
   // Inline expand / cancel
@@ -179,6 +179,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
     if (payment === 'success') {
       this.paymentFeedback = { type: 'success', message: 'Paiement confirmé ! Merci pour votre commande.' };
+    } else if (payment === 'cod_success') {
+      this.paymentFeedback = { type: 'success', message: 'Commande enregistrée ! Notre équipe va la confirmer. Le règlement se fera en espèces à la livraison.' };
     } else if (payment === 'failed') {
       this.paymentFeedback = { type: 'error', message: 'Le paiement n\'a pas abouti. Vous pouvez le relancer immédiatement ci-dessous.' };
     }

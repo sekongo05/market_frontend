@@ -1,7 +1,7 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap, finalize, shareReplay } from 'rxjs';
 import { ApiResponse } from '../models/common.models';
 import {
   RegisterRequest,
@@ -29,6 +29,7 @@ export class AuthService {
 
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private refreshTimer: ReturnType<typeof setTimeout> | null = null;
+  private refreshInFlight$: Observable<ApiResponse<AuthResponse>> | null = null;
   private readonly PROACTIVE_REFRESH_MS = 25 * 60 * 1000;
 
   constructor(
@@ -116,17 +117,24 @@ export class AuthService {
   refreshToken(
     refreshToken: string
   ): Observable<ApiResponse<AuthResponse>> {
-    return this.apiService
-      .post<AuthResponse>('/auth/refresh', { refreshToken })
-      .pipe(
-        tap((response) => {
-          if (response.success && response.data) {
-            this.setTokens(response.data.token, response.data.refreshToken);
-            this.setCurrentUser(response.data);
-            this._connectWs(response.data);
-          }
-        })
-      );
+    if (!this.refreshInFlight$) {
+      this.refreshInFlight$ = this.apiService
+        .post<AuthResponse>('/auth/refresh', { refreshToken })
+        .pipe(
+          tap((response) => {
+            if (response.success && response.data) {
+              this.setTokens(response.data.token, response.data.refreshToken);
+              this.setCurrentUser(response.data);
+              this._connectWs(response.data);
+            }
+          }),
+          finalize(() => {
+            this.refreshInFlight$ = null;
+          }),
+          shareReplay(1)
+        );
+    }
+    return this.refreshInFlight$;
   }
 
   forgotPassword(
@@ -234,7 +242,15 @@ export class AuthService {
       }
     }
 
+    // Plafonner à 24h pour éviter le débordement 32-bit de setTimeout (> ~24,8 jours → déclenchement immédiat à 1ms)
+    const MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+    const effectiveDelayMs = Math.min(delayMs, MAX_TIMEOUT_MS);
+
     this.refreshTimer = setTimeout(() => {
+      if (delayMs > MAX_TIMEOUT_MS) {
+        this._scheduleProactiveRefresh();
+        return;
+      }
       const refreshToken = this.getRefreshToken();
       if (refreshToken) {
         this.refreshToken(refreshToken).subscribe({
@@ -245,7 +261,7 @@ export class AuthService {
           }
         });
       }
-    }, delayMs);
+    }, effectiveDelayMs);
   }
 
   private _clearProactiveRefresh(): void {

@@ -165,6 +165,20 @@
               <span class="truncate">{{ itemsPreview(order) }}</span>
             </div>
 
+            <!-- Code de réception colis (à présenter au livreur) -->
+            @if (order.deliveryCode && order.orderStatus !== 'CANCELLED') {
+              <div class="mb-4 px-4 py-3 rounded-xl flex items-center justify-between gap-3"
+                   style="background:rgba(212,175,55,0.10);border:1px dashed rgba(212,175,55,0.45)">
+                <div class="min-w-0">
+                  <p class="text-[11px] font-bold uppercase tracking-wider text-gold">Code de réception colis</p>
+                  <p class="text-xs theme-muted">À présenter au livreur à la remise du colis</p>
+                </div>
+                <span class="font-mono text-base sm:text-lg font-black tracking-widest text-gold px-3 py-1 rounded-lg bg-black/20 flex-shrink-0">
+                  {{ order.deliveryCode }}
+                </span>
+              </div>
+            }
+
             <!-- Barre de progression statut (sauf CANCELLED) -->
             @if (order.orderStatus !== 'CANCELLED') {
               <div class="flex items-center gap-0 mb-4">
@@ -234,7 +248,12 @@
               </div>
 
               <div class="flex items-center gap-2">
-                @if (order.orderStatus === 'PENDING' && (order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED')) {
+                @if (order.paymentMethod === 'CASH_ON_DELIVERY' && order.paymentStatus !== 'PAID') {
+                  <span class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Espèces à la livraison
+                  </span>
+                }
+                @if (order.orderStatus === 'PENDING' && order.paymentMethod !== 'CASH_ON_DELIVERY' && (order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED')) {
                   <button (click)="retryPayment(order)" [disabled]="payingId === order.id"
                     class="flex items-center gap-1.5 px-3.5 py-3 rounded-xl text-xs sm:text-sm font-black bg-gold text-black hover:bg-amber-400 disabled:opacity-50 transition-all shadow-sm">
                     @if (payingId === order.id) {

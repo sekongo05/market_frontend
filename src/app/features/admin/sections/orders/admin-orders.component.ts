@@ -59,6 +59,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
   readonly OrderStatus = OrderStatus;
   readonly orderStatuses = Object.values(OrderStatus);
   readonly nextStatusMap: Record<string, OrderStatus | null> = {
+    PENDING:   OrderStatus.CONFIRMED,
     CONFIRMED: OrderStatus.SHIPPED,
     SHIPPED:   OrderStatus.DELIVERED,
     DELIVERED: null,
@@ -161,6 +162,9 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     if (order.promoCode)
       badges.push({ label: 'Promo', classes: 'bg-purple-500/15 text-purple-400 border border-purple-500/25' });
 
+    if (order.paymentMethod === 'CASH_ON_DELIVERY')
+      badges.push({ label: 'Paiement livraison', classes: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25' });
+
     return badges;
   }
 
@@ -234,6 +238,7 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
         next: (r) => {
           if (!r.success) return;
           const count = (r.data as PageResponse<OrderResponse>).totalElements;
+          if (status === OrderStatus.PENDING)   this.pendingCount   = count;
           if (status === OrderStatus.CONFIRMED) this.confirmedCount = count;
           if (status === OrderStatus.SHIPPED)   this.shippedCount   = count;
           if (status === OrderStatus.DELIVERED) this.deliveredCount = count;
